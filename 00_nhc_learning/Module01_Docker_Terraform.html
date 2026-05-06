@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 01 — Docker & Terraform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #f78166;
+    --accent4: #d2a8ff;
+    --accent5: #ffa657;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --code-bg: #0d1117;
+    --highlight: #388bfd26;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 40%, #1a2a1e 100%);
+    border-bottom: 2px solid var(--accent4);
+    padding: 40px 24px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, #6e40c922, transparent 70%); pointer-events: none; }
+  .hero h1 { font-size: 2rem; font-weight: 800; color: var(--accent4); letter-spacing: -0.5px; }
+  .hero p { color: var(--text-muted); margin-top: 8px; font-size: 0.95rem; }
+  .badge-row { display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+  .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; border: 1px solid; }
+  .badge-blue  { color: var(--accent);  border-color: var(--accent);  background: #1f6feb1a; }
+  .badge-green { color: var(--accent2); border-color: var(--accent2); background: #2ea04326; }
+  .badge-orange{ color: var(--accent5); border-color: var(--accent5); background: #d2940026; }
+  .badge-purple{ color: var(--accent4); border-color: var(--accent4); background: #6e40c926; }
+
+  .container { display: flex; min-height: calc(100vh - 160px); }
+
+  .sidebar {
+    width: 290px; min-width: 290px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 0;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .sidebar-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); padding: 0 16px 12px; }
+  .level-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 8px 16px 4px; color: var(--accent4); }
+  .nav-item { display: block; padding: 7px 16px; cursor: pointer; font-size: 0.82rem; color: var(--text-muted); border-left: 3px solid transparent; transition: all 0.15s; }
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+  .nav-item.active { color: var(--accent4); border-left-color: var(--accent4); background: #6e40c915; font-weight: 600; }
+  .nav-number { display: inline-block; width: 44px; font-size: 0.7rem; color: var(--text-muted); font-family: 'JetBrains Mono', 'Courier New', monospace; }
+
+  .main { flex: 1; padding: 32px 40px; max-width: 980px; }
+  .module { display: none; }
+  .module.active { display: block; }
+
+  .module-header { border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; background: var(--surface); margin-bottom: 24px; position: relative; overflow: hidden; }
+  .module-header::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent4); }
+  .module-tag   { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent4); margin-bottom: 8px; }
+  .module-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; }
+  .module-subtitle { color: var(--text-muted); font-size: 0.9rem; }
+
+  .section { margin-bottom: 28px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .section-header { padding: 14px 20px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; cursor: pointer; background: var(--surface2); border-bottom: 1px solid var(--border); user-select: none; }
+  .section-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .icon-purpose  { background: #1f6feb33; }
+  .icon-detail   { background: #2ea04326; }
+  .icon-quiz     { background: #d2940026; }
+  .icon-summary  { background: #6e40c926; }
+  .icon-practice { background: #f7816626; }
+  .section-content { padding: 20px; background: var(--surface); }
+  .section-toggle { margin-left: auto; color: var(--text-muted); font-size: 12px; }
+
+  h3 { font-size: 1rem; font-weight: 700; color: var(--accent4); margin: 18px 0 10px; }
+  h3:first-child { margin-top: 0; }
+  h3.blue   { color: var(--accent); }
+  h3.green  { color: var(--accent2); }
+  h3.orange { color: var(--accent5); }
+  h3.red    { color: var(--accent3); }
+  p  { margin-bottom: 12px; color: var(--text); font-size: 0.88rem; }
+  ul, ol { padding-left: 20px; margin-bottom: 12px; }
+  li { font-size: 0.88rem; margin-bottom: 5px; }
+  strong { color: var(--text); }
+
+  .cmd-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; margin: 12px 0; overflow: hidden; }
+  .cmd-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 0.72rem; color: var(--text-muted); font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  .cmd-dots { display: flex; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red    { background: #f7816680; }
+  .dot-yellow { background: #ffa65780; }
+  .dot-green  { background: #3fb95080; }
+  .cmd-body { padding: 14px; }
+  pre { font-family: 'JetBrains Mono', 'Courier New', 'Consolas', monospace; font-size: 0.82rem; line-height: 1.6; white-space: pre; overflow-x: auto; color: var(--text); }
+  .kw  { color: #ff7b72; }
+  .kw2 { color: var(--accent); }
+  .str { color: var(--accent5); }
+  .fn  { color: var(--accent4); }
+  .num { color: #79c0ff; }
+  .comment { color: var(--text-muted); }
+
+  .db-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .db-pg     { background: #4169e122; color: #4d9de0; border: 1px solid #4169e155; }
+  .db-oracle { background: #cc000022; color: #f97316; border: 1px solid #cc000055; }
+
+  code { font-family: 'JetBrains Mono', 'Courier New', monospace; background: var(--surface2); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-size: 0.82rem; color: var(--accent4); }
+
+  .quiz-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+  .quiz-q { font-weight: 600; font-size: 0.88rem; margin-bottom: 10px; }
+  .quiz-q::before { content: 'Q'; display: inline-block; width: 22px; height: 22px; background: var(--accent4); color: #000; border-radius: 50%; font-size: 0.7rem; font-weight: 800; text-align: center; line-height: 22px; margin-right: 8px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+  .quiz-opt { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 0.84rem; transition: all 0.15s; background: var(--bg); }
+  .quiz-opt:hover { border-color: var(--accent4); color: var(--accent4); }
+  .quiz-opt.correct { border-color: var(--accent2); color: var(--accent2); background: #2ea04310; }
+  .quiz-opt.wrong   { border-color: var(--accent3); color: var(--accent3); background: #f7816610; }
+  .quiz-explain { font-size: 0.82rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 8px; display: none; }
+  .quiz-explain.show { display: block; }
+
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .summary-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 0.82rem; }
+  .summary-item strong { color: var(--accent4); display: block; margin-bottom: 4px; }
+
+  .practice-task { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+  .practice-task-header { padding: 12px 16px; background: #6e40c915; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 0.85rem; color: var(--accent4); }
+  .practice-task-body { padding: 16px; }
+  .solution-toggle { display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 0.8rem; cursor: pointer; color: var(--accent2); margin-top: 10px; transition: all 0.15s; }
+  .solution-toggle:hover { background: var(--surface2); }
+  .solution-box { margin-top: 10px; display: none; border-top: 1px solid var(--border); padding-top: 12px; }
+  .solution-box.show { display: block; }
+
+  .info-box { border-radius: 8px; padding: 14px 16px; margin: 12px 0; font-size: 0.84rem; border: 1px solid; display: flex; gap: 10px; }
+  .info-box.tip    { border-color: var(--accent2); background: #2ea04310; color: var(--accent2); }
+  .info-box.warn   { border-color: var(--accent5); background: #d2940015; color: var(--accent5); }
+  .info-box.note   { border-color: var(--accent4); background: #6e40c915; color: var(--accent4); }
+  .info-box.danger { border-color: var(--accent3); background: #f7816610; color: var(--accent3); }
+  .info-box span   { color: var(--text); }
+
+  .progress-bar { background: var(--surface2); border-radius: 4px; height: 4px; margin: 16px 0; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent4), var(--accent2)); border-radius: 4px; width: 0; transition: width 0.2s; }
+
+  .nav-buttons { display: flex; gap: 12px; margin-top: 32px; justify-content: space-between; }
+  .nav-btn { padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+  .nav-btn:hover { border-color: var(--accent4); color: var(--accent4); }
+  .nav-btn.primary { background: var(--accent4); color: #000; border-color: var(--accent4); }
+  .nav-btn.primary:hover { background: #e2c0ff; }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.83rem; }
+  th { background: var(--surface2); padding: 8px 12px; text-align: left; border: 1px solid var(--border); color: var(--accent4); }
+  td { padding: 8px 12px; border: 1px solid var(--border); }
+  tr:nth-child(even) td { background: #ffffff05; }
+
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; font-size: 0.88rem; border-bottom: 1px solid var(--border); }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before { content: '□'; color: var(--accent4); font-size: 1.1rem; flex-shrink: 0; margin-top: -1px; }
+
+  .test-question { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+  .test-question.correct  { border-color: var(--accent2); background: #2ea04312; }
+  .test-question.wrong    { border-color: var(--accent3); background: #f7816612; }
+  .test-question.unanswered { border-color: var(--accent5); background: #d2940015; }
+  .test-question-title { font-size: 0.86rem; font-weight: 600; margin-bottom: 8px; }
+  .test-options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
+  .test-option { display: flex; align-items: center; gap: 6px; font-size: 0.83rem; color: var(--text); }
+  .test-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .test-result { margin-top: 16px; padding: 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface2); }
+  .score-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .score-chip { border: 1px solid var(--border); border-radius: 14px; padding: 4px 10px; font-size: 0.78rem; color: var(--text); background: var(--bg); }
+  .score-chip.good { border-color: var(--accent2); color: var(--accent2); }
+  .score-chip.warn { border-color: var(--accent5); color: var(--accent5); }
+  .score-chip.bad  { border-color: var(--accent3); color: var(--accent3); }
+  .mistake-list { margin-top: 8px; padding-left: 18px; }
+
+  .tab-group { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border); }
+  .tab { padding: 8px 18px; cursor: pointer; font-size: 0.82rem; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab.active { color: var(--accent4); border-bottom-color: var(--accent4); font-weight: 600; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .schema-box { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin: 14px 0; overflow-x: auto; }
+  .schema-row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .schema-table { border: 1px solid var(--border); border-radius: 8px; min-width: 160px; overflow: hidden; }
+  .schema-table-header { padding: 8px 12px; font-size: 0.75rem; font-weight: 700; text-align: center; }
+  .schema-table-header.fact { background: #1f6feb33; color: var(--accent); }
+  .schema-table-header.dim  { background: #6e40c926; color: var(--accent4); }
+  .schema-col { padding: 5px 12px; font-size: 0.73rem; border-top: 1px solid var(--border); display: flex; gap: 6px; }
+  .schema-col .pk  { color: var(--accent5); font-weight: 700; font-size: 0.65rem; }
+  .schema-col .fk  { color: var(--accent3); font-weight: 700; font-size: 0.65rem; }
+  .schema-col .col { color: var(--text-muted); }
+  .schema-arrow { align-self: center; color: var(--text-muted); font-size: 1.4rem; padding: 0 2px; }
+
+  .mental-model { border-left: 4px solid var(--accent); background: #1f6feb1a; padding: 12px 14px; border-radius: 6px; margin: 12px 0; font-size: 0.88rem; }
+  .checklist-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .check-box {
+    width: 16px; height: 16px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .check-box.checked {
+    background: var(--accent2);
+    border-color: var(--accent2);
+  }
+  .check-box.checked::after { content: '✓'; font-size: 10px; color: #000; font-weight: 600; }
+  .progress-text { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 16px; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .test-options { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Module 01 — Docker & Terraform</h1>
+  <p>Đóng gói môi trường và khai báo hạ tầng để pipeline chạy nhất quán từ local lên cloud.</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">Beginner → Senior</span>
+    <span class="badge badge-green">~7 ngày</span>
+    <span class="badge badge-blue">Infrastructure</span>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="sidebar-title">Module Navigation</div>
+    <div class="level-label">MODULE 01 · DOCKER + TERRAFORM</div>
+    <div class="nav-item active" onclick="showModule(0,this)"><span class="nav-number">S0</span>Tổng quan & Mục tiêu</div>
+    <div class="nav-item" onclick="showModule(1,this)"><span class="nav-number">S1</span>Lý thuyết nền</div>
+    <div class="nav-item" onclick="showModule(2,this)"><span class="nav-number">S2</span>Đọc hiểu code repo</div>
+    <div class="nav-item" onclick="showModule(3,this)"><span class="nav-number">S3</span>Thực hành từng bước</div>
+    <div class="nav-item" onclick="showModule(4,this)"><span class="nav-number">S4</span>Production Thinking</div>
+    <div class="nav-item" onclick="showModule(5,this)"><span class="nav-number">S5</span>Kiến thức nâng cao</div>
+    <div class="nav-item" onclick="showModule(6,this)"><span class="nav-number">S6</span>Lỗi thường gặp</div>
+    <div class="nav-item" onclick="showModule(7,this)"><span class="nav-number">S7</span>Interview Prep</div>
+    <div class="nav-item" onclick="showModule(8,this)"><span class="nav-number">S8</span>Checklist & Tổng kết</div>
+  </nav>
+
+  <main class="main">
+
+    <div class="module active" id="s0">
+      <div class="module-header">
+        <div class="module-tag">S0 · Orientation</div>
+        <div class="module-title">Tổng quan & Mục tiêu Module 01</div>
+        <div class="module-subtitle">Hiểu vấn đề gốc Docker/Terraform giải quyết trước khi học command.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🧭</span>
+          Roadmap 9 sections của module
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead>
+              <tr>
+                <th>Section</th>
+                <th>Tên section</th>
+                <th>Thời gian ước tính</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>S0</td><td>Tổng quan & Mục tiêu</td><td>30–45 phút</td></tr>
+              <tr><td>S1</td><td>Lý thuyết nền</td><td>4–5 giờ</td></tr>
+              <tr><td>S2</td><td>Đọc hiểu code trong repo</td><td>3 giờ</td></tr>
+              <tr><td>S3</td><td>Thực hành từng bước</td><td>1.5–2 ngày</td></tr>
+              <tr><td>S4</td><td>Production Thinking</td><td>2 giờ</td></tr>
+              <tr><td>S5</td><td>Kiến thức nâng cao</td><td>2 giờ</td></tr>
+              <tr><td>S6</td><td>Lỗi thường gặp</td><td>1.5 giờ</td></tr>
+              <tr><td>S7</td><td>Interview Prep</td><td>2 giờ</td></tr>
+              <tr><td>S8</td><td>Checklist & Tổng kết</td><td>1 giờ</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">🎯</span>
+          Vấn đề thực tế Docker & Terraform giải quyết
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Docker giải quyết gì?</h3>
+          <p><strong>"Works on my machine" syndrome:</strong> cùng một script ingest data (ví dụ <code>ingest_data.py</code> trong <code>01-docker-terraform/docker-sql/pipeline/</code>) chạy tốt trên máy A nhưng fail trên máy B vì khác version Python, package, OS dependency.</p>
+          <div class="info-box warn">⚠️ <span><strong>Cảnh báo:</strong> Nếu chỉ dùng local virtualenv, bạn vẫn dễ gặp khác biệt system-level (libpq, timezone, locale, network) giữa dev machines.</span></div>
+
+          <h3 class="green">Terraform giải quyết gì?</h3>
+          <p><strong>Click tay trên cloud console không reproducible:</strong> tạo GCS bucket / BigQuery dataset bằng UI thì nhanh lúc đầu, nhưng khó audit, khó review, khó recreate cho môi trường khác, và rất dễ drift cấu hình.</p>
+          <div class="info-box note">📌 <span><strong>Lưu ý:</strong> Trong repo, phần <code>terraform/terraform/</code> đã hướng dẫn flow chuẩn <code>init → plan → apply</code> để biến hạ tầng thành mã version-controlled.</span></div>
+
+          <h3 class="orange">Trước Docker người ta làm gì?</h3>
+          <ul>
+            <li>Cài trực tiếp PostgreSQL + Python dependencies lên máy host.</li>
+            <li>Gửi checklist setup dài qua README/Wiki rồi hy vọng mọi người cài giống nhau.</li>
+            <li>Dùng VM nặng (VirtualBox/Vagrant) để cố gắng đồng bộ môi trường.</li>
+          </ul>
+
+          <h3 class="red">Trước Terraform người ta làm gì?</h3>
+          <ul>
+            <li>ClickOps: tạo resource thủ công trên AWS/GCP/Azure console.</li>
+            <li>Viết shell script gọi cloud CLI rời rạc, thiếu dependency graph rõ ràng.</li>
+            <li>Copy cấu hình giữa dev/staging/prod bằng tay → sai sót khó tránh.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🔁</span>
+          Data flow diagrams (ASCII)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3>Docker flow trong module 01</h3>
+          <div class="cmd-block">
+            <div class="cmd-header">
+              <span>● ● ●</span>
+              <span>docker-data-flow.txt</span>
+            </div>
+            <div class="cmd-body">
+<pre>Local Script (<span class="kw2">ingest_data.py</span>)
+        │
+        ▼
+Docker Container (<span class="kw2">Python ingestion image</span>)
+        │
+        ▼
+PostgreSQL Container (<span class="kw2">ny_taxi db</span>)
+        │
+        ▼
+pgAdmin Container (<span class="kw2">query + kiểm tra dữ liệu</span>)</pre>
+            </div>
+          </div>
+
+          <h3>Terraform flow trong module 01</h3>
+          <div class="cmd-block">
+            <div class="cmd-header">
+              <span>● ● ●</span>
+              <span>terraform-data-flow.txt</span>
+            </div>
+            <div class="cmd-body">
+<pre>Terraform code (<span class="kw2">main.tf + variables.tf</span>)
+        │
+        ▼
+GCP API (<span class="kw2">provider google</span>)
+        │
+        ├──────────────► GCS Bucket
+        │
+        └──────────────► BigQuery Dataset</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">✅</span>
+          Exit criteria: "Bạn đã nắm module này khi..."
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li>Bạn giải thích được vì sao container hóa pipeline giảm lỗi môi trường.</li>
+            <li>Bạn tự viết/đọc được Dockerfile cơ bản và docker-compose cho multi-container stack.</li>
+            <li>Bạn mô tả được state file Terraform là gì và vì sao mất state là rủi ro lớn.</li>
+            <li>Bạn luôn review output <code>terraform plan</code> trước <code>apply</code>.</li>
+            <li>Bạn so sánh được khi nào dùng Docker/Terraform và khi nào cân nhắc tool khác.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s1">
+      <div class="module-header">
+        <div class="module-tag">S1 · Foundation Theory</div>
+        <div class="module-title">Lý thuyết nền — Docker & Terraform (3-Level)</div>
+        <div class="module-subtitle">WHY trước HOW: hiểu bản chất để debug và ra quyết định đúng trong production.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🐳</span>
+          Docker — Beginner → Intermediate → Senior
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Beginner level</h3>
+          <p><strong>Container là gì?</strong> Container là runtime package chứa app + dependency + config cần thiết để chạy nhất quán trên mọi môi trường.</p>
+          <p><strong>Image là gì?</strong> Image là template bất biến để tạo container. Container là instance đang chạy của image.</p>
+          <div class="info-box note">📌 <span><strong>Analogy:</strong> Image giống "thiết kế chuẩn" của shipping container; container chạy thật là từng "thùng hàng" cụ thể đang di chuyển.</span></div>
+
+          <h3 class="green">Container vs VM</h3>
+          <table>
+            <thead>
+              <tr><th>Tiêu chí</th><th>Container</th><th>VM</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Isolation</td><td>Process-level, share host kernel</td><td>Hardware-level qua hypervisor</td></tr>
+              <tr><td>Khởi động</td><td>Nhanh (giây)</td><td>Chậm hơn (chục giây tới phút)</td></tr>
+              <tr><td>Resource overhead</td><td>Nhẹ</td><td>Nặng hơn do có guest OS</td></tr>
+              <tr><td>Use case</td><td>App packaging, microservices, CI</td><td>Strong isolation, legacy OS requirement</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="orange">Intermediate level</h3>
+          <p><strong>Dockerfile layers:</strong> Mỗi instruction (<code>FROM</code>, <code>RUN</code>, <code>COPY</code>...) tạo layer. Build cache reuse layer cũ nếu instruction + context không đổi.</p>
+          <div class="info-box tip">💡 <span><strong>Tip:</strong> Layer ordering optimization: đặt bước ít thay đổi (install system deps) lên trên, bước đổi thường xuyên (COPY source code) xuống dưới để tận dụng cache tối đa.</span></div>
+          <p><strong>Docker Compose:</strong> Khi pipeline có nhiều service (PostgreSQL, pgAdmin, ingestion app), Compose gom toàn bộ dependency vào một file <code>docker-compose.yaml</code>, giúp up/down stack đồng bộ.</p>
+
+          <h3 class="red">Senior level</h3>
+          <ul>
+            <li><strong>Network modes:</strong> bridge (default local multi-container), host (hiệu năng cao hơn nhưng giảm isolation), overlay (multi-host/swarm).</li>
+            <li><strong>Volume types:</strong> named volume (quản lý bởi Docker), bind mount (map thư mục host), tmpfs (in-memory, ephemeral).</li>
+            <li><strong>Resource limits:</strong> giới hạn CPU/RAM để tránh một container ăn hết tài nguyên host và làm sập service khác.</li>
+          </ul>
+          <div class="info-box danger">🔥 <span><strong>Nguy hiểm:</strong> Không đặt memory/cpu limits trong môi trường share host có thể gây OOM kill ngẫu nhiên, đặc biệt khi ingest batch lớn.</span></div>
+
+          <div class="mental-model"><strong>Mental model:</strong> Docker = môi trường đóng gói chạy giống hệt nhau ở mọi nơi.</div>
+
+          <h3>Docker vs Podman vs containerd</h3>
+          <table>
+            <thead>
+              <tr><th>Tool</th><th>Điểm mạnh</th><th>Trade-off</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Docker</td><td>Ecosystem lớn, UX thân thiện, compose phổ biến</td><td>Daemon-centric, rootless support cải thiện nhưng không phải mặc định ở mọi setup cũ</td></tr>
+              <tr><td>Podman</td><td>Daemonless, rootless-first, tương thích nhiều lệnh Docker</td><td>Compose/story tooling có thể khác hành vi tùy môi trường</td></tr>
+              <tr><td>containerd</td><td>Runtime core nhẹ, phổ biến trong Kubernetes stack</td><td>Không tối ưu cho UX dev hằng ngày nếu dùng trực tiếp</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🧪</span>
+          Quiz Docker — 6 tình huống thực tế
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn build image ingest mất 7 phút mỗi lần chỉ vì đổi 1 dòng Python ở cuối file. Tối ưu đầu tiên?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Giảm RAM không giúp build cache. Vấn đề ở thứ tự layers.')">A. Giảm memory limit cho Docker daemon</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Di chuyển COPY code xuống dưới sau khi cài dependencies để cache được reuse.')">B. Sắp xếp lại Dockerfile để dependency layers nằm trước, COPY source nằm sau</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Xóa cache làm build chậm hơn trong trường hợp này.')">C. Luôn build bằng --no-cache</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Scale worker không giải quyết tốc độ build local cơ bản.')">D. Tăng số worker của pipeline</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Team bạn chạy app container được nhưng query DB fail do hostname <code>localhost</code> không đúng. Trong docker-compose, app nên trỏ tới gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Trong cùng compose network, service gọi nhau bằng service name.')">A. Tên service PostgreSQL, ví dụ <code>pgdatabase:5432</code></div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'localhost trong app container là chính app container, không phải DB container.')">B. localhost:5432</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, '127.0.0.1 cũng trỏ về chính container hiện tại.')">C. 127.0.0.1:5432</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Random IP dễ đổi, không ổn định bằng DNS nội bộ của compose.')">D. IP bất kỳ của host machine</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn cần dữ liệu PostgreSQL còn nguyên sau khi <code>docker compose down</code>. Chọn giải pháp nào đúng?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Không cần rebuild image để giữ data DB runtime.')">A. Rebuild image sau mỗi lần down</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Gắn persistent volume cho thư mục data của PostgreSQL.')">B. Mount named volume vào thư mục data của PostgreSQL</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'tmpfs là in-memory, mất data khi container dừng.')">C. Dùng tmpfs volume cho production data</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Restart policy không đảm bảo persistence khi container bị xóa.')">D. Chỉ thêm restart: always</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Một container ingest ngốn hết RAM khiến pgAdmin lag và DB bị kill. Hành động Senior đúng nhất?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Xóa container không giải quyết gốc rễ nếu chạy lại workload tương tự.')">A. Xóa container rồi chạy lại</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Đặt memory/cpu limits và tuning batch size để kiểm soát tài nguyên.')">B. Thiết lập resource limits và review batch/chunk size</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Host mode không tự xử lý vấn đề phân bổ tài nguyên.')">C. Chuyển sang host network mode</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Restart loop có thể làm hệ thống bất ổn hơn.')">D. Tăng restart policy lên on-failure</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn dùng bind mount source code vào container để dev nhanh. Rủi ro lớn nhất nếu lên production vẫn giữ cách này?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Bind mount phụ thuộc filesystem host, làm deployment drift và khó reproducible.')">A. Drift cấu hình giữa host và container, khó tái lập build</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Màu log không liên quan đến reliability production.')">B. Mất màu syntax trong log</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Container vẫn có thể start nếu port mapping đúng.')">C. Không expose được port ra ngoài</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Docker vẫn có thể pull image bình thường.')">D. Không pull được image từ registry</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Khi nào nên cân nhắc Podman thay vì Docker trong môi trường enterprise?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Podman daemonless và rootless-first phù hợp policy security chặt.')">A. Khi security policy yêu cầu rootless mạnh và giảm phụ thuộc daemon trung tâm</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Kubernetes hiện đại không còn phụ thuộc docker runtime trực tiếp.')">B. Khi cluster Kubernetes bắt buộc phải có Docker daemon</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Podman không phải công cụ ETL thay thế orchestration data.')">C. Khi muốn thay Airflow</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'UI đẹp không phải tiêu chí kỹ thuật chính để chọn container runtime.')">D. Khi muốn terminal đẹp hơn</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🏗️</span>
+          Terraform — Beginner → Intermediate → Senior
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Beginner level</h3>
+          <p><strong>IaC (Infrastructure as Code) là gì?</strong> IaC là cách khai báo hạ tầng bằng code để version control, review, và recreate nhất quán.</p>
+          <p><strong>Terraform vs ClickOps:</strong> ClickOps nhanh cho demo, nhưng khó audit và khó lặp lại; Terraform chậm hơn ban đầu nhưng scale team tốt hơn.</p>
+          <ul>
+            <li><strong>Provider:</strong> plugin để Terraform nói chuyện với cloud API (vd: <code>google</code>).</li>
+            <li><strong>Resource:</strong> object hạ tầng cụ thể (bucket, dataset, VM...).</li>
+            <li><strong>Variable:</strong> tham số hóa config cho nhiều môi trường.</li>
+            <li><strong>Output:</strong> giá trị xuất ra sau apply để reuse ở bước khác.</li>
+          </ul>
+
+          <h3 class="orange">Intermediate level</h3>
+          <p><strong>State file:</strong> Terraform lưu snapshot tài nguyên thật vào state để biết cần tạo/sửa/xóa gì lần chạy sau.</p>
+          <div class="info-box danger">🔥 <span><strong>Nguy hiểm:</strong> Mất hoặc corrupt state có thể khiến Terraform "mù trạng thái", dẫn tới create trùng hoặc destroy nhầm tài nguyên.</span></div>
+          <p><strong>Plan → Apply workflow:</strong> <code>plan</code> là bước preview diff hạ tầng; <code>apply</code> mới thực thi. Review plan trước apply giúp bắt sai sót sớm (name, region, quota, cost).</p>
+
+          <h3 class="red">Senior level</h3>
+          <ul>
+            <li><strong>Remote state (GCS backend):</strong> lưu state tập trung cho team thay vì local file rời rạc.</li>
+            <li><strong>State locking:</strong> tránh 2 người apply đồng thời gây race condition trạng thái.</li>
+            <li><strong>Workspace:</strong> tách state theo môi trường (dev/staging/prod) với cùng codebase.</li>
+          </ul>
+          <div class="info-box tip">💡 <span><strong>Tip:</strong> Trong CI/CD, pattern an toàn là plan trên Pull Request, chỉ apply sau khi merge và có approval.</span></div>
+
+          <div class="mental-model"><strong>Mental model:</strong> Terraform = git cho hạ tầng cloud.</div>
+
+          <h3>Terraform vs Pulumi vs AWS CDK</h3>
+          <table>
+            <thead>
+              <tr><th>Tool</th><th>Điểm mạnh</th><th>Trade-off</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Terraform</td><td>Provider ecosystem rộng, ngôn ngữ HCL khai báo rõ ý định, multi-cloud tốt</td><td>State management cần kỷ luật cao</td></tr>
+              <tr><td>Pulumi</td><td>Dùng ngôn ngữ lập trình quen thuộc (TS/Python/Go/C#), linh hoạt logic</td><td>Dễ over-program infrastructure, review intent khó hơn HCL thuần</td></tr>
+              <tr><td>AWS CDK</td><td>Tích hợp sâu AWS, abstractions mạnh cho cloud-native patterns</td><td>Thiên về AWS, multi-cloud không thuận bằng Terraform</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🧠</span>
+          Quiz Terraform — 6 tình huống thực tế
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn thấy teammate định chạy thẳng <code>terraform apply</code> trên nhánh mới chưa review. Phản xạ đúng?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Apply ngay có thể gây thay đổi ngoài ý muốn.')">A. Đồng ý vì tiết kiệm thời gian</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Bắt buộc chạy plan và review diff trước.')">B. Yêu cầu chạy plan và review output trước khi apply</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Destroy không liên quan và có thể gây mất tài nguyên.')">C. Chạy destroy trước cho sạch</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Chia state file không thay thế bước review plan.')">D. Tách state thành nhiều file local</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Một bạn lỡ xóa file <code>terraform.tfstate</code> local. Rủi ro quan trọng nhất?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Terraform mất mapping với tài nguyên đang tồn tại, dễ tạo trùng/sai lệch.')">A. Terraform không còn biết tài nguyên nào đã được quản lý</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Formatting không phải vấn đề chính khi mất state.')">B. Code HCL mất syntax highlight</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Provider version không tự đổi chỉ vì mất state.')">C. Provider tự nâng cấp major version</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'CLI vẫn dùng được dù state bị mất.')">D. Terraform CLI không chạy được nữa</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Team 5 người cùng quản lý hạ tầng GCP. Thiết kế state phù hợp nhất?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'State local per-user gây drift và conflict cao.')">A. Mỗi người giữ một local state riêng</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Remote state tập trung + locking giảm conflict và tăng auditability.')">B. Dùng remote state trên GCS kèm locking</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Copy state qua chat là anti-pattern.')">C. Chia sẻ tfstate qua Slack</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Không thể bỏ state hoàn toàn khi dùng Terraform chuẩn.')">D. Không dùng state</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn cần cùng code tạo infra cho dev và prod khác project/region. Chọn cách tiếp cận tốt?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Variables + workspace hoặc env-specific tfvars là cách chuẩn.')">A. Parameter hóa bằng variables và tách workspace (hoặc tfvars theo môi trường)</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Hardcode làm giảm reuse và tăng lỗi config.')">B. Hardcode tất cả project id vào main.tf</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Copy-paste folder làm tăng chi phí bảo trì.')">C. Nhân đôi toàn bộ repo cho mỗi môi trường</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Destroy/apply liên tục là nguy cơ downtime và lỗi thao tác.')">D. Mỗi lần deploy thì destroy rồi apply lại từ đầu</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Trong CI/CD, vì sao "plan on PR, apply on merge" là pattern tốt?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Plan tạo điểm kiểm soát thay đổi trước khi đụng tài nguyên thật.')">A. Tăng khả năng review và giảm thay đổi bất ngờ trên môi trường thật</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Áp dụng ngay trên PR dễ gây side-effect cho môi trường dùng chung.')">B. Vì apply trên PR luôn an toàn hơn</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Lý do chính không phải giảm thời gian chạy test đơn thuần.')">C. Vì test unit chạy nhanh hơn</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Terraform vẫn cần review chứ không tự động đúng 100%.')">D. Vì Terraform không bao giờ tạo sai tài nguyên</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Khi nào nên cân nhắc Pulumi hoặc AWS CDK thay Terraform?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Khi cần logic imperative mạnh trong ngôn ngữ app hoặc AWS abstraction sâu, có thể chọn Pulumi/CDK.')">A. Khi team cần tận dụng ngôn ngữ lập trình hiện có hoặc tối ưu cho AWS-specific abstractions</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Terraform không chỉ dành cho startup; enterprise dùng rất rộng.')">B. Khi công ty lớn thì không được dùng Terraform</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Pulumi/CDK không thay thế SQL ingestion logic.')">C. Khi cần viết SQL transform</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Độ dài file không phải tiêu chí chọn công cụ hạ tầng.')">D. Khi file HCL dài hơn 200 dòng</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s2" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S2 · Repo Deep Dive</div>
+        <div class="module-title">Đọc hiểu code trong repo — Module 01</div>
+        <div class="module-subtitle">Đi từ cấu trúc thư mục → config thực tế → data flow để hiểu file nào gọi file nào.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🗂️</span>
+          Phần 1 — Cấu trúc thư mục toàn bộ 01-docker-terraform/
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header">
+              <span>● ● ●</span>
+              <span>01-docker-terraform/tree.txt</span>
+            </div>
+            <div class="cmd-body">
+<pre>01-docker-terraform/
+├── README.md
+├── docker-sql/
+│   ├── README.md
+│   ├── 01-introduction.md
+│   ├── 02-virtual-environment.md
+│   ├── 03-dockerizing-pipeline.md
+│   ├── 04-postgres-docker.md
+│   ├── 05-data-ingestion.md
+│   ├── 06-ingestion-script.md
+│   ├── 07-pgadmin.md
+│   ├── 08-dockerizing-ingestion.md
+│   ├── 09-docker-compose.md
+│   ├── 10-sql-refresher.md
+│   ├── 11-cleanup.md
+│   └── pipeline/
+│       ├── .python-version
+│       ├── Dockerfile
+│       ├── docker-compose.yaml
+│       ├── ingest_data.py
+│       ├── pyproject.toml
+│       └── docker-helper-scripts/
+│           ├── docker-postgres.sh
+│           ├── docker-pgadmin.sh
+│           └── docker-ingest.sh
+└── terraform/
+    ├── README.md
+    ├── 1_terraform_overview.md
+    ├── 2_gcp_overview.md
+    ├── windows.md
+    └── terraform/
+        ├── README.md
+        ├── terraform_basic/
+        │   └── main.tf
+        ├── terraform_with_variables/
+        │   ├── main.tf
+        │   └── variables.tf
+        └── terraform_with_variable_AWS/
+            ├── README.md
+            ├── main.tf
+            ├── variables.tf
+            └── terraform.tfvars</pre>
+            </div>
+          </div>
+
+          <h3 class="blue">Mục đích từng cụm file</h3>
+          <ul>
+            <li><strong>README.md (root):</strong> entrypoint của module, điều hướng Docker workshop + Terraform workshop.</li>
+            <li><strong>docker-sql/*.md:</strong> lộ trình học từng bước từ Docker basics đến Compose/SQL refresh/cleanup.</li>
+            <li><strong>docker-sql/pipeline/:</strong> code runnable thật của ingestion pipeline (compose, Dockerfile, Python script).</li>
+            <li><strong>docker-helper-scripts/*.sh:</strong> wrapper lệnh chạy nhanh cho Postgres, pgAdmin, ingest container.</li>
+            <li><strong>terraform/*.md:</strong> khái niệm IaC + setup GCP + auth + lưu ý cho Windows.</li>
+            <li><strong>terraform/terraform/*:</strong> code HCL mẫu: từ basic hardcode đến version dùng variables; thêm 1 ví dụ AWS mapping.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧩</span>
+          Phần 2 — Phân tích docker-compose.yaml (nguyên văn từ repo)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2-tabs-compose">
+            <div class="tab active" onclick="switchTab('s2-tabs-compose', 's2-compose-yaml')">YAML</div>
+            <div class="tab" onclick="switchTab('s2-tabs-compose', 's2-compose-hcl')">HCL</div>
+            <div class="tab" onclick="switchTab('s2-tabs-compose', 's2-compose-python')">Python</div>
+          </div>
+
+          <div class="tab-content active" id="s2-compose-yaml">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>docker-sql/pipeline/docker-compose.yaml</span></div>
+              <div class="cmd-body">
+<pre><span class="kw">services</span>:
+  <span class="kw2">pgdatabase</span>:
+    <span class="kw">image</span>: <span class="str">postgres:18</span>
+    <span class="kw">environment</span>:
+      <span class="kw2">POSTGRES_USER</span>: <span class="str">"root"</span>
+      <span class="kw2">POSTGRES_PASSWORD</span>: <span class="str">"root"</span>
+      <span class="kw2">POSTGRES_DB</span>: <span class="str">"ny_taxi"</span>
+    <span class="kw">volumes</span>:
+      - <span class="str">ny_taxi_postgres_data:/var/lib/postgresql</span>
+    <span class="kw">ports</span>:
+      - <span class="str">"5432:5432"</span>
+
+  <span class="kw2">pgadmin</span>:
+    <span class="kw">image</span>: <span class="str">dpage/pgadmin4</span>
+    <span class="kw">environment</span>:
+      <span class="kw2">PGADMIN_DEFAULT_EMAIL</span>: <span class="str">"admin@admin.com"</span>
+      <span class="kw2">PGADMIN_DEFAULT_PASSWORD</span>: <span class="str">"root"</span>
+    <span class="kw">volumes</span>:
+      - <span class="str">pgadmin_data:/var/lib/pgadmin</span>
+    <span class="kw">ports</span>:
+      - <span class="str">"8085:80"</span>
+
+<span class="kw">volumes</span>:
+  <span class="kw2">ny_taxi_postgres_data</span>:
+  <span class="kw2">pgadmin_data</span>:</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="s2-compose-hcl">
+            <div class="info-box note">📌 <span><strong>Note:</strong> Compose là YAML, không phải HCL. Tab này dùng để liên kết mental model với Terraform.</span></div>
+            <p>Trong S2, HCL được dùng ở phần <code>main.tf</code> và <code>variables.tf</code>. Tư duy chung giống nhau: khai báo trạng thái mong muốn, để tool tự reconcile hạ tầng thực tế.</p>
+          </div>
+
+          <div class="tab-content" id="s2-compose-python">
+            <div class="info-box note">📌 <span><strong>Note:</strong> Python không định nghĩa compose, nhưng <code>ingest_data.py</code> phụ thuộc vào service names trong compose để kết nối DB.</span></div>
+            <p>Nếu container ingest chạy cùng network compose, tham số host sẽ dùng <code>pgdatabase</code> thay vì <code>localhost</code>.</p>
+          </div>
+
+          <h3 class="green">Giải thích từng block + WHY</h3>
+          <ul>
+            <li><strong>services:</strong> định nghĩa các thành phần runtime; repo tách <code>pgdatabase</code> và <code>pgadmin</code> để DB và UI quản trị chạy độc lập.</li>
+            <li><strong>environment:</strong> inject credentials khởi tạo service; dùng env để tránh hardcode vào image layer, giúp thay theo môi trường dễ hơn.</li>
+            <li><strong>volumes:</strong> giữ state lâu dài của DB/pgAdmin; nếu không có volume, down/up sẽ mất data hoặc mất cấu hình server trong pgAdmin.</li>
+            <li><strong>ports:</strong> mở cổng từ host vào container để local tools/browser truy cập được.</li>
+          </ul>
+
+          <h3 class="orange">Ports mapping: vì sao 5432:5432, 8080:8080?</h3>
+          <p>Trong repo hiện tại, mapping thực tế là <code>5432:5432</code> và <code>8085:80</code>:</p>
+          <ul>
+            <li><strong>5432:5432:</strong> giữ đúng cổng mặc định PostgreSQL cả host và container, giúp lệnh CLI/driver quen thuộc.</li>
+            <li><strong>8085:80:</strong> pgAdmin trong container nghe ở cổng 80, nhưng host đổi sang 8085 để tránh xung đột với các web service khác.</li>
+          </ul>
+          <div class="info-box warn">⚠️ <span><strong>Cảnh báo:</strong> Nếu bạn đổi sang <code>8080:8080</code>, pgAdmin phải thực sự listen trên 8080 trong container; với image này mặc định là 80.</span></div>
+
+          <h3 class="red">Depends_on và thứ tự start</h3>
+          <p>File compose hiện tại <strong>chưa khai báo <code>depends_on</code></strong>. Nghĩa là Compose tạo service mà không enforce strict startup ordering. Về thực tế:</p>
+          <ul>
+            <li>pgAdmin cần PostgreSQL đang reachable để connect thành công.</li>
+            <li>ingest container (chạy rời) cần DB sẵn sàng trước khi push data.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>docker-compose.yaml (depends_on + healthcheck example)</span></div>
+            <div class="cmd-body">
+<pre><span class="kw">services</span>:
+  <span class="kw2">pgdatabase</span>:
+    <span class="kw">image</span>: <span class="str">postgres:18</span>
+    <span class="kw">healthcheck</span>:
+      <span class="kw">test</span>: [<span class="str">"CMD-SHELL"</span>, <span class="str">"pg_isready -U root -d ny_taxi"</span>]
+      <span class="kw">interval</span>: <span class="str">10s</span>
+      <span class="kw">timeout</span>: <span class="str">5s</span>
+      <span class="kw">retries</span>: <span class="num">5</span>
+
+  <span class="kw2">pgadmin</span>:
+    <span class="kw">image</span>: <span class="str">dpage/pgadmin4</span>
+    <span class="kw">depends_on</span>:
+      <span class="kw2">pgdatabase</span>:
+        <span class="kw">condition</span>: <span class="str">service_healthy</span></pre>
+            </div>
+          </div>
+          <div class="info-box tip">💡 <span><strong>Tip:</strong> Pattern này làm startup ordering rõ ràng hơn: pgAdmin chỉ start khi DB đã healthy.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🐍</span>
+          Phần 3 — Phân tích ingest_data.py (nguyên văn từ repo)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2-tabs-ingest">
+            <div class="tab active" onclick="switchTab('s2-tabs-ingest', 's2-ingest-python')">Python</div>
+            <div class="tab" onclick="switchTab('s2-tabs-ingest', 's2-ingest-yaml')">YAML</div>
+            <div class="tab" onclick="switchTab('s2-tabs-ingest', 's2-ingest-hcl')">HCL</div>
+          </div>
+
+          <div class="tab-content active" id="s2-ingest-python">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>docker-sql/pipeline/ingest_data.py (extract)</span></div>
+              <div class="cmd-body">
+<pre><span class="kw">import</span> click
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> sqlalchemy <span class="kw">import</span> create_engine
+<span class="kw">from</span> tqdm.auto <span class="kw">import</span> tqdm
+
+dtype = {
+    <span class="str">"VendorID"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"passenger_count"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"trip_distance"</span>: <span class="str">"float64"</span>,
+    <span class="str">"RatecodeID"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"store_and_fwd_flag"</span>: <span class="str">"string"</span>,
+    <span class="str">"PULocationID"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"DOLocationID"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"payment_type"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"fare_amount"</span>: <span class="str">"float64"</span>,
+    <span class="str">"extra"</span>: <span class="str">"float64"</span>,
+    <span class="str">"mta_tax"</span>: <span class="str">"float64"</span>,
+    <span class="str">"tip_amount"</span>: <span class="str">"float64"</span>,
+    <span class="str">"tolls_amount"</span>: <span class="str">"float64"</span>,
+    <span class="str">"improvement_surcharge"</span>: <span class="str">"float64"</span>,
+    <span class="str">"total_amount"</span>: <span class="str">"float64"</span>,
+    <span class="str">"congestion_surcharge"</span>: <span class="str">"float64"</span>
+}
+
+parse_dates = [
+    <span class="str">"tpep_pickup_datetime"</span>,
+    <span class="str">"tpep_dropoff_datetime"</span>
+]
+
+<span class="kw">@click.command</span>()
+<span class="kw">@click.option</span>(<span class="str">'--pg-user'</span>, default=<span class="str">'root'</span>)
+<span class="kw">@click.option</span>(<span class="str">'--pg-pass'</span>, default=<span class="str">'root'</span>)
+<span class="kw">@click.option</span>(<span class="str">'--pg-host'</span>, default=<span class="str">'localhost'</span>)
+<span class="kw">@click.option</span>(<span class="str">'--pg-port'</span>, default=<span class="num">5432</span>, type=<span class="fn">int</span>)
+<span class="kw">@click.option</span>(<span class="str">'--pg-db'</span>, default=<span class="str">'ny_taxi'</span>)
+<span class="kw">@click.option</span>(<span class="str">'--year'</span>, default=<span class="num">2021</span>, type=<span class="fn">int</span>)
+<span class="kw">@click.option</span>(<span class="str">'--month'</span>, default=<span class="num">1</span>, type=<span class="fn">int</span>)
+<span class="kw">@click.option</span>(<span class="str">'--target-table'</span>, default=<span class="str">'yellow_taxi_data'</span>)
+<span class="kw">@click.option</span>(<span class="str">'--chunksize'</span>, default=<span class="num">100000</span>, type=<span class="fn">int</span>)
+<span class="kw">def</span> <span class="fn">run</span>(pg_user, pg_pass, pg_host, pg_port, pg_db, year, month, target_table, chunksize):
+    prefix = <span class="str">'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow'</span>
+    url = <span class="fn">f</span><span class="str">'{prefix}/yellow_tripdata_{year}-{month:02d}.csv.gz'</span>
+
+    engine = <span class="fn">create_engine</span>(
+      <span class="fn">f</span><span class="str">'postgresql+psycopg://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}'</span>
+    )
+
+    df_iter = pd.read_csv(
+        url,
+        dtype=dtype,
+        parse_dates=parse_dates,
+        iterator=<span class="kw">True</span>,
+        chunksize=chunksize,
+    )
+
+    first = <span class="kw">True</span>
+    <span class="kw">for</span> df_chunk <span class="kw">in</span> <span class="fn">tqdm</span>(df_iter):
+        <span class="kw">if</span> first:
+            df_chunk.head(<span class="num">0</span>).to_sql(name=target_table, con=engine, if_exists=<span class="str">'replace'</span>)
+            first = <span class="kw">False</span>
+
+        df_chunk.to_sql(name=target_table, con=engine, if_exists=<span class="str">'append'</span>)</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="s2-ingest-yaml">
+            <p>YAML liên quan trực tiếp tới script này là <code>docker-compose.yaml</code> (service name, port, network). Khi chạy ingestion container ngoài compose, script nhận params CLI để map vào infra runtime.</p>
+          </div>
+
+          <div class="tab-content" id="s2-ingest-hcl">
+            <p>HCL không gọi trực tiếp <code>ingest_data.py</code>, nhưng tạo hạ tầng cloud upstream (bucket/dataset) cho các bước ingest và warehouse ở module sau.</p>
+          </div>
+
+          <h3 class="blue">Data flow trong script</h3>
+          <ol>
+            <li>Build URL dataset theo <code>year/month</code>.</li>
+            <li>Tạo SQLAlchemy engine tới PostgreSQL.</li>
+            <li>Đọc CSV nén theo iterator + chunksize.</li>
+            <li>Chunk đầu tạo schema table (<code>head(0)</code> + <code>replace</code>).</li>
+            <li>Các chunk sau append dữ liệu liên tục.</li>
+          </ol>
+
+          <h3 class="green">Vì sao dùng chunks?</h3>
+          <ul>
+            <li>File taxi CSV lớn, đọc full dễ ngốn RAM.</li>
+            <li>Chunking giảm peak memory và giúp stream data từng phần vào DB.</li>
+            <li>Dễ quan sát tiến độ qua <code>tqdm</code>.</li>
+          </ul>
+
+          <h3 class="orange">Connection string PostgreSQL — từng tham số</h3>
+          <ul>
+            <li><code>postgresql+psycopg://</code>: SQLAlchemy dialect + driver.</li>
+            <li><code>{pg_user}:{pg_pass}</code>: credentials DB.</li>
+            <li><code>@{pg_host}:{pg_port}</code>: endpoint DB (localhost hoặc service name trong Docker network).</li>
+            <li><code>/{pg_db}</code>: database đích (ny_taxi).</li>
+          </ul>
+
+          <h3 class="red">Điểm yếu hiện tại của script</h3>
+          <ul>
+            <li><strong>Chưa idempotent tuyệt đối:</strong> mỗi lần chạy với cùng table sẽ <code>replace</code> rồi append lại toàn bộ.</li>
+            <li><strong>Error handling tối thiểu:</strong> chưa bắt lỗi network/DB/auth/timeouts theo từng class lỗi.</li>
+            <li><strong>Không có checkpoint/resume:</strong> fail giữa chừng phải ingest lại từ đầu.</li>
+            <li><strong>Chưa có validation dữ liệu:</strong> chưa check schema drift/null anomalies trước khi load.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">☁️</span>
+          Phần 4 — Phân tích main.tf + variables.tf (nguyên văn từ repo)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2-tabs-terraform">
+            <div class="tab active" onclick="switchTab('s2-tabs-terraform', 's2-tf-hcl')">HCL</div>
+            <div class="tab" onclick="switchTab('s2-tabs-terraform', 's2-tf-yaml')">YAML</div>
+            <div class="tab" onclick="switchTab('s2-tabs-terraform', 's2-tf-python')">Python</div>
+          </div>
+
+          <div class="tab-content active" id="s2-tf-hcl">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>terraform_with_variables/main.tf</span></div>
+              <div class="cmd-body">
+<pre><span class="kw">terraform</span> {
+  <span class="kw">required_providers</span> {
+    google = {
+      source  = <span class="str">"hashicorp/google"</span>
+      version = <span class="str">"5.6.0"</span>
+    }
+  }
+}
+
+<span class="kw">provider</span> <span class="str">"google"</span> {
+  credentials = <span class="fn">file</span>(var.credentials)
+  project     = var.project
+  region      = var.region
+}
+
+<span class="kw">resource</span> <span class="str">"google_storage_bucket"</span> <span class="str">"demo-bucket"</span> {
+  name          = var.gcs_bucket_name
+  location      = var.location
+  force_destroy = <span class="kw">true</span>
+
+  lifecycle_rule {
+    condition { age = <span class="num">1</span> }
+    action { type = <span class="str">"AbortIncompleteMultipartUpload"</span> }
+  }
+}
+
+<span class="kw">resource</span> <span class="str">"google_bigquery_dataset"</span> <span class="str">"demo_dataset"</span> {
+  dataset_id = var.bq_dataset_name
+  location   = var.location
+}</pre>
+              </div>
+            </div>
+
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>terraform_with_variables/variables.tf</span></div>
+              <div class="cmd-body">
+<pre><span class="kw">variable</span> <span class="str">"credentials"</span> {
+  description = <span class="str">"My Credentials"</span>
+  default     = <span class="str">"&lt;Path to your Service Account json file&gt;"</span>
+}
+
+<span class="kw">variable</span> <span class="str">"project"</span> {
+  description = <span class="str">"Project"</span>
+  default     = <span class="str">"&lt;Your Project ID&gt;"</span>
+}
+
+<span class="kw">variable</span> <span class="str">"region"</span> {
+  description = <span class="str">"Region"</span>
+  default     = <span class="str">"us-central1"</span>
+}
+
+<span class="kw">variable</span> <span class="str">"location"</span> {
+  description = <span class="str">"Project Location"</span>
+  default     = <span class="str">"US"</span>
+}
+
+<span class="kw">variable</span> <span class="str">"bq_dataset_name"</span> {
+  description = <span class="str">"My BigQuery Dataset Name"</span>
+  default     = <span class="str">"demo_dataset"</span>
+}
+
+<span class="kw">variable</span> <span class="str">"gcs_bucket_name"</span> {
+  description = <span class="str">"My Storage Bucket Name"</span>
+  default     = <span class="str">"terraform-demo-terra-bucket"</span>
+}</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="s2-tf-yaml">
+            <p>Terraform không dùng YAML ở ví dụ này. HCL được chọn vì dễ biểu diễn dependency graph cho resource cloud.</p>
+          </div>
+
+          <div class="tab-content" id="s2-tf-python">
+            <p>Python script ingest ở module này không trực tiếp invoke Terraform; hai luồng tách biệt để learner hiểu rõ compute runtime (Docker) vs infra provisioning (Terraform).</p>
+          </div>
+
+          <h3 class="green">Giải thích block cốt lõi</h3>
+          <ul>
+            <li><strong>terraform block:</strong> khóa provider/version để đảm bảo môi trường deploy ổn định.</li>
+            <li><strong>provider block:</strong> khai báo context auth + project + region để mọi resource bên dưới biết tạo ở đâu.</li>
+            <li><strong>resource block:</strong> mô tả tài nguyên mong muốn (GCS bucket, BQ dataset).</li>
+            <li><strong>variable block:</strong> tách input khỏi logic hạ tầng để tái sử dụng cho nhiều môi trường.</li>
+          </ul>
+
+          <h3 class="orange">Tại sao variable riêng thay vì hardcode?</h3>
+          <ul>
+            <li>Giảm duplication khi đổi project/region/bucket.</li>
+            <li>Tăng khả năng tái dùng cùng module cho dev/staging/prod.</li>
+            <li>Giảm lỗi copy-paste khi nhiều người cùng maintain hạ tầng.</li>
+          </ul>
+
+          <h3 class="blue">Output block nghĩa là gì?</h3>
+          <p>Trong Terraform, <code>output</code> dùng để export giá trị sau <code>apply</code> (vd: bucket name, dataset id) cho người vận hành hoặc pipeline downstream. Bộ file <code>terraform_with_variables</code> hiện chưa định nghĩa output, nhưng pattern chuẩn là thêm <code>output.tf</code> khi cần chia sẻ giá trị giữa modules/jobs.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">🔄</span>
+          Phần 5 — Data flow tổng hợp & thứ tự chạy
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>module01-end-to-end-flow.txt</span></div>
+            <div class="cmd-body">
+<pre>terraform_with_variables/*.tf
+        │
+        ▼
+Terraform CLI (init/plan/apply)
+        │
+        ▼
+GCP API
+   ├──────► GCS Bucket
+   └──────► BigQuery Dataset
+
+Docker image (pipeline/Dockerfile)
+        │
+        ▼
+ingest_data.py (container runtime)
+        │
+        ▼
+PostgreSQL (pgdatabase service)
+        │
+        ▼
+pgAdmin (pgadmin service) để query/verify</pre>
+            </div>
+          </div>
+
+          <h3 class="green">Ai gọi ai? File nào chạy trước?</h3>
+          <ol>
+            <li><strong>Hạ tầng cloud:</strong> chạy <code>terraform init/plan/apply</code> trong <code>terraform/terraform/terraform_with_variables/</code>.</li>
+            <li><strong>Local DB stack:</strong> chạy <code>docker-compose up</code> trong <code>docker-sql/pipeline/</code> để bật <code>pgdatabase</code> + <code>pgadmin</code>.</li>
+            <li><strong>Ingestion:</strong> build image từ <code>pipeline/Dockerfile</code>, chạy container truyền tham số cho <code>ingest_data.py</code>.</li>
+            <li><strong>Validation:</strong> dùng pgAdmin vào DB kiểm tra table và row count.</li>
+          </ol>
+          <div class="info-box tip">💡 <span><strong>Tip:</strong> Trong repo, luồng Terraform và luồng ingest local tách rời để người học không bị lock vào 1 môi trường duy nhất ngay từ đầu.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🧠</span>
+          Quiz S2 — Data flow & cấu trúc code (6 câu)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item">
+            <div class="quiz-q">Trong compose hiện tại, vì sao <code>pgadmin</code> truy cập DB bằng hostname <code>pgdatabase</code> thay vì <code>localhost</code>?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Các service trong cùng compose network resolve nhau qua service name.')">A. Vì Docker Compose tạo DNS nội bộ theo service name</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'localhost trong mỗi container trỏ về chính container đó.')">B. Vì localhost luôn trỏ tới container Postgres</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Port mapping không tự đổi hostname logic.')">C. Vì map port 5432:5432</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Biến môi trường không bắt buộc hostname phải là localhost.')">D. Vì PGADMIN_DEFAULT_EMAIL</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Script <code>ingest_data.py</code> dùng <code>chunksize=100000</code> chủ yếu để làm gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Chunking giúp tránh load toàn bộ file vào RAM và stream vào DB theo lô.')">A. Giảm peak memory và nạp dữ liệu theo lô</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Chunking không tự đổi schema SQL.')">B. Tự chuyển đổi toàn bộ cột sang string</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Chunking không thay thế auth/token.')">C. Tránh phải cấu hình PostgreSQL password</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Chunking không tự tạo indexes.')">D. Tạo index nhanh hơn</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Trong <code>main.tf</code>, block nào quyết định Terraform dùng provider nào và version nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'provider block cấu hình runtime, không pin source/version provider ở mức required_providers.')">A. provider "google" block</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. terraform { required_providers { ... } } pin provider source/version.')">B. terraform { required_providers { ... } }</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'resource block chỉ mô tả tài nguyên cụ thể.')">C. resource "google_storage_bucket"</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'variables chỉ giữ input values.')">D. variable "region"</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Vì sao tách <code>variables.tf</code> thay vì hardcode trực tiếp trong <code>main.tf</code>?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Tách variables giúp tái dùng module và đổi môi trường ít sửa code hơn.')">A. Reuse tốt hơn và giảm lỗi khi đổi môi trường</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Terraform không bắt buộc tách file để chạy apply.')">B. Vì Terraform chỉ chạy được nếu có variables.tf</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Tách file không tự tăng tốc độ API cloud.')">C. Vì cloud API gọi nhanh hơn</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Tách file không liên quan trực tiếp tới cú pháp YAML.')">D. Vì HCL giống YAML hơn</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Điểm yếu idempotency nào đang tồn tại trong script ingest?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Chạy lại sẽ replace table rồi append lại full dataset cùng tháng nếu không có partition/upsert logic.')">A. Chạy lại có thể nạp lại full dữ liệu do logic replace+append</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Click usage không tự đảm bảo idempotency.')">B. Có click nên tự idempotent</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Dùng tqdm không liên quan chống duplicate.')">C. tqdm ngăn duplicate row</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'dtype parse không xử lý dedup.')">D. dtype map giải quyết idempotency</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Thứ tự thực tế hợp lý nhất trong module 01 là gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Thiếu bước chuẩn bị DB stack trước ingest.')">A. Chạy ingest_data.py trước, sau đó mới bật PostgreSQL</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, true, 'Đúng. Terraform tạo cloud infra; compose bật local DB/UI; sau đó ingest rồi verify trên pgAdmin.')">B. Terraform apply → docker-compose up → chạy ingest container → kiểm tra pgAdmin</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Destroy infra trước khi ingest sẽ không còn tài nguyên cloud đích.')">C. Terraform destroy → chạy ingest → create bucket</div>
+              <div class="quiz-opt" onclick="answerQuiz(this, false, 'Bật pgAdmin trước DB không đảm bảo kết nối thành công.')">D. Mở pgAdmin trước tất cả service còn lại</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s3" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S3 · Hands-on Lab</div>
+        <div class="module-title">Thực hành từng bước — Docker Pipeline & Terraform</div>
+        <div class="module-subtitle">Làm theo thứ tự: Setup → Run → Break → Debug. Bám sát execution plan 7 ngày của M01.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🛠️</span>
+          Phần 1 — Setup môi trường (copy-paste commands)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Bước 1: Cài Docker Desktop và verify</h3>
+          <p>Download chính thức: <a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener noreferrer">https://www.docker.com/products/docker-desktop/</a></p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>verify-docker.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">docker</span> --version
+<span class="kw2">docker</span> compose version
+<span class="kw2">docker</span> run --rm hello-world</pre>
+            </div>
+          </div>
+          <p><strong>Output mong đợi:</strong> có version Docker/Compose và container hello-world in ra thông báo thành công.</p>
+
+          <h3 class="green">Bước 2: Clone repo đúng lệnh</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>clone-repo.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">git</span> clone <span class="str">https://github.com/DataTalksClub/data-engineering-zoomcamp.git</span>
+<span class="kw2">cd</span> data-engineering-zoomcamp
+<span class="kw2">ls</span></pre>
+            </div>
+          </div>
+
+          <h3 class="orange">Bước 3: Cấu trúc thư mục sau khi clone (phần cần dùng cho M01)</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>expected-structure.txt</span></div>
+            <div class="cmd-body">
+<pre>data-engineering-zoomcamp/
+├── 01-docker-terraform/
+│   ├── docker-sql/
+│   │   └── pipeline/
+│   │       ├── docker-compose.yaml
+│   │       ├── Dockerfile
+│   │       └── ingest_data.py
+│   └── terraform/
+│       └── terraform/
+│           └── terraform_with_variables/
+│               ├── main.tf
+│               └── variables.tf</pre>
+            </div>
+          </div>
+
+          <h3 class="red">Bước 4: .env từ .env.example (nếu có)</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>env-check.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">cd</span> 01-docker-terraform
+<span class="kw2">find</span> . -name <span class="str">".env*"</span></pre>
+            </div>
+          </div>
+          <p>Trong repo M01 hiện tại <strong>không có</strong> <code>.env.example</code>, nên bạn chưa cần bước copy file env ở module này.</p>
+
+          <div class="info-box note">📌 <span><strong>Verify setup đúng khi:</strong> Docker chạy được hello-world, clone repo thành công, bạn nhìn thấy đúng các file <code>docker-compose.yaml</code>, <code>ingest_data.py</code>, <code>main.tf</code>, <code>variables.tf</code>.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🐳</span>
+          Phần 2 — Chạy Docker pipeline từng bước
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Step 2.1 — Start PostgreSQL + pgAdmin bằng compose</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>start-compose.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">cd</span> 01-docker-terraform/docker-sql/pipeline
+<span class="kw2">docker-compose</span> up -d</pre>
+            </div>
+          </div>
+          <ul>
+            <li><strong>Làm gì:</strong> chạy đồng thời 2 service từ <code>docker-compose.yaml</code>: <code>pgdatabase</code> và <code>pgadmin</code>.</li>
+            <li><strong>Output mong đợi:</strong> message kiểu <code>Creating ... done</code>.</li>
+            <li><strong>Verify:</strong> <code>docker ps</code> thấy 2 container up; mở <code>http://localhost:8085</code> vào pgAdmin.</li>
+          </ul>
+
+          <h3 class="green">Step 2.2 — Build image ingest từ Dockerfile thật</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>build-ingest-image.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">docker</span> build -t taxi_ingest:v001 .</pre>
+            </div>
+          </div>
+          <ul>
+            <li><strong>Làm gì:</strong> build image từ <code>pipeline/Dockerfile</code> (cài dependencies bằng <code>uv sync --locked</code>).</li>
+            <li><strong>Output mong đợi:</strong> bước build kết thúc với image tag <code>taxi_ingest:v001</code>.</li>
+            <li><strong>Verify:</strong> <code>docker images | grep taxi_ingest</code> có tag vừa build.</li>
+          </ul>
+
+          <h3 class="orange">Step 2.3 — Chạy ingest_data.py bằng container</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>run-ingest.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">docker</span> run -it --rm \
+  --network=pipeline_default \
+  taxi_ingest:v001 \
+    --year=2021 \
+    --month=1 \
+    --pg-user=root \
+    --pg-pass=root \
+    --pg-host=pgdatabase \
+    --pg-port=5432 \
+    --pg-db=ny_taxi \
+    --chunksize=100000 \
+    --target-table=yellow_taxi_trips</pre>
+            </div>
+          </div>
+          <ul>
+            <li><strong>Làm gì:</strong> chạy script ingest từ image, đọc dữ liệu yellow taxi và insert vào PostgreSQL.</li>
+            <li><strong>Output mong đợi:</strong> progress bar từ <code>tqdm</code>, không có exception kết nối DB.</li>
+            <li><strong>Verify:</strong> vào pgAdmin, refresh database, thấy table <code>yellow_taxi_trips</code> có dữ liệu.</li>
+          </ul>
+
+          <div class="info-box tip">💡 <span><strong>Tip:</strong> Theo execution plan M01 (roadmap): D1–D2 chạy compose, D3–D4 dockerize + ingest. Đừng skip verify từng bước.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🏗️</span>
+          Phần 3 — Chạy Terraform từng bước
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Step 3.1 — terraform init</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>terraform-init.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">cd</span> 01-docker-terraform/terraform/terraform/terraform_with_variables
+<span class="kw2">terraform</span> init</pre>
+            </div>
+          </div>
+          <p><strong>Làm gì:</strong> tải provider plugin, khởi tạo working directory, chuẩn bị state local.</p>
+          <p><strong>Output mong đợi:</strong> <code>Terraform has been successfully initialized!</code></p>
+
+          <h3 class="green">Step 3.2 — terraform plan</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>terraform-plan.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">terraform</span> plan -var=<span class="str">"project=&lt;your-gcp-project-id&gt;"</span></pre>
+            </div>
+          </div>
+          <ul>
+            <li><strong>Làm gì:</strong> preview thay đổi trước khi apply thật.</li>
+            <li><strong>Cần chú ý:</strong> số lượng resource add/change/destroy; tên bucket; region/location; quyền IAM.</li>
+            <li><strong>Output mong đợi:</strong> plan có dạng <code>Plan: X to add, 0 to change, 0 to destroy.</code></li>
+          </ul>
+
+          <h3 class="orange">Step 3.3 — terraform apply</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>terraform-apply.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">terraform</span> apply -var=<span class="str">"project=&lt;your-gcp-project-id&gt;"</span></pre>
+            </div>
+          </div>
+          <ul>
+            <li><strong>Làm gì:</strong> thực thi plan, tạo bucket + dataset trên GCP.</li>
+            <li><strong>Confirm:</strong> nhập <code>yes</code> khi Terraform hỏi xác nhận.</li>
+            <li><strong>Verify:</strong> vào GCP Console, kiểm tra bucket và BigQuery dataset đã xuất hiện.</li>
+          </ul>
+
+          <h3 class="red">Step 3.4 — terraform destroy</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>terraform-destroy.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">terraform</span> destroy -var=<span class="str">"project=&lt;your-gcp-project-id&gt;"</span></pre>
+            </div>
+          </div>
+          <p><strong>Khi nào dùng:</strong> sau khi học xong / test xong để tránh tốn chi phí cloud không cần thiết.</p>
+          <p><strong>Vì sao quan trọng:</strong> roadmap M01 coi cost-awareness là tư duy production cơ bản.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🧪</span>
+          Phần 4 — 3 bài tập thực hành (Beginner → Advanced)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="practice-task">
+            <div class="practice-task-header">🔧 Task 1 (Beginner) — Chạy pipeline với green taxi thay vì yellow taxi</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Chạy lại ingest cho green taxi data thay vì yellow taxi.</p>
+              <p><strong>Gợi ý:</strong> Script đang hardcode prefix yellow trong <code>ingest_data.py</code>, nên cần đổi prefix rồi rebuild image.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">💡 Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>task1-solution.sh</span></div>
+                  <div class="cmd-body">
+<pre><span class="comment"># 1) Sửa prefix trong ingest_data.py:</span>
+<span class="comment"># from: .../download/yellow</span>
+<span class="comment"># to:   .../download/green</span>
+
+<span class="comment"># 2) Rebuild image</span>
+<span class="kw2">docker</span> build -t taxi_ingest:v002 .
+
+<span class="comment"># 3) Run ingest cho green taxi</span>
+<span class="kw2">docker</span> run -it --rm \
+  --network=pipeline_default \
+  taxi_ingest:v002 \
+    --year=2021 \
+    --month=1 \
+    --pg-user=root \
+    --pg-pass=root \
+    --pg-host=pgdatabase \
+    --pg-port=5432 \
+    --pg-db=ny_taxi \
+    --chunksize=100000 \
+    --target-table=green_taxi_trips</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">🔧 Task 2 (Intermediate) — Thêm PostgreSQL database thứ hai cho green taxi data</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Mở rộng compose để có thêm database riêng cho green taxi.</p>
+              <p><strong>Gợi ý:</strong> Tạo service mới, đổi tên service/volume/port để tránh conflict.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">💡 Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>docker-compose.yaml (extended)</span></div>
+                  <div class="cmd-body">
+<pre><span class="kw">services</span>:
+  <span class="kw2">pgdatabase</span>:
+    <span class="kw">image</span>: <span class="str">postgres:18</span>
+    <span class="kw">environment</span>:
+      <span class="kw2">POSTGRES_USER</span>: <span class="str">"root"</span>
+      <span class="kw2">POSTGRES_PASSWORD</span>: <span class="str">"root"</span>
+      <span class="kw2">POSTGRES_DB</span>: <span class="str">"ny_taxi"</span>
+    <span class="kw">volumes</span>:
+      - <span class="str">ny_taxi_postgres_data:/var/lib/postgresql</span>
+    <span class="kw">ports</span>:
+      - <span class="str">"5432:5432"</span>
+
+  <span class="kw2">pgdatabase_green</span>:
+    <span class="kw">image</span>: <span class="str">postgres:18</span>
+    <span class="kw">environment</span>:
+      <span class="kw2">POSTGRES_USER</span>: <span class="str">"root"</span>
+      <span class="kw2">POSTGRES_PASSWORD</span>: <span class="str">"root"</span>
+      <span class="kw2">POSTGRES_DB</span>: <span class="str">"ny_taxi_green"</span>
+    <span class="kw">volumes</span>:
+      - <span class="str">ny_taxi_green_postgres_data:/var/lib/postgresql</span>
+    <span class="kw">ports</span>:
+      - <span class="str">"5433:5432"</span>
+
+  <span class="kw2">pgadmin</span>:
+    <span class="kw">image</span>: <span class="str">dpage/pgadmin4</span>
+    <span class="kw">environment</span>:
+      <span class="kw2">PGADMIN_DEFAULT_EMAIL</span>: <span class="str">"admin@admin.com"</span>
+      <span class="kw2">PGADMIN_DEFAULT_PASSWORD</span>: <span class="str">"root"</span>
+    <span class="kw">volumes</span>:
+      - <span class="str">pgadmin_data:/var/lib/pgadmin</span>
+    <span class="kw">ports</span>:
+      - <span class="str">"8085:80"</span>
+
+<span class="kw">volumes</span>:
+  <span class="kw2">ny_taxi_postgres_data</span>:
+  <span class="kw2">ny_taxi_green_postgres_data</span>:
+  <span class="kw2">pgadmin_data</span>:</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">🔧 Task 3 (Advanced) — Thêm GCS staging bucket + lifecycle 30 ngày</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Tạo thêm một bucket staging bằng Terraform và tự xóa file sau 30 ngày.</p>
+              <p><strong>Gợi ý:</strong> Dùng <code>google_storage_bucket</code> + <code>lifecycle_rule</code>.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">💡 Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>main.tf (add resource)</span></div>
+                  <div class="cmd-body">
+<pre><span class="kw">resource</span> <span class="str">"google_storage_bucket"</span> <span class="str">"staging_bucket"</span> {
+  name          = <span class="str">"${var.gcs_bucket_name}-staging"</span>
+  location      = var.location
+  force_destroy = <span class="kw">true</span>
+
+  lifecycle_rule {
+    condition {
+      age = <span class="num">30</span>
+    }
+    action {
+      type = <span class="str">"Delete"</span>
+    }
+  }
+}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">💥</span>
+          Phần 5 — Cố tình phá (Break) & Debug từng bước
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Scenario 1 — Đổi sai port PostgreSQL trong compose</h3>
+          <ul>
+            <li><strong>Phá:</strong> đổi mapping thành <code>5434:5432</code> nhưng app vẫn connect 5432.</li>
+            <li><strong>Lỗi thường gặp:</strong> connection timeout / refused khi dùng host port cũ.</li>
+            <li><strong>Debug:</strong> chạy <code>docker ps</code> kiểm tra port thực tế; chạy <code>docker-compose logs pgdatabase</code>; đối chiếu lại tham số <code>--pg-port</code>.</li>
+          </ul>
+
+          <h3 class="green">Scenario 2 — Xóa volume khi container đang chạy</h3>
+          <ul>
+            <li><strong>Phá:</strong> cố remove volume DB đang mount.</li>
+            <li><strong>Kết quả:</strong> Docker thường chặn xóa nếu volume đang in-use; nếu stop rồi xóa volume thì data mất.</li>
+            <li><strong>Debug:</strong> <code>docker volume ls</code> + <code>docker volume inspect &lt;name&gt;</code>; xác nhận container nào đang giữ volume.</li>
+          </ul>
+
+          <h3 class="orange">Scenario 3 — Sai password DB trong env</h3>
+          <ul>
+            <li><strong>Phá:</strong> sửa <code>POSTGRES_PASSWORD</code> hoặc <code>--pg-pass</code> không khớp.</li>
+            <li><strong>Lỗi thường gặp:</strong> <code>password authentication failed</code> (không phải connection refused trong phần lớn trường hợp).</li>
+            <li><strong>Tìm log:</strong> <code>docker-compose logs pgdatabase</code>, log container ingest, và traceback SQLAlchemy trong terminal.</li>
+          </ul>
+
+          <h3 class="red">Scenario 4 — Xóa terraform.tfstate</h3>
+          <ul>
+            <li><strong>Phá:</strong> xóa file state local rồi chạy <code>terraform apply</code> lại.</li>
+            <li><strong>Chuyện xảy ra:</strong> Terraform mất mapping resource đã tạo; có thể đề xuất tạo lại resource hoặc gặp conflict name đã tồn tại.</li>
+            <li><strong>Debug:</strong> kiểm tra backup state, dùng <code>terraform import</code> khi cần reclaim resource, tránh apply mù.</li>
+          </ul>
+
+          <h3>Scenario 5 — Mô phỏng Partial Insert (đang chạy thì Ctrl+C)</h3>
+          <ul>
+            <li><strong>Phá:</strong> chạy ingest và ấn <code>Ctrl+C</code> giữa chừng khi progress bar chưa hoàn tất.</li>
+            <li><strong>Chuyện xảy ra:</strong> bảng bị nạp một phần dữ liệu vì run dừng giữa loop append.</li>
+            <li><strong>Bản chất kỹ thuật:</strong> chunk đầu dùng <code>if_exists='replace'</code> nên lần chạy lại sẽ drop/recreate table rồi nạp lại từ đầu — không tạo duplicate do pipeline, nhưng tốn lại toàn bộ compute/time cho full reload.</li>
+            <li><strong>Kiểm tra:</strong> đếm dòng trước khi ngắt và sau khi chạy lại full:
+              <div class="cmd-block">
+                <div class="cmd-header"><span>● ● ●</span><span>verify-partial-insert.sql</span></div>
+                <div class="cmd-body">
+<pre><span class="kw">SELECT</span> <span class="fn">COUNT</span>(*) <span class="kw">FROM</span> yellow_taxi_data;</pre>
+                </div>
+              </div>
+            </li>
+          </ul>
+
+          <div class="info-box warn">⚠️ <span><strong>Roadmap alignment (M01 D5–D7):</strong> bắt buộc thử các lỗi kiểu port/env/state và ghi lại logbook theo mẫu Break → Root cause → Fix → Lesson learned.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s4" style="display:none">
+        <h2>🔍 S4 — Production Thinking (Senior Questions)</h2>
+        <p>Ở production, Docker + Terraform không được đánh giá bằng việc “chạy được”, mà bằng khả năng <strong>recover nhanh</strong>, <strong>scale đúng chỗ</strong>, và <strong>kiểm soát cost + security</strong>. 6 câu hỏi dưới đây là khung tư duy Senior bạn cần luyện từ Module 01.</p>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">1) Failure — Nếu pipeline fail lúc 3h sáng, debug từ đâu?</div>
+            <div class="section-content">
+                <p><strong>WHY:</strong> Lúc incident, sai lầm phổ biến nhất là sửa ngay mà chưa khoanh vùng. Module này có 2 lớp failure chính: container runtime (Docker) và infra drift/config (Terraform).</p>
+                <div class="cmd-block">
+                    <div class="cmd-header"><span>● ● ●</span><span>incident-triage.sh</span></div>
+                    <pre>docker compose ps
+docker logs pgdatabase --tail 120
+docker logs pgadmin --tail 120
+
+docker exec -it pgdatabase psql -U root -d ny_taxi -c "SELECT COUNT(*) FROM yellow_taxi_data;"
+
+terraform state list
+terraform plan</pre>
+                </div>
+                <ul>
+                    <li><strong>Bước 1:</strong> Xác nhận service nào down/restart loop.</li>
+                    <li><strong>Bước 2:</strong> Đọc logs Postgres trước, rồi ingest step.</li>
+                    <li><strong>Bước 3:</strong> Chỉ chạy lại ingest sau khi DB healthy.</li>
+                    <li><strong>Bước 4:</strong> Nếu cloud path lỗi, check state drift trước apply.</li>
+                </ul>
+                <div class="info-box warn">⚠️ <strong>Cảnh báo:</strong> Re-run mù khi DB chưa sẵn sàng sẽ tạo chuỗi lỗi giả, làm incident kéo dài.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">2) Scale — Nếu volume tăng x100, bottleneck ở đâu?</div>
+            <div class="section-content">
+                <p><strong>WHY:</strong> Script <code>ingest_data.py</code> đọc CSV theo chunk và ghi vào Postgres local. Mô hình này tốt để học, nhưng bottleneck sẽ xuất hiện nhanh khi volume tăng mạnh.</p>
+                <ul>
+                    <li>Single Postgres container: write throughput hạn chế.</li>
+                    <li>CSV parse bằng pandas: CPU + memory pressure.</li>
+                    <li>Network + disk I/O local volume: nghẽn khi ghi liên tục.</li>
+                </ul>
+                <p><strong>Hướng scale:</strong></p>
+                <ul>
+                    <li><strong>Near-term:</strong> tune chunksize, batch insert, tách download và load.</li>
+                    <li><strong>Mid-term:</strong> dùng object storage làm staging.</li>
+                    <li><strong>Senior path:</strong> chuyển sang columnar format + distributed compute cho transform lớn.</li>
+                </ul>
+                <div class="info-box tip">💡 <strong>Tip:</strong> Scale đúng là loại bỏ bottleneck lớn nhất trước, không phải tăng đồng loạt CPU/RAM.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">3) Idempotency — Chạy lại 2 lần có safe không?</div>
+            <div class="section-content">
+                <p><strong>WHY:</strong> Batch pipeline production phải re-run được sau lỗi mà không để lại duplicate hoặc state nửa vời.</p>
+                <div class="cmd-block">
+                    <div class="cmd-header"><span>● ● ●</span><span>ingest-idempotency.py</span></div>
+                    <pre># chunk đầu thay table
+c = next(df_iter)
+c.to_sql(name=table_name, con=engine, if_exists='replace')
+
+# các chunk sau append
+for c in df_iter:
+    c.to_sql(name=table_name, con=engine, if_exists='append')</pre>
+                </div>
+                <p>Pattern này cho full refresh là tương đối an toàn vì mỗi run reset table về trạng thái chuẩn. Trade-off: table lớn sẽ tốn thời gian; production thường đi theo incremental + dedup key.</p>
+                <div class="info-box note">📌 <strong>Lưu ý:</strong> Idempotency là thuộc tính của outcome cuối, không chỉ của một câu lệnh SQL.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">4) Monitoring — Metric nào cho biết pipeline healthy?</div>
+            <div class="section-content">
+                <p><strong>WHY:</strong> Không đo thì không vận hành được. Với module này, hãy luyện monitoring mindset ngay cả khi chạy local.</p>
+                <ul>
+                    <li><strong>Freshness:</strong> thời điểm ingest thành công gần nhất.</li>
+                    <li><strong>Volume:</strong> số rows nạp mỗi run, so với baseline.</li>
+                    <li><strong>Duration:</strong> thời gian từ start đến loaded.</li>
+                    <li><strong>Error rate:</strong> tỷ lệ run fail.</li>
+                    <li><strong>Container health:</strong> restart count, disk usage volume.</li>
+                </ul>
+                <div class="cmd-block">
+                    <div class="cmd-header"><span>● ● ●</span><span>freshness-check.sql</span></div>
+                    <pre>SELECT
+  MAX(tpep_pickup_datetime) AS latest_pickup,
+  COUNT(*) AS total_rows
+FROM yellow_taxi_data;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">5) Cost — Ước lượng và tối ưu chi phí thế nào?</div>
+            <div class="section-content">
+                <p><strong>WHY:</strong> Terraform làm provision nhanh, nhưng cũng có thể tạo chi phí sai rất nhanh nếu apply thiếu kiểm soát.</p>
+                <ul>
+                    <li><strong>GCS Standard Storage:</strong> khoảng <code>$0.02/GB/tháng</code> (tham chiếu mức phổ biến cho bài lab).</li>
+                    <li><strong>BigQuery analysis:</strong> khoảng <code>$5/TB data processed</code>, nên query scan dư thừa sẽ đội chi phí rất nhanh.</li>
+                    <li>Egress phát sinh khi region mismatch.</li>
+                    <li>Orphan resources do state drift làm “rò” chi phí dài hạn.</li>
+                </ul>
+                <div class="cmd-block">
+                    <div class="cmd-header"><span>● ● ●</span><span>cost-estimation.sh</span></div>
+                    <pre>infracost breakdown --path .</pre>
+                </div>
+                <p><strong>Practice chuẩn:</strong> chạy <code>infracost</code> + review <code>terraform plan</code> trước apply, gắn label cost owner, và teardown tài nguyên học tập khi không dùng.</p>
+                <div class="info-box warn">⚠️ <strong>Cảnh báo:</strong> Để lâu môi trường lab không destroy là lỗi cost phổ biến nhất của người mới làm cloud.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">6) Security — Credential đã xử lý đúng chuẩn chưa?</div>
+            <div class="section-content">
+                <p><strong>WHY:</strong> Nhiều incident bắt đầu từ hardcoded secrets hơn là từ bug logic.</p>
+                <ul>
+                    <li>Không hardcode password/key trong source.</li>
+                    <li>Tách secrets khỏi repo (Secret Manager/Vault).</li>
+                    <li>Áp dụng least privilege cho service account.</li>
+                    <li>Không commit state file nếu chứa metadata nhạy cảm.</li>
+                    <li>Quét secrets trước commit.</li>
+                </ul>
+                <div class="cmd-block">
+                    <div class="cmd-header"><span>● ● ●</span><span>.gitignore (security baseline)</span></div>
+                    <pre>*.env
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars</pre>
+                </div>
+                <div class="info-box danger">🔥 <strong>Nguy hiểm:</strong> Một lần push nhầm credential public có thể dẫn đến incident bảo mật và chi phí cloud ngoài kiểm soát.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="module" id="s5" style="display:none">
+        <h2>🚀 S5 — Kiến thức nâng cao: Từ Zoomcamp lên Production</h2>
+        <p>S5 tập trung vào phần roadmap gọi là <strong>Pro-tier patterns</strong>: các kỹ thuật chưa bắt buộc ở workshop nhưng rất quan trọng khi vận hành thật với team và CI/CD.</p>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">A) Docker Pro-tier Patterns</div>
+            <div class="section-content">
+                <h4>1) Multi-stage build để giảm image size</h4>
+                <p><strong>WHY:</strong> Image nhẹ pull nhanh hơn, scan security nhanh hơn, deploy ổn định hơn.</p>
+                <ul>
+                    <li>Builder stage: cài full dependencies build.</li>
+                    <li>Runtime stage: chỉ giữ artifacts cần chạy.</li>
+                </ul>
+
+                <h4>2) Resource limits + health checks</h4>
+                <p><strong>WHY:</strong> Tránh 1 container “ăn sạch” tài nguyên máy và giúp orchestrator phát hiện unhealthy service.</p>
+                <ul>
+                    <li>Define CPU/memory limits cho service critical.</li>
+                    <li>Health check DB/app để gate step ingest tiếp theo.</li>
+                </ul>
+
+                <h4>3) Immutable image tagging</h4>
+                <p><strong>WHY:</strong> Dùng tag theo commit SHA giúp rollback chính xác, tránh drift do <code>:latest</code>.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">B) Terraform Pro-tier Patterns</div>
+            <div class="section-content">
+                <h4>1) Remote backend + state locking</h4>
+                <p><strong>WHY:</strong> Team nhiều người mà dùng local state sẽ rất dễ ghi đè và drift.</p>
+                <ul>
+                    <li>Remote backend (ví dụ GCS/S3) cho shared state.</li>
+                    <li>State locking để tránh apply đồng thời.</li>
+                </ul>
+
+                <h4>2) Workspace strategy theo environment</h4>
+                <p><strong>WHY:</strong> Tách dev/staging/prod giúp kiểm soát blast radius khi apply thay đổi.</p>
+
+                <h4>3) CI/CD: plan trước, apply sau approval</h4>
+                <p><strong>WHY:</strong> Review infra diff như review code, giảm rủi ro thay đổi ngoài ý muốn.</p>
+                <div class="cmd-block">
+                    <div class="cmd-header"><span>● ● ●</span><span>terraform-ci-flow.sh</span></div>
+                    <pre>terraform fmt -check
+terraform init
+terraform validate
+terraform plan -out=tfplan
+# Manual approval
+terraform apply tfplan</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">C) Decision Table — Khi nào dùng / không dùng Docker + Terraform</div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Context</th>
+                            <th>Dùng Docker/Terraform</th>
+                            <th>Không dùng / Cân nhắc khác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Local learning + reproducible setup</td>
+                            <td>Rất phù hợp: setup nhanh, nhất quán môi trường</td>
+                            <td>N/A</td>
+                        </tr>
+                        <tr>
+                            <td>Single-service nhỏ, đổi infra hiếm</td>
+                            <td>Có thể dùng nhưng lợi ích Terraform chưa cao</td>
+                            <td>Manual provisioning có thể đủ trong ngắn hạn</td>
+                        </tr>
+                        <tr>
+                            <td>Multi-env (dev/stg/prod), nhiều thành viên</td>
+                            <td>Nên dùng mạnh: versioned IaC, review diff</td>
+                            <td>Không IaC sẽ khó audit/change tracking</td>
+                        </tr>
+                        <tr>
+                            <td>Container orchestration lớn, autoscaling sâu</td>
+                            <td>Docker vẫn là nền tảng image build</td>
+                            <td>Compose có thể outgrow, cân nhắc Kubernetes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">D) Khi nào outgrow stack hiện tại?</div>
+            <div class="section-content">
+                <p><strong>Dấu hiệu outgrow Docker Compose:</strong></p>
+                <ul>
+                    <li>Cần autoscaling theo workload.</li>
+                    <li>Cần rolling deploy, self-healing ở mức cluster.</li>
+                    <li>Cần secret/config management tập trung cho nhiều service.</li>
+                </ul>
+                <p><strong>Hướng thay thế:</strong> Kubernetes (AKS/GKE/EKS) khi cần orchestration production-grade.</p>
+
+                <p><strong>Dấu hiệu outgrow Terraform thuần module đơn giản:</strong></p>
+                <ul>
+                    <li>Codebase IaC lớn, nhiều shared module phức tạp.</li>
+                    <li>Nhu cầu policy-as-code và guardrail chặt.</li>
+                    <li>Cần abstraction cao hơn cho app-centric infra.</li>
+                </ul>
+                <p><strong>Hướng thay thế/cộng thêm:</strong> Terragrunt cho quản trị module lớn; Pulumi/CDK khi team cần abstraction bằng ngôn ngữ lập trình.</p>
+                <div class="info-box note">📌 <strong>Lưu ý:</strong> Outgrow không có nghĩa tool cũ “dở”, mà là requirements mới đã vượt ngưỡng thiết kế ban đầu.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">E) Senior mindset summary cho Module 01</div>
+            <div class="section-content">
+                <ul>
+                    <li>Thiết kế để re-run an toàn trước khi nghĩ tới tối ưu tốc độ.</li>
+                    <li>Mọi thay đổi infra phải đi qua plan/review, không apply cảm tính.</li>
+                    <li>Tối ưu cost ngay từ design: region, lifecycle, retention, teardown.</li>
+                    <li>Xử lý secrets như tài sản nhạy cảm, không coi là config tiện tay.</li>
+                    <li>Luôn có lộ trình nâng cấp stack khi workload vượt ngưỡng.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="module" id="s6" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S6 · Troubleshooting</div>
+        <div class="module-title">Lỗi thường gặp — Docker & Terraform</div>
+        <div class="module-subtitle">Đọc đúng error message, khoanh vùng nguyên nhân, fix dứt điểm và phòng tránh tái diễn.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🧯</span>
+          10 lỗi phổ biến trong Module 01
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Lỗi (error message thực tế)</th>
+                <th>Nguyên nhân</th>
+                <th>Cách fix</th>
+                <th>Cách phòng tránh</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>port is already allocated</code> (docker-compose up)</td>
+                <td>Port host (thường 5432 hoặc 8085) đã bị process/container khác chiếm.</td>
+                <td>Kiểm tra <code>docker ps</code>/<code>netstat</code>, stop container/process đang chiếm port hoặc đổi port mapping.</td>
+                <td>Chuẩn hóa port conventions cho team và ghi rõ trong README + compose.</td>
+              </tr>
+              <tr>
+                <td><code>connection refused</code> (app connect DB)</td>
+                <td>DB chưa ready, sai host/port, hoặc app dùng <code>localhost</code> thay vì service name trong compose network.</td>
+                <td>Xác nhận DB healthy, dùng đúng host (<code>pgdatabase</code>) và port nội bộ.</td>
+                <td>Thêm health check và startup ordering; luôn verify connectivity trước ingest.</td>
+              </tr>
+              <tr>
+                <td><code>No such file or directory</code> (volume mount path sai)</td>
+                <td>Bind mount trỏ đến path host không tồn tại hoặc sai relative path.</td>
+                <td>Kiểm tra path tuyệt đối/tương đối, tạo đúng thư mục host trước khi mount.</td>
+                <td>Dùng named volume khi không cần bind code trực tiếp, hạn chế path phụ thuộc máy cá nhân.</td>
+              </tr>
+              <tr>
+                <td>Container exits immediately (<code>exit code 1</code>)</td>
+                <td>Entry command fail do thiếu env, dependency lỗi, hoặc script crash khi start.</td>
+                <td>Đọc <code>docker logs &lt;container&gt;</code>, sửa command/env và rebuild nếu cần.</td>
+                <td>Tách startup check rõ ràng, fail-fast với error message dễ đọc.</td>
+              </tr>
+              <tr>
+                <td><code>permission denied</code> (file/folder trong container)</td>
+                <td>User trong container không có quyền đọc/ghi volume hoặc file executable thiếu quyền.</td>
+                <td>Chỉnh owner/permission đúng, kiểm tra user runtime và chmod/chown phù hợp.</td>
+                <td>Thiết kế image với quyền tối thiểu nhưng đúng mục đích; tránh chạy root mặc định nếu không cần.</td>
+              </tr>
+              <tr>
+                <td>Data mất sau <code>docker-compose down</code></td>
+                <td>Không mount persistent volume hoặc dùng sai volume path cho DB data dir.</td>
+                <td>Gắn named volume đúng thư mục dữ liệu PostgreSQL, không xóa volume khi teardown.</td>
+                <td>Review compose trước khi chạy; phân biệt rõ <code>down</code> và <code>down -v</code>.</td>
+              </tr>
+              <tr>
+                <td><code>Error: No configuration files found</code> (terraform init)</td>
+                <td>Chạy lệnh sai thư mục, không có file <code>.tf</code> trong working directory.</td>
+                <td><code>cd</code> đúng vào folder Terraform (vd: <code>terraform_with_variables</code>) rồi chạy lại.</td>
+                <td>Thiết lập shell prompt/alias hiển thị thư mục hiện tại trước khi chạy IaC.</td>
+              </tr>
+              <tr>
+                <td><code>Error acquiring the state lock</code> (terraform apply)</td>
+                <td>Một process khác đang giữ lock state hoặc lock cũ chưa được release.</td>
+                <td>Xác định process đang chạy, chờ hoàn tất; chỉ force-unlock khi chắc chắn không còn apply nào active.</td>
+                <td>Dùng workflow apply tuần tự qua CI/CD, tránh nhiều người apply tay cùng lúc.</td>
+              </tr>
+              <tr>
+                <td><code>403 Forbidden</code> (terraform apply lên GCP)</td>
+                <td>Service account/user thiếu IAM permission cho resource cần tạo.</td>
+                <td>Đối chiếu role cần thiết (Storage, BigQuery...) và cấp đúng quyền tối thiểu.</td>
+                <td>Chuẩn hóa IAM matrix theo môi trường, validate quyền trước khi apply.</td>
+              </tr>
+              <tr>
+                <td><code>terraform.tfstate</code> bị corrupt hoặc mất</td>
+                <td>State local hỏng/xóa nhầm, đồng bộ thủ công sai hoặc merge conflict state file.</td>
+                <td>Khôi phục từ backup/remote backend; dùng <code>terraform import</code> để re-attach resource nếu cần.</td>
+                <td>Dùng remote state + locking + backup policy; không chỉnh state bằng tay trừ tình huống recovery.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 class="orange">Debugging checklist theo thứ tự ưu tiên</h3>
+          <ol>
+            <li><strong>Đọc nguyên văn lỗi đầu tiên</strong> (đừng bắt đầu từ stack trace cuối cùng).</li>
+            <li><strong>Xác định lớp lỗi:</strong> runtime container, network, credentials, hay state/infra.</li>
+            <li><strong>Kiểm tra trạng thái service nền:</strong> DB/container/provider đã healthy chưa.</li>
+            <li><strong>Kiểm tra config đầu vào:</strong> host, port, path, env vars, IAM, terraform working dir.</li>
+            <li><strong>Sửa một biến mỗi lần</strong> và re-run để xác nhận đúng root cause.</li>
+            <li><strong>Chụp lại evidence</strong> (command + output) trước/sau fix để tránh "fix may mắn".</li>
+            <li><strong>Đánh giá phòng ngừa</strong> (health check, retry, idempotency, remote state, runbook).</li>
+          </ol>
+
+          <div class="info-box note">📝 <span>Sau mỗi lỗi, hãy mở Logbook và ghi theo template: <a href="../00_file_temp/master_de_roadmap.html#s11" target="_blank" rel="noopener noreferrer">Logbook Template (master_de_roadmap.html)</a>.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s7" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S7 · Interview Prep</div>
+        <div class="module-title">Interview Prep — Junior → Mid → Senior</div>
+        <div class="module-subtitle">Mỗi câu hỏi đều cần trả lời theo WHY + Trade-off + Failure handling, không chỉ định nghĩa.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔵</span>
+          <span class="badge badge-blue">Junior</span>
+          1) Container khác VM ở điểm nào cơ bản nhất?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> Container chia sẻ kernel của host nên nhẹ và start nhanh; VM ảo hóa cả OS nên isolation mạnh hơn nhưng tốn tài nguyên hơn. Container phù hợp packaging app/pipeline, VM phù hợp workload cần boundary hệ điều hành riêng.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "Container là VM nhẹ nên giống hệt VM" — câu này bỏ qua khác biệt kiến trúc cốt lõi.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔵</span>
+          <span class="badge badge-blue">Junior</span>
+          2) <code>docker-compose up -d</code> khác <code>docker run</code> ở chỗ nào?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> <code>docker run</code> thường chạy 1 container theo câu lệnh đơn; <code>docker-compose up -d</code> chạy nhiều service theo declarative file (network, volume, env, dependency) và dựng stack đồng bộ.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "Compose chỉ là viết tắt cho nhiều lệnh run" — thiếu phần orchestration config-as-code.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔵</span>
+          <span class="badge badge-blue">Junior</span>
+          3) Terraform state file là gì và lưu ở đâu mặc định?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> State là snapshot mapping giữa code Terraform và resource thực tế. Mặc định Terraform lưu local tại <code>terraform.tfstate</code> trong thư mục chạy lệnh; team production thường chuyển sang remote backend để tránh mất/corrupt và giảm conflict.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "State chỉ là cache, xóa cũng không sao" — xóa state có thể làm Terraform mất toàn bộ nhận thức hiện trạng.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔵</span>
+          <span class="badge badge-blue">Junior</span>
+          4) Tại sao phải chạy <code>terraform plan</code> trước <code>terraform apply</code>?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> <code>plan</code> cho bạn preview chính xác resource nào sẽ add/change/destroy trước khi tác động môi trường thật; đây là bước kiểm soát rủi ro, chi phí và sai config. Trong team, plan cũng là artifact review trước approval apply.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "Apply luôn cho nhanh" — bỏ bước plan là anti-pattern với hạ tầng production.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🟡</span>
+          <span class="badge" style="color:#fbbf24;border-color:#fbbf24;background:rgba(251,191,36,0.12);">Mid</span>
+          5) Làm sao đảm bảo data không mất khi container restart?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> Tách state khỏi lifecycle container bằng persistent volume (named volume hoặc storage ngoài host), mount đúng data directory và kiểm soát backup policy. Restart policy chỉ giúp process sống lại, không thay thế persistence strategy.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "Dùng restart: always là đủ" — service lên lại nhưng data vẫn có thể mất.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🟡</span>
+          <span class="badge" style="color:#fbbf24;border-color:#fbbf24;background:rgba(251,191,36,0.12);">Mid</span>
+          6) Nếu 2 developer cùng chạy <code>terraform apply</code>, chuyện gì xảy ra?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> Có nguy cơ race condition lên state: một người giữ lock, người còn lại gặp lock error; tệ hơn là khi không lock chuẩn thì có thể gây drift hoặc ghi đè trạng thái. Quy trình đúng là remote state + locking + apply tập trung qua CI.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "Không sao vì Terraform tự merge" — Terraform không phải git merge cho hạ tầng.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🟡</span>
+          <span class="badge" style="color:#fbbf24;border-color:#fbbf24;background:rgba(251,191,36,0.12);">Mid</span>
+          7) Tại sao nên dùng <code>variables.tf</code> thay vì hardcode trong <code>main.tf</code>?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> Variables tách input khỏi logic giúp tái sử dụng cùng module cho nhiều môi trường, giảm copy-paste, giảm lỗi thao tác khi đổi project/region/name. Nó cũng giúp review diff tập trung vào logic hạ tầng thay vì noise cấu hình.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "Chỉ để code đẹp hơn" — lợi ích chính là kiểm soát thay đổi và giảm rủi ro vận hành.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🟡</span>
+          <span class="badge" style="color:#fbbf24;border-color:#fbbf24;background:rgba(251,191,36,0.12);">Mid</span>
+          8) Docker image build lại mỗi lần deploy có vấn đề gì về performance?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> Build full mỗi lần làm chậm pipeline CI/CD, tốn compute và network pull/push, nhất là khi dependencies lớn. Tối ưu bằng layer caching, multi-stage build, base image ổn định và chỉ rebuild phần thực sự thay đổi.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "Build chậm không ảnh hưởng gì" — tốc độ deploy chậm trực tiếp giảm incident recovery speed.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🔴</span>
+          <span class="badge" style="color:#f87171;border-color:#f87171;background:rgba(248,113,113,0.12);">Senior</span>
+          9) Thiết kế Docker setup cho pipeline production với 10 services, đảm bảo không có single point of failure
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> Tách service theo trách nhiệm, mỗi service có health check + restart policy + resource limits; stateful components dùng storage bền vững và backup. Đặt load balancer trước service critical, tách observability stack riêng, và có cơ chế graceful degradation khi một service phụ trợ fail.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "Chỉ cần docker-compose với 1 host mạnh" — 1 host là SPoF rõ ràng.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🔴</span>
+          <span class="badge" style="color:#f87171;border-color:#f87171;background:rgba(248,113,113,0.12);">Senior</span>
+          10) Terraform state ở local bị mất sau khi đã apply lên GCP — xử lý thế nào?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> Dừng apply ngay để tránh drift thêm. Khôi phục từ backup nếu có; nếu không, tạo state mới cẩn trọng và <code>terraform import</code> các resource hiện hữu để tái lập mapping. Sau recovery, chuyển sang remote backend + locking để tránh lặp lại.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "Cứ apply lại cho Terraform tự hiểu" — có thể tạo trùng resource hoặc phá naming constraints.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🔴</span>
+          <span class="badge" style="color:#f87171;border-color:#f87171;background:rgba(248,113,113,0.12);">Senior</span>
+          11) Ingest pipeline fail sau 6 tiếng, đã insert 80% data — restart toàn bộ hay tiếp tục? Design idempotent solution
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> Không restart mù từ đầu nếu tốn thời gian và dễ tạo inconsistency. Thiết kế checkpoint theo batch/window + key dedup/merge (UPSERT) để resume từ mốc cuối cùng an toàn. Idempotent outcome quan trọng hơn việc rerun “đơn giản”.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "Xóa bảng rồi nạp lại luôn" trong mọi bối cảnh — cách này có thể phá SLA và làm mất khả năng truy vết.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🔴</span>
+          <span class="badge" style="color:#f87171;border-color:#f87171;background:rgba(248,113,113,0.12);">Senior</span>
+          12) Team có 5 DE cùng dùng chung GCP project với Terraform — quy trình làm việc tránh conflict thế nào?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Gợi ý trả lời:</strong> Chuẩn hóa workflow: branch/PR bắt buộc, plan trên PR, apply sau merge qua CI với quyền tập trung; dùng remote state + locking + convention module rõ ràng theo domain. Tách môi trường bằng workspace hoặc project riêng để giảm blast radius.</p>
+          <div class="info-box danger">🚩 <span><strong>Red flag: đừng nói...</strong> "Mỗi người tự apply local cẩn thận là được" — cách này không scale và thiếu auditability.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s8" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S8 · Checklist & Wrap-up</div>
+        <div class="module-title">Checklist tốt nghiệp Module 01</div>
+        <div class="module-subtitle">Tick đủ, hiểu đủ, giải thích được đủ thì mới sang Module 02.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">📈</span>
+          Progress checklist (18 mục)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="progress-text" id="checklist-progress-text">0/18 mục hoàn thành (0%)</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="checklist-progress-fill"></div>
+          </div>
+
+          <h3 class="blue">Beginner (6 items)</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Giải thích được Container vs VM cho người không biết IT</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Chạy được <code>docker-compose up -d</code> không lỗi</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Biết dùng <code>docker logs</code>, <code>docker ps</code>, <code>docker exec</code> để debug</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Chạy được <code>ingest_data.py</code> và verify data trong PostgreSQL</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Chạy được <code>terraform init</code>, <code>plan</code>, <code>apply</code>, <code>destroy</code></span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Giải thích được cơ chế ánh xạ port HOST:CONTAINER</span></div>
+
+          <h3 class="orange">Intermediate (6 items)</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Tự viết Dockerfile cho Python script từ đầu</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Thêm service mới vào docker-compose với đúng network và volume</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Đọc hiểu toàn bộ <code>main.tf</code> và <code>variables.tf</code> trong repo</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Tạo thêm GCP resource mới bằng Terraform không cần copy-paste</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Debug được <code>connection refused</code> giữa 2 containers</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Biết <code>terraform.tfstate</code> chứa gì và rủi ro khi để ở local</span></div>
+
+          <h3 class="red">Senior (6 items)</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Viết được Dockerfile multi-stage giảm image size</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Cấu hình remote state Terraform trên GCS với state locking</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Thêm idempotency vào <code>ingest_data.py</code> (chạy N lần = 1 lần)</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Thiết kế health check cho tất cả services trong docker-compose</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Trả lời được 4 câu Senior interview không cần nhìn tài liệu</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Giải thích trade-off Docker Compose vs Kubernetes cho người mới</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧠</span>
+          Summary grid — 4 điểm chốt
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="summary-grid">
+            <div class="summary-item"><strong>1) Docker</strong>Môi trường nhất quán, giải quyết "works on my machine".</div>
+            <div class="summary-item"><strong>2) Terraform</strong>IaC giúp hạ tầng reproducible và version controlled.</div>
+            <div class="summary-item"><strong>3) Idempotency</strong>Nguyên tắc số 1 để pipeline production re-run an toàn.</div>
+            <div class="summary-item"><strong>4) State management</strong>Điểm yếu lớn nhất nếu xử lý cẩu thả; cần backend/locking/backup rõ ràng.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">✅</span>
+          Definition of Done (DoD) — phải tick đủ mới sang Module 02
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Chạy được:</strong> Code/pipeline chạy thành công từ đầu đến cuối.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Hiểu được:</strong> Vẽ lại kiến trúc module mà không cần nhìn tài liệu.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Phá được:</strong> Tự tạo ít nhất 1 lỗi và ghi lại cách fix vào Logbook.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Tối ưu được:</strong> Không hardcode secrets, cấu trúc gọn, đọc được.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Trả lời được:</strong> Giải quyết mạch lạc Senior Questions của module.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">⏭️</span>
+          Preview Module 02
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Module tiếp theo:</strong> Workflow Orchestration với Kestra/Airflow.</p>
+          <p><strong>Cần chuẩn bị:</strong> Docker đang chạy được (module này), hiểu khái niệm scheduling cơ bản.</p>
+          <p><a href="Module02_Orchestration.html">→ Module 02: Workflow Orchestration</a></p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const modules = document.querySelectorAll('.module');
+const navItems = document.querySelectorAll('.nav-item');
+
+function showModule(index, navItem) {
+  modules.forEach(module => {
+    module.classList.remove('active');
+    module.style.display = 'none';
+  });
+  navItems.forEach(item => item.classList.remove('active'));
+
+  const target = document.getElementById(`s${index}`);
+  if (target) {
+    target.classList.add('active');
+    target.style.display = 'block';
+  }
+
+  if (navItem) navItem.classList.add('active');
+  else if (navItems[index]) navItems[index].classList.add('active');
+
+  window.scrollTo(0, 0);
+}
+
+function toggleSection(header) {
+  const content = header.nextElementSibling;
+  const toggle = header.querySelector('.section-toggle');
+  const isHidden = content.style.display === 'none';
+  content.style.display = isHidden ? 'block' : 'none';
+  toggle.textContent = isHidden ? '▼' : '▶';
+}
+
+function answerQuiz(el, isCorrect, msg) {
+  const item = el.closest('.quiz-item');
+  const opts = item.querySelectorAll('.quiz-opt');
+  const explain = item.querySelector('.quiz-explain');
+
+  opts.forEach(opt => (opt.style.pointerEvents = 'none'));
+  el.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  if (!isCorrect) {
+    opts.forEach(opt => {
+      const onclick = opt.getAttribute('onclick');
+      if (onclick && onclick.includes('true')) opt.classList.add('correct');
+    });
+  }
+
+  explain.textContent = (isCorrect ? '✓ Chính xác! ' : '✗ Sai. ') + msg;
+  explain.classList.add('show');
+}
+
+function toggleSolution(btn) {
+  const box = btn.nextElementSibling;
+  const show = box.classList.toggle('show');
+  btn.textContent = show ? '🔼 Ẩn lời giải' : '💡 Xem lời giải';
+}
+
+function switchTab(groupId, tabId) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+
+  group.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+  const clicked = group.querySelector(`[onclick*="${tabId}"]`);
+  if (clicked) clicked.classList.add('active');
+
+  const container = group.parentElement;
+  container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  const target = document.getElementById(tabId);
+  if (target) target.classList.add('active');
+}
+
+function toggleCheck(box) {
+  box.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress() {
+  const checks = document.querySelectorAll('.check-box');
+  const checked = document.querySelectorAll('.check-box.checked').length;
+  const total = checks.length;
+  const pct = total === 0 ? 0 : Math.round((checked / total) * 100);
+
+  const progressFill = document.getElementById('checklist-progress-fill') || document.getElementById('progress-fill');
+  const progressText = document.getElementById('checklist-progress-text') || document.getElementById('progress-text');
+
+  if (progressFill) progressFill.style.width = `${pct}%`;
+  if (progressText) progressText.textContent = `${checked}/${total} mục hoàn thành (${pct}%)`;
+}
+
+showModule(0, navItems[0]);
+updateProgress();
+</script>
+</body>
+</html>

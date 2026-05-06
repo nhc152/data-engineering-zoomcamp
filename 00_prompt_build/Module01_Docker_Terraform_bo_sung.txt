@@ -1,0 +1,93 @@
+## Prompt Patch — Bổ sung 6 đoạn vào Module01_Docker_Terraform.html
+
+```
+Đọc các file sau trước khi làm:
+- Module01_Docker_Terraform.html (đọc toàn bộ để hiểu structure hiện tại)
+- data-engineering-zoomcamp/01-docker-terraform/docker-sql/pipeline/ingest_data.py
+- data-engineering-zoomcamp/01-docker-terraform/docker-sql/pipeline/docker-compose.yaml
+- data-engineering-zoomcamp/01-docker-terraform/docker-sql/pipeline/Dockerfile
+
+Thực hiện 6 bổ sung sau vào file Module01_Docker_Terraform.html.
+Không được thay đổi bất cứ nội dung nào đã có — chỉ TÌM ĐÚNG VỊ TRÍ và CHÈN THÊM.
+
+---
+
+BỔ SUNG 1 — Trong S2, phần phân tích ingest_data.py
+Tìm đoạn giải thích "Điểm yếu của script này" hoặc đoạn kết thúc phân tích ingest_data.py.
+Chèn thêm sau đó:
+
+- Tại sao dùng `Int64` (nullable) thay vì `int64` thường cho VendorID, passenger_count?
+  → Dataset thực tế có missing values, int64 không chứa được NaN, Int64 (pandas nullable) thì được
+- `uv sync --locked` trong Dockerfile khác `pip install` thế nào?
+  → --locked đảm bảo dùng đúng version trong uv.lock, tránh "dependency drift" giữa các môi trường
+- pgAdmin map port 8085:80 (không phải 8080:80) — giải thích tại sao chọn 8085
+
+---
+
+BỔ SUNG 2 — Trong S2, phần phân tích docker-compose.yaml
+Tìm đoạn giải thích ports mapping trong docker-compose.yaml.
+Chèn thêm sau đó:
+
+- Tại sao không có `depends_on` trong file compose hiện tại?
+  → Đây là điểm yếu thực tế: postgres khởi động mất 2-5 giây, nếu ingest chạy ngay sẽ báo
+  "connection refused". Fix đúng cách là dùng healthcheck + depends_on condition: service_healthy
+  (không phải chỉ depends_on tên service — đó chỉ check container started, không check DB ready)
+
+---
+
+BỔ SUNG 3 — Trong S3, phần "Cố tình phá"
+Tìm kịch bản cuối cùng trong phần "Cố tình phá" (kịch bản thứ 5).
+Chèn thêm kịch bản thứ 6 sau đó:
+
+- Chạy docker run ingest với --pg-host=localhost thay vì --pg-host=pgdatabase
+  → Lỗi: "connection refused" hoặc "could not connect to server"
+  → Tại sao: container có network namespace riêng, localhost trong container
+    trỏ về chính container đó, không phải host machine hay container khác
+  → Fix: luôn dùng tên container (--name) làm hostname khi giao tiếp container-to-container
+  → Đây là lỗi phổ biến nhất của người mới học Docker networking
+
+---
+
+BỔ SUNG 4 — Trong S4, câu 6 SECURITY
+Tìm phần trả lời câu hỏi Security (câu 6) trong S4.
+Chèn thêm vào cuối phần đó:
+
+- Container đang chạy với root user theo mặc định — rủi ro gì?
+  → Nếu có lỗ hổng trong app, attacker có full root access vào container
+  → Fix: thêm vào Dockerfile:
+    RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+    USER appuser
+
+- Service Account Key JSON trên máy cá nhân — rủi ro gì và alternative tốt hơn?
+  → Key JSON nếu bị leak (commit nhầm lên git, máy bị hack) → attacker có full quyền trên GCP
+  → Alternative production: Workload Identity Federation — GCP cấp quyền tạm thời
+    cho workload (GitHub Actions, VM) mà không cần key file
+  → Nguyên tắc: credentials không nên tồn tại dưới dạng file trên disk
+
+---
+
+BỔ SUNG 5 — Trong S6, bảng lỗi thường gặp
+Tìm bảng lỗi trong S6. Thêm một row mới vào cuối bảng:
+
+Lỗi: psycopg.OperationalError: connection to server at "localhost" failed
+Nguyên nhân: --pg-host=localhost khi chạy ingest container — localhost trỏ về chính container đó, không phải postgres container
+Fix: đổi thành --pg-host=pgdatabase (tên container được đặt bằng --name flag)
+Phòng tránh: luôn dùng container name làm hostname khi giao tiếp nội bộ Docker network
+
+---
+
+BỔ SUNG 6 — Trong S8, phần Summary
+Tìm "Summary grid" hoặc phần "4 điểm chốt" trong S8.
+Thêm điểm thứ 5 vào cuối:
+
+AWS mapping — kiến thức có thể transfer:
+GCS → S3, BigQuery Dataset → Glue Data Catalog
+Repo đã có terraform_with_variable_AWS/ làm reference sẵn
+
+---
+
+SAU KHI THÊM XONG:
+1. Kiểm tra file mở được trên browser không lỗi console
+2. Kiểm tra 6 vị trí vừa chèn hiển thị đúng style với phần xung quanh
+3. Báo cáo: số dòng trước và sau khi patch, vị trí chính xác (line number) của từng bổ sung
+```

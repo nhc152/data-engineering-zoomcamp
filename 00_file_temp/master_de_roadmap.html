@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Roadmap: Từ Zero đến Senior Data Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f0e;
+    --surface: #141716;
+    --surface2: #1c1f1d;
+    --border: #2a2e2c;
+    --text: #e8ede9;
+    --muted: #6b736d;
+    --accent-green: #4ade80;
+    --accent-amber: #fbbf24;
+    --accent-blue: #60a5fa;
+    --accent-red: #f87171;
+    --accent-purple: #c084fc;
+    --accent-teal: #2dd4bf;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Fraunces', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+    display: flex;
+  }
+  .content-wrapper {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(74,222,128,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent-green);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    max-width: 800px;
+  }
+  header h1 em {
+    font-style: italic;
+    color: var(--accent-green);
+  }
+  .header-meta {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 2rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .header-meta span { color: var(--text); }
+
+  /* NAV (SIDEBAR) */
+  nav.sidebar {
+    position: sticky;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    flex-shrink: 0;
+    background: rgba(13,15,14,0.95);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 100;
+  }
+  nav.sidebar::-webkit-scrollbar { display: none; }
+  nav.sidebar { scrollbar-width: none; }
+  nav.sidebar a {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.8rem 2rem;
+    white-space: nowrap;
+    border-left: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  nav.sidebar a:hover { 
+    color: var(--accent-green); 
+    border-left-color: var(--accent-green); 
+    background: rgba(74,222,128,0.05);
+  }
+  
+  @media (max-width: 850px) {
+    body { flex-direction: column; }
+    nav.sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      flex-direction: row;
+      overflow-x: auto;
+      padding: 0;
+    }
+    .nav-brand { display: none; }
+    nav.sidebar a {
+      padding: 1rem 1.2rem;
+      border-left: none;
+      border-bottom: 2px solid transparent;
+    }
+    nav.sidebar a:hover {
+      border-left-color: transparent;
+      border-bottom-color: var(--accent-green);
+    }
+  }
+
+  /* MAIN */
+  main { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+
+  /* SECTION */
+  section { margin-bottom: 5rem; scroll-margin-top: 80px; }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--accent-green);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  section > h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 300;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  section > p.lead {
+    color: var(--muted);
+    font-size: 0.95rem;
+    max-width: 750px;
+    margin-bottom: 2.5rem;
+  }
+
+  /* BLOCKS */
+  .block { margin-bottom: 2rem; }
+  .block:last-child { margin-bottom: 0; }
+  .block-title {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* LISTS */
+  ul.items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  ul.items li {
+    font-size: 0.88rem;
+    padding-left: 1.2rem;
+    position: relative;
+    color: #c8cfc9;
+  }
+  ul.items li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--muted);
+  }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.2rem;
+  }
+  .card h4 {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+    color: var(--text);
+  }
+  .card p { font-size: 0.85rem; color: #8a9490; }
+
+  /* CALLOUTS */
+  .callout {
+    border-left: 3px solid;
+    padding: 1rem 1.2rem;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+    border-radius: 0 4px 4px 0;
+    background: var(--surface2);
+  }
+  .callout.warn { border-color: var(--accent-amber); background: rgba(251,191,36,0.05); }
+  .callout.info { border-color: var(--accent-blue); background: rgba(96,165,250,0.05); }
+  .callout.danger { border-color: var(--accent-red); background: rgba(248,113,113,0.05); }
+  .callout.success { border-color: var(--accent-green); background: rgba(74,222,128,0.05); }
+  .callout strong { font-weight: 500; color: var(--text); }
+
+  /* PRE/CODE */
+  pre {
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem 1.2rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    overflow-x: auto;
+    color: #a8b5a9;
+    line-height: 1.6;
+    margin: 1rem 0;
+  }
+  code { font-family: var(--mono); font-size: 0.85em; color: var(--accent-green); background: rgba(74,222,128,0.1); padding: 0.1rem 0.3rem; border-radius: 2px; }
+  pre code { background: none; padding: 0; color: inherit; }
+
+  /* PHASE ACCORDION */
+  .phase {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+  }
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    background: var(--surface);
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .phase-header:hover { background: var(--surface2); }
+  .phase-num {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    min-width: 2rem;
+  }
+  .phase-title {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  .phase-chevron {
+    font-size: 0.8rem;
+    color: var(--muted);
+    transition: transform 0.3s;
+  }
+  .phase.open .phase-chevron { transform: rotate(90deg); }
+  .phase-body {
+    display: none;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .phase.open .phase-body { display: block; }
+
+  /* SPECIFIC COLORS */
+  .text-blue { color: var(--accent-blue); }
+  .text-green { color: var(--accent-green); }
+  .text-amber { color: var(--accent-amber); }
+  .text-red { color: var(--accent-red); }
+  .text-purple { color: var(--accent-purple); }
+  .text-teal { color: var(--accent-teal); }
+
+  /* TABLES */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1rem 0; }
+  .data-table th {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-align: left;
+    padding: 0.8rem;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .data-table td {
+    padding: 0.8rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: #a8b5a9;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+
+  /* FLOW STEPS */
+  .flow-steps {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+  }
+  .flow-steps li {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    padding: 0.8rem 0.5rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    text-align: center;
+    border-radius: 4px;
+    color: var(--accent-green);
+    position: relative;
+  }
+  @media (max-width: 768px) { .flow-steps { grid-template-columns: 1fr; } }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    font-size: 0.9rem;
+    padding: 0.4rem 0;
+    color: #c8cfc9;
+  }
+  .check-box {
+    width: 16px; height: 16px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .check-box.checked {
+    background: var(--accent-green);
+    border-color: var(--accent-green);
+  }
+  .check-box.checked::after { content: '✓'; font-size: 10px; color: #000; font-weight: 600; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    background: var(--surface);
+  }
+  footer p { margin-bottom: 0.5rem; }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="nav-brand" style="padding: 1.5rem 2rem 1rem; margin-bottom: 0.5rem;">
+    <h2 style="font-family: var(--serif); font-size: 1.2rem; color: var(--accent-green); font-weight: 300;">DE Roadmap</h2>
+    <p style="font-size: 0.7rem; color: var(--muted); font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase;">Zero to Hero</p>
+  </div>
+  <div style="padding: 0 1rem 1rem;">
+    <input
+      id="sidebar-search"
+      type="text"
+      placeholder="Tìm nhanh..."
+      oninput="filterSidebar(this.value)"
+      style="width:100%; background:var(--surface2); border:1px solid var(--border);
+             border-radius:4px; padding:0.4rem 0.6rem; font-family:var(--mono);
+             font-size:0.72rem; color:var(--text); outline:none;"
+    />
+  </div>
+  <a href="#s01">01. Overview</a>
+  <a href="#s02">02. 3 Levels</a>
+  <a href="#s03">03. Learning Flow</a>
+  <a href="#s04">04. Daily Plan</a>
+  <a href="#s05">05. Modules</a>
+  <a href="#s06">06. Project</a>
+  <a href="#s07">07. System Design</a>
+  <a href="#s08">08. Incidents</a>
+  <a href="#s09">09. Cost &amp; Perf</a>
+  <a href="#s10">10. Decisions</a>
+  <a href="#s11">11. Logbook</a>
+  <a href="#s12">12. DoD</a>
+  <a href="#s13">13. Execution Plan</a>
+  <a href="#s14">14. Prod Metrics</a>
+  <a href="#s15">15. Testing &amp; CI/CD</a>
+  <a href="#s16">16. Interview Map</a>
+  <a href="#s17">17. Strategy</a>
+  <a href="#s18">18. Portfolio</a>
+  <a href="#s19">19. Checklist</a>
+</nav>
+
+<div class="content-wrapper">
+
+<header>
+  <div class="header-tag">Master Roadmap · Zero to Hero</div>
+  <h1>Lộ trình học<br><em>Data Engineering</em><br>Thực Chiến Chuyên Sâu</h1>
+  <div class="header-meta">
+    <div>Dành cho: <span>Beginner &amp; Mid-level</span></div>
+    <div>Thời gian: <span>6-8 tháng</span></div>
+    <div>Commitment: <span>2-3 giờ/ngày</span></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- PHẦN 1 — OVERVIEW -->
+  <section id="s01">
+    <div class="section-label">01 · Big Picture</div>
+    <h2>Data Engineer làm gì?</h2>
+    <p class="lead">Hiểu rõ cuộc chơi trước khi bắt đầu. Không lặn ngụp trong tool nếu chưa biết đích đến.</p>
+
+    <div class="block">
+      <div class="block-title">Định nghĩa ngắn gọn</div>
+      <p>Data Engineer (DE) là người xây dựng "hệ thống ống nước" (pipelines) để vận chuyển dữ liệu từ nguồn (App, API, DB) về kho lưu trữ tập trung, làm sạch và chuẩn bị sẵn sàng cho Data Analyst, Data Scientist hoặc hệ thống AI sử dụng một cách <strong>đúng, đủ, kịp thời và tối ưu chi phí</strong>.</p>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Hệ sinh thái & Vị trí 7 Module Zoomcamp</div>
+      <div class="grid-2">
+        <div class="card">
+          <h4 class="text-blue">1. Infrastructure & Orchestration</h4>
+          <p>Nền tảng hạ tầng và lập lịch tự động.</p>
+          <ul class="items" style="margin-top: 0.5rem;">
+            <li><strong>Module 01 (Docker + Terraform):</strong> Đóng gói app, tự động hóa tạo hạ tầng.</li>
+            <li><strong>Module 02 (Kestra/Airflow):</strong> Lập lịch, quản lý luồng chạy, retry khi lỗi.</li>
+            <li><strong>Module 05 (Platform):</strong> Quản lý metadata, assets.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 class="text-amber">2. Storage & Transformation</h4>
+          <p>Nơi dữ liệu hạ cánh và được nhào nặn.</p>
+          <ul class="items" style="margin-top: 0.5rem;">
+            <li><strong>Module 03 (BigQuery/DWH):</strong> Lưu trữ khổng lồ, truy vấn siêu tốc.</li>
+            <li><strong>Module 04 (dbt):</strong> Transform raw data thành mô hình chuẩn (Kimball, Medallion).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 class="text-red">3. Heavy Compute (Batch)</h4>
+          <p>Xử lý dữ liệu định kỳ khối lượng khủng.</p>
+          <ul class="items" style="margin-top: 0.5rem;">
+            <li><strong>Module 06 (Spark):</strong> Xử lý dữ liệu phân tán (TB, PB), backfill lịch sử.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4 class="text-purple">4. Real-time (Streaming)</h4>
+          <p>Dữ liệu chảy liên tục, xử lý tức thì.</p>
+          <ul class="items" style="margin-top: 0.5rem;">
+            <li><strong>Module 07 (Kafka + Flink):</strong> Message broker, xử lý stateful stream, low latency.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 2 — 3 LEVEL LEARNING SYSTEM -->
+  <section id="s02">
+    <div class="section-label">02 · Hệ thống 3 Tầng</div>
+    <h2>Level Learning System</h2>
+    <p class="lead">Đừng cố học Senior khi bạn chưa vững Beginner. Đây là cách phân cấp kiến thức để không bị ngợp.</p>
+
+    <div class="grid-3">
+      <div class="card" style="border-top: 3px solid var(--accent-blue);">
+        <h4>LEVEL 1 — BEGINNER</h4>
+        <p style="margin-bottom: 1rem; color: var(--text);">Mục tiêu: Hiểu cơ bản & Chạy được.</p>
+        <ul class="items">
+          <li><strong>Skill:</strong> Setup môi trường, gõ lại tutorial không lỗi.</li>
+          <li><strong>Output:</strong> Script chạy thành công.</li>
+          <li><strong>Sai lầm:</strong> Copy paste mù quáng, không đọc error log.</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--accent-amber);">
+        <h4>LEVEL 2 — INTERMEDIATE</h4>
+        <p style="margin-bottom: 1rem; color: var(--text);">Mục tiêu: Độc lập & Build pipeline.</p>
+        <ul class="items">
+          <li><strong>Skill:</strong> Tự ghép các module (Zoomcamp level), debug lỗi phổ thông.</li>
+          <li><strong>Output:</strong> Mini project cá nhân.</li>
+          <li><strong>Sai lầm:</strong> Nghĩ "chạy được là xong", bỏ qua xử lý lỗi (exception handling).</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--accent-red);">
+        <h4>LEVEL 3 — SENIOR</h4>
+        <p style="margin-bottom: 1rem; color: var(--text);">Mục tiêu: Production & System Thinking.</p>
+        <ul class="items">
+          <li><strong>Skill:</strong> Optimize cost, design architecture, scale, CI/CD, data quality.</li>
+          <li><strong>Output:</strong> Runbook, Architecture docs, PR review.</li>
+          <li><strong>Sai lầm:</strong> Over-engineering, dùng tool khủng cho data nhỏ.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 3 — LEARNING FLOW -->
+  <section id="s03">
+    <div class="section-label">03 · Cốt lõi phương pháp</div>
+    <h2>Core Learning Flow</h2>
+    <p class="lead">Đây là bí quyết để biến tutorial thành kỹ năng thực tế. Bỏ qua một bước là kiến thức sẽ rơi rụng.</p>
+
+    <ul class="flow-steps">
+      <li>1. Read</li>
+      <li>2. Run</li>
+      <li>3. Break</li>
+      <li>4. Debug</li>
+      <li>5. Explain</li>
+      <li>6. Improve</li>
+      <li>7. Document</li>
+    </ul>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Bước</th><th>Làm gì?</th><th>Vì sao quan trọng?</th><th>Ví dụ</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-blue"><strong>Read</strong></td>
+          <td>Đọc README, lướt source code, tìm entry point.</td>
+          <td>Nắm bức tranh tổng thể trước khi lạc vào chi tiết code.</td>
+          <td>Biết file <code>docker-compose.yml</code> nằm đâu và có mấy service.</td>
+        </tr>
+        <tr>
+          <td class="text-amber"><strong>Run</strong></td>
+          <td>Chạy script, setup infra theo hướng dẫn chuẩn.</td>
+          <td>Tạo baseline. Đảm bảo môi trường work đúng.</td>
+          <td>Chạy lệnh <code>docker-compose up -d</code> thành công.</td>
+        </tr>
+        <tr>
+          <td class="text-red"><strong>Break</strong></td>
+          <td>Cố tình phá hỏng pipeline (tắt DB, đổi port, xóa file).</td>
+          <td>Hiểu giới hạn hệ thống và cách nó thất bại (fail-fast).</td>
+          <td>Đổi mật khẩu DB trong <code>.env</code> khi pipeline đang chạy.</td>
+        </tr>
+        <tr>
+          <td class="text-purple"><strong>Debug</strong></td>
+          <td>Đọc log, tìm Root Cause, sửa lại cho đúng.</td>
+          <td>Kỹ năng sống còn. Fix lỗi là lúc não học nhiều nhất.</td>
+          <td>Mở <code>docker logs</code>, search Google mã lỗi, sửa lại <code>.env</code>.</td>
+        </tr>
+        <tr>
+          <td class="text-teal"><strong>Explain</strong></td>
+          <td>Tự giải thích lại cơ chế bằng tiếng Việt.</td>
+          <td>Feynman technique. Chuẩn bị cho phỏng vấn.</td>
+          <td>"Lỗi connection refused là do service app start trước khi DB ready."</td>
+        </tr>
+        <tr>
+          <td class="text-green"><strong>Improve</strong></td>
+          <td>Tối ưu code cũ, thêm rule, clean up.</td>
+          <td>Tư duy refactoring, hướng tới production.</td>
+          <td>Thêm <code>depends_on</code> và <code>healthcheck</code> vào compose.</td>
+        </tr>
+        <tr>
+          <td class="text-blue"><strong>Document</strong></td>
+          <td>Ghi chú lại vào Logbook hoặc Markdown.</td>
+          <td>Xây dựng kho tàng kiến thức cá nhân (Second Brain).</td>
+          <td>Viết bài blog hoặc note lại trong Github.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PHẦN 4 — DAILY EXECUTION PLAN -->
+  <section id="s04">
+    <div class="section-label">04 · Thực thi hàng ngày</div>
+    <h2>Daily Execution Plan</h2>
+    <p class="lead">Routine 150 phút mỗi ngày. Kỷ luật sinh ra tự do.</p>
+
+    <div class="card" style="border-left: 4px solid var(--accent-green);">
+      <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px;">
+          <h4 class="text-green">Timebox (150 phút)</h4>
+          <ul class="items">
+            <li><strong>30m Đọc:</strong> Concepts, tài liệu, diagram.</li>
+            <li><strong>60m Chạy code:</strong> Clone repo, run tutorial, setup.</li>
+            <li><strong>30m Debug/Break:</strong> Áp dụng flow phá lỗi.</li>
+            <li><strong>20m Logbook:</strong> Ghi chép lại lỗi và cách giải quyết.</li>
+            <li><strong>10m Explain:</strong> Trình bày to thành tiếng (giả lập phỏng vấn).</li>
+          </ul>
+        </div>
+        <div style="flex: 1; min-width: 250px;">
+          <h4 class="text-red">The Iron Rules</h4>
+          <ul class="items">
+            <li><strong>Rule 1:</strong> KHÔNG tính thời gian học nếu hôm đó không gõ/chạy dòng code nào.</li>
+            <li><strong>Rule 2:</strong> KHÔNG qua module mới nếu chưa tự tay debug ít nhất 2 lỗi.</li>
+            <li><strong>Rule 3:</strong> KHÔNG copy-paste error vào ChatGPT ngay lập tức. Phải đọc log trước 5 phút.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 5 — MODULE ROADMAP -->
+  <section id="s05">
+    <div class="section-label">05 · Lộ trình cốt lõi</div>
+    <h2>Module Roadmap (01 → 07)</h2>
+    <p class="lead">Chiến lược cày từng module theo 3 levels và production patterns.</p>
+
+    <!-- M01 -->
+    <div class="phase open">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">01</span>
+        <span class="phase-title text-blue">Docker & Terraform</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="grid-3">
+          <div>
+            <h4>1. Beginner</h4>
+            <ul class="items">
+              <li>Hiểu Container vs VM. Hiểu IaC.</li>
+              <li>Chạy thành công <code>docker run</code> và <code>terraform apply</code> basic.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>2. Intermediate</h4>
+            <ul class="items">
+              <li>Đọc hiểu Dockerfile, docker-compose.</li>
+              <li>Tự build custom image cho script Python. Tự cấu hình GCP resources qua TF.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>3. Senior Questions</h4>
+            <ul class="items">
+              <li>Fail: Nếu TF apply đứt mạng giữa chừng?</li>
+              <li>Scale: Nếu có 50 services, quản lý Compose/K8s sao?</li>
+              <li>Cost: Quản lý resource limit trong Docker thế nào?</li>
+            </ul>
+          </div>
+        </div>
+        <div class="block" style="margin-top: 1.5rem;">
+          <div class="block-title">Pro-tier patterns</div>
+          <p style="font-size: 0.85rem; color: #a8b5a9;">Multi-stage builds để giảm image size. Quản lý Terraform remote state bằng GCS backend + State locking. CI/CD cho Terraform (plan on PR, apply on merge). Secret injection thay vì hardcode.</p>
+        </div>
+        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
+          <a href="Module01_Docker_Terraform.html"
+             style="font-family:var(--mono); font-size:0.75rem; color:var(--accent-green);
+                    text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;">
+            → Vào bài học chi tiết Module 01
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- M02 -->
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">02</span>
+        <span class="phase-title text-green">Workflow Orchestration</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="grid-3">
+          <div>
+            <h4>1. Beginner</h4>
+            <ul class="items">
+              <li>Hiểu DAG, Task, Schedule.</li>
+              <li>Chạy được 1 luồng hello-world trên Airflow/Kestra.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>2. Intermediate</h4>
+            <ul class="items">
+              <li>Hiểu Parameterization, Variables.</li>
+              <li>Tự build DAG daily ingest API vào DB với retry.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>3. Senior Questions</h4>
+            <ul class="items">
+              <li>Fail: Làm sao chạy lại từ task bị fail mà không duplicate data?</li>
+              <li>Scale: Lập lịch 10,000 DAGs, bottleneck ở đâu?</li>
+              <li>Alert: Alert SLA trễ như thế nào?</li>
+            </ul>
+          </div>
+        </div>
+        <div class="block" style="margin-top: 1.5rem;">
+          <div class="block-title">Pro-tier patterns</div>
+          <p style="font-size: 0.85rem; color: #a8b5a9;">Tuyệt đối tuân thủ <strong>Idempotency</strong> (chạy N lần kết quả như 1). Dynamic DAG generation. Backfill strategy theo partition date. Cấu hình task timeout và SLA alerts.</p>
+        </div>
+        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
+          <a href="Module02_Orchestration.html"
+             style="font-family:var(--mono); font-size:0.75rem; color:var(--accent-green);
+                    text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;">
+            → Vào bài học chi tiết Module 02
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- M03 -->
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">03</span>
+        <span class="phase-title text-amber">Data Warehouse (BigQuery)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="grid-3">
+          <div>
+            <h4>1. Beginner</h4>
+            <ul class="items">
+              <li>Hiểu OLAP vs OLTP. Columnar storage.</li>
+              <li>Tạo table, query cơ bản trên BQ UI.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>2. Intermediate</h4>
+            <ul class="items">
+              <li>Đọc hiểu External tables, Partition, Cluster.</li>
+              <li>Tự design schema cho dataset thực tế, load data từ GCS.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>3. Senior Questions</h4>
+            <ul class="items">
+              <li>Cost: Làm sao giới hạn bytes billed per query?</li>
+              <li>Scale: Update/Delete hàng tỷ record trong DWH thế nào?</li>
+              <li>Security: Quản lý Row/Column level security?</li>
+            </ul>
+          </div>
+        </div>
+        <div class="block" style="margin-top: 1.5rem;">
+          <div class="block-title">Pro-tier patterns</div>
+          <p style="font-size: 0.85rem; color: #a8b5a9;">Luôn luôn dùng Partitioning (thường theo DATE) và Clustering. Cấm dùng <code>SELECT *</code>. Thiết lập Custom Quotas để chống query tỉ đô. Materialized views cho dashboard chậm.</p>
+        </div>
+        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
+          <a href="Module03_Data_Warehouse.html"
+             style="font-family:var(--mono); font-size:0.75rem; color:var(--accent-green);
+                    text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;">
+            → Vào bài học chi tiết Module 03
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- M04 -->
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">04</span>
+        <span class="phase-title text-teal">Analytics Engineering (dbt)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="grid-3">
+          <div>
+            <h4>1. Beginner</h4>
+            <ul class="items">
+              <li>Hiểu vai trò của dbt (phần T trong ELT).</li>
+              <li>Chạy <code>dbt run</code> và tạo được view/table đơn giản.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>2. Intermediate</h4>
+            <ul class="items">
+              <li>Hiểu Jinja, Macros, Tests cơ bản.</li>
+              <li>Tự build luồng Staging -> Mart theo Medallion architecture.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>3. Senior Questions</h4>
+            <ul class="items">
+              <li>Fail: Nếu model chạy fail, downstream model ảnh hưởng sao?</li>
+              <li>Cost: Chiến lược Incremental load tối ưu nhất?</li>
+              <li>Scale: Quản lý hàng trăm models không bị spaghetti?</li>
+            </ul>
+          </div>
+        </div>
+        <div class="block" style="margin-top: 1.5rem;">
+          <div class="block-title">Pro-tier patterns</div>
+          <p style="font-size: 0.85rem; color: #a8b5a9;">Sử dụng dbt Slim CI (chỉ chạy models bị thay đổi). Áp dụng nghiêm ngặt Data Contracts & Tests (unique, not_null). Tận dụng Packages (dbt-utils, dbt-expectations). Generate và host dbt docs.</p>
+        </div>
+        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
+          <a href="Module04_Analytics_Engineering.html"
+             style="font-family:var(--mono); font-size:0.75rem; color:var(--accent-green);
+                    text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;">
+            → Vào bài học chi tiết Module 04
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- M05 -->
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">05</span>
+        <span class="phase-title text-blue">Data Platforms (Platform Thinking)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <p style="font-size: 0.85rem; color: #a8b5a9; margin-bottom: 1rem;"><em>Module này nâng cấp tư duy từ viết script rải rác sang quản trị Data như một Sản phẩm.</em></p>
+        <div class="grid-2">
+          <div>
+            <h4>Intermediate: Tooling</h4>
+            <ul class="items">
+              <li>Sử dụng các tool quản lý asset (ví dụ: Bruin, Dagster).</li>
+              <li>Biết khai báo dependencies giữa các data assets.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Senior: Governance</h4>
+            <ul class="items">
+              <li>Tích hợp Data Lineage (trace từ source tới dashboard).</li>
+              <li>Định nghĩa Ownership và Data Catalog (DataHub/Amundsen).</li>
+            </ul>
+          </div>
+        </div>
+        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
+          <a href="Module05_Data_Platforms.html"
+             style="font-family:var(--mono); font-size:0.75rem; color:var(--accent-green);
+                    text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;">
+            → Vào bài học chi tiết Module 05
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- M06 -->
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">06</span>
+        <span class="phase-title text-red">Batch Processing (Spark)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="grid-3">
+          <div>
+            <h4>1. Beginner</h4>
+            <ul class="items">
+              <li>Hiểu Distributed computing, Resilient Distributed Datasets (RDDs), DataFrames.</li>
+              <li>Chạy PySpark script đếm dòng cơ bản.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>2. Intermediate</h4>
+            <ul class="items">
+              <li>Đọc hiểu Transformation vs Action, Lazy evaluation.</li>
+              <li>Tự viết job xử lý 10GB data, group by và join ghi ra Parquet.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>3. Senior Questions</h4>
+            <ul class="items">
+              <li>Fail: OOM (Out of memory) xử lý sao?</li>
+              <li>Perf: Data skew trong lúc join giải quyết thế nào?</li>
+              <li>Cost: Chọn Cluster sizing ra sao cho job chạy hàng ngày?</li>
+            </ul>
+          </div>
+        </div>
+        <div class="block" style="margin-top: 1.5rem;">
+          <div class="block-title">Pro-tier patterns</div>
+          <p style="font-size: 0.85rem; color: #a8b5a9;">Tuning memory (Executor, Driver, Overhead). Xử lý Data Skew bằng Salting hoặc AQE. Tránh Shuffle tối đa (dùng Broadcast Hash Join). Quản lý Small Files problem (dùng Coalesce/Repartition hợp lý).</p>
+        </div>
+        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
+          <a href="Module06_Batch_Processing.html"
+             style="font-family:var(--mono); font-size:0.75rem; color:var(--accent-green);
+                    text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;">
+            → Vào bài học chi tiết Module 06
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- M07 -->
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">07</span>
+        <span class="phase-title text-purple">Streaming (Kafka + Flink)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="grid-3">
+          <div>
+            <h4>1. Beginner</h4>
+            <ul class="items">
+              <li>Hiểu Message Broker, Topic, Publisher, Subscriber.</li>
+              <li>Chạy được Kafka local, push/pull message CLI.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>2. Intermediate</h4>
+            <ul class="items">
+              <li>Hiểu Offset, Consumer Group, Partitions.</li>
+              <li>Tự build app Python produce JSON và Flink consume tính tổng.</li>
+            </ul>
+          </div>
+          <div>
+            <h4>3. Senior Questions</h4>
+            <ul class="items">
+              <li>Fail: Exactly-once semantics thực hiện thế nào?</li>
+              <li>Scale: Lag tăng cao, làm sao scale consumers?</li>
+              <li>Data: Xử lý schema evolution (Avro/Protobuf) thế nào?</li>
+            </ul>
+          </div>
+        </div>
+        <div class="block" style="margin-top: 1.5rem;">
+          <div class="block-title">Pro-tier patterns</div>
+          <p style="font-size: 0.85rem; color: #a8b5a9;">Cấu hình Topic Partition strategy dựa trên throughput. Giám sát Consumer Lag chặt chẽ. Xử lý late arriving data bằng Watermarks. Tích hợp Schema Registry để block bad data ngay từ producer.</p>
+        </div>
+        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
+          <a href="Module07_Streaming.html"
+             style="font-family:var(--mono); font-size:0.75rem; color:var(--accent-green);
+                    text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;">
+            → Vào bài học chi tiết Module 07
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 6 — PROJECT XUYÊN SUỐT -->
+  <section id="s06">
+    <div class="section-label">06 · The Masterpiece</div>
+    <h2>Project Xuyên Suốt Thực Chiến</h2>
+    <p class="lead">Đừng làm 7 cái project lắt nhắt. Hãy làm 1 cái to, kiến trúc chuẩn, nâng cấp dần.</p>
+
+    <div class="block">
+      <div class="block-title">Architecture Diagram (Text)</div>
+      <pre>
+[Sources]
+  ├── Taxi CSVs (Batch)
+  ├── Weather API (Batch)
+  └── User Clicks (Stream)
+       │
+[Ingestion & Orchestration - Kestra/Airflow + Docker]
+  ├── GCS Landing Zone (Raw)
+  └── Kafka Topics (Raw Events)
+       │
+[Processing - Spark & Flink]
+  ├── Spark: Heavy aggregations, Backfills -> GCS/BQ
+  └── Flink: Real-time fraud/surge detection -> Alert Webhook
+       │
+[Warehouse & Transformation - BigQuery & dbt]
+  ├── Bronze: Raw tables
+  ├── Silver: Cleaned, deduped (dbt)
+  └── Gold: Business Marts (dbt)
+       │
+[Serving & Observability]
+  ├── Dashboard (Metabase/Looker Studio)
+  └── Data Quality & Alerts (Slack/Email)
+      </pre>
+    </div>
+
+    <div class="grid-3" style="gap: 1.5rem;">
+      <div class="card" style="border-top: 3px solid var(--accent-blue);">
+        <h4>Phase 1: Batch Foundation (MVP)</h4>
+        <ul class="items" style="font-size: 0.85rem;">
+          <li><strong>Goal:</strong> Xây bộ khung chạy được E2E.</li>
+          <li><strong>Tech:</strong> Docker, Terraform, Kestra, BQ, dbt.</li>
+          <li><strong>Task:</strong> Ingest file Taxi lên GCS -> Load vào BQ -> dbt transform -> Vẽ 1 chart cơ bản.</li>
+          <li><strong>Output:</strong> Repo có IaC, DAG chạy mượt hàng ngày.</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--accent-amber);">
+        <h4>Phase 2: Enrichment & Quality</h4>
+        <ul class="items" style="font-size: 0.85rem;">
+          <li><strong>Goal:</strong> Tăng tính thực tế và ổn định.</li>
+          <li><strong>Tech:</strong> Python API, dbt tests.</li>
+          <li><strong>Task:</strong> Kéo Weather API join với Taxi data. Viết tests chặn data null/sai logic. Bật CI/CD.</li>
+          <li><strong>Output:</strong> Pipeline idempotent, có cảnh báo khi API fail hoặc data bẩn.</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--accent-purple);">
+        <h4>Phase 3: Real-time Streaming</h4>
+        <ul class="items" style="font-size: 0.85rem;">
+          <li><strong>Goal:</strong> Xử lý dữ liệu nóng.</li>
+          <li><strong>Tech:</strong> Kafka, Flink.</li>
+          <li><strong>Task:</strong> Giả lập stream user click. Flink join stream với static data từ DB, tính surge pricing real-time.</li>
+          <li><strong>Output:</strong> Stream pipeline chạy song song batch, bắn alert Slack khi có anomaly.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 7 — SYSTEM DESIGN MINI-CASE -->
+  <section id="s07">
+    <div class="section-label">07 · Não bộ Kiến trúc sư</div>
+    <h2>System Design Mini-Case</h2>
+    <p class="lead">Cách trả lời phỏng vấn System Design. Vấn đề không nằm ở tool, mà nằm ở Trade-offs.</p>
+
+    <div class="block">
+      <div class="card" style="margin-bottom: 1rem;">
+        <h4 class="text-red">Case 1: Hệ thống Batch 1TB/day</h4>
+        <p><strong>Problem:</strong> Log file từ web server đẩy về S3 1TB mỗi ngày, cần extract thông tin user tạo báo cáo lúc 8h sáng.</p>
+        <p><strong>Constraint:</strong> Cost phải rẻ, query phải nhanh lúc sáng sớm.</p>
+        <p><strong>Expected Thinking:</strong> Không dump thẳng vào DWH. Dùng Spark xử lý trên EMR/Dataproc, filter rác, nén Parquet/Snappy, partition theo ngày rồi mới load vào BQ/Snowflake. Dùng dbt incremental update mart.</p>
+        <p><strong>Sai lầm phổ biến:</strong> Xài Python thuần đọc 1TB (sập RAM), hoặc load raw text thẳng vào DWH (tiền cloud x10).</p>
+      </div>
+
+      <div class="card" style="margin-bottom: 1rem;">
+        <h4 class="text-purple">Case 2: Hệ thống Streaming Payment</h4>
+        <p><strong>Problem:</strong> Hệ thống thanh toán cần check fraud trong 2 giây.</p>
+        <p><strong>Constraint:</strong> Không được mất event (Zero loss), độ trễ thấp.</p>
+        <p><strong>Expected Thinking:</strong> Kafka với config <code>acks=all</code>, replication factor 3. Flink đọc xử lý stateful (windowing). Quan trọng nhất: Design Idempotent consumer để xử lý duplicate (vì at-least-once guarantee).</p>
+        <p><strong>Sai lầm phổ biến:</strong> Bỏ qua xử lý duplicate events, cấu hình Kafka mặc định mất data khi broker sập.</p>
+      </div>
+
+      <div class="card">
+        <h4 class="text-blue">Case 3: Data Platform Multi-team</h4>
+        <p><strong>Problem:</strong> 5 team Data Analyst khác nhau cùng đụng vào DWH, query dẫm chân nhau, schema thay đổi liên tục làm hỏng report.</p>
+        <p><strong>Constraint:</strong> Phải có Governance, không cản trở tốc độ dev.</p>
+        <p><strong>Expected Thinking:</strong> Data Mesh concept. Medallion architecture rõ ràng. Bắt buộc có Data Contracts giữa các layer. Phân quyền RLS/CLS. CI/CD strict cho dbt.</p>
+        <p><strong>Sai lầm phổ biến:</strong> Cấp quyền admin cho mọi người, thiếu lineage, sửa view trực tiếp trên UI thay vì qua code.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 8 — INCIDENT SIMULATION -->
+  <section id="s08">
+    <div class="section-label">08 · Diễn tập cứu hỏa</div>
+    <h2>Incident Simulation</h2>
+    <p class="lead">Senior hơn nhau ở chỗ xử lý sự cố lúc nửa đêm. Hãy diễn tập trước.</p>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Incident</th><th>Symptom (Triệu chứng)</th><th>Root Cause & Action</th><th>Prevention (Phòng ngừa)</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-red"><strong>Pipeline Fail</strong></td>
+          <td>DAG đỏ lòm, báo cáo sáng bị rỗng.</td>
+          <td colspan="2">
+            <button onclick="revealIncident(this)"
+                    style="font-family:var(--mono); font-size:0.72rem; color:var(--accent-amber);
+                           background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.3);
+                           border-radius:4px; padding:4px 10px; cursor:pointer;">
+              Tự nghĩ rồi xem đáp án →
+            </button>
+            <div class="incident-answer" style="display:none; margin-top:0.5rem; font-size:0.82rem; color:#a8b5a9;">
+              <div style="margin-bottom: 0.3rem;"><strong>Root Cause & Action:</strong><br><strong>Cause:</strong> API nguồn đổi cấu trúc json.<br><strong>Fix:</strong> Sửa parser, backfill lại data từ ngày fail.</div>
+              <div><strong>Prevention:</strong> Dùng schema registry hoặc validate bằng Data Contracts.</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-amber"><strong>Duplicate Data</strong></td>
+          <td>Doanh thu tự nhiên tăng gấp đôi.</td>
+          <td colspan="2">
+            <button onclick="revealIncident(this)"
+                    style="font-family:var(--mono); font-size:0.72rem; color:var(--accent-amber);
+                           background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.3);
+                           border-radius:4px; padding:4px 10px; cursor:pointer;">
+              Tự nghĩ rồi xem đáp án →
+            </button>
+            <div class="incident-answer" style="display:none; margin-top:0.5rem; font-size:0.82rem; color:#a8b5a9;">
+              <div style="margin-bottom: 0.3rem;"><strong>Root Cause & Action:</strong><br><strong>Cause:</strong> Pipeline chạy retry nhưng lệnh INSERT không xóa data cũ.<br><strong>Fix:</strong> Chạy query deduplicate, xóa rác.</div>
+              <div><strong>Prevention:</strong> Biến mọi pipeline thành Idempotent (dùng MERGE/UPSERT thay vì INSERT).</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-green"><strong>Cost Spike</strong></td>
+          <td>Bill GCP tháng này tăng 500%.</td>
+          <td colspan="2">
+            <button onclick="revealIncident(this)"
+                    style="font-family:var(--mono); font-size:0.72rem; color:var(--accent-amber);
+                           background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.3);
+                           border-radius:4px; padding:4px 10px; cursor:pointer;">
+              Tự nghĩ rồi xem đáp án →
+            </button>
+            <div class="incident-answer" style="display:none; margin-top:0.5rem; font-size:0.82rem; color:#a8b5a9;">
+              <div style="margin-bottom: 0.3rem;"><strong>Root Cause & Action:</strong><br><strong>Cause:</strong> Một Analyst chạy <code>SELECT *</code> trên bảng không có partition 100 lần.<br><strong>Fix:</strong> Kill query, block user tạm thời.</div>
+              <div><strong>Prevention:</strong> Bắt buộc <code>require_partition_filter=true</code>, set custom Quotas.</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-purple"><strong>Kafka Lag</strong></td>
+          <td>Dashboard real-time bị delay 30 phút.</td>
+          <td colspan="2">
+            <button onclick="revealIncident(this)"
+                    style="font-family:var(--mono); font-size:0.72rem; color:var(--accent-amber);
+                           background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.3);
+                           border-radius:4px; padding:4px 10px; cursor:pointer;">
+              Tự nghĩ rồi xem đáp án →
+            </button>
+            <div class="incident-answer" style="display:none; margin-top:0.5rem; font-size:0.82rem; color:#a8b5a9;">
+              <div style="margin-bottom: 0.3rem;"><strong>Root Cause & Action:</strong><br><strong>Cause:</strong> Lưu lượng đột biến (sale event), consumers xử lý không kịp.<br><strong>Fix:</strong> Scale up consumer group (nếu số partition cho phép).</div>
+              <div><strong>Prevention:</strong> Monitor offset lag metric, setup auto-scaling rule.</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-blue"><strong>Schema Change</strong></td>
+          <td>Cột <code>price</code> chuyển từ INT sang STRING, pipeline crash.</td>
+          <td colspan="2">
+            <button onclick="revealIncident(this)"
+                    style="font-family:var(--mono); font-size:0.72rem; color:var(--accent-amber);
+                           background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.3);
+                           border-radius:4px; padding:4px 10px; cursor:pointer;">
+              Tự nghĩ rồi xem đáp án →
+            </button>
+            <div class="incident-answer" style="display:none; margin-top:0.5rem; font-size:0.82rem; color:#a8b5a9;">
+              <div style="margin-bottom: 0.3rem;"><strong>Root Cause & Action:</strong><br><strong>Cause:</strong> Backend dev sửa DB không báo cáo.<br><strong>Fix:</strong> Cập nhật dbt cast type, chạy lại pipeline.</div>
+              <div><strong>Prevention:</strong> Communication quy trình rõ ràng, CI/CD báo lỗi từ vòng staging.</div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PHẦN 9 — COST & PERFORMANCE -->
+  <section id="s09">
+    <div class="section-label">09 · Tiền bạc & Tốc độ</div>
+    <h2>Cost & Performance</h2>
+    <p class="lead">Kỹ sư xịn không chỉ làm cho nó chạy, mà làm cho nó chạy nhanh và rẻ nhất.</p>
+
+    <div class="callout warn">
+      <strong>The Golden Rule:</strong> Luôn dự toán chi phí trước khi deploy architecture. Luôn Explain Plan trước khi chạy query lớn.
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <h4 class="text-amber">BigQuery Tuning</h4>
+        <ul class="items" style="font-size: 0.85rem;">
+          <li>Cost tính theo lượng data scan.</li>
+          <li>Giảm cost: Chọn đúng cột, dùng Partition & Cluster.</li>
+          <li>Tuyệt đối tránh Cross Join vô ý.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 class="text-red">Spark Tuning</h4>
+        <ul class="items" style="font-size: 0.85rem;">
+          <li>Kẻ thù số 1 là <strong>Shuffle</strong> (di chuyển data qua mạng).</li>
+          <li>Dùng Broadcast Hash Join cho bảng nhỏ.</li>
+          <li>Tuning bộ nhớ: Tránh OOM bằng cách chỉnh overhead, chia nhỏ partitions.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 class="text-purple">Kafka Throughput</h4>
+        <ul class="items" style="font-size: 0.85rem;">
+          <li>Speed phụ thuộc Disk I/O và Network.</li>
+          <li>Tăng batch size để tăng throughput.</li>
+          <li>Số consumers tối đa = Số partitions. Thiết kế partition key cẩn thận tránh skew.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 10 — DECISION MAKING -->
+  <section id="s10">
+    <div class="section-label">10 · Lựa chọn vũ khí</div>
+    <h2>Decision Making (Trade-offs)</h2>
+    <p class="lead">Công cụ nào cũng có mặt trái. Hiểu khi nào KHÔNG NÊN dùng mới là làm chủ công nghệ.</p>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Công cụ</th><th>Khi NÀO dùng?</th><th>Khi nào KHÔNG DÙNG?</th><th>Trade-off (Đánh đổi)</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-blue"><strong>Docker</strong></td>
+          <td>Đóng gói service, CI/CD, chạy ở đâu cũng giống nhau.</td>
+          <td>Chạy 1 script python bé tí dùng 1 lần, resource máy siêu yếu.</td>
+          <td>Consistency <strong>đổi lấy</strong> Overhead quản lý image/networking.</td>
+        </tr>
+        <tr>
+          <td class="text-green"><strong>Airflow/Kestra</strong></td>
+          <td>Quản lý chục pipeline phức tạp, phụ thuộc lẫn nhau, cần alert.</td>
+          <td>1 task cronjob đơn giản chạy mỗi tháng 1 lần.</td>
+          <td>Reliability & Observability <strong>đổi lấy</strong> Chi phí vận hành scheduler.</td>
+        </tr>
+        <tr>
+          <td class="text-amber"><strong>BigQuery</strong></td>
+          <td>Data lớn (TB/PB), analytical queries phức tạp.</td>
+          <td>OLTP transaction (insert/update từng dòng liên tục).</td>
+          <td>Zero-ops & Scale <strong>đổi lấy</strong> Nguy cơ bill tiền tỉ nếu query ngu.</td>
+        </tr>
+        <tr>
+          <td class="text-red"><strong>Spark</strong></td>
+          <td>ETL khối lượng dữ liệu khổng lồ vượt quá giới hạn 1 máy.</td>
+          <td>Data vài trăm MB (hãy dùng Pandas/DuckDB cho nhanh).</td>
+          <td>Distributed power <strong>đổi lấy</strong> Độ phức tạp setup và debug OOM cực khổ.</td>
+        </tr>
+        <tr>
+          <td class="text-purple"><strong>Kafka</strong></td>
+          <td>Event streaming chịu tải cao, decoupling microservices.</td>
+          <td>Bắn vài message mỗi phút, không cần real-time (dùng API/DB pull là đủ).</td>
+          <td>High throughput/Low latency <strong>đổi lấy</strong> Hệ sinh thái nặng nề, khó maintain.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PHẦN 11 — LOGBOOK TEMPLATE -->
+  <section id="s11">
+    <div class="section-label">11 · Nhật ký chiến đấu</div>
+    <h2>Logbook Template</h2>
+    <p class="lead">Đây là bằng chứng duy nhất chứng minh bạn đã thực sự "nhúng chàm". Cứ gặp lỗi là mở file Notion/Markdown ra điền vào.</p>
+
+    <pre>
+# Logbook Entry: [Tên Lỗi / Vấn đề]
+- **Date:** YYYY-MM-DD
+- **Module/Task:** Đang làm gì (VD: Setup Terraform GCS)
+- **Command executed:** `terraform apply`
+- **Expected outcome:** Tạo thành công 1 bucket.
+- **Actual error (copy paste):** 
+  `Error 403: Caller does not have storage.buckets.create access`
+- **Investigation / Root cause:** 
+  Tài khoản Service Account đang dùng thiếu role Storage Admin.
+- **Fix applied:** 
+  Vào IAM GCP, add role `Storage Admin` cho service account, tạo key mới.
+- **Lesson Learned:** 
+  Luôn check IAM permissions trước khi chạy IaC. Nguyên tắc Least Privilege.
+    </pre>
+  </section>
+
+  <!-- PHẦN 12 — DEFINITION OF DONE -->
+  <section id="s12">
+    <div class="section-label">12 · Khi nào là xong?</div>
+    <h2>Definition of Done (DoD)</h2>
+    <p class="lead">Tuyệt đối không lướt qua module mới nếu chưa tick đủ các mục này.</p>
+
+    <ul class="checklist" style="max-width: 600px; margin: 0 auto; background: var(--surface2); padding: 1.5rem; border-radius: 4px; border: 1px solid var(--border);">
+      <li><div class="check-box checked"></div><strong>Chạy được:</strong> Code/Pipeline chạy thành công từ đầu đến cuối không vấp.</li>
+      <li><div class="check-box checked"></div><strong>Hiểu được:</strong> Có thể vẽ lại kiến trúc ra giấy trắng mà không nhìn tài liệu.</li>
+      <li><div class="check-box checked"></div><strong>Phá được:</strong> Đã tự tạo ra ít nhất 1 lỗi và ghi chép lại cách fix vào Logbook.</li>
+      <li><div class="check-box checked"></div><strong>Tối ưu được:</strong> Code đã được format gọn gàng, chia file hợp lý, không hardcode password.</li>
+      <li><div class="check-box checked"></div><strong>Trả lời được:</strong> Giải quyết trôi chảy các câu hỏi "Senior Questions" của module đó.</li>
+    </ul>
+  </section>
+
+  <!-- PHẦN 13 — EXECUTION PLAN -->
+  <section id="s13">
+    <div class="section-label">13 · Kế hoạch 7 Ngày</div>
+    <h2>Execution Plan per Module</h2>
+    <p class="lead">Chia nhỏ lịch học 5-7 ngày cho mỗi module để không bị ngợp. Mỗi ngày đều phải có output.</p>
+    
+    <div class="phase open">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">M01</span>
+        <span class="phase-title text-blue">Docker &amp; Terraform (7 Days)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <table class="data-table">
+          <thead><tr><th>Ngày</th><th>Task</th><th>Command</th><th>Break/Error</th></tr></thead>
+          <tbody>
+            <tr><td>D1-D2</td><td>Setup Docker, chạy Postgres + pgAdmin</td><td><code>docker-compose up -d</code></td><td>Trùng port 5432, sai biến môi trường.</td></tr>
+            <tr><td>D3-D4</td><td>Dockerize script Python ingest data</td><td><code>docker build -t ingest .</code></td><td>Lỗi thiếu dependency trong image, fail connect network.</td></tr>
+            <tr><td>D5-D6</td><td>Viết Terraform tạo GCP Bucket &amp; BQ</td><td><code>terraform init &amp;&amp; apply</code></td><td>Xóa file tfstate cục bộ, thiếu IAM permissions.</td></tr>
+            <tr><td>D7</td><td>Review &amp; Update Logbook</td><td><code>git commit -m "M01 done"</code></td><td>Giải thích flow từ source tới Bucket.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">M02</span>
+        <span class="phase-title text-green">Workflow Orchestration (7 Days)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <table class="data-table">
+          <thead><tr><th>Ngày</th><th>Task</th><th>Command/Action</th><th>Break/Error cần thử</th></tr></thead>
+          <tbody>
+            <tr><td>D1–D2</td><td>Đọc hiểu Kestra UI, chạy hello-world flow</td><td>Mở localhost Kestra, trigger flow thủ công</td><td>Sửa sai schedule cron syntax, xem lỗi</td></tr>
+            <tr><td>D3–D4</td><td>Build DAG ingest dữ liệu từ API vào GCS với retry</td><td>Viết flow YAML, cấu hình retry + timeout</td><td>Tắt kết nối giữa chừng, xem retry có hoạt động không</td></tr>
+            <tr><td>D5–D6</td><td>Thêm idempotency: chạy lại không duplicate data</td><td>Dùng MERGE/UPSERT thay INSERT thuần</td><td>Chạy flow 2 lần, kiểm tra data có bị nhân đôi không</td></tr>
+            <tr><td>D7</td><td>Thêm SLA alert + viết Logbook</td><td>Cấu hình notification khi task trễ</td><td>Git commit, ghi lại lỗi đã gặp</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">M06</span>
+        <span class="phase-title text-red">Batch Processing / Spark (7 Days)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <table class="data-table">
+          <thead><tr><th>Ngày</th><th>Task</th><th>Command/Action</th><th>Break/Error cần thử</th></tr></thead>
+          <tbody>
+            <tr><td>D1–D2</td><td>Setup PySpark local, chạy script đếm dòng cơ bản</td><td>spark-submit basic_count.py</td><td>Đặt sai master URL, thiếu JAVA_HOME</td></tr>
+            <tr><td>D3–D4</td><td>Viết job đọc Parquet, group by, join, ghi ra Parquet</td><td>Xử lý NYC Taxi dataset từ repo</td><td>Tăng data size, xem OOM xảy ra khi nào</td></tr>
+            <tr><td>D5–D6</td><td>Tối ưu: Broadcast join, repartition, cache</td><td>Đo thời gian trước/sau tối ưu</td><td>Xóa cache giữa chừng, tạo data skew nhân tạo</td></tr>
+            <tr><td>D7</td><td>Đọc Spark UI, identify bottleneck + Logbook</td><td>localhost:4040 khi job đang chạy</td><td>So sánh execution plan trước/sau optimize</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">M07</span>
+        <span class="phase-title text-purple">Streaming / Kafka + Flink (7 Days)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <table class="data-table">
+          <thead><tr><th>Ngày</th><th>Task</th><th>Command/Action</th><th>Break/Error cần thử</th></tr></thead>
+          <tbody>
+            <tr><td>D1–D2</td><td>Setup Kafka local, produce/consume message qua CLI</td><td>kafka-console-producer + consumer</td><td>Kill broker giữa chừng, xem message có mất không</td></tr>
+            <tr><td>D3–D4</td><td>Viết Python producer JSON + Flink consumer tính tổng</td><td>Chạy producer.py, flink job</td><td>Gửi message sai schema, xem consumer xử lý sao</td></tr>
+            <tr><td>D5–D6</td><td>Xử lý duplicate: idempotent consumer + offset commit</td><td>Cấu hình enable.auto.commit=false</td><td>Crash consumer trước khi commit, đếm duplicate</td></tr>
+            <tr><td>D7</td><td>Monitor consumer lag + Schema Registry cơ bản + Logbook</td><td>Dùng kafka-consumer-groups.sh</td><td>Tăng tốc độ produce, xem lag tăng thế nào</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p style="font-size: 0.85rem; color: #a8b5a9; margin-top: 1.5rem; text-align: center;">Pattern chung cho M03-M05: 2 ngày theory/setup – 2 ngày hands-on – 2 ngày break/debug – 1 ngày document</p>
+  </section>
+
+  <!-- PHẦN 14 — PRODUCTION METRICS -->
+  <section id="s14">
+    <div class="section-label">14 · Độ đo thực tế</div>
+    <h2>Production Metrics</h2>
+    <p class="lead">DE không chỉ build pipeline, mà phải giám sát nó bằng các con số (SLI/SLA).</p>
+    
+    <div class="grid-3">
+      <div class="card">
+        <h4 class="text-blue">Data Freshness</h4>
+        <p><strong>Định nghĩa:</strong> Dữ liệu có mặt trên dashboard trễ nhất là bao lâu so với thực tế.</p>
+        <p><strong>Ví dụ:</strong> Báo cáo lúc 8h sáng phải có data của 23h59 hôm qua.</p>
+        <p><strong>Cách đo:</strong> So sánh <code>MAX(created_at)</code> trong DWH với current_timestamp.</p>
+      </div>
+      <div class="card">
+        <h4 class="text-amber">Latency &amp; Throughput</h4>
+        <p><strong>Định nghĩa:</strong> Latency là thời gian xử lý 1 record. Throughput là số records / giây.</p>
+        <p><strong>Ví dụ:</strong> Streaming payment check fraud &lt; 2s (Latency), chịu tải 10,000 TPS (Throughput).</p>
+        <p><strong>Cách đo:</strong> Monitor lag trên Kafka, hoặc thời gian chạy DAG của Airflow.</p>
+      </div>
+      <div class="card">
+        <h4 class="text-red">Error Rate &amp; SLA</h4>
+        <p><strong>Định nghĩa:</strong> Tỉ lệ record bị rớt / tổng số record. SLA là cam kết uptime.</p>
+        <p><strong>Ví dụ:</strong> SLA 99.9% uptime, error rate &lt; 0.01% cho event tracking.</p>
+        <p><strong>Cách đo:</strong> Đếm số lượng record nhảy vào Dead Letter Queue (DLQ).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 15 — TESTING & CI/CD -->
+  <section id="s15">
+    <div class="section-label">15 · Bức tường phòng ngự</div>
+    <h2>Testing &amp; CI/CD</h2>
+    <p class="lead">Nếu không có test, pipeline của bạn chỉ là 1 quả bom nổ chậm.</p>
+    
+    <div class="block">
+      <div class="block-title">Flow CI/CD Tiêu Chuẩn</div>
+      <pre>Local Push -&gt; GitHub Actions -&gt; 1. Lint Code -&gt; 2. Unit Test -&gt; 3. Integration Test -&gt; 4. Deploy (Staging/Prod)</pre>
+    </div>
+    
+    <div class="grid-3">
+      <div class="card" style="border-top: 3px solid var(--accent-purple);">
+        <h4 class="text-purple">Unit Test (Mã Nguồn)</h4>
+        <ul class="items" style="font-size: 0.85rem; margin-top: 0.5rem;">
+          <li><strong>Mục tiêu:</strong> Test từng function Python/Spark xử lý logic.</li>
+          <li><strong>Công cụ:</strong> <code>pytest</code>, mock data nhỏ.</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--accent-teal);">
+        <h4 class="text-teal">Data Quality Test</h4>
+        <ul class="items" style="font-size: 0.85rem; margin-top: 0.5rem;">
+          <li><strong>Mục tiêu:</strong> Đảm bảo dữ liệu không null, unique, đúng format.</li>
+          <li><strong>Công cụ:</strong> <code>dbt test</code>, Great Expectations.</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--accent-green);">
+        <h4 class="text-green">Integration Test</h4>
+        <ul class="items" style="font-size: 0.85rem; margin-top: 0.5rem;">
+          <li><strong>Mục tiêu:</strong> Đảm bảo các component nối với nhau không gãy.</li>
+          <li><strong>Công cụ:</strong> Spin up Testcontainers (Docker) để chạy thử E2E.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 16 — INTERVIEW MAPPING -->
+  <section id="s16">
+    <div class="section-label">16 · Đấu trường Phỏng vấn</div>
+    <h2>Interview Mapping</h2>
+    <p class="lead">Cách biến những gì bạn đã học thành câu trả lời ghi điểm tuyệt đối trong vòng phỏng vấn Technical.</p>
+    
+    <div class="card" style="margin-bottom: 1rem; border-left: 3px solid var(--accent-amber);">
+      <h4 class="text-amber">Cách Kể Project (STAR Framework)</h4>
+      <p style="font-size: 0.85rem; color: #a8b5a9;"><strong>Situation:</strong> Team cần báo cáo realtime... <br><strong>Task:</strong> Xây pipeline batch và streaming... <br><strong>Action:</strong> Đã dùng Kafka để ingest, Flink xử lý, xử lý duplicate bằng UPSERT trên BQ... <br><strong>Result:</strong> Giảm data freshness từ 24h xuống 5 phút, cost tăng không đáng kể nhờ cluster partition.</p>
+    </div>
+    
+    <div class="card" style="border-left: 3px solid var(--accent-blue);">
+      <h4 class="text-blue">Mẫu 3 Câu Hỏi Cốt Lõi (Mọi Module)</h4>
+      <ul class="items" style="font-size: 0.85rem; margin-top: 0.5rem;">
+        <li><strong>Câu hỏi Design:</strong> "Tại sao chọn X mà không chọn Y?" -&gt; <em>Trình bày sự đánh đổi (Trade-off) về cost, setup overhead, latency.</em></li>
+        <li><strong>Câu hỏi Failure:</strong> "Nếu X chết giữa chừng, data có bị mất hoặc duplicate không?" -&gt; <em>Trình bày Idempotency và Checkpointing.</em></li>
+        <li><strong>Câu hỏi Scale:</strong> "Data tăng gấp 100 lần, pipeline của em sập ở đâu trước?" -&gt; <em>Trình bày bottleneck (Memory ở Spark, I/O ở Kafka, hay limits ở BigQuery).</em></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PHẦN 17 — LEARNING STRATEGY -->
+  <section id="s17">
+    <div class="section-label">17 · Kỹ năng Sinh tồn</div>
+    <h2>Learning Strategy</h2>
+    <p class="lead">Hành trình dài không tránh khỏi bế tắc. Biết lúc nào cần cố, lúc nào cần buông là chìa khóa.</p>
+    
+    <div class="grid-3">
+      <div class="card">
+        <h4 class="text-red">Khi Bị Stuck (Bế tắc)</h4>
+        <p style="font-size: 0.85rem; color: #a8b5a9;">Không ngồi nhìn error quá 2 tiếng. Đứng dậy đi bộ. Search GitHub issues theo exact error log. Đặt câu hỏi trong StackOverflow hoặc Slack cộng đồng với đầy đủ context.</p>
+      </div>
+      <div class="card">
+        <h4 class="text-green">Khi Nào Nên Nghỉ</h4>
+        <p style="font-size: 0.85rem; color: #a8b5a9;">Não bạn không học được khi mệt mỏi. Sleep is a feature, not a bug. Nếu fix bug sau 12h đêm không ra, đi ngủ. Sáng dậy thường sẽ nhìn ra ngay lỗi typo ngu ngốc.</p>
+      </div>
+      <div class="card">
+        <h4 class="text-purple">Spaced Repetition</h4>
+        <p style="font-size: 0.85rem; color: #a8b5a9;">Để không quên kiến thức: Mỗi cuối tuần, đừng code mới, hãy mở lại Logbook đọc lướt 15 phút. Giải thích lại các diagram cho vịt cao su nghe.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- PHẦN 18 — PORTFOLIO -->
+  <section id="s18">
+    <div class="section-label">18 · Show off</div>
+    <h2>Xây dựng Portfolio đẳng cấp</h2>
+    <p class="lead">Nhà tuyển dụng không có thời gian đọc code của bạn. Họ nhìn README và kiến trúc.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h4 class="text-green">Bắt buộc phải có</h4>
+        <ul class="items">
+          <li><strong>GitHub Repo:</strong> Clean structure (có folder src, dags, infra...).</li>
+          <li><strong>README.md chuẩn:</strong> Tóm tắt problem, business value, tech stack.</li>
+          <li><strong>Architecture Diagram:</strong> Sơ đồ rõ ràng (dùng draw.io / excalidraw).</li>
+          <li><strong>Reproducibility:</strong> Hướng dẫn chi tiết cách ai đó clone repo và chạy được ngay.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 class="text-amber">Vũ khí bí mật (Ghi điểm tuyệt đối)</h4>
+        <ul class="items">
+          <li><strong>Demo Video (3-5 phút):</strong> Quay màn hình giải thích luồng data chảy và show dashboard kết quả.</li>
+          <li><strong>Cost Analysis:</strong> Một đoạn phân tích hệ thống này tốn bao nhiêu tiền cloud mỗi tháng.</li>
+          <li><strong>Incident Report:</strong> Kể lại một lỗi khó bạn gặp phải và quá trình suy luận để giải quyết nó.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHẦN 14 — FINAL CHECKLIST -->
+  <section id="s19">
+    <div class="section-label">19 · Kiểm tra cuối cùng</div>
+    <h2>Final Readiness Checklist</h2>
+    <p class="lead">Bạn đang ở level nào? Hãy thành thực với bản thân.</p>
+
+    <div style="margin-bottom: 2rem;">
+      <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.7rem; color:var(--muted); margin-bottom:0.4rem;">
+        <span>Tiến độ tự đánh giá</span>
+        <span id="checklist-progress-text">0 / 9</span>
+      </div>
+      <div style="height:3px; background:var(--border); border-radius:2px;">
+        <div id="checklist-progress-fill" style="height:100%; width:0%; background:var(--accent-green); border-radius:2px; transition:width 0.4s ease;"></div>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card" style="border-top: 3px solid var(--accent-blue);">
+        <h4>Junior</h4>
+        <ul class="checklist" style="margin-top: 1rem;">
+          <li><div class="check-box"></div>Setup được môi trường.</li>
+          <li><div class="check-box"></div>Chạy được các tool cơ bản (Docker, SQL).</li>
+          <li><div class="check-box"></div>Hiểu ý nghĩa các khái niệm data.</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--accent-amber);">
+        <h4>Mid-Level</h4>
+        <ul class="checklist" style="margin-top: 1rem;">
+          <li><div class="check-box"></div>Tự build end-to-end pipeline.</li>
+          <li><div class="check-box"></div>Xử lý lỗi rành rọt, biết đọc log.</li>
+          <li><div class="check-box"></div>Sử dụng dbt, Spark, Orchestration trôi chảy.</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--accent-red);">
+        <h4>Senior</h4>
+        <ul class="checklist" style="margin-top: 1rem;">
+          <li><div class="check-box"></div>Thiết kế hệ thống chịu tải, mở rộng.</li>
+          <li><div class="check-box"></div>Đảm bảo Data Quality & Idempotency tuyệt đối.</li>
+          <li><div class="check-box"></div>Tối ưu chi phí và hiệu năng hệ thống.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div style="max-width: 600px; margin: 0 auto;">
+    <h3 style="color: var(--text); font-family: var(--serif); font-weight: 300; margin-bottom: 1rem;">Tóm tắt Lộ trình</h3>
+    <div style="text-align: left; background: var(--bg); padding: 1.5rem; border-radius: 4px; border: 1px solid var(--border);">
+      <p><strong>1. Dành cho ai:</strong> Người mới bắt đầu có nền tảng IT cơ bản, hoặc Junior DE muốn nâng trình độ lên hệ thống, chuẩn hóa kỹ năng thực chiến.</p>
+      <p><strong>2. Thời gian:</strong> Trung bình 6 đến 8 tháng nếu giữ vững cam kết.</p>
+      <p><strong>3. Cách dùng:</strong> Áp dụng <em>Daily Execution Plan</em> (150p) mỗi ngày. Kỷ luật ghi chép Logbook. Không học lý thuyết suông, bắt buộc phải Hands-on và Debug.</p>
+    </div>
+    <p style="margin-top: 2rem; color: #555;">© 2026 Data Engineering System Architect. Build with passion.</p>
+  </div>
+</footer>
+</div>
+
+<script>
+  function togglePhase(header) {
+    header.parentElement.classList.toggle('open');
+  }
+  
+  // Interactive checkboxes
+  document.querySelectorAll('.check-box').forEach(box => {
+    box.addEventListener('click', function() {
+      this.classList.toggle('checked');
+      const all = document.querySelectorAll('.check-box').length;
+      const checked = document.querySelectorAll('.check-box.checked').length;
+      const pct = Math.round(checked / all * 100);
+      document.getElementById('checklist-progress-fill').style.width = pct + '%';
+      document.getElementById('checklist-progress-text').textContent = checked + ' / ' + all;
+    });
+  });
+
+  function revealIncident(btn) {
+    const answer = btn.nextElementSibling;
+    answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+    btn.textContent = answer.style.display === 'none' ? 'Tự nghĩ rồi xem đáp án →' : 'Ẩn đáp án';
+  }
+
+  function filterSidebar(query) {
+    const q = query.toLowerCase();
+    document.querySelectorAll('nav.sidebar a').forEach(link => {
+      const match = link.textContent.toLowerCase().includes(q);
+      link.style.display = match ? 'block' : 'none';
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,400 @@
+
+
+## Prompt 1 — Khởi tạo file + S0 + S1
+
+
+Đọc các file sau trước khi làm bất cứ điều gì:
+- .claude/CLAUDE.md
+- .claude/OUTPUT_STANDARD.md
+- .claude/SOURCE_POLICY.md
+- master_de_roadmap.html (phần Module 01 và section 3-Level System)
+- file_mau_tham_khao_can_nang_cap.html (lấy TOÀN BỘ CSS variables, font, component patterns)
+- data-engineering-zoomcamp/01-docker-terraform/ (đọc README + liệt kê toàn bộ files)
+
+Tạo file mới: Module01_Docker_Terraform.html
+
+File phải có:
+- Toàn bộ HTML boilerplate: <!DOCTYPE>, <head>, CSS inline, fonts Google
+- Copy NGUYÊN XI CSS variables và styles từ file_mau_tham_khao_can_nang_cap.html
+- Hero banner: "Module 01 — Docker & Terraform", badges (Beginner→Senior, ~7 ngày, Infrastructure)
+- Sidebar với 9 nav items: S0 đến S8 (S0 active mặc định)
+- JavaScript: showModule(), toggleSection(), answerQuiz(), toggleSolution(), switchTab(), toggleCheck(), updateProgress()
+- Phần main content chứa S0 và S1 đầy đủ, các section S2–S8 để placeholder <div id="sX" style="display:none"></div>
+
+NỘI DUNG S0 — Tổng quan & Mục tiêu:
+- Bảng 9 sections với tên + thời gian ước tính
+- Vấn đề thực tế Docker giải quyết: "works on my machine" syndrome
+- Vấn đề thực tế Terraform giải quyết: click tay trên console không reproducible
+- Trước Docker người ta làm gì? Trước Terraform người ta làm gì?
+- Data flow diagram ASCII: Local Script → Docker Container → PostgreSQL → pgAdmin
+- Data flow diagram ASCII: Terraform code → GCP API → GCS Bucket + BQ Dataset
+- Exit criteria: "Bạn đã nắm module này khi..."
+
+NỘI DUNG S1 — Lý thuyết nền:
+Phần Docker (3 levels):
+- Beginner: Container là gì, Image là gì, analogy shipping container
+- Beginner: Container vs VM — bảng so sánh rõ ràng
+- Intermediate: Dockerfile layers, build cache, layer ordering optimization
+- Intermediate: docker-compose — tại sao cần, orchestrate multi-container
+- Senior: Network modes (bridge/host/overlay), volume types, resource limits
+- Mental model 1 câu: "Docker = môi trường đóng gói chạy giống hệt nhau ở mọi nơi"
+- So sánh: Docker vs Podman vs containerd — trade-offs
+- Info boxes: tip/warn/note/danger đan xen
+- 6 câu quiz scenario-based với explanation đầy đủ
+
+Phần Terraform (3 levels):
+- Beginner: IaC là gì, tại sao cần, Terraform vs ClickOps
+- Beginner: Provider, Resource, Variable, Output — giải thích đơn giản
+- Intermediate: State file — tại sao quan trọng, rủi ro nếu mất/corrupt
+- Intermediate: Plan → Apply workflow, tại sao phải review plan trước
+- Senior: Remote state (GCS backend), State locking, Workspace
+- Mental model 1 câu: "Terraform = git cho hạ tầng cloud"
+- So sánh: Terraform vs Pulumi vs AWS CDK — trade-offs
+- 6 câu quiz scenario-based với explanation đầy đủ
+
+Lưu file. Báo cáo số dòng đã tạo.
+
+
+---
+
+## Prompt 2 — Thêm S2 vào file
+
+```
+Đọc các file sau:
+- Module01_Docker_Terraform.html (file đang build, đọc toàn bộ để hiểu structure)
+- data-engineering-zoomcamp/01-docker-terraform/ (đọc TOÀN BỘ từng file một)
+  Cụ thể phải đọc:
+  * docker-sql/pipeline/docker-compose.yaml
+  * docker-sql/pipeline/ingest_data.py
+  * docker-sql/Dockerfile (nếu có)
+  * terraform/terraform_with_variables/main.tf
+  * terraform/terraform_with_variables/variables.tf
+  * terraform/terraform_with_variables/.terraform.lock.hcl (nếu có)
+  * Tất cả file còn lại trong thư mục
+
+Thêm nội dung S2 vào Module01_Docker_Terraform.html.
+Tìm placeholder <div id="s2" style="display:none"></div> và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S2 — Đọc hiểu code trong repo:
+
+Phần 1 — Cấu trúc thư mục:
+- Vẽ tree diagram toàn bộ 01-docker-terraform/
+- Giải thích mục đích từng folder và file
+
+Phần 2 — docker-compose.yaml (phân tích NGUYÊN VĂN từ repo):
+- Trích code thực tế, syntax highlight
+- Giải thích TỪNG block: services, volumes, networks, environment variables
+- Tại sao cấu hình như vậy? (không chỉ giải thích là gì)
+- Ports mapping: tại sao 5432:5432, 8080:8080?
+- Depends_on: service nào phụ thuộc service nào, thứ tự start
+- Tại sao không có `depends_on` trong file compose hiện tại?
+  → Đây là điểm yếu thực tế: postgres khởi động mất 2-5 giây, nếu ingest chạy ngay sẽ báo
+  "connection refused". Fix đúng cách là dùng healthcheck + depends_on condition: service_healthy
+  (không phải chỉ depends_on tên service — đó chỉ check container started, không check DB ready)
+  
+Phần 3 — ingest_data.py (phân tích NGUYÊN VĂN từ repo):
+- Trích code thực tế từng đoạn quan trọng, syntax highlight
+- Data flow: script đọc gì, xử lý gì, ghi đi đâu
+- Tại sao dùng chunks khi đọc CSV?
+- Connection string PostgreSQL — từng tham số nghĩa là gì
+- Điểm yếu của script này (chưa idempotent, chưa có error handling đủ)
+- Tại sao dùng `Int64` (nullable) thay vì `int64` thường cho VendorID, passenger_count?
+  → Dataset thực tế có missing values, int64 không chứa được NaN, Int64 (pandas nullable) thì được
+- `uv sync --locked` trong Dockerfile khác `pip install` thế nào?
+  → --locked đảm bảo dùng đúng version trong uv.lock, tránh "dependency drift" giữa các môi trường
+- pgAdmin map port 8085:80 (không phải 8080:80) — giải thích tại sao chọn 8085
+
+Phần 4 — main.tf + variables.tf (phân tích NGUYÊN VĂN từ repo):
+- Trích code thực tế, syntax highlight HCL
+- Giải thích: provider block, resource block, variable block
+- Tại sao khai báo variable riêng thay vì hardcode?
+- Output block nghĩa là gì, dùng để làm gì
+
+Phần 5 — Data flow tổng hợp:
+- Diagram: Terraform tạo GCS → ingest_data.py chạy trong Docker → data vào PostgreSQL → pgAdmin kết nối xem
+- Ai gọi ai? File nào chạy trước?
+
+Tabs: Python / YAML / HCL — dùng switchTab() function
+
+Quiz: 6 câu về data flow và cấu trúc code, có explanation
+
+Lưu file. Báo cáo số dòng hiện tại.
+```
+
+---
+
+## Prompt 3 — Thêm S3 vào file
+
+```
+Đọc các file sau:
+- Module01_Docker_Terraform.html (đọc toàn bộ)
+- data-engineering-zoomcamp/01-docker-terraform/ (đọc lại để lấy commands chính xác)
+- master_de_roadmap.html (phần M01 — 7-ngày execution plan và Break/Debug examples)
+
+Thêm nội dung S3 vào Module01_Docker_Terraform.html.
+Tìm placeholder <div id="s3" style="display:none"></div> và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S3 — Thực hành từng bước:
+
+Phần 1 — Setup môi trường (commands thực tế, copy-paste được):
+- Cài Docker Desktop: link + verify bằng lệnh gì
+- Clone repo: lệnh chính xác
+- Cấu trúc thư mục sau khi clone
+- Tạo file .env từ .env.example (nếu có)
+- Verify thành công: "Bạn biết setup đúng khi thấy..."
+
+Phần 2 — Chạy Docker pipeline:
+- Step by step với commands thực tế từ repo
+- Mỗi command: giải thích làm gì, output mong đợi là gì
+- Verify từng bước thành công thế nào
+- Chạy ingest_data.py: command đầy đủ với arguments
+
+Phần 3 — Chạy Terraform:
+- terraform init: làm gì, output mong đợi
+- terraform plan: đọc output thế nào, cần chú ý gì
+- terraform apply: confirm, verify GCP resources được tạo
+- terraform destroy: khi nào dùng, tại sao quan trọng
+
+Phần 4 — 3 bài tập thực hành (dùng .practice-task component):
+
+Task 1 (Beginner): 
+Đề: Chạy lại pipeline với dataset khác (green taxi thay vì yellow taxi)
+Gợi ý: Thay URL trong command ingest_data.py
+Solution: Command đầy đủ với URL mới
+
+Task 2 (Intermediate):
+Đề: Thêm service pgAdmin vào docker-compose nếu chưa có, hoặc thêm một PostgreSQL database thứ hai cho green taxi data
+Gợi ý: Cấu trúc service trong compose, port mapping khác nhau
+Solution: YAML config đầy đủ
+
+Task 3 (Advanced):
+Đề: Tạo thêm một GCS bucket mới cho staging data bằng Terraform, với lifecycle rule tự động xóa files sau 30 ngày
+Gợi ý: google_storage_bucket resource, lifecycle_rule block
+Solution: HCL config đầy đủ
+
+Phần 5 — "Cố tình phá" section:
+6 kịch bản với hướng dẫn debug từng bước:
+1. Đổi port PostgreSQL sai trong docker-compose → lỗi gì, debug thế nào
+2. Xóa volume khi container đang chạy → data mất không, tại sao
+3. Sửa sai password DB trong environment variable → connection refused, tìm log ở đâu
+4. Xóa file terraform.tfstate → chuyện gì xảy ra khi apply lại
+5. Chạy ingest_data.py 2 lần → data có bị duplicate không, kiểm tra thế nào
+6. Chạy docker run ingest với --pg-host=localhost thay vì --pg-host=pgdatabase
+   → Lỗi: "connection refused" hoặc "could not connect to server"
+   → Tại sao: container có network namespace riêng, localhost trong container
+     trỏ về chính container đó, không phải host machine hay container khác
+   → Fix: luôn dùng tên container (--name) làm hostname khi giao tiếp container-to-container
+   → Đây là lỗi phổ biến nhất của người mới học Docker networking
+Lưu file. Báo cáo số dòng hiện tại.
+```
+
+---
+
+## Prompt 4 — Thêm S4 + S5 vào file
+
+```
+Đọc các file sau:
+- Module01_Docker_Terraform.html (đọc toàn bộ)
+- master_de_roadmap.html (phần M01 Senior Questions, Pro-tier patterns, Cost & Perf, Decisions)
+- data-engineering-zoomcamp/01-docker-terraform/ (đọc lại nếu cần reference code)
+
+Thêm nội dung S4 và S5 vào Module01_Docker_Terraform.html.
+Tìm 2 placeholders và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S4 — Production Thinking:
+
+6 câu hỏi, mỗi câu có answer chi tiết + code example:
+
+1. FAILURE: Pipeline ingest_data.py fail lúc 3h sáng sau khi insert được 500k/1M rows
+   - Log xem ở đâu? (docker logs, PostgreSQL logs)
+   - Data đang ở trạng thái gì? (partial insert)
+   - Restart an toàn không? Tại sao không nếu không có idempotency
+   - Fix ngay: query kiểm tra, truncate và chạy lại vs resume từ chỗ dừng
+
+2. SCALE: Từ 1 file CSV 500MB lên 50 files tổng 50GB mỗi ngày
+   - Bottleneck ở đâu? (single Python process, single PostgreSQL)
+   - Docker single container không đủ → cần gì thay thế
+   - Terraform: provision thêm resources tự động thế nào
+
+3. IDEMPOTENCY: Chạy ingest_data.py 2 lần → duplicate data
+   - Tại sao script hiện tại không idempotent
+   - Fix: TRUNCATE trước INSERT vs ON CONFLICT DO UPDATE
+   - Code example: thêm idempotency vào ingest_data.py
+
+4. MONITORING: Làm sao biết pipeline chạy xong và đúng
+   - Docker: health check config trong compose
+   - PostgreSQL: query kiểm tra row count, max timestamp
+   - Alert đơn giản: script gửi email/slack khi fail
+   - Code example: healthcheck block trong docker-compose
+
+5. COST: GCP resources này tốn bao nhiêu
+   - GCS bucket: pricing model, estimate cho 50GB/tháng
+   - BigQuery dataset: storage vs query cost
+   - Terraform: tự động destroy dev resources ngoài giờ làm việc
+   - Code example: scheduled terraform destroy
+
+6. SECURITY: Những rủi ro bảo mật trong setup hiện tại
+   - Credentials hardcode trong docker-compose → rủi ro gì
+   - .env file có nên commit vào git không → .gitignore
+   - Container đang chạy với root user theo mặc định — rủi ro gì?
+  → Nếu có lỗ hổng trong app, attacker có full root access vào container
+  → Fix: thêm vào Dockerfile:
+    RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+    USER appuser
+  
+- Service Account Key JSON trên máy cá nhân — rủi ro gì và alternative tốt hơn?
+  → Key JSON nếu bị leak (commit nhầm lên git, máy bị hack) → attacker có full quyền trên GCP
+  → Alternative production: Workload Identity Federation — GCP cấp quyền tạm thời
+    cho workload (GitHub Actions, VM) mà không cần key file
+  → Nguyên tắc: credentials không nên tồn tại dưới dạng file trên disk
+   - Terraform state chứa sensitive data → remote state encryption
+   - Code example: dùng Secret Manager thay vì biến môi trường
+
+NỘI DUNG S5 — Kiến thức nâng cao:
+
+Phần 1 — Docker Pro patterns:
+- Multi-stage builds: tại sao, ví dụ Dockerfile 2 stages, so sánh image size
+- Docker resource limits: memory, CPU — tại sao cần trong production
+- Health checks production-grade: các loại check, retry policy
+- .dockerignore: tại sao quan trọng, những gì nên ignore
+
+Phần 2 — Terraform Pro patterns:
+- Remote state với GCS backend: config đầy đủ, tại sao cần
+- State locking: tránh 2 người apply cùng lúc, DynamoDB/GCS lock
+- Terraform Workspace: dev/staging/prod environments
+- CI/CD cho Terraform: plan on PR, apply on merge to main — workflow diagram
+
+Phần 3 — Bảng Trade-offs (khi DÙNG vs KHÔNG DÙNG):
+Lấy từ section "Decisions" trong master_de_roadmap.html, bổ sung thêm context thực tế
+
+Phần 4 — Khi nào outgrow Docker Compose:
+- Dấu hiệu cần chuyển sang Kubernetes
+- Dấu hiệu cần chuyển từ Terraform sang Pulumi hoặc CDK
+
+Lưu file. Báo cáo số dòng hiện tại.
+```
+
+---
+
+## Prompt 5 — Thêm S6 + S7 + S8, hoàn thiện file
+
+```
+Đọc các file sau:
+- Module01_Docker_Terraform.html (đọc toàn bộ)
+- master_de_roadmap.html (phần Incident Simulation, Interview Mapping, DoD, Final Checklist)
+
+Thêm nội dung S6, S7, S8 vào Module01_Docker_Terraform.html.
+Tìm 3 placeholders và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S6 — Lỗi thường gặp:
+
+Bảng 11 lỗi, dùng class="data-table":
+Cột: Lỗi (error message thực tế) | Nguyên nhân | Cách fix | Cách phòng tránh
+
+11 lỗi phải bao gồm:
+1. "port is already allocated" — docker-compose up
+2. "connection refused" — app connect đến DB
+3. "No such file or directory" — volume mount path sai
+4. Container exits immediately (exit code 1)
+5. "permission denied" — file/folder trong container
+6. Data mất sau docker-compose down
+7. "Error: No configuration files found" — terraform init
+8. "Error acquiring the state lock" — terraform apply
+9. "403 Forbidden" — terraform apply lên GCP
+10. terraform.tfstate bị corrupt hoặc mất
+11. "--pg-host=localhost" khi chạy ingest container
+    Lỗi: psycopg.OperationalError: connection to server at "localhost" failed
+    Nguyên nhân: localhost trong container trỏ về chính container đó, không phải postgres container
+    Fix: dùng --pg-host=pgdatabase (tên container trong --name flag)
+    Phòng tránh: luôn dùng container name làm host khi giao tiếp nội bộ Docker network
+	
+Sau bảng: Debugging checklist theo thứ tự ưu tiên (numbered list)
+Sau checklist: Nhắc learner mở Logbook ghi lại lỗi đã gặp (link template từ master_de_roadmap.html)
+
+NỘI DUNG S7 — Interview Prep:
+
+12 câu hỏi, dùng toggleSection hoặc collapsible pattern:
+
+Junior (4 câu — badge xanh lam):
+1. Container khác VM ở điểm nào cơ bản nhất?
+2. docker-compose up -d khác docker run ở chỗ nào?
+3. Terraform state file là gì và lưu ở đâu mặc định?
+4. Tại sao phải chạy terraform plan trước terraform apply?
+
+Mid (4 câu — badge vàng):
+5. Làm sao đảm bảo data không mất khi container restart?
+6. Nếu 2 developer cùng chạy terraform apply, chuyện gì xảy ra?
+7. Tại sao nên dùng variables.tf thay vì hardcode trong main.tf?
+8. Docker image build lại mỗi lần deploy có vấn đề gì về performance?
+
+Senior (4 câu — badge đỏ):
+9. Thiết kế Docker setup cho pipeline chạy production với 10 services, đảm bảo không có single point of failure
+10. Terraform state ở local bị mất sau khi đã apply lên GCP — xử lý thế nào?
+11. Ingest pipeline fail sau 6 tiếng, đã insert 80% data — restart toàn bộ hay tiếp tục? Design idempotent solution
+12. Team có 5 DE cùng dùng chung GCP project với Terraform — quy trình làm việc tránh conflict thế nào?
+
+Mỗi câu: click expand → gợi ý trả lời chi tiết + "Red flag: đừng nói..."
+
+NỘI DUNG S8 — Checklist & Tổng kết:
+
+Progress bar (tự update khi tick):
+ID: checklist-progress-fill và checklist-progress-text
+
+Checklist 18 items chia 3 level:
+
+Beginner (6 items):
+- Giải thích được Container vs VM cho người không biết IT
+- Chạy được docker-compose up -d không lỗi
+- Biết dùng docker logs, docker ps, docker exec để debug
+- Chạy được ingest_data.py và verify data trong PostgreSQL
+- Chạy được terraform init, plan, apply, destroy
+- Biết .env file là gì và tại sao không commit lên git
+
+Intermediate (6 items):
+- Tự viết Dockerfile cho Python script từ đầu
+- Thêm service mới vào docker-compose với đúng network và volume
+- Đọc hiểu toàn bộ main.tf và variables.tf trong repo
+- Tạo thêm GCP resource mới bằng Terraform không cần copy-paste
+- Debug được connection refused giữa 2 containers
+- Biết terraform.tfstate chứa gì và rủi ro khi để ở local
+
+Senior (6 items):
+- Viết được Dockerfile multi-stage giảm image size
+- Cấu hình remote state Terraform trên GCS với state locking
+- Thêm idempotency vào ingest_data.py (chạy N lần = 1 lần)
+- Thiết kế health check cho tất cả services trong docker-compose
+- Trả lời được 4 câu Senior interview không cần nhìn tài liệu
+- Giải thích trade-off Docker Compose vs Kubernetes cho người mới
+
+Summary grid (5 điểm chốt):
+1. Docker = môi trường nhất quán, giải quyết "works on my machine"
+2. Terraform = IaC, hạ tầng reproducible, version controlled
+3. Idempotency = nguyên tắc số 1 mọi pipeline production
+4. State management = điểm yếu lớn nhất cần handle cẩn thận
+5. AWS mapping — kiến thức có thể transfer: GCS → S3, BigQuery Dataset → Glue Data Catalog,
+   repo đã có terraform_with_variable_AWS/ làm reference
+   
+Definition of Done (từ master_de_roadmap.html):
+5 checkboxes DoD — tick đủ mới được sang Module 02
+
+Preview Module 02:
+"Module tiếp theo: Workflow Orchestration với Kestra/Airflow
+Cần chuẩn bị: Docker đang chạy được (module này), hiểu khái niệm scheduling cơ bản"
+Link: <a href="Module02_Orchestration.html">→ Module 02: Workflow Orchestration</a>
+
+SAU KHI THÊM XONG 3 SECTIONS:
+Kiểm tra toàn bộ file:
+- Tất cả JavaScript functions hoạt động đúng không
+- Sidebar navigation showModule() đúng index chưa
+- Progress bar updateProgress() được gọi đúng chưa
+- Không còn placeholder nào chưa điền
+- File mở được trên browser không lỗi console
+
+Lưu file. Báo cáo số dòng cuối cùng và tóm tắt những gì đã build.
+```
+
+---
+
+**Cách chạy:** Mở terminal → `cd DE-Learning` → `claude` → paste Prompt 1 → chờ xong → paste Prompt 2 → tiếp tục đến Prompt 5.
+
+Sau mỗi lần chạy nên mở file trên browser kiểm tra section vừa thêm trước khi chạy prompt tiếp theo.

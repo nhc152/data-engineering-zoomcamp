@@ -1,0 +1,51 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "Bash(python *)",
+      "Bash(py *)",
+      "Bash(dir)",
+      "Bash(tree *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(type *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git restore --staged *)",
+      "Bash(git log *)",
+      "Bash(findstr *)",
+      "WebFetch(domain:github.com)",
+      "mcp__ide__getDiagnostics",
+      "mcp__ide__readFile",
+      "mcp__ide__writeFile",
+      "mcp__ide__listDirectory",
+      "Bash(PYTHONIOENCODING=utf-8 python *)",
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(wc *)",
+      "mcp__ide__executeCode"
+    ],
+    "deny": [
+      "Bash(del *)",
+      "Bash(erase *)",
+      "Bash(rm *)",
+      "Bash(rmdir *)",
+      "Bash(rd *)",
+      "Bash(move *)",
+      "Bash(ren *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(bitsadmin *)",
+      "Bash(certutil *)",
+      "Bash(powershell Invoke-WebRequest *)",
+      "Bash(powershell iwr *)",
+      "Bash(shutdown *)",
+      "Bash(restart *)",
+      "Bash(taskkill *)",
+      "Bash(format *)",
+      "Bash(diskpart *)"
+    ]
+  }
+}

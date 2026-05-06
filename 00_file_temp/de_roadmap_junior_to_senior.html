@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lộ trình Junior → Senior Data Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f0e;
+    --surface: #141716;
+    --surface2: #1c1f1d;
+    --border: #2a2e2c;
+    --text: #e8ede9;
+    --muted: #6b736d;
+    --accent-green: #4ade80;
+    --accent-amber: #fbbf24;
+    --accent-blue: #60a5fa;
+    --accent-red: #f87171;
+    --accent-purple: #c084fc;
+    --accent-teal: #2dd4bf;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Fraunces', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(74,222,128,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent-green);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    max-width: 700px;
+  }
+  header h1 em {
+    font-style: italic;
+    color: var(--accent-green);
+  }
+  .header-meta {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 2rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .header-meta span { color: var(--text); }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,15,14,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav a {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 1rem 1.2rem;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    letter-spacing: 0.05em;
+  }
+  nav a:hover { color: var(--accent-green); border-color: var(--accent-green); }
+
+  /* MAIN */
+  main { max-width: 900px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+
+  /* SECTION */
+  section { margin-bottom: 5rem; }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--accent-green);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  section > h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 300;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  section > p.lead {
+    color: var(--muted);
+    font-size: 0.95rem;
+    max-width: 650px;
+    margin-bottom: 2.5rem;
+  }
+
+  /* PHASE CARDS */
+  .phase {
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 1px;
+    overflow: hidden;
+  }
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    background: var(--surface);
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .phase-header:hover { background: var(--surface2); }
+  .phase-num {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    min-width: 2rem;
+  }
+  .phase-title {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .phase-duration {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .phase-chevron {
+    font-size: 0.7rem;
+    color: var(--muted);
+    transition: transform 0.3s;
+  }
+  .phase.open .phase-chevron { transform: rotate(90deg); }
+  .phase-body {
+    display: none;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .phase.open .phase-body { display: block; }
+
+  /* COLOR ACCENTS PER PHASE */
+  .phase-1 .phase-title { color: var(--accent-blue); }
+  .phase-2 .phase-title { color: var(--accent-green); }
+  .phase-3 .phase-title { color: var(--accent-amber); }
+  .phase-4 .phase-title { color: var(--accent-red); }
+  .phase-5 .phase-title { color: var(--accent-purple); }
+  .phase-6 .phase-title { color: var(--accent-teal); }
+
+  /* CONTENT BLOCKS */
+  .block { margin-bottom: 2rem; }
+  .block:last-child { margin-bottom: 0; }
+  .block-title {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  ul.items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  ul.items li {
+    font-size: 0.88rem;
+    padding-left: 1.2rem;
+    position: relative;
+    color: #c8cfc9;
+  }
+  ul.items li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--muted);
+  }
+
+  /* CODE BLOCKS */
+  pre {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 1rem 1.2rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    overflow-x: auto;
+    color: #a8b5a9;
+    line-height: 1.6;
+    margin: 0.8rem 0;
+  }
+  code { font-family: var(--mono); font-size: 0.82em; color: var(--accent-green); }
+
+  /* CALLOUT */
+  .callout {
+    border-left: 2px solid;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.85rem;
+    border-radius: 0 2px 2px 0;
+  }
+  .callout.warn { border-color: var(--accent-amber); background: rgba(251,191,36,0.05); }
+  .callout.info { border-color: var(--accent-blue); background: rgba(96,165,250,0.05); }
+  .callout.danger { border-color: var(--accent-red); background: rgba(248,113,113,0.05); }
+  .callout.success { border-color: var(--accent-green); background: rgba(74,222,128,0.05); }
+  .callout strong { font-weight: 500; }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 1rem;
+  }
+  .card h4 {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+    color: var(--text);
+  }
+  .card p { font-size: 0.82rem; color: #8a9490; }
+
+  /* MODULE TIMELINE */
+  .modules { display: flex; flex-direction: column; gap: 0; }
+  .module-row {
+    display: grid;
+    grid-template-columns: 3rem 1fr auto;
+    gap: 1rem;
+    align-items: start;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .module-row:last-child { border-bottom: none; }
+  .module-num {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    padding-top: 0.15rem;
+  }
+  .module-info h4 {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+  }
+  .module-info p { font-size: 0.8rem; color: var(--muted); }
+  .module-badge {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .badge-infra { background: rgba(96,165,250,0.1); color: var(--accent-blue); }
+  .badge-orch { background: rgba(74,222,128,0.1); color: var(--accent-green); }
+  .badge-dwh { background: rgba(251,191,36,0.1); color: var(--accent-amber); }
+  .badge-batch { background: rgba(248,113,113,0.1); color: var(--accent-red); }
+  .badge-stream { background: rgba(192,132,252,0.1); color: var(--accent-purple); }
+
+  /* INTERVIEW Q */
+  .question-block {
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+  }
+  .question-header {
+    padding: 0.8rem 1rem;
+    background: var(--surface);
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.15s;
+  }
+  .question-header:hover { background: var(--surface2); }
+  .question-answer {
+    display: none;
+    padding: 1rem;
+    font-size: 0.82rem;
+    color: #8a9490;
+    border-top: 1px solid var(--border);
+    line-height: 1.7;
+  }
+  .question-block.open .question-answer { display: block; }
+  .q-tag {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 2px;
+    margin-left: 0.5rem;
+    flex-shrink: 0;
+  }
+  .q-junior { background: rgba(96,165,250,0.15); color: var(--accent-blue); }
+  .q-mid { background: rgba(251,191,36,0.15); color: var(--accent-amber); }
+  .q-senior { background: rgba(248,113,113,0.15); color: var(--accent-red); }
+
+  /* ERROR TABLE */
+  .error-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .error-table th {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-align: left;
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .error-table td {
+    padding: 0.7rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: #a8b5a9;
+  }
+  .error-table tr:last-child td { border-bottom: none; }
+  .error-name { font-family: var(--mono); color: var(--accent-red); font-size: 0.78rem; }
+  .error-fix { color: var(--accent-green); }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 0.3rem; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    font-size: 0.85rem;
+    padding: 0.3rem 0;
+  }
+  .check-box {
+    width: 14px; height: 14px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .check-box.checked {
+    background: var(--accent-green);
+    border-color: var(--accent-green);
+  }
+  .check-box.checked::after { content: '✓'; font-size: 9px; color: #000; font-weight: 600; }
+
+  /* PROGRESS BAR */
+  .progress-wrap { margin: 2rem 0; }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent-green);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+
+  /* NEW SECTIONS */
+  .flow-steps {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .flow-steps li {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    text-align: center;
+  }
+
+  .logbook-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+  .logbook-table th,
+  .logbook-table td {
+    border-bottom: 1px solid var(--border);
+    padding: 0.65rem 0.75rem;
+    vertical-align: top;
+  }
+  .logbook-table th {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    width: 33%;
+  }
+
+  .tool-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .tool-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 1rem;
+  }
+  .tool-card h4 {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    margin-bottom: 0.7rem;
+    color: var(--accent-green);
+  }
+  .tool-card p { font-size: 0.82rem; color: #a8b5a9; margin-bottom: 0.5rem; }
+  .tool-card p strong { color: var(--text); font-weight: 500; }
+
+  .level-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+  .level-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 1rem;
+  }
+  .level-card h4 {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    margin-bottom: 0.7rem;
+  }
+  .level-junior h4 { color: var(--accent-blue); }
+  .level-mid h4 { color: var(--accent-amber); }
+  .level-senior h4 { color: var(--accent-red); }
+
+  .month-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+  .month-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 1rem;
+  }
+  .month-card h4 {
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    margin-bottom: 0.7rem;
+    color: var(--accent-teal);
+  }
+
+  @media (max-width: 900px) {
+    .flow-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tool-card-grid, .level-grid { grid-template-columns: 1fr; }
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Data Engineering · Junior → Senior</div>
+  <h1>Lộ trình học<br><em>Data Engineering</em><br>từ nền tảng đến chuyên sâu</h1>
+  <div class="header-meta">
+    <div>Thời gian ước tính <span>5–7 tháng</span></div>
+    <div>Modules <span>7</span></div>
+    <div>Mỗi ngày <span>2–4 giờ</span></div>
+  </div>
+</header>
+
+<nav>
+  <a href="#overview">Tổng quan</a>
+  <a href="#how-to-use">Dùng roadmap</a>
+  <a href="#project-xuyen-suot">Project xuyên suốt</a>
+  <a href="#logbook">Run/Break/Fix</a>
+  <a href="#workshop-ingestion">Workshop Ingestion</a>
+  <a href="#senior-questions">Senior Questions</a>
+  <a href="#phase1">Nền tảng</a>
+  <a href="#phase3">Nâng cao</a>
+  <a href="#decision">Decision Making</a>
+  <a href="#monthly">Milestone tháng</a>
+  <a href="#antigravity-checklist">Antigravity</a>
+  <a href="#anti-procrastination">Anti-procrastination</a>
+  <a href="#errors">Lỗi thường gặp</a>
+  <a href="#interview">Interview</a>
+  <a href="#checklist">Checklist level</a>
+</nav>
+
+<main>
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <div class="section-label">01 · Tổng quan</div>
+    <h2>Bức tranh toàn cảnh</h2>
+    <p class="lead">Trước khi bắt đầu, bạn cần hiểu DE làm gì, hệ sinh thái trông như thế nào, và tại sao các công nghệ trong Zoomcamp lại được chọn.</p>
+
+    <div class="block">
+      <div class="block-title">Data Engineer làm gì?</div>
+      <div class="grid-2">
+        <div class="card">
+          <h4>Xây dựng pipeline</h4>
+          <p>Di chuyển dữ liệu từ nguồn (API, DB, file) vào hệ thống lưu trữ, đảm bảo đúng, đủ, kịp thời.</p>
+        </div>
+        <div class="card">
+          <h4>Quản lý data platform</h4>
+          <p>Infra, scheduling, monitoring, cost — đảm bảo toàn bộ hệ thống data chạy ổn định.</p>
+        </div>
+        <div class="card">
+          <h4>Đảm bảo data quality</h4>
+          <p>Validate schema, detect anomalies, handle late/duplicate data, build trust với stakeholders.</p>
+        </div>
+        <div class="card">
+          <h4>Enable analytics</h4>
+          <p>Biến raw data thành dạng mà analyst và scientist có thể dùng được — modeling, transformation.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">7 Module trong repo — vị trí trong hệ sinh thái</div>
+      <div class="modules">
+        <div class="module-row">
+          <div class="module-num">01</div>
+          <div class="module-info">
+            <h4>Docker + Terraform</h4>
+            <p>Đóng gói môi trường, tự động hóa hạ tầng cloud. Nền tảng mọi thứ chạy trên đó.</p>
+          </div>
+          <span class="module-badge badge-infra">Infra</span>
+        </div>
+        <div class="module-row">
+          <div class="module-num">02</div>
+          <div class="module-info">
+            <h4>Workflow Orchestration (Kestra)</h4>
+            <p>Lên lịch, quản lý, retry pipeline tự động. Airflow/Kestra/Dagster — cùng một concept.</p>
+          </div>
+          <span class="module-badge badge-orch">Orchestration</span>
+        </div>
+        <div class="module-row">
+          <div class="module-num">03</div>
+          <div class="module-info">
+            <h4>Data Warehouse (BigQuery)</h4>
+            <p>Nơi lưu trữ và query data ở scale lớn. Partitioning, clustering, query optimization.</p>
+          </div>
+          <span class="module-badge badge-dwh">DWH</span>
+        </div>
+        <div class="module-row">
+          <div class="module-num">04</div>
+          <div class="module-info">
+            <h4>Analytics Engineering (dbt)</h4>
+            <p>Transform raw data thành analytical models. Nơi DE và Analyst giao nhau.</p>
+          </div>
+          <span class="module-badge badge-dwh">Transform</span>
+        </div>
+        <div class="module-row">
+          <div class="module-num">05</div>
+          <div class="module-info">
+            <h4>Data Platforms (Bruin)</h4>
+            <p>Platform-level thinking — quản lý nhiều pipeline, asset, project cùng lúc.</p>
+          </div>
+          <span class="module-badge badge-orch">Platform</span>
+        </div>
+        <div class="module-row">
+          <div class="module-num">06</div>
+          <div class="module-info">
+            <h4>Batch Processing (Spark)</h4>
+            <p>Xử lý data lớn theo batch. Distributed computing, partitioning, shuffle optimization.</p>
+          </div>
+          <span class="module-badge badge-batch">Batch</span>
+        </div>
+        <div class="module-row">
+          <div class="module-num">07</div>
+          <div class="module-info">
+            <h4>Streaming (Kafka + Flink)</h4>
+            <p>Xử lý data real-time. Event-driven architecture, exactly-once semantics.</p>
+          </div>
+          <span class="module-badge badge-stream">Streaming</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <strong>Tại sao học theo thứ tự này?</strong> Mỗi module build on top of cái trước. Không có Docker → không hiểu cách isolate môi trường. Không có Orchestration → pipeline chạy thủ công. Không có DWH → không biết lưu data đi đâu. Thứ tự quan trọng.
+    </div>
+  </section>
+
+  <!-- HOW TO USE ROADMAP -->
+  <section id="how-to-use">
+    <div class="section-label">02 · Cách học đúng</div>
+    <h2>Cách dùng roadmap này đúng cách</h2>
+    <p class="lead">Roadmap này không phải để đọc cho biết. Mục tiêu là biến từng module thành kỹ năng có thể chạy, debug, giải thích và cải tiến được trong bối cảnh thực tế.</p>
+
+    <div class="callout danger">
+      <strong>Không học theo kiểu chỉ đọc + ghi chú.</strong> HTML đẹp hoặc note dài chỉ là output cuối. Nó không phải bằng chứng bạn hiểu.
+    </div>
+
+    <div class="block">
+      <div class="block-title">Flow bắt buộc cho mọi module</div>
+      <ul class="flow-steps">
+        <li>Read</li>
+        <li>Run</li>
+        <li>Break</li>
+        <li>Debug</li>
+        <li>Explain</li>
+        <li>Improve</li>
+        <li>Document</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Daily Execution Plan (Gợi ý phân bổ thời gian)</div>
+      <ul class="items">
+        <li><strong>30 phút:</strong> Đọc README/code để hiểu kiến trúc tổng thể.</li>
+        <li><strong>60 phút:</strong> Chạy code thực tế (hands-on).</li>
+        <li><strong>30 phút:</strong> Cố tình phá/debug để hiểu cơ chế hoạt động và lỗi.</li>
+        <li><strong>20 phút:</strong> Ghi Run/Break/Fix Logbook.</li>
+        <li><strong>10 phút:</strong> Tự explain lại bằng tiếng Việt (giả lập phỏng vấn).</li>
+      </ul>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h4>Evidence giả</h4>
+        <p>“Em đã đọc hết docs”, “Em có summary đẹp”, “Em có hỏi AI và copy output”.</p>
+      </div>
+      <div class="card">
+        <h4>Evidence thật</h4>
+        <p>Em chạy được pipeline, tự gây lỗi rồi tự fix, và giải thích được vì sao fix đó đúng.</p>
+      </div>
+    </div>
+
+    <div class="callout success">
+      <strong>Bằng chứng hiểu thực sự:</strong> chạy được, debug được, giải thích được trade-off, và cải tiến được code cũ chứ không chỉ lặp lại tutorial.
+    </div>
+  </section>
+
+  <!-- PROJECT XUYEN SUOT -->
+  <section id="project-xuyen-suot">
+    <div class="section-label">03 · Capstone xuyên suốt</div>
+    <h2>Project xuyên suốt 7 module</h2>
+    <p class="lead">Dùng một project end-to-end duy nhất để kết nối toàn bộ Zoomcamp: từ setup hạ tầng đến batch + streaming và lớp mart cho BI.</p>
+
+    <div class="block">
+      <div class="block-title">Đề bài gợi ý & 3 Phase triển khai</div>
+      <p style="font-size:0.86rem;color:#a8b5a9;margin-bottom:0.8rem">Build nền tảng phân tích chuyến taxi: ingest dữ liệu trip + weather + event clickstream, xây dashboard demand theo giờ/khu vực, đồng thời có cảnh báo near-real-time khi surge tăng bất thường.</p>
+      <div class="grid-2" style="grid-template-columns: 1fr; gap: 0.5rem;">
+        <div class="card" style="padding: 0.8rem 1rem;">
+          <h4 style="color: var(--accent-blue);">Phase 1: MVP (Minimum Viable Product)</h4>
+          <p>Taxi batch pipeline → BigQuery → dbt → Dashboard cơ bản.</p>
+        </div>
+        <div class="card" style="padding: 0.8rem 1rem;">
+          <h4 style="color: var(--accent-amber);">Phase 2: Mở rộng & Đảm bảo chất lượng</h4>
+          <p>Thêm Weather API + Data quality checks (Great Expectations/dbt tests).</p>
+        </div>
+        <div class="card" style="padding: 0.8rem 1rem;">
+          <h4 style="color: var(--accent-purple);">Phase 3: Real-time & Alerting</h4>
+          <p>Thêm Kafka/Flink streaming clickstream + Alerting. <br><strong style="color: var(--accent-red);">Cảnh báo:</strong> Không bắt đầu streaming/Flink nếu MVP batch ở Phase 1 chưa chạy end-to-end trơn tru.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Data flow diagram (text)</div>
+      <pre>Sources
+  ├─ NYC taxi trips (batch files/API)
+  ├─ Weather API (batch)
+  └─ App events (stream)
+
+Ingestion Layer
+  ├─ Module 01: Docker services + Terraform infra
+  └─ Raw landing zone (GCS/Bucket + staging tables)
+
+Orchestration Layer
+  └─ Module 02: Kestra schedules ingestion + retries + alerts
+
+Warehouse Layer
+  └─ Module 03: BigQuery raw tables (partitioned)
+
+Transformation Layer
+  └─ Module 04: dbt (staging → intermediate → marts)
+
+Platform Layer
+  └─ Module 05: Asset lineage, ownership, SLA, quality checks
+
+Batch Compute
+  └─ Module 06: Spark job for heavy aggregations/backfills
+
+Streaming Compute
+  └─ Module 07: Kafka + Flink for near-real-time metrics
+
+Serving
+  ├─ BI dashboard (hourly/daily KPIs)
+  └─ Alert channel when anomaly detected</pre>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Milestone theo từng module</div>
+      <ul class="items">
+        <li><strong>Module 01:</strong> Container hóa local stack, Terraform tạo bucket + dataset + service account.</li>
+        <li><strong>Module 02:</strong> Orchestrate job ingest hàng ngày, có retry/backoff, có failure notification.</li>
+        <li><strong>Module 03:</strong> Nạp raw vào BigQuery, partition/cluster chuẩn, kiểm soát schema drift.</li>
+        <li><strong>Module 04:</strong> Build dbt models theo staging/intermediate/marts + tests + docs.</li>
+        <li><strong>Module 05:</strong> Quản lý asset/data contract, định nghĩa owner, SLA, runbook.</li>
+        <li><strong>Module 06:</strong> Spark batch để backfill và aggregate dataset lớn (cost/perf tối ưu).</li>
+        <li><strong>Module 07:</strong> Kafka/Flink streaming pipeline cho chỉ số realtime + checkpointing.</li>
+      </ul>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h4>Output cuối cùng</h4>
+        <p>1 repo chạy được end-to-end, diagram kiến trúc, dashboard KPI, tài liệu runbook, và video demo ngắn 5–7 phút.</p>
+      </div>
+      <div class="card">
+        <h4>Cách kể trong phỏng vấn</h4>
+        <p>Dùng format: Problem → Design → Failure đã gặp → Trade-off đã chọn → Kết quả đo được (latency/cost/reliability).</p>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Final Project bắt buộc phải có</div>
+      <ul class="items">
+        <li>Terraform (IaC) + Docker (runtime consistency).</li>
+        <li>Orchestration pipeline + ingestion layer (batch/API/stream source).</li>
+        <li>BigQuery warehouse + dbt transformation (staging/intermediate/marts).</li>
+        <li>Spark batch job cho workload lớn hoặc backfill nặng.</li>
+        <li>Kafka/Flink streaming flow cho realtime metrics/use case.</li>
+        <li>Dashboard phục vụ stakeholder (Looker Studio/Metabase/BI tool tương đương).</li>
+        <li>CI/CD pipeline cho code + Terraform + dbt checks.</li>
+        <li>Alerting (pipeline fail, freshness, lag, cost spike) + on-call runbook.</li>
+        <li>Testing: unit/integration/data quality tests với quality gates.</li>
+        <li>Documentation: architecture, lineage, data contract, handover guide.</li>
+        <li>Cost estimation: baseline + monthly projection + optimization notes.</li>
+        <li>Failure recovery plan: retry/replay/backfill/rollback theo incident type.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- LOGBOOK -->
+  <section id="logbook">
+    <div class="section-label">04 · Debug discipline</div>
+    <h2>Run / Break / Fix Logbook</h2>
+    <p class="lead">Mỗi buổi học phải để lại logbook. Đây là bằng chứng năng lực debug và tư duy production, không phải checklist hình thức.</p>
+
+    <div class="block">
+      <div class="block-title">Template cho mỗi lần học</div>
+      <table class="logbook-table">
+        <tbody>
+          <tr><th>Tôi chạy command gì?</th><td>Ghi chính xác command + input dataset/config đã dùng.</td></tr>
+          <tr><th>Kết quả mong đợi?</th><td>Nêu rõ expected output: table nào tạo ra, job state nào thành công, metric nào tăng/giảm.</td></tr>
+          <tr><th>Lỗi xảy ra?</th><td>Paste nguyên văn error quan trọng, không paraphrase.</td></tr>
+          <tr><th>Tôi đọc log ở đâu?</th><td>Container logs, orchestrator logs, Spark UI, BigQuery job history, Kafka consumer lag...</td></tr>
+          <tr><th>Root cause là gì?</th><td>Phân biệt symptom vs root cause; nêu bằng chứng xác minh.</td></tr>
+          <tr><th>Fix thế nào?</th><td>Fix cụ thể ở code/config + vì sao fix này giải quyết đúng root cause.</td></tr>
+          <tr><th>Nếu lỗi này xảy ra production lúc 3h sáng?</th><td>Escalation path, rollback/backfill plan, alert, owner chịu trách nhiệm.</td></tr>
+          <tr><th>Tôi học được gì?</th><td>1–2 nguyên tắc rút ra để tránh lặp lại ở module sau.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <strong>Rule:</strong> Không được đóng buổi học nếu chưa có ít nhất 1 entry logbook có root cause rõ ràng.
+    </div>
+  </section>
+
+  <!-- WORKSHOP INGESTION -->
+  <section id="workshop-ingestion">
+    <div class="section-label">05 · Workshop chuyên sâu</div>
+    <h2>Workshop: Data Ingestion chuyên sâu</h2>
+    <p class="lead">Từ mức “ingest được” lên mức production-ready: kiểm soát tốc độ gọi API, incremental strategy chuẩn, và contract để tránh vỡ downstream.</p>
+
+    <div class="phase phase-2 open">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">WS1</span>
+        <span class="phase-title">dlt + API ingestion patterns</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Pro-tier patterns</div>
+          <ul class="items">
+            <li><strong>dlt:</strong> Chuẩn hóa extraction/load pipeline, schema evolution có kiểm soát.</li>
+            <li><strong>API pagination:</strong> Cursor-based/page-based pagination có checkpoint để resume.</li>
+            <li><strong>Rate limiting:</strong> Token bucket / delay theo quota provider để tránh 429.</li>
+            <li><strong>Retry/backoff:</strong> Exponential backoff + jitter, phân loại retryable vs non-retryable errors.</li>
+            <li><strong>CDC vs timestamp incremental:</strong> Chọn theo độ tin cậy nguồn và yêu cầu audit/replay.</li>
+            <li><strong>Data contract:</strong> Định nghĩa schema bắt buộc + nullability + semantic rules ngay từ ingestion.</li>
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Lab phải làm</div>
+          <ul class="items">
+            <li>Build 1 pipeline dlt ingest API phân trang có resume sau khi fail giữa chừng.</li>
+            <li>Giả lập 429/5xx và chứng minh retry + backoff hoạt động đúng.</li>
+            <li>So sánh 2 chiến lược incremental (CDC và updated_at) trên cùng dataset.</li>
+            <li>Viết data contract và chặn pipeline khi payload vi phạm contract.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SENIOR QUESTIONS -->
+  <section id="senior-questions">
+    <div class="section-label">06 · Senior thinking by module</div>
+    <h2>Senior Questions trong từng module</h2>
+    <p class="lead">Mỗi module đều phải tự trả lời đủ 5 câu hỏi dưới đây với ngữ cảnh cụ thể của module đó.</p>
+
+    <div class="phase phase-1 open">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">M01</span>
+        <span class="phase-title">Docker + Terraform</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Pro-tier patterns</div>
+          <ul class="items">
+            <li>Multi-stage Docker build để giảm image size và bề mặt tấn công.</li>
+            <li>Secrets management: không hardcode; dùng secret manager hoặc injected runtime variables.</li>
+            <li>Remote Terraform state (GCS/S3) + state locking để tránh race conditions.</li>
+            <li>Tách Terraform theo modules, variables, locals để tái sử dụng và dễ review.</li>
+            <li>CI/CD cho IaC: tự động <code>terraform fmt/validate/plan</code>, apply có approval.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <div class="block-title">Senior Questions</div>
+          <ul class="items">
+            <li>Nếu provisioning fail giữa chừng thì rollback state/cleanup resource thế nào?</li>
+            <li>Nếu số service và môi trường tăng x100 thì bottleneck nằm ở image build, state lock hay networking?</li>
+            <li>Nếu chi phí cloud tăng mạnh thì tối ưu resource sizing, lifecycle policy và môi trường dev ra sao?</li>
+            <li>Nếu schema nguồn đổi, hạ tầng ingest cần versioning/contract thế nào để không vỡ downstream?</li>
+            <li>Nếu bàn giao cho Junior, cần document bootstrap, secrets handling, state backend, runbook gì?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-2">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">M02</span>
+        <span class="phase-title">Workflow Orchestration</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Pro-tier patterns</div>
+          <ul class="items">
+            <li>Idempotency cho từng task để rerun an toàn, không tạo duplicate.</li>
+            <li>Backfill + catchup strategy theo partition/time window, có giới hạn concurrency.</li>
+            <li>Dynamic DAG/flow sinh từ config để scale nhiều data source.</li>
+            <li>SLA monitoring cho duration/freshness; alerting theo severity (Slack/Email/Pager).</li>
+            <li>Retry policy tách bạch transient vs permanent failures.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <div class="block-title">Senior Questions</div>
+          <ul class="items">
+            <li>Nếu DAG fail giữa chừng, rerun từ task nào để an toàn dữ liệu?</li>
+            <li>Nếu số lượng workflow x100, bottleneck ở scheduler, queue hay worker concurrency?</li>
+            <li>Nếu cost tăng, nên tối ưu tần suất schedule, retries, compute profile thế nào?</li>
+            <li>Nếu source schema đổi, task validate và branching chiến lược ra sao?</li>
+            <li>Nếu bàn giao Junior, cần document dependency graph, SLA, on-call flow gì?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-3">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">M03</span>
+        <span class="phase-title">Data Warehouse (BigQuery)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Pro-tier patterns</div>
+          <ul class="items">
+            <li>BigQuery cost optimization: partition filters bắt buộc, tránh <code>SELECT *</code>, theo dõi bytes scanned.</li>
+            <li>Kimball modeling: fact/dimension rõ grain, conformed dimensions cho nhiều mart.</li>
+            <li>RLS/CLS để bảo vệ dữ liệu nhạy cảm theo role và domain.</li>
+            <li>Materialized views cho dashboard/query lặp lại, cân bằng freshness vs cost.</li>
+            <li>Reservation/slot strategy theo workload nếu team query đồng thời lớn.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <div class="block-title">Senior Questions</div>
+          <ul class="items">
+            <li>Nếu load fail giữa chừng thì đảm bảo atomicity/idempotency khi nạp lại thế nào?</li>
+            <li>Nếu volume x100, bottleneck ở partition design, join pattern hay concurrent slots?</li>
+            <li>Nếu bill tăng mạnh, tối ưu bytes scanned, materialization và retention ra sao?</li>
+            <li>Nếu source schema đổi, migration và compatibility strategy cho tables downstream thế nào?</li>
+            <li>Nếu bàn giao Junior, cần document naming convention, partition policy, cost guardrail gì?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-4">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">M04</span>
+        <span class="phase-title">dbt Analytics Engineering</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Pro-tier patterns</div>
+          <ul class="items">
+            <li>dbt Slim CI: chỉ run/test model bị ảnh hưởng trong Pull Request.</li>
+            <li>Incremental merge vs append: chọn theo business key, late updates và lịch sử dữ liệu.</li>
+            <li>dbt macros + packages để chuẩn hóa logic SQL tái sử dụng.</li>
+            <li>Data quality gates: fail pipeline khi test critical thất bại.</li>
+            <li>State-based selection để giảm thời gian CI/CD và chi phí query.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <div class="block-title">Senior Questions</div>
+          <ul class="items">
+            <li>Nếu run fail giữa chừng, chọn chạy lại model nào và state selection ra sao?</li>
+            <li>Nếu data x100, bottleneck ở incremental logic, tests hay model dependency nào?</li>
+            <li>Nếu cost tăng, tối ưu materialization (view/table/incremental) thế nào?</li>
+            <li>Nếu schema nguồn đổi, update staging contract và test coverage ra sao?</li>
+            <li>Nếu bàn giao Junior, document lineage, model contract, và release checklist gì?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-5">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">M05</span>
+        <span class="phase-title">Data Platform / Asset Thinking</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Pro-tier patterns</div>
+          <ul class="items">
+            <li>Modern data stack evaluation theo use case: managed services vs self-hosted components.</li>
+            <li>Metadata management: ownership, SLA/SLO, freshness, classification.</li>
+            <li>Data lineage end-to-end từ source đến dashboard để tăng tốc RCA.</li>
+            <li>Asset-based platform thinking: pipeline như product có contract và lifecycle.</li>
+            <li>Governance workflow cho change management và incident review.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <div class="block-title">Senior Questions</div>
+          <ul class="items">
+            <li>Nếu một asset fail, ảnh hưởng dây chuyền tới asset nào và degrade mode là gì?</li>
+            <li>Nếu asset count x100, bottleneck ở metadata, ownership hay observability?</li>
+            <li>Nếu cost platform tăng, chuẩn hóa shared services và chargeback thế nào?</li>
+            <li>Nếu schema đổi liên tục, quản trị data contract và versioning sao cho bền?</li>
+            <li>Nếu bàn giao Junior, cần document ownership matrix, SLA/SLO, incident template gì?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-6">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">M06</span>
+        <span class="phase-title">Batch Processing (Spark)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Pro-tier patterns</div>
+          <ul class="items">
+            <li>Spark memory tuning: executor/core/memory overhead theo workload.</li>
+            <li>Spill to disk awareness: theo dõi shuffle spill và tối ưu partition sizing.</li>
+            <li>Data skew mitigation: salting keys, repartition có chủ đích, skew hints.</li>
+            <li>Broadcast join + AQE để giảm shuffle và tự điều chỉnh plan runtime.</li>
+            <li>Spark unit testing (Pytest/chispa) cho transformation logic quan trọng.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <div class="block-title">Senior Questions</div>
+          <ul class="items">
+            <li>Nếu job fail giữa chừng, checkpoint/output commit strategy nào giúp rerun an toàn?</li>
+            <li>Nếu data x100, bottleneck ở shuffle, skew, IO hay executor memory?</li>
+            <li>Nếu cost compute tăng, tối ưu partitioning, autoscaling, storage format ra sao?</li>
+            <li>Nếu schema thay đổi, xử lý evolution của parquet/table và compatibility thế nào?</li>
+            <li>Nếu bàn giao Junior, document Spark UI reading guide và tuning playbook gì?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-6">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">M07</span>
+        <span class="phase-title">Streaming (Kafka + Flink)</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Pro-tier patterns</div>
+          <ul class="items">
+            <li>Exactly-once semantics theo phạm vi end-to-end, không chỉ producer side.</li>
+            <li>Partition strategy: key design, consumer scaling, rebalance impact.</li>
+            <li>Consumer lag monitoring + auto-remediation/playbook khi lag vượt ngưỡng.</li>
+            <li>Schema evolution với Avro compatibility (backward/forward/full) qua registry.</li>
+            <li>Replay và DLQ strategy để khôi phục dữ liệu khi downstream fail.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <div class="block-title">Senior Questions</div>
+          <ul class="items">
+            <li>Nếu stream job fail giữa chừng, offset/checkpoint recovery bảo toàn dữ liệu thế nào?</li>
+            <li>Nếu throughput x100, bottleneck ở broker partitions, consumer lag hay state backend?</li>
+            <li>Nếu cost tăng, tối ưu retention, serialization format, window strategy ra sao?</li>
+            <li>Nếu source schema đổi, áp dụng schema registry và compatibility mode thế nào?</li>
+            <li>Nếu bàn giao Junior, document replay strategy, DLQ flow, on-call runbook gì?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHASE 1: THEORY -->
+  <section id="phase1">
+    <div class="section-label">07 · Giai đoạn học</div>
+    <h2>Từng bước — lý thuyết đến thực chiến</h2>
+    <p class="lead">Mỗi module đều đi qua đúng 5 bước này. Đừng nhảy bước.</p>
+
+    <div class="phase phase-1 open">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">01</span>
+        <span class="phase-title">Lý thuyết nền — hiểu BỨC TRANH trước</span>
+        <span class="phase-duration">2–3 ngày / module</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Câu hỏi cần trả lời được trước khi code</div>
+          <ul class="items">
+            <li>Công nghệ này giải quyết vấn đề gì? Vấn đề đó xuất hiện từ khi nào?</li>
+            <li>Trước khi có nó, người ta làm thế nào? Tại sao cách cũ không đủ?</li>
+            <li>Nó hoạt động như thế nào ở mức tổng quát (không cần biết implementation detail)?</li>
+            <li>Khi nào NÊN dùng? Khi nào KHÔNG nên dùng?</li>
+            <li>Các alternatives là gì? Trade-off giữa chúng?</li>
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Ví dụ — Module 01: Docker</div>
+          <div class="callout info">
+            <strong>Vấn đề Docker giải quyết:</strong> "Works on my machine" — code chạy được trên laptop dev nhưng fail trên server production vì khác OS, khác Python version, khác library. Docker đóng gói toàn bộ môi trường vào một container chạy giống hệt nhau ở bất kỳ đâu.
+          </div>
+          <ul class="items">
+            <li><strong>Image</strong> = bản thiết kế (blueprint) — chứa OS, runtime, dependencies</li>
+            <li><strong>Container</strong> = instance đang chạy từ image đó — isolated, ephemeral</li>
+            <li><strong>Volume</strong> = cách persist data ra ngoài container (vì container mất data khi stop)</li>
+            <li><strong>Network</strong> = cách các container nói chuyện với nhau</li>
+            <li><strong>docker-compose</strong> = định nghĩa và chạy nhiều container cùng lúc</li>
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Ví dụ — Module 01: Terraform</div>
+          <ul class="items">
+            <li><strong>Vấn đề:</strong> Click tay trên GCP/AWS console → không reproducible, không version control, dễ sai</li>
+            <li><strong>Terraform giải quyết:</strong> Infrastructure as Code — viết file <code>.tf</code> mô tả hạ tầng, Terraform tự tạo/update/destroy</li>
+            <li><strong>State file:</strong> Terraform nhớ "hiện tại hạ tầng trông như thế nào" để biết cần thay đổi gì</li>
+            <li><strong>Plan → Apply:</strong> Xem trước sẽ thay đổi gì TRƯỚC khi thực sự thực thi</li>
+          </ul>
+        </div>
+
+        <div class="callout warn">
+          <strong>Đừng học syntax trước.</strong> Đọc docs, xem video overview, hiểu WHY trước. Syntax học sau 30 phút. WHY mất cả tuần mới ngấm.
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-2">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">02</span>
+        <span class="phase-title">Đọc code trong repo — hiểu người ta build thế nào</span>
+        <span class="phase-duration">1–2 ngày / module</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Cách đọc code hiệu quả (không đọc dòng theo dòng)</div>
+          <ul class="items">
+            <li>Đọc README trước — hiểu mục đích tổng thể</li>
+            <li>Nhìn cấu trúc thư mục — phân biệt config, code, data, script</li>
+            <li>Tìm entry point — file nào chạy đầu tiên?</li>
+            <li>Đọc config files (docker-compose.yaml, .tf, .yaml) — chúng kể câu chuyện về architecture</li>
+            <li>Đặt câu hỏi cho từng file: file này làm gì? Ai gọi nó? Nó phụ thuộc vào gì?</li>
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Dùng Claude Code CLI để phân tích sâu hơn</div>
+          <pre>cd data-engineering-zoomcamp/01-docker-terraform/docker-sql/pipeline
+
+claude "Đọc toàn bộ code trong thư mục này.
+Giải thích:
+1. Pipeline này làm gì (data flow từ đầu đến cuối)?
+2. Mỗi file có vai trò gì?
+3. Tại sao docker-compose cấu hình như vậy?
+4. Nếu tôi là Junior DE mới vào team, tôi cần hiểu gì về codebase này?"</pre>
+        </div>
+
+        <div class="callout success">
+          <strong>Mục tiêu:</strong> Sau bước này, bạn phải vẽ được data flow diagram trên giấy — không nhìn code. Nếu không vẽ được, chưa hiểu đủ.
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-3">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">03</span>
+        <span class="phase-title">Chạy thật — hands-on từng bước</span>
+        <span class="phase-duration">2–4 ngày / module</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Quy trình chạy chuẩn</div>
+          <pre># Bước 1: Đọc README setup
+# Bước 2: Chạy
+docker compose up -d
+
+# Bước 3: Verify nó đang chạy
+docker ps
+docker logs &lt;container_name&gt;
+
+# Bước 4: Test kết nối
+# (xem trong README — thường có hướng dẫn verify)
+
+# Bước 5: Chạy script ingestion
+python ingest_data.py ...</pre>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Sau khi chạy được — cố tình phá (QUAN TRỌNG)</div>
+          <pre># Thử các kịch bản fail:
+docker stop postgres           # DB bị tắt giữa chừng
+docker rm -f postgres          # Xóa container → mất data?
+# Sửa sai port trong docker-compose
+# Bỏ biến môi trường ENV
+# Cho file data không đúng format
+# Ngắt kết nối network giữa chừng</pre>
+          <p style="font-size:0.82rem;color:var(--muted);margin-top:0.5rem">Mỗi lần phá → đọc error message → tìm hiểu tại sao → fix. Đây là nơi học được 70% kiến thức thực chiến.</p>
+        </div>
+
+        <div class="callout warn">
+          <strong>Khi gặp lỗi, đừng hỏi AI ngay.</strong> Đọc error message toàn bộ. Google chính xác error đó. Đọc Stack Overflow / GitHub Issues. Nếu vẫn không hiểu sau 30 phút → hỏi. Quá trình tự debug xây dựng intuition không gì thay thế được.
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-4">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">04</span>
+        <span class="phase-title">Production thinking — tư duy Senior</span>
+        <span class="phase-duration">1–2 ngày / module</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Sau khi code chạy được, hỏi những câu này</div>
+          <ul class="items">
+            <li><strong>Reliability:</strong> Pipeline này fail ở đâu được? Làm sao retry an toàn? Có idempotent không?</li>
+            <li><strong>Scale:</strong> Nếu data volume x100, bottleneck ở đâu? Cần thay đổi gì?</li>
+            <li><strong>Observability:</strong> Khi fail lúc 3h sáng, tôi biết qua kênh nào? Logs ở đâu? Alert thế nào?</li>
+            <li><strong>Cost:</strong> Cái này tốn bao nhiêu? Có cách nào rẻ hơn không mất quality?</li>
+            <li><strong>Security:</strong> Credentials được lưu thế nào? Có hardcode secret trong code không?</li>
+            <li><strong>Maintainability:</strong> Nếu người khác tiếp nhận code này, mất bao lâu để hiểu?</li>
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Ví dụ — Module 01 ingestion pipeline</div>
+          <div class="callout danger">
+            <strong>Vấn đề idempotency:</strong> Script <code>ingest_data.py</code> chạy lại có bị duplicate data không? Nếu job fail ở giữa, chạy lại từ đầu có an toàn không? → Đây là câu hỏi Junior thường không nghĩ đến, Senior phải trả lời được trước khi deploy.
+          </div>
+          <pre># Câu hỏi cần suy nghĩ:
+# 1. Nếu postgres restart → data có mất không? Tại sao?
+# 2. Nếu chạy ingest_data.py 2 lần → database có 2x data không?
+# 3. Làm sao biết ingestion thành công? Log ở đâu?
+# 4. Nếu file CSV có row bị lỗi → toàn bộ fail hay bỏ qua row đó?</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-5">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">05</span>
+        <span class="phase-title">Build mini project — apply vào thực tế</span>
+        <span class="phase-duration">3–5 ngày / module</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Nguyên tắc: đừng clone — hãy rebuild với twist của mình</div>
+          <ul class="items">
+            <li>Module 01: Tạo pipeline ingest data từ một nguồn khác (open data Việt Nam, API thời tiết...)</li>
+            <li>Module 02: Tạo DAG có retry logic, có alert khi fail</li>
+            <li>Module 03: Tạo DWH schema cho use case thực tế bạn biết</li>
+            <li>Module 04: Build dbt models từ raw data bạn tự ingest</li>
+            <li>Module 06: Chạy Spark job xử lý dataset lớn hơn (parquet, nhiều partitions)</li>
+            <li>Module 07: Build streaming pipeline nhỏ với real event source</li>
+          </ul>
+        </div>
+        <div class="callout success">
+          <strong>Portfolio value:</strong> Những mini project này là thứ bạn nói trong phỏng vấn. "Tôi đã build pipeline XYZ, gặp vấn đề ABC, giải quyết bằng cách DEF" — Senior interviewer nghe câu đó sẽ biết ngay bạn có real experience.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADVANCED -->
+  <section id="phase3">
+    <div class="section-label">08 · Kiến thức Senior</div>
+    <h2>Những gì Zoomcamp không dạy đủ</h2>
+    <p class="lead">Đây là những concept phân biệt Junior/Mid với Senior. Không cần học ngay — nhưng phải nắm được trước khi apply Senior role.</p>
+
+    <div class="phase phase-1 open">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">A</span>
+        <span class="phase-title">Data reliability engineering</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Idempotency — khái niệm quan trọng nhất</div>
+          <p style="font-size:0.85rem;color:#a8b5a9;margin-bottom:0.8rem">Một operation là idempotent nếu chạy nhiều lần cho kết quả giống chạy một lần. Mọi pipeline production phải idempotent.</p>
+          <pre># ❌ KHÔNG idempotent — chạy 2 lần = duplicate
+INSERT INTO orders SELECT * FROM raw_orders WHERE date = '2024-01-01'
+
+# ✅ Idempotent — chạy bao nhiêu lần cũng được
+INSERT INTO orders
+SELECT * FROM raw_orders WHERE date = '2024-01-01'
+ON CONFLICT (order_id) DO UPDATE SET updated_at = EXCLUDED.updated_at</pre>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Backfill — xử lý historical data</div>
+          <ul class="items">
+            <li>Pipeline fail 3 ngày → cần chạy lại 3 ngày đó → gọi là backfill</li>
+            <li>Pipeline phải hỗ trợ <code>execution_date</code> parameter để backfill được</li>
+            <li>Backfill lớn thường chạy parallel → cần cẩn thận về resource contention</li>
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Late arriving data</div>
+          <ul class="items">
+            <li>Event xảy ra 10h tối nhưng server log về lúc 2h sáng hôm sau → late data</li>
+            <li>Cần phân biệt <strong>event time</strong> (khi event xảy ra) vs <strong>processing time</strong> (khi process)</li>
+            <li>Watermark: quyết định "sau bao lâu thì không nhận late data nữa"</li>
+            <li>Ảnh hưởng lớn đến streaming pipeline (Kafka, Flink)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-2">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">B</span>
+        <span class="phase-title">Data modeling chuyên sâu</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">Medallion Architecture (Bronze / Silver / Gold)</div>
+          <pre>Bronze (Raw Layer)
+  → Data ingested as-is, no transformation
+  → Immutable, append-only, full history
+  → Never delete, never modify
+
+Silver (Cleaned Layer)
+  → Dedup, validate, standardize types
+  → Partial transformation, still granular
+  → Source of truth for data team
+
+Gold (Business Layer)
+  → Aggregated, business-ready
+  → What analysts query
+  → Built from Silver, never from Bronze directly</pre>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Slowly Changing Dimensions (SCD)</div>
+          <ul class="items">
+            <li><strong>SCD Type 1:</strong> Overwrite — đơn giản, mất history. Dùng khi history không quan trọng</li>
+            <li><strong>SCD Type 2:</strong> Add row — giữ full history với effective_date. Phổ biến nhất</li>
+            <li><strong>SCD Type 3:</strong> Add column — lưu current + previous. Ít dùng</li>
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Partitioning strategy</div>
+          <ul class="items">
+            <li>Partition by date trong BigQuery → query chỉ scan partition cần thiết → tiết kiệm cost</li>
+            <li>Partition by date trong Spark → parallel processing trên từng partition</li>
+            <li>Over-partitioning (quá nhiều partition nhỏ) → overhead lớn hơn lợi ích</li>
+            <li>Under-partitioning → scan toàn bộ data → slow và tốn tiền</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-3">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">C</span>
+        <span class="phase-title">Observability & Monitoring</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">3 trụ cột observability</div>
+          <div class="grid-2">
+            <div class="card">
+              <h4>Metrics</h4>
+              <p>Số đo: rows processed/min, pipeline duration, error rate, lag. Dùng để alert và trending.</p>
+            </div>
+            <div class="card">
+              <h4>Logs</h4>
+              <p>Structured logs (JSON) cho mỗi event quan trọng. Searchable, filterable. Không log quá nhiều.</p>
+            </div>
+            <div class="card">
+              <h4>Traces</h4>
+              <p>End-to-end journey của một request/record qua hệ thống. Quan trọng khi debug distributed system.</p>
+            </div>
+            <div class="card">
+              <h4>Alerting</h4>
+              <p>Alert khi metric vượt threshold. Alert fatigue nguy hiểm — chỉ alert những thứ cần action ngay.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Data quality checks (phải có trong mọi pipeline)</div>
+          <pre># Kiểm tra phải có:
+- Row count (so với hôm qua, không được giảm quá X%)
+- Null rate trên critical columns
+- Duplicate check trên primary key
+- Value range check (tuổi không thể âm, giá không thể = 0)
+- Freshness check (data có update đúng giờ không?)
+- Schema drift detection (column mới xuất hiện / mất)</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase phase-4">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">D</span>
+        <span class="phase-title">Performance & Cost optimization</span>
+        <span class="phase-chevron">›</span>
+      </div>
+      <div class="phase-body">
+        <div class="block">
+          <div class="block-title">BigQuery optimization</div>
+          <pre># Tránh SELECT * — chỉ select column cần thiết
+# BigQuery tính cost theo bytes scanned, không theo rows
+
+# ❌ Tốn tiền
+SELECT * FROM `project.dataset.table`
+
+# ✅ Tiết kiệm
+SELECT user_id, event_type, created_at
+FROM `project.dataset.table`
+WHERE DATE(created_at) = '2024-01-01'  -- sử dụng partition</pre>
+        </div>
+
+        <div class="block">
+          <div class="block-title">Spark optimization</div>
+          <ul class="items">
+            <li><strong>Avoid shuffle khi có thể:</strong> Shuffle là operation tốn kém nhất (data move across network)</li>
+            <li><strong>Partition tuning:</strong> default 200 partitions sau shuffle — tune theo data size</li>
+            <li><strong>Broadcast join:</strong> join bảng nhỏ (< vài GB) → broadcast thay vì shuffle join</li>
+            <li><strong>Predicate pushdown:</strong> filter sớm nhất có thể, trước join</li>
+            <li><strong>Cache wisely:</strong> cache DataFrame dùng nhiều lần, uncache khi xong</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DECISION MAKING -->
+  <section id="decision">
+    <div class="section-label">09 · Decision Framework</div>
+    <h2>Decision Making — Khi nào KHÔNG dùng tool</h2>
+    <p class="lead">Senior không chọn tool theo trend. Senior chọn theo yêu cầu latency, scale, chi phí, năng lực team và rủi ro vận hành.</p>
+
+    <div class="tool-card-grid">
+      <div class="tool-card">
+        <h4>Docker</h4>
+        <p><strong>Dùng khi nào:</strong> Cần môi trường nhất quán, đóng gói service, deploy đa môi trường.</p>
+        <p><strong>Không dùng khi nào:</strong> Script một lần trên máy local, workload cực nhẹ, không cần isolate.</p>
+        <p><strong>Trade-off:</strong> Reproducible hơn nhưng thêm overhead image/build/network.</p>
+        <p><strong>Ví dụ production:</strong> ETL service nhiều dependency Python → dùng Docker để tránh mismatch giữa dev và prod.</p>
+      </div>
+
+      <div class="tool-card">
+        <h4>Terraform</h4>
+        <p><strong>Dùng khi nào:</strong> Hạ tầng cần version control, review, tái tạo nhiều môi trường.</p>
+        <p><strong>Không dùng khi nào:</strong> POC 1 ngày, 1 resource tạm thời, chưa có vòng đời dài.</p>
+        <p><strong>Trade-off:</strong> Governance tốt hơn nhưng thêm learning curve + state management.</p>
+        <p><strong>Ví dụ production:</strong> Tạo BigQuery dataset/bucket theo chuẩn team, review qua PR trước apply.</p>
+      </div>
+
+      <div class="tool-card">
+        <h4>Orchestration Tool</h4>
+        <p><strong>Dùng khi nào:</strong> Có nhiều task phụ thuộc, lịch chạy định kỳ, cần retry/alert/audit.</p>
+        <p><strong>Không dùng khi nào:</strong> Chỉ 1 script chạy thủ công vài lần/tháng, không SLA rõ ràng.</p>
+        <p><strong>Trade-off:</strong> Reliability cao hơn nhưng vận hành scheduler/worker phức tạp hơn cron đơn giản.</p>
+        <p><strong>Ví dụ production:</strong> Pipeline daily 20 task + backfill + alert Slack → bắt buộc orchestration.</p>
+      </div>
+
+      <div class="tool-card">
+        <h4>BigQuery</h4>
+        <p><strong>Dùng khi nào:</strong> Analytical query lớn, nhiều người dùng SQL, cần managed warehouse.</p>
+        <p><strong>Không dùng khi nào:</strong> Workload chủ yếu transactional OLTP hoặc dữ liệu cực nhỏ/ít query.</p>
+        <p><strong>Trade-off:</strong> Scale nhanh, ít ops; đổi lại cần kỷ luật query để tránh cost spike.</p>
+        <p><strong>Ví dụ production:</strong> Team BI cần dashboard theo giờ trên hàng tỷ rows → BigQuery phù hợp.</p>
+      </div>
+
+      <div class="tool-card">
+        <h4>dbt</h4>
+        <p><strong>Dùng khi nào:</strong> SQL transformation nhiều lớp, cần test/docs/lineage, teamwork qua Git.</p>
+        <p><strong>Không dùng khi nào:</strong> Chỉ vài query ad-hoc ngắn hạn, chưa cần lifecycle rõ ràng.</p>
+        <p><strong>Trade-off:</strong> Maintainable hơn nhưng thêm project structure và release discipline.</p>
+        <p><strong>Ví dụ production:</strong> 60+ model cho finance/reporting, cần test tự động trước khi publish mart.</p>
+      </div>
+
+      <div class="tool-card">
+        <h4>Spark</h4>
+        <p><strong>Dùng khi nào:</strong> Batch compute lớn, dataset vượt giới hạn single machine, cần distributed processing.</p>
+        <p><strong>Không dùng khi nào:</strong> Data nhỏ/vừa có thể xử lý bằng SQL engine hoặc pandas đủ nhanh.</p>
+        <p><strong>Trade-off:</strong> Scale tốt nhưng debug/tuning/shuffle phức tạp và tốn compute.</p>
+        <p><strong>Ví dụ production:</strong> Backfill 2 năm clickstream parquet vài TB → Spark job partitioned.</p>
+      </div>
+
+      <div class="tool-card">
+        <h4>Kafka / Flink</h4>
+        <p><strong>Dùng khi nào:</strong> Cần near-real-time, event-driven, xử lý stateful stream.</p>
+        <p><strong>Không dùng khi nào:</strong> SLA theo giờ/ngày, không cần real-time, team chưa sẵn sàng on-call stream.</p>
+        <p><strong>Trade-off:</strong> Latency thấp nhưng vận hành phức tạp (offset, checkpoint, lag, replay).</p>
+        <p><strong>Ví dụ production:</strong> Fraud detection cần cảnh báo trong vài giây → Kafka + Flink là hợp lý.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MONTHLY MILESTONE -->
+  <section id="monthly">
+    <div class="section-label">10 · 5–7 tháng</div>
+    <h2>Milestone đánh giá theo tháng</h2>
+    <p class="lead">Mỗi tháng phải có 4 outputs rõ ràng: build được gì, debug được gì, giải thích được gì, và artifact nào đưa vào portfolio.</p>
+
+    <div class="month-grid">
+      <div class="month-card">
+        <h4>Tháng 1 — Docker / Terraform / Ingestion</h4>
+        <ul class="items">
+          <li><strong>Build:</strong> Local stack chạy ổn định + terraform tạo hạ tầng cơ bản.</li>
+          <li><strong>Debug:</strong> Port conflict, connection refused, state drift, ENV sai.</li>
+          <li><strong>Explain:</strong> Vì sao cần container + IaC, plan/apply/state hoạt động thế nào.</li>
+          <li><strong>Portfolio:</strong> Repo setup + sơ đồ infra + runbook bootstrap.</li>
+        </ul>
+      </div>
+
+      <div class="month-card">
+        <h4>Tháng 2 — Orchestration + Data Warehouse</h4>
+        <ul class="items">
+          <li><strong>Build:</strong> Pipeline schedule tự động vào DWH có retry/alert.</li>
+          <li><strong>Debug:</strong> Task timeout, dependency fail, load duplicate, partition sai.</li>
+          <li><strong>Explain:</strong> Idempotency, backfill, partition/cluster, cost scan.</li>
+          <li><strong>Portfolio:</strong> DAG/workflow + screenshot runs + bảng raw đã nạp.</li>
+        </ul>
+      </div>
+
+      <div class="month-card">
+        <h4>Tháng 3 — dbt + Modeling</h4>
+        <ul class="items">
+          <li><strong>Build:</strong> dbt project chuẩn staging/intermediate/marts + tests/docs.</li>
+          <li><strong>Debug:</strong> Test fail, model dependency lỗi, incremental logic sai.</li>
+          <li><strong>Explain:</strong> Data contracts, model lineage, SCD/medallion trade-off.</li>
+          <li><strong>Portfolio:</strong> dbt docs site + model SQL + quality checks.</li>
+        </ul>
+      </div>
+
+      <div class="month-card">
+        <h4>Tháng 4 — Spark Batch</h4>
+        <ul class="items">
+          <li><strong>Build:</strong> Spark batch job xử lý dataset lớn + ghi output tối ưu.</li>
+          <li><strong>Debug:</strong> OOM, skew, shuffle bottleneck, small files problem.</li>
+          <li><strong>Explain:</strong> Partitioning, join strategy, tuning executor, cost/perf.</li>
+          <li><strong>Portfolio:</strong> Notebook/job script + benchmark trước/sau tối ưu.</li>
+        </ul>
+      </div>
+
+      <div class="month-card">
+        <h4>Tháng 5 — Streaming</h4>
+        <ul class="items">
+          <li><strong>Build:</strong> Kafka producer/consumer + Flink job có state/checkpoint.</li>
+          <li><strong>Debug:</strong> Consumer lag, duplicate event, offset recovery, schema mismatch.</li>
+          <li><strong>Explain:</strong> Event time vs processing time, delivery semantics, replay.</li>
+          <li><strong>Portfolio:</strong> Demo realtime metric + mô tả incident handling.</li>
+        </ul>
+      </div>
+
+      <div class="month-card">
+        <h4>Tháng 6–7 — End-to-end project + Interview prep</h4>
+        <ul class="items">
+          <li><strong>Build:</strong> Hoàn thiện capstone end-to-end với monitoring + quality + cost notes.</li>
+          <li><strong>Debug:</strong> Ít nhất 3 incident giả lập từ ingestion đến serving.</li>
+          <li><strong>Explain:</strong> Design decisions, trade-off, scaling strategy, handover plan.</li>
+          <li><strong>Portfolio:</strong> README chuẩn phỏng vấn + architecture diagram + video demo.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANTIGRAVITY CHECKLIST -->
+  <section id="antigravity-checklist">
+    <div class="section-label">11 · Antigravity Checklist</div>
+    <h2>Antigravity Pro-tier Checklist</h2>
+    <p class="lead">Bảng này là cầu nối từ “đã học” sang “đã làm thật”. Mỗi hàng phải có lab chạy được và artifact đưa vào portfolio.</p>
+
+    <div class="block">
+      <table class="error-table">
+        <thead>
+          <tr>
+            <th>Module</th>
+            <th>Pattern Senior cần học</th>
+            <th>Lab phải làm</th>
+            <th>Evidence/Artifact đưa vào portfolio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>M01</td>
+            <td>Multi-stage build, secrets, remote state, locking, Terraform CI/CD</td>
+            <td>Pipeline IaC có plan/apply qua CI, rollback test, secret injection runtime</td>
+            <td>Terraform plan screenshot, CI logs, diagram infra, runbook state recovery</td>
+          </tr>
+          <tr>
+            <td>M02</td>
+            <td>Idempotency, backfill/catchup, dynamic DAG, SLA/alerting</td>
+            <td>Simulate fail giữa chừng và rerun an toàn theo partition</td>
+            <td>Workflow config + alert demo + incident note</td>
+          </tr>
+          <tr>
+            <td>Workshop</td>
+            <td>dlt, pagination, rate limiting, retry/backoff, CDC vs incremental, contract</td>
+            <td>Ingest API có 429 handling + checkpoint + contract validation</td>
+            <td>Logbook lỗi API, contract file, benchmark retry strategy</td>
+          </tr>
+          <tr>
+            <td>M03</td>
+            <td>Cost optimization, Kimball, RLS/CLS, materialized views</td>
+            <td>Thiết kế marts + bảo mật role-based + tối ưu query cost</td>
+            <td>Cost before/after report, schema docs, SQL models</td>
+          </tr>
+          <tr>
+            <td>M04</td>
+            <td>dbt Slim CI, merge vs append incremental, macros/packages, quality gates</td>
+            <td>PR chỉ chạy model impacted + fail khi test critical không đạt</td>
+            <td>CI pipeline screenshot, dbt artifacts, test policy</td>
+          </tr>
+          <tr>
+            <td>M05</td>
+            <td>Modern data stack evaluation, metadata, lineage, asset-based thinking</td>
+            <td>Map lineage E2E và ownership matrix cho assets chính</td>
+            <td>Lineage graph, metadata catalog snapshot, handover doc</td>
+          </tr>
+          <tr>
+            <td>M06</td>
+            <td>Memory tuning, spill, skew/salting, broadcast join, AQE, Spark tests</td>
+            <td>Tune job giảm runtime/cost; thêm unit tests cho transformation</td>
+            <td>Spark UI before/after, test suite result, tuning notes</td>
+          </tr>
+          <tr>
+            <td>M07</td>
+            <td>EOS, partition strategy, lag monitoring, schema evolution/Avro compatibility</td>
+            <td>Streaming lab có replay + DLQ + schema compatibility checks</td>
+            <td>Lag dashboard, compatibility test results, recovery runbook</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ANTI PROCRASTINATION -->
+  <section id="anti-procrastination">
+    <div class="section-label">12 · Kỷ luật học</div>
+    <h2>Anti-procrastination rules</h2>
+    <p class="lead">Những rule này giữ bạn ở trạng thái “làm thật” thay vì “học cho cảm giác bận rộn”.</p>
+
+    <ul class="items">
+      <li>Không dành quá 20% thời gian để làm HTML đẹp hoặc chỉnh format note.</li>
+      <li>Không generate lesson trước khi tự chạy code thật và có output.</li>
+      <li>Không chuyển module nếu chưa tự debug ít nhất 3 lỗi thực tế.</li>
+      <li>Không coi AI answer là kiến thức của mình nếu chưa tự explain lại bằng lời của mình.</li>
+      <li>Mỗi module bắt buộc có ít nhất 1 mini project có repo hoặc artifact rõ ràng.</li>
+    </ul>
+
+    <div class="callout info">
+      <strong>Daily cadence gợi ý:</strong> 20% đọc/thiết kế · 60% run/break/debug · 20% document/tổng kết.
+    </div>
+  </section>
+
+  <!-- COMMON ERRORS -->
+  <section id="errors">
+    <div class="section-label">13 · Lỗi thường gặp</div>
+    <h2>Lỗi hay gặp và cách xử lý</h2>
+    <p class="lead">Tổng hợp lỗi phổ biến theo từng technology. Khi gặp, đọc đây trước khi Google.</p>
+
+    <div class="block">
+      <div class="block-title">Docker</div>
+      <table class="error-table">
+        <thead>
+          <tr><th>Lỗi</th><th>Nguyên nhân</th><th>Fix</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="error-name">port already in use</span></td>
+            <td>Port đã bị process khác dùng</td>
+            <td class="error-fix"><code>lsof -i :5432</code> → kill process hoặc đổi port trong compose</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">connection refused</span></td>
+            <td>Service chưa ready hoặc sai hostname</td>
+            <td class="error-fix">Chờ health check, check service name trong compose (đây là hostname)</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">volume data mất sau restart</span></td>
+            <td>Dùng anonymous volume hoặc không mount</td>
+            <td class="error-fix">Khai báo named volume trong compose, mount đúng path</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">container exits immediately</span></td>
+            <td>Process crash, thiếu ENV, config sai</td>
+            <td class="error-fix"><code>docker logs &lt;container&gt;</code> xem error message</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">permission denied</span></td>
+            <td>File/folder permission hoặc user mismatch</td>
+            <td class="error-fix">Check ownership, dùng <code>--user</code> flag hoặc fix trong Dockerfile</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="block">
+      <div class="block-title">BigQuery / SQL</div>
+      <table class="error-table">
+        <thead>
+          <tr><th>Lỗi</th><th>Nguyên nhân</th><th>Fix</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="error-name">Resources exceeded</span></td>
+            <td>Query scan quá nhiều data, join cartesian</td>
+            <td class="error-fix">Thêm WHERE clause, check cho cross join, dùng partition filter</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">Too many partitions</span></td>
+            <td>Partition column có cardinality quá cao</td>
+            <td class="error-fix">Dùng date partition thay vì user_id partition</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">Data skew trong join</span></td>
+            <td>Một key có quá nhiều rows → một worker quá tải</td>
+            <td class="error-fix">Salting technique, broadcast join nếu có thể</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">Schema mismatch</span></td>
+            <td>Source thay đổi column type hoặc thêm/xóa column</td>
+            <td class="error-fix">Schema validation, schema registry, migration scripts</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Spark</div>
+      <table class="error-table">
+        <thead>
+          <tr><th>Lỗi</th><th>Nguyên nhân</th><th>Fix</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="error-name">OutOfMemoryError</span></td>
+            <td>Executor memory không đủ, data skew, collect() quá nhiều data</td>
+            <td class="error-fix">Tăng executor memory, repartition, tránh collect() trên large dataset</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">Job stuck at shuffle</span></td>
+            <td>Data skew — một partition quá lớn</td>
+            <td class="error-fix">Salting, repartition, adaptive query execution (AQE)</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">Task failed, retry</span></td>
+            <td>Node failure, GC overhead, network timeout</td>
+            <td class="error-fix">Check executor logs, tăng timeout, giảm task size</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">Small files problem</span></td>
+            <td>Output có hàng nghìn file nhỏ → đọc lại rất chậm</td>
+            <td class="error-fix"><code>coalesce()</code> trước khi write, hoặc compact job riêng</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Kafka / Streaming</div>
+      <table class="error-table">
+        <thead>
+          <tr><th>Lỗi</th><th>Nguyên nhân</th><th>Fix</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="error-name">Consumer lag tăng</span></td>
+            <td>Consumer xử lý chậm hơn producer produce</td>
+            <td class="error-fix">Scale up consumer (thêm instance), optimize xử lý logic</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">Duplicate messages</span></td>
+            <td>Consumer crash trước khi commit offset</td>
+            <td class="error-fix">Idempotent consumer, exactly-once semantics, dedup logic</td>
+          </tr>
+          <tr>
+            <td><span class="error-name">Offset out of range</span></td>
+            <td>Consumer group inactive quá lâu, message bị xóa (retention)</td>
+            <td class="error-fix">Set <code>auto.offset.reset=earliest/latest</code> theo use case</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section id="interview">
+    <div class="section-label">14 · Interview Prep</div>
+    <h2>Câu hỏi phỏng vấn theo level</h2>
+    <p class="lead">Click vào câu hỏi để xem gợi ý trả lời. Junior cần trả lời được tất cả. Senior cần có depth ở mỗi câu.</p>
+
+    <div class="block">
+      <div class="block-title">Infrastructure & Data Platform</div>
+
+      <div class="question-block">
+        <div class="question-header" onclick="toggleQ(this)">
+          Tại sao dùng Docker trong data pipeline?
+          <span class="q-tag q-junior">Junior</span>
+        </div>
+        <div class="question-answer">
+          Trả lời Junior: "Đảm bảo môi trường nhất quán giữa local, staging, production. Reproducible builds."<br><br>
+          Trả lời Senior thêm: "Isolate dependencies giữa các service. Dễ scale horizontally. Container orchestration (K8s) cho phép auto-scaling và self-healing. Nhưng cần trade-off: overhead so với bare-metal, complexity của container networking, image size management."
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-header" onclick="toggleQ(this)">
+          Terraform state file là gì? Tại sao quan trọng và có những rủi ro gì?
+          <span class="q-tag q-mid">Mid</span>
+        </div>
+        <div class="question-answer">
+          State file lưu mapping giữa Terraform resources và actual infrastructure. Terraform dùng nó để biết cần apply change gì.<br><br>
+          Rủi ro: State file có thể chứa sensitive data (passwords, keys). Nếu state bị out of sync với thực tế (ai đó manually thay đổi infra) → terraform plan/apply có thể làm điều sai. Giải pháp: remote state (GCS/S3), state locking (tránh 2 người apply cùng lúc), encrypt state.
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-header" onclick="toggleQ(this)">
+          Design một hệ thống ingestion cho 10TB/ngày từ 100 nguồn khác nhau
+          <span class="q-tag q-senior">Senior</span>
+        </div>
+        <div class="question-answer">
+          Không có một đáp án đúng — interviewer muốn thấy thinking process:<br><br>
+          1. Phân loại nguồn: batch (file, DB dump) vs streaming (API, event stream)<br>
+          2. Landing zone (Bronze): S3/GCS, raw format, immutable<br>
+          3. Ingestion layer: Airbyte/Fivetran cho SaaS sources, custom connectors cho proprietary<br>
+          4. Reliability: retry logic, dead letter queue cho failed records<br>
+          5. Observability: row count, latency, error rate per source<br>
+          6. Cost: compression (Parquet > CSV), partition by source+date, lifecycle policy<br>
+          7. Schema management: Schema Registry hoặc catalog (Glue, DataHub)
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Data Warehouse & Modeling</div>
+
+      <div class="question-block">
+        <div class="question-header" onclick="toggleQ(this)">
+          Partition và Cluster trong BigQuery khác nhau thế nào?
+          <span class="q-tag q-junior">Junior</span>
+        </div>
+        <div class="question-answer">
+          <strong>Partition:</strong> Chia table thành các phần nhỏ theo column (thường là date). Query với WHERE trên partition column → BigQuery chỉ scan partition đó → tiết kiệm cost.<br><br>
+          <strong>Cluster:</strong> Sort data trong mỗi partition theo column(s). Query với WHERE/ORDER BY trên cluster column → đọc ít blocks hơn.<br><br>
+          Dùng cả hai: Partition by date, cluster by user_id → query filter theo date AND user → cực kỳ hiệu quả.
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-header" onclick="toggleQ(this)">
+          Giải thích SCD Type 2 và khi nào dùng
+          <span class="q-tag q-mid">Mid</span>
+        </div>
+        <div class="question-answer">
+          SCD Type 2: Khi attribute thay đổi, thêm row mới thay vì update. Giữ toàn bộ history.<br><br>
+          Ví dụ: Customer thay địa chỉ → thêm row mới với effective_start_date = hôm nay, đánh is_current = false row cũ.<br><br>
+          Dùng khi: cần audit trail, cần biết trạng thái tại thời điểm X trong quá khứ, báo cáo historical.<br>
+          Không dùng khi: history không quan trọng, table quá lớn (SCD2 làm table phình rất nhanh), chỉ cần current state.
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-header" onclick="toggleQ(this)">
+          Pipeline của bạn suddenly produce wrong numbers. Làm sao debug?
+          <span class="q-tag q-senior">Senior</span>
+        </div>
+        <div class="question-answer">
+          Đây là câu hỏi về systematic debugging — không phải technical knowledge:<br><br>
+          1. Xác định scope: tất cả metrics sai hay chỉ một số? Từ bao giờ? (git blame, deployment log)<br>
+          2. Check data lineage: số sai ở layer nào? Gold → Silver → Bronze → Source<br>
+          3. Compare với expected: row count, sum, distinct count tại mỗi layer<br>
+          4. Check recent changes: code deploy, schema change, source data format change<br>
+          5. Isolate: reproduce với subset data, test từng transformation riêng lẻ<br>
+          6. Root cause + fix + verify + prevent: thêm data quality check để catch sớm hơn lần sau
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Streaming & Batch</div>
+
+      <div class="question-block">
+        <div class="question-header" onclick="toggleQ(this)">
+          Exactly-once semantics trong Kafka là gì? Có thực sự đạt được không?
+          <span class="q-tag q-senior">Senior</span>
+        </div>
+        <div class="question-answer">
+          Exactly-once = mỗi message được xử lý đúng một lần, không bỏ sót, không duplicate.<br><br>
+          Trong distributed system, đây là bài toán cực kỳ khó. Kafka đạt được ở producer level (idempotent producer + transactions). Nhưng end-to-end exactly-once (từ source đến sink) phụ thuộc vào cả consumer và destination system.<br><br>
+          Thực tế: at-least-once + idempotent consumer thường đủ và dễ implement hơn. Chỉ cần exactly-once khi: financial transaction, billing, critical counting.
+        </div>
+      </div>
+
+      <div class="question-block">
+        <div class="question-header" onclick="toggleQ(this)">
+          Khi nào dùng batch, khi nào dùng streaming?
+          <span class="q-tag q-mid">Mid</span>
+        </div>
+        <div class="question-answer">
+          <strong>Batch:</strong> Latency chấp nhận được (giờ/ngày), data volume lớn, phức tạp transformation, cost là ưu tiên, historical reprocessing thường xuyên.<br><br>
+          <strong>Streaming:</strong> Low latency yêu cầu (giây/phút), alerting real-time, user-facing features cần fresh data, event-driven architecture.<br><br>
+          Senior thêm: Lambda architecture (cả hai), Kappa architecture (streaming only với reprocessing). Trade-off: streaming phức tạp hơn, harder to debug, more expensive per record.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section id="checklist">
+    <div class="section-label">15 · Readiness Checklist</div>
+    <h2>Checklist theo 3 level: Junior → Mid → Senior Candidate</h2>
+    <p class="lead">Tick theo năng lực thật của bạn. Mục tiêu không phải tick nhanh, mà là chứng minh được năng lực qua project và debug logs.</p>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Tiến độ tổng</span>
+        <span id="progress-text">0 / 0</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+
+    <div class="level-grid">
+      <div class="level-card level-junior">
+        <h4>Junior Ready</h4>
+        <p style="font-size:0.82rem;color:#a8b5a9;margin-bottom:0.6rem">Tiêu chí: chạy được tutorial, hiểu concept cơ bản, làm theo runbook có hướng dẫn.</p>
+        <ul class="checklist">
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Chạy trọn 7 module theo hướng dẫn repo và verify được output chính.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Giải thích được Docker/Terraform/Orchestration/DWH/dbt/Spark/Streaming ở mức WHY cơ bản.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Tự setup local environment mới từ đầu trong &lt; 2 giờ.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Viết được mini pipeline ingest + load vào warehouse theo template có sẵn.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Ghi được logbook đầy đủ cho ít nhất 5 lỗi phổ biến đã tự fix.</li>
+        </ul>
+      </div>
+
+      <div class="level-card level-mid">
+        <h4>Mid Ready</h4>
+        <p style="font-size:0.82rem;color:#a8b5a9;margin-bottom:0.6rem">Tiêu chí: tự build pipeline, debug lỗi phổ biến, explain trade-off ở mức hệ thống.</p>
+        <ul class="checklist">
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Tự thiết kế và build end-to-end pipeline (batch + modeling) không cần copy tutorial.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Xử lý được retry/backfill/idempotency cho các failure scenario thường gặp.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Tối ưu query/job để giảm ít nhất 20–30% thời gian hoặc chi phí so với baseline.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Giải thích trade-off giữa ít nhất 2 design choices cho mỗi module chính.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Document được kiến trúc, lineage, vận hành on-call cơ bản để người khác tiếp nhận.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Build ingestion có pagination + rate-limit + retry/backoff và chứng minh resume sau fail.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Áp dụng BigQuery partition/cluster + materialized view để tối ưu dashboard workload.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Triển khai dbt tests + quality gates để chặn deploy khi dữ liệu critical lỗi.</li>
+        </ul>
+      </div>
+
+      <div class="level-card level-senior">
+        <h4>Senior Candidate</h4>
+        <p style="font-size:0.82rem;color:#a8b5a9;margin-bottom:0.6rem">Tiêu chí: design system, xử lý failure/scale/cost/observability, review code và dẫn dắt kỹ thuật.</p>
+        <ul class="checklist">
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Thiết kế được kiến trúc data platform cho multi-source, có SLA/SLO, observability và ownership rõ.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Xử lý được incident mô phỏng 3h sáng: triage, rollback/replay, RCA, prevention.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Lập được kế hoạch scale khi data volume x100 kèm cost guardrail cụ thể.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Review code pipeline của người khác và chỉ ra risk về reliability/security/cost.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Kể trọn project end-to-end trong phỏng vấn bằng số liệu đo được và quyết định kiến trúc đã chọn.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Vận hành được Terraform CI/CD với remote state locking và policy kiểm soát apply.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Triển khai dbt Slim CI + Spark unit testing + quality gates xuyên suốt pipeline.</li>
+          <li><div class="check-box" onclick="toggleCheck(this)"></div>Thiết kế streaming flow có exactly-once strategy, lag observability và schema evolution an toàn.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout success">
+      <strong>Cách dùng checklist:</strong> Junior = nền tảng vận hành, Mid = tự build + tối ưu, Senior Candidate = tư duy hệ thống + ownership.
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Lộ trình dựa trên DataTalksClub DE Zoomcamp · Cập nhật theo repo 2026
+</footer>
+
+<script>
+  function togglePhase(header) {
+    header.parentElement.classList.toggle('open');
+  }
+
+  function toggleQ(header) {
+    header.parentElement.classList.toggle('open');
+  }
+
+  function toggleCheck(box) {
+    box.classList.toggle('checked');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('.check-box');
+    const checked = document.querySelectorAll('.check-box.checked');
+    const pct = Math.round((checked.length / all.length) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = checked.length + ' / ' + all.length;
+  }
+
+  updateProgress();
+
+  // Open first phase by default
+  document.querySelectorAll('.phase')[0].classList.add('open');
+</script>
+</body>
+</html>
