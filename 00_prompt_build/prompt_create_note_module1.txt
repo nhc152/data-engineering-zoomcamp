@@ -1,0 +1,128 @@
+Đọc TOÀN BỘ các file sau trong data-engineering-zoomcamp/01-docker-terraform/:
+
+DOCKER-SQL:
+- docker-sql/pipeline/docker-compose.yaml
+- docker-sql/pipeline/Dockerfile
+- docker-sql/pipeline/ingest_data.py
+- docker-sql/pipeline/pyproject.toml
+- docker-sql/pipeline/.python-version
+- docker-sql/pipeline/docker-helper-scripts/docker-pgadmin.sh
+- docker-sql/pipeline/docker-helper-scripts/docker-postgres.sh
+- docker-sql/README.md
+- docker-sql/01-introduction.md
+- docker-sql/02-virtual-environment.md
+- docker-sql/03-dockerizing-pipeline.md
+- docker-sql/04-postgres-docker.md
+- docker-sql/05-data-ingestion.md
+- docker-sql/06-ingestion-script.md
+- docker-sql/07-pgadmin.md
+- docker-sql/08-dockerizing-ingestion.md
+- docker-sql/09-docker-compose.md
+- docker-sql/10-sql-refresher.md
+- docker-sql/11-cleanup.md
+
+TERRAFORM:
+- terraform/README.md
+- terraform/1_terraform_overview.md
+- terraform/2_gcp_overview.md
+- terraform/windows.md
+- terraform/terraform_basic/main.tf
+- terraform/terraform_with_variables/main.tf
+- terraform/terraform_with_variables/variables.tf
+- terraform/terraform_with_variables/README.md
+- terraform/terraform_with_variable_AWS/main.tf
+- terraform/terraform_with_variable_AWS/variables.tf
+- terraform/terraform_with_variable_AWS/terraform.tfvars
+- terraform/terraform_with_variable_AWS/README.md
+
+Sau khi đọc xong TOÀN BỘ, tạo file repo_notes_M01.md:
+
+═══════════════════════════════
+1. CẤU TRÚC THƯ MỤC
+═══════════════════════════════
+Tree đầy đủ + mục đích từng folder và file
+
+═══════════════════════════════
+2. NỘI DUNG CÁC FILE .MD
+═══════════════════════════════
+Tóm tắt từng file .md theo format:
+[Tên file]
+- Dạy về: [topic]
+- Concepts chính: [list]
+- Commands được dùng: [list commands thực tế]
+- Lưu ý đặc biệt: [nếu có]
+
+═══════════════════════════════
+3. PHÂN TÍCH CODE FILES
+═══════════════════════════════
+Với mỗi file code, ghi rõ:
+
+[docker-compose.yaml]
+- Services: tên, image, ports, volumes, env vars, networks, depends_on
+- Copy nguyên văn toàn bộ file
+
+[Dockerfile]
+- Base image, layers theo thứ tự
+- Entry point, CMD
+- Copy nguyên văn toàn bộ file
+
+[ingest_data.py]
+- Arguments nhận vào
+- Logic chính từng bước
+- Libraries dùng
+- Copy nguyên văn toàn bộ file
+
+[pyproject.toml]
+- Dependencies list
+- Copy nguyên văn toàn bộ file
+
+[docker-pgadmin.sh / docker-postgres.sh]
+- Làm gì, arguments, cách chạy
+- Copy nguyên văn toàn bộ file
+
+[terraform_basic/main.tf]
+- Copy nguyên văn toàn bộ file
+
+[terraform_with_variables/main.tf + variables.tf]
+- Resources được tạo
+- Variables: tên, type, default
+- Copy nguyên văn toàn bộ file
+
+[terraform_with_variable_AWS/main.tf + variables.tf + terraform.tfvars]
+- Copy nguyên văn toàn bộ file
+
+═══════════════════════════════
+4. DATA FLOW THỰC TẾ
+═══════════════════════════════
+- Flow đầy đủ từng bước: data đi từ đâu → qua đâu → đến đâu
+- File nào trigger file nào
+- Thứ tự chạy đúng
+- Dependency giữa các services
+
+═══════════════════════════════
+5. ĐIỂM YẾU & THIẾU SÓT
+═══════════════════════════════
+- Security issues trong code thực tế (hardcode, credentials...)
+- Idempotency issues
+- Production readiness gaps
+- Monitoring gaps
+- Những gì repo dạy nhưng không đủ cho Senior DE
+
+═══════════════════════════════
+6. KIẾN THỨC NGOÀI REPO
+═══════════════════════════════
+Dựa trên những gì repo đang cover, liệt kê những concept
+Senior DE phải biết nhưng repo KHÔNG dạy:
+- Docker: [list cụ thể]
+- Terraform: [list cụ thể]
+- Pipeline/Ingestion: [list cụ thể]
+- GCP: [list cụ thể]
+
+Lưu file: repo_notes_M01.md
+
+QUAN TRỌNG:
+- Copy nguyên văn toàn bộ nội dung các file code
+- Không tóm tắt bỏ qua bất kỳ dòng code nào
+- Không bỏ qua file nào trong danh sách trên
+- Mục tiêu: đọc file notes này là hiểu hoàn toàn repo mà không cần mở repo
+
