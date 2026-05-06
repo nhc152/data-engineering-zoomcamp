@@ -792,6 +792,7 @@ GCP API (<span class="kw2">provider google</span>)
             <li><strong>8085:80:</strong> pgAdmin trong container nghe ở cổng 80, nhưng host đổi sang 8085 để tránh xung đột với các web service khác.</li>
           </ul>
           <div class="info-box warn">⚠️ <span><strong>Cảnh báo:</strong> Nếu bạn đổi sang <code>8080:8080</code>, pgAdmin phải thực sự listen trên 8080 trong container; với image này mặc định là 80.</span></div>
+          <div class="info-box note">📌 <span><strong>Tại sao compose hiện tại chưa có <code>depends_on</code>:</strong> đây là điểm yếu thực tế của file gốc — PostgreSQL thường mất 2–5 giây để ready; nếu ingest chạy ngay thì dễ gặp <code>connection refused</code>. Cách fix chuẩn là kết hợp <code>healthcheck</code> + <code>depends_on.condition: service_healthy</code>; chỉ dùng <code>depends_on</code> theo tên service thì mới đảm bảo container started, chưa đảm bảo DB ready.</span></div>
 
           <h3 class="red">Depends_on và thứ tự start</h3>
           <p>File compose hiện tại <strong>chưa khai báo <code>depends_on</code></strong>. Nghĩa là Compose tạo service mà không enforce strict startup ordering. Về thực tế:</p>
@@ -943,6 +944,13 @@ parse_dates = [
             <li><strong>Error handling tối thiểu:</strong> chưa bắt lỗi network/DB/auth/timeouts theo từng class lỗi.</li>
             <li><strong>Không có checkpoint/resume:</strong> fail giữa chừng phải ingest lại từ đầu.</li>
             <li><strong>Chưa có validation dữ liệu:</strong> chưa check schema drift/null anomalies trước khi load.</li>
+          </ul>
+
+          <h3 class="blue">Chi tiết kỹ thuật quan trọng từ repo</h3>
+          <ul>
+            <li><strong>Vì sao dùng <code>Int64</code> thay vì <code>int64</code>:</strong> dataset thực tế có missing values; <code>int64</code> thường không chứa được <code>NaN</code>, còn <code>Int64</code> (pandas nullable integer) thì giữ được null mà vẫn bảo toàn semantic kiểu số nguyên.</li>
+            <li><strong><code>uv sync --locked</code> khác <code>pip install</code>:</strong> cờ <code>--locked</code> buộc dùng đúng versions trong <code>uv.lock</code>, giúp tránh dependency drift giữa local/CI/container.</li>
+            <li><strong>pgAdmin map <code>8085:80</code> (không phải <code>8080:80</code>):</strong> service trong container listen cổng 80, còn host chọn 8085 để giảm xung đột với các web app/dev server thường chiếm 8080.</li>
           </ul>
         </div>
       </div>
@@ -1545,6 +1553,15 @@ pgAdmin (pgadmin service) để query/verify</pre>
             </li>
           </ul>
 
+          <h3 class="blue">Scenario 6 — Chạy ingest với <code>--pg-host=localhost</code></h3>
+          <ul>
+            <li><strong>Phá:</strong> chạy <code>docker run</code> ingest nhưng truyền <code>--pg-host=localhost</code> thay vì <code>--pg-host=pgdatabase</code>.</li>
+            <li><strong>Lỗi thường gặp:</strong> <code>connection refused</code> hoặc <code>could not connect to server</code>.</li>
+            <li><strong>Tại sao:</strong> mỗi container có network namespace riêng; <code>localhost</code> trong container trỏ về chính container đó, không trỏ về host machine hay container khác.</li>
+            <li><strong>Fix:</strong> luôn dùng container/service name làm hostname khi giao tiếp container-to-container (ở lab này là <code>pgdatabase</code>).</li>
+            <li><strong>Lưu ý:</strong> đây là lỗi phổ biến nhất của người mới học Docker networking.</li>
+          </ul>
+
           <div class="info-box warn">⚠️ <span><strong>Roadmap alignment (M01 D5–D7):</strong> bắt buộc thử các lỗi kiểu port/env/state và ghi lại logbook theo mẫu Break → Root cause → Fix → Lesson learned.</span></div>
         </div>
       </div>
@@ -1674,6 +1691,19 @@ terraform.tfstate
 terraform.tfstate.backup
 *.tfvars</pre>
                 </div>
+                <ul>
+                    <li><strong>Container chạy root mặc định — rủi ro:</strong> nếu app có lỗ hổng, attacker có thể chiếm quyền root trong container và mở rộng blast radius.</li>
+                </ul>
+                <div class="cmd-block">
+                    <div class="cmd-header"><span>● ● ●</span><span>Dockerfile (run as non-root)</span></div>
+                    <pre>RUN addgroup --system appgroup &amp;&amp; adduser --system --ingroup appgroup appuser
+USER appuser</pre>
+                </div>
+                <ul>
+                    <li><strong>Service Account Key JSON trên máy cá nhân — rủi ro:</strong> nếu key bị leak (commit nhầm git, máy bị compromise), attacker có thể dùng key đó truy cập tài nguyên GCP theo quyền đã cấp.</li>
+                    <li><strong>Alternative production tốt hơn:</strong> Workload Identity Federation cấp credentials tạm thời cho workload (GitHub Actions/VM) mà không cần lưu key file lâu dài.</li>
+                    <li><strong>Nguyên tắc:</strong> credentials không nên tồn tại dưới dạng file tĩnh trên disk nếu có thể tránh được.</li>
+                </ul>
                 <div class="info-box danger">🔥 <strong>Nguy hiểm:</strong> Một lần push nhầm credential public có thể dẫn đến incident bảo mật và chi phí cloud ngoài kiểm soát.</div>
             </div>
         </div>
@@ -1887,6 +1917,12 @@ terraform apply tfplan</pre>
                 <td>State local hỏng/xóa nhầm, đồng bộ thủ công sai hoặc merge conflict state file.</td>
                 <td>Khôi phục từ backup/remote backend; dùng <code>terraform import</code> để re-attach resource nếu cần.</td>
                 <td>Dùng remote state + locking + backup policy; không chỉnh state bằng tay trừ tình huống recovery.</td>
+              </tr>
+              <tr>
+                <td><code>psycopg.OperationalError: connection to server at "localhost" failed</code></td>
+                <td>Chạy ingest container với <code>--pg-host=localhost</code>; trong container, localhost trỏ về chính nó chứ không phải PostgreSQL container.</td>
+                <td>Đổi host thành <code>--pg-host=pgdatabase</code> (tên container/service trên Docker network).</td>
+                <td>Luôn dùng container name làm hostname khi giao tiếp nội bộ Docker network.</td>
               </tr>
             </tbody>
           </table>
@@ -2128,6 +2164,7 @@ terraform apply tfplan</pre>
             <div class="summary-item"><strong>2) Terraform</strong>IaC giúp hạ tầng reproducible và version controlled.</div>
             <div class="summary-item"><strong>3) Idempotency</strong>Nguyên tắc số 1 để pipeline production re-run an toàn.</div>
             <div class="summary-item"><strong>4) State management</strong>Điểm yếu lớn nhất nếu xử lý cẩu thả; cần backend/locking/backup rõ ràng.</div>
+            <div class="summary-item"><strong>5) AWS mapping</strong>Kiến thức có thể transfer: GCS → S3, BigQuery Dataset → Glue Data Catalog; repo đã có <code>terraform_with_variable_AWS/</code> làm reference sẵn.</div>
           </div>
         </div>
       </div>

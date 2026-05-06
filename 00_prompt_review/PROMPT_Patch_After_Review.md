@@ -2,7 +2,7 @@
 # Dùng trong Claude Code CLI sau khi có output từ Antigravity review
 
 ```
-Đọc file [TÊN FILE — ví dụ Module01_Docker_Terraform.html] toàn bộ.
+Đọc file [D:\TaiLieu\Data Engineer\data-engineering-zoomcamp\data-engineering-zoomcamp\00_nhc_learning\Module01_Docker_Terraform.html] toàn bộ.
 
 Thực hiện các thay đổi sau theo đúng Patch Checklist từ review:
 
