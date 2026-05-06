@@ -1,0 +1,2355 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 02 — Workflow Orchestration với Kestra</title>
+<style>
+  :root {
+    --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+    --accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;
+    --text:#e6edf3;--text-muted:#8b949e;--code-bg:#0d1117;--highlight:#388bfd26;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;}
+
+  .hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 40%,#1a2a1e 100%);border-bottom:2px solid var(--accent4);padding:40px 24px 30px;text-align:center;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#6e40c922,transparent 70%);pointer-events:none;}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--accent4);letter-spacing:-0.5px;}
+  .hero p{color:var(--text-muted);margin-top:8px;font-size:0.95rem;}
+  .badge-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .badge{padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;border:1px solid;}
+  .badge-blue {color:var(--accent); border-color:var(--accent); background:#1f6feb1a;}
+  .badge-green{color:var(--accent2);border-color:var(--accent2);background:#2ea04326;}
+  .badge-orange{color:var(--accent5);border-color:var(--accent5);background:#d2940026;}
+  .badge-purple{color:var(--accent4);border-color:var(--accent4);background:#6e40c926;}
+
+  .container{display:flex;min-height:calc(100vh - 160px);}
+
+  .sidebar{width:320px;min-width:320px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .sidebar-title{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:0 16px 12px;}
+  .level-label{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 16px 4px;color:var(--accent4);}
+  .nav-item{display:block;padding:7px 16px;cursor:pointer;font-size:0.82rem;color:var(--text-muted);border-left:3px solid transparent;transition:all 0.15s;}
+  .nav-item:hover{color:var(--text);background:var(--surface2);}
+  .nav-item.active{color:var(--accent4);border-left-color:var(--accent4);background:#6e40c915;font-weight:600;}
+  .nav-number{display:inline-block;width:52px;font-size:0.7rem;color:var(--text-muted);font-family:monospace;}
+
+  .main{flex:1;padding:32px 40px;max-width:1060px;}
+  .module{display:none;}
+  .module.active{display:block;}
+
+  .module-header{border:1px solid var(--border);border-radius:12px;padding:24px 28px;background:var(--surface);margin-bottom:24px;position:relative;overflow:hidden;}
+  .module-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent4);}
+  .module-tag{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent4);margin-bottom:8px;}
+  .module-title{font-size:1.6rem;font-weight:800;margin-bottom:8px;}
+  .module-subtitle{color:var(--text-muted);font-size:0.9rem;}
+
+  .section{margin-bottom:28px;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .section-header{padding:14px 20px;font-weight:700;font-size:0.9rem;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--surface2);border-bottom:1px solid var(--border);user-select:none;}
+  .section-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+  .icon-purpose{background:#1f6feb33;}
+  .icon-detail{background:#2ea04326;}
+  .icon-quiz{background:#d2940026;}
+  .icon-summary{background:#6e40c926;}
+  .icon-practice{background:#f7816626;}
+  .section-content{padding:20px;background:var(--surface);}
+  .section-toggle{margin-left:auto;color:var(--text-muted);font-size:12px;}
+
+  h3{font-size:1rem;font-weight:700;color:var(--accent4);margin:18px 0 10px;}
+  h3:first-child{margin-top:0;}
+  h3.blue{color:var(--accent);}
+  h3.green{color:var(--accent2);}
+  h3.orange{color:var(--accent5);}
+  h3.red{color:var(--accent3);}
+  p{margin-bottom:12px;color:var(--text);font-size:0.88rem;}
+  ul,ol{padding-left:20px;margin-bottom:12px;}
+  li{font-size:0.88rem;margin-bottom:5px;}
+  strong{color:var(--text);}
+
+  .cmd-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden;}
+  .cmd-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:0.72rem;color:var(--text-muted);font-family:'Courier New',monospace;}
+  .cmd-dots{display:flex;gap:5px;}
+  .dot{width:10px;height:10px;border-radius:50%;}
+  .dot-red{background:#f7816680;}
+  .dot-yellow{background:#ffa65780;}
+  .dot-green{background:#3fb95080;}
+  .cmd-body{padding:14px;}
+  pre{font-family:'Courier New','Consolas',monospace;font-size:0.82rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--text);}
+  .kw{color:#ff7b72;}
+  .kw2{color:var(--accent);}
+  .str{color:var(--accent5);}
+  .fn{color:var(--accent4);}
+  .num{color:#79c0ff;}
+  .comment{color:var(--text-muted);}
+
+  .db-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.68rem;font-weight:700;letter-spacing:0.5px;margin-bottom:6px;}
+  .db-pg{background:#4169e122;color:#4d9de0;border:1px solid #4169e155;}
+  .db-oracle{background:#cc000022;color:#f97316;border:1px solid #cc000055;}
+
+  code{font-family:'Courier New',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:0.82rem;color:var(--accent4);}
+
+  .quiz-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px;}
+  .quiz-q{font-weight:600;font-size:0.88rem;margin-bottom:10px;}
+  .quiz-q::before{content:'Q';display:inline-block;width:22px;height:22px;background:var(--accent4);color:#000;border-radius:50%;font-size:0.7rem;font-weight:800;text-align:center;line-height:22px;margin-right:8px;}
+  .quiz-options{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+  .quiz-opt{padding:8px 12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:0.84rem;transition:all 0.15s;background:var(--bg);}
+  .quiz-opt:hover{border-color:var(--accent4);color:var(--accent4);}
+  .quiz-opt.correct{border-color:var(--accent2);color:var(--accent2);background:#2ea04310;}
+  .quiz-opt.wrong{border-color:var(--accent3);color:var(--accent3);background:#f7816610;}
+  .quiz-explain{font-size:0.82rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px;margin-top:8px;display:none;}
+  .quiz-explain.show{display:block;}
+
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+  .summary-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:0.82rem;}
+  .summary-item strong{color:var(--accent4);display:block;margin-bottom:4px;}
+
+  .practice-task{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden;}
+  .practice-task-header{padding:12px 16px;background:#6e40c915;border-bottom:1px solid var(--border);font-weight:700;font-size:0.85rem;color:var(--accent4);}
+  .practice-task-body{padding:16px;}
+  .solution-toggle{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:0.8rem;cursor:pointer;color:var(--accent2);margin-top:10px;transition:all 0.15s;}
+  .solution-toggle:hover{background:var(--surface2);}
+  .solution-box{margin-top:10px;display:none;border-top:1px solid var(--border);padding-top:12px;}
+  .solution-box.show{display:block;}
+
+  .info-box{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:0.84rem;border:1px solid;display:flex;gap:10px;}
+  .info-box.tip{border-color:var(--accent2);background:#2ea04310;color:var(--accent2);}
+  .info-box.warn{border-color:var(--accent5);background:#d2940015;color:var(--accent5);}
+  .info-box.note{border-color:var(--accent4);background:#6e40c915;color:var(--accent4);}
+  .info-box.danger{border-color:var(--accent3);background:#f7816610;color:var(--accent3);}
+  .info-box span{color:var(--text);}
+
+  .progress-bar{background:var(--surface2);border-radius:4px;height:4px;margin:16px 0;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent4),var(--accent2));border-radius:4px;}
+
+  .nav-buttons{display:flex;gap:12px;margin-top:32px;justify-content:space-between;}
+  .nav-btn{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:0.85rem;font-weight:600;transition:all 0.15s;display:flex;align-items:center;gap:6px;}
+  .nav-btn:hover{border-color:var(--accent4);color:var(--accent4);}
+  .nav-btn.primary{background:var(--accent4);color:#000;border-color:var(--accent4);}
+  .nav-btn.primary:hover{background:#e2c0ff;}
+
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:0.83rem;}
+  th{background:var(--surface2);padding:8px 12px;text-align:left;border:1px solid var(--border);color:var(--accent4);}
+  td{padding:8px 12px;border:1px solid var(--border);vertical-align:top;}
+  tr:nth-child(even) td{background:#ffffff05;}
+
+  .checklist{list-style:none;padding:0;}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:0.88rem;border-bottom:1px solid var(--border);}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist li::before{content:'□';color:var(--accent4);font-size:1.1rem;flex-shrink:0;margin-top:-1px;}
+
+  .test-question{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;}
+  .test-question.correct{border-color:var(--accent2);background:#2ea04312;}
+  .test-question.wrong{border-color:var(--accent3);background:#f7816612;}
+  .test-question.unanswered{border-color:var(--accent5);background:#d2940015;}
+  .test-question-title{font-size:0.86rem;font-weight:600;margin-bottom:8px;}
+  .test-options{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;}
+  .test-option{display:flex;align-items:center;gap:6px;font-size:0.83rem;color:var(--text);}
+  .test-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+  .test-result{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);}
+  .score-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+  .score-chip{border:1px solid var(--border);border-radius:14px;padding:4px 10px;font-size:0.78rem;color:var(--text);background:var(--bg);}
+  .score-chip.good{border-color:var(--accent2);color:var(--accent2);}
+  .score-chip.warn{border-color:var(--accent5);color:var(--accent5);}
+  .score-chip.bad{border-color:var(--accent3);color:var(--accent3);}
+  .mistake-list{margin-top:8px;padding-left:18px;}
+
+  .tab-group{display:flex;gap:0;margin-bottom:0;border-bottom:1px solid var(--border);}
+  .tab{padding:8px 18px;cursor:pointer;font-size:0.82rem;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px;}
+  .tab.active{color:var(--accent4);border-bottom-color:var(--accent4);font-weight:600;}
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+
+  .schema-box{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin:14px 0;overflow-x:auto;}
+  .schema-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;}
+  .schema-table{border:1px solid var(--border);border-radius:8px;min-width:160px;overflow:hidden;}
+  .schema-table-header{padding:8px 12px;font-size:0.75rem;font-weight:700;text-align:center;}
+  .schema-table-header.fact{background:#1f6feb33;color:var(--accent);}
+  .schema-table-header.dim{background:#6e40c926;color:var(--accent4);}
+  .schema-col{padding:5px 12px;font-size:0.73rem;border-top:1px solid var(--border);display:flex;gap:6px;}
+  .schema-col .pk{color:var(--accent5);font-weight:700;font-size:0.65rem;}
+  .schema-col .fk{color:var(--accent3);font-weight:700;font-size:0.65rem;}
+  .schema-col .col{color:var(--text-muted);}
+  .schema-arrow{align-self:center;color:var(--text-muted);font-size:1.4rem;padding:0 2px;}
+
+  .diagram{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;font-family:'Courier New',monospace;font-size:0.8rem;color:#c9d1d9;overflow:auto;}
+  .code-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .copy-btn{background:var(--surface);border:1px solid var(--border);color:var(--accent2);padding:4px 10px;border-radius:6px;font-size:0.72rem;cursor:pointer;transition:all .15s;}
+  .copy-btn:hover{border-color:var(--accent2);}
+  .yaml-key{color:#79c0ff;}
+  .yaml-punc{color:#ff7b72;}
+  .yaml-str{color:#ffa657;}
+  .yaml-bool{color:#d2a8ff;}
+  .yaml-num{color:#58a6ff;}
+
+  @media(max-width:768px){
+    .sidebar{display:none;}
+    .main{padding:16px;}
+    .summary-grid{grid-template-columns:1fr;}
+    .test-options{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Module 02 — Workflow Orchestration với Kestra</h1>
+  <p>Kestra · PostgreSQL · GCS · BigQuery · ETL vs ELT</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">Module 02/9</span>
+    <span class="badge badge-blue">Roadmap: Workflow Orchestration (7 Days)</span>
+    <span class="badge badge-green">D1–D7</span>
+    <span class="badge badge-orange">Progress: 2/9</span>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="sidebar-title">Module 02 Learning Map</div>
+    <div class="level-label">▶ PASS 1 · FOUNDATION</div>
+    <div class="nav-item active" onclick="showModule(0,this)"><span class="nav-number">02.01</span>Tổng quan &amp; Mục tiêu</div>
+    <div class="nav-item" onclick="showModule(1,this)"><span class="nav-number">02.02</span>Kestra Core Concepts</div>
+    <div class="nav-item" onclick="showModule(2,this)"><span class="nav-number">02.03</span>Local Stack Setup</div>
+    <div class="nav-item" onclick="showModule(3,this)"><span class="nav-number">02.04</span>Flows 01–03</div>
+    <div class="nav-item" onclick="showModule(4,this)"><span class="nav-number">02.05</span>ETL Local Postgres</div>
+    <div class="nav-item" onclick="showModule(5,this)"><span class="nav-number">02.06</span>Scheduling &amp; Backfill</div>
+    <div class="nav-item" onclick="showModule(6,this)"><span class="nav-number">02.07</span>GCP Setup</div>
+    <div class="nav-item" onclick="showModule(7,this)"><span class="nav-number">02.08</span>GCS + BigQuery ELT</div>
+    <div class="nav-item" onclick="showModule(8,this)"><span class="nav-number">02.09</span>AI + RAG in Kestra</div>
+    <div class="nav-item" onclick="showModule(9,this)"><span class="nav-number">02.10</span>Checklist &amp; Interview Prep</div>
+  </nav>
+
+  <main class="main">
+
+    <div class="module active" id="m0">
+      <div class="module-header">
+        <div class="module-tag">Section 1 · Orientation</div>
+        <div class="module-title">1) Tổng quan &amp; Mục tiêu Module</div>
+        <div class="module-subtitle">Vì sao orchestration là bắt buộc khi pipeline đi vào production.</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:22%"></div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-purpose">🧠</div>
+          Vì sao cần Workflow Orchestration?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Cron thủ công</strong> chạy được bài toán nhỏ, nhưng khi flow có nhiều bước phụ thuộc (extract → transform → load), bạn sẽ thiếu khả năng retry theo task, theo dõi trạng thái, log tập trung và backfill dữ liệu lịch sử.</p>
+          <p><strong>Workflow orchestrator</strong> đóng vai trò “conductor”: điều phối thứ tự task, xử lý lỗi có kiểm soát, chạy theo lịch/event và cho bạn visibility toàn bộ execution trên UI.</p>
+
+          <table>
+            <thead>
+              <tr><th>Tiêu chí</th><th>Cron thủ công</th><th>Kestra Orchestrator</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Dependency giữa bước</td><td>Tự code shell phức tạp</td><td>Khai báo rõ bằng task graph trong YAML</td></tr>
+              <tr><td>Retry &amp; timeout</td><td>Phải tự viết logic</td><td>Quản lý tập trung theo workflow/task</td></tr>
+              <tr><td>Quan sát logs</td><td>Rải rác nhiều nơi</td><td>Logs/Gantt/execution trong UI</td></tr>
+              <tr><td>Backfill</td><td>Dễ lỗi và khó audit</td><td>Có trigger + execution history</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box note">📌 <span><strong>Kestra là gì?</strong> Nền tảng orchestration open-source, event-driven, khai báo flow bằng YAML để điều phối pipeline dữ liệu theo lịch hoặc theo sự kiện.</span></div>
+          <div class="info-box tip">💡 <span><strong>Mục tiêu module:</strong> chạy ETL local vào Postgres (flows 04–05) và ELT cloud qua GCS + BigQuery (flows 08–09), hiểu vì sao khi lên cloud thì ELT thường lợi hơn ETL.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-summary">🗺️</div>
+          Sơ đồ kiến trúc tổng quan module
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="diagram">[GitHub CSV] → [Kestra Flow] → [Postgres local]   (Flows 04-05)
+[GitHub CSV] → [Kestra Flow] → [GCS] → [BigQuery]  (Flows 08-09)</div>
+          <p>Stack dùng xuyên module: <code>kestra/kestra:v1.1</code>, <code>postgres:18</code>, pgAdmin local, GCS bucket và BigQuery dataset.</p>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <div></div>
+        <button class="nav-btn primary" onclick="showModule(1,document.querySelectorAll('.nav-item')[1])">Tiếp Section 2 →</button>
+      </div>
+    </div>
+
+    <div class="module" id="m1">
+      <div class="module-header">
+        <div class="module-tag">Section 2 · Foundation Concepts</div>
+        <div class="module-title">2) Kestra Core Concepts</div>
+        <div class="module-subtitle">Nắm các building blocks trước khi đọc flow lớn.</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-detail">🧩</div>
+          2.1 → 2.9 Concepts + mini YAML examples
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3>2.1 Namespace</h3>
+          <p>Dùng để nhóm flows theo team/project. Ví dụ source dùng namespace <code>zoomcamp</code>.</p>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>namespace_example.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">id: hello
+namespace: zoomcamp</pre></div>
+          </div>
+
+          <h3>2.2 Flow structure</h3>
+          <p>Các khối thường gặp: <code>id</code>, <code>namespace</code>, <code>description</code>, <code>inputs</code>, <code>variables</code>, <code>tasks</code>, <code>triggers</code>.</p>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>flow_structure.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">id: sample_flow
+namespace: zoomcamp
+description: Sample flow structure
+inputs: []
+variables: {}
+tasks: []
+triggers: []</pre></div>
+          </div>
+
+          <h3>2.3 Task types phổ biến trong module</h3>
+          <table>
+            <thead><tr><th>Task type</th><th>Plugin</th><th>Dùng để làm gì</th></tr></thead>
+            <tbody>
+              <tr><td>Log</td><td>io.kestra.plugin.core.log.Log</td><td>In log thông điệp trong execution</td></tr>
+              <tr><td>Return</td><td>io.kestra.plugin.core.debug.Return</td><td>Trả output để task sau tham chiếu</td></tr>
+              <tr><td>Sleep</td><td>io.kestra.plugin.core.flow.Sleep</td><td>Giả lập delay/task wait</td></tr>
+              <tr><td>If</td><td>io.kestra.plugin.core.flow.If</td><td>Rẽ nhánh điều kiện</td></tr>
+              <tr><td>Python Script</td><td>io.kestra.plugin.scripts.python.Script</td><td>Chạy Python trong flow</td></tr>
+              <tr><td>Shell Commands</td><td>io.kestra.plugin.scripts.shell.Commands</td><td>Chạy shell command</td></tr>
+              <tr><td>Postgres Queries</td><td>io.kestra.plugin.jdbc.postgresql.Queries</td><td>Chạy SQL query Postgres</td></tr>
+              <tr><td>Postgres CopyIn</td><td>io.kestra.plugin.jdbc.postgresql.CopyIn</td><td>Bulk load CSV vào Postgres</td></tr>
+              <tr><td>GCS Upload</td><td>io.kestra.plugin.gcp.gcs.Upload</td><td>Upload file lên GCS</td></tr>
+              <tr><td>BigQuery Query</td><td>io.kestra.plugin.gcp.bigquery.Query</td><td>Chạy SQL trong BigQuery</td></tr>
+            </tbody>
+          </table>
+
+          <h3>2.4 Inputs vs Variables</h3>
+          <p><code>inputs</code> là tham số runtime, <code>variables</code> là giá trị tái dùng trong flow.</p>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>inputs_variables.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">inputs:
+  - id: name
+    type: STRING
+  - id: columns_to_keep
+    type: ARRAY
+    itemType: STRING
+variables:
+  welcome_message: "Hello, {{ inputs.name }}!"
+  file_path: "taxi/{{ inputs.name }}.csv"
+tasks:
+  - id: print
+    type: io.kestra.plugin.core.log.Log
+    message: "{{ render(vars.welcome_message) }}"
+  - id: print_file
+    type: io.kestra.plugin.core.log.Log
+    message: "{{ render(vars.file_path) }}"</pre></div>
+          </div>
+
+          <h3>2.5 Outputs &amp; Dependencies</h3>
+          <p>Task sau có thể lấy output task trước qua cú pháp <code>{{ outputs.task_id.value }}</code>.</p>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>outputs_dependency.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">tasks:
+  - id: generate_output
+    type: io.kestra.plugin.core.debug.Return
+    format: I was generated during this workflow.
+  - id: log_output
+    type: io.kestra.plugin.core.log.Log
+    message: "This is an output: {{ outputs.generate_output.value }}"</pre></div>
+          </div>
+
+          <h3>2.6 Triggers — Schedule + Backfill + disabled</h3>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>trigger_example.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">triggers:
+  - id: schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 10 * * *"
+    disabled: true</pre></div>
+          </div>
+
+          <h3>2.7 pluginDefaults</h3>
+          <p>Dùng để set mặc định cho cùng một loại task trong flow, tránh lặp config.</p>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>plugin_defaults.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">pluginDefaults:
+  - type: io.kestra.plugin.jdbc.postgresql
+    values:
+      url: jdbc:postgresql://pgdatabase:5432/ny_taxi
+      username: root
+      password: root</pre></div>
+          </div>
+
+          <h3>2.8 Concurrency &amp; Labels</h3>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>concurrency_example.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">concurrency:
+  behavior: FAIL
+  limit: 2</pre></div>
+          </div>
+
+          <h3>2.9 Secrets &amp; KV Store</h3>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>secret_kv_example.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">variables:
+  creds_json: "{{ secret('GCP_CREDS') }}"
+  project_id: "{{ kv('GCP_PROJECT_ID') }}"</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(0,document.querySelectorAll('.nav-item')[0])">← Section 1</button>
+        <button class="nav-btn primary" onclick="showModule(2,document.querySelectorAll('.nav-item')[2])">Tiếp Section 3 →</button>
+      </div>
+    </div>
+
+    <div class="module" id="m2">
+      <div class="module-header">
+        <div class="module-tag">Section 3 · Setup</div>
+        <div class="module-title">3) Local Stack Setup</div>
+        <div class="module-subtitle">Kestra + Postgres + pgAdmin local stack cho workshop Module 02.</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-purpose">🏗️</div>
+          3.1 Dependency architecture (4 services)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="diagram">kestra_postgres → kestra → pgdatabase → pgadmin</div>
+          <p>Repo Module 02 pin phiên bản để đảm bảo reproducibility: <code>kestra/kestra:v1.1</code> và <code>postgres:18</code>.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-detail">📦</div>
+          3.2 Full docker-compose.yml (source nguyên văn)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>02-workflow-orchestration/docker-compose.yml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">volumes:
+  ny_taxi_postgres_data:
+    driver: local
+  kestra_postgres_data:
+    driver: local
+  kestra_data:
+    driver: local
+  kestra_tmp:
+    driver: local
+
+services:
+  pgdatabase:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ny_taxi
+    ports:
+      - "5432:5432"
+    volumes:
+      - ny_taxi_postgres_data:/var/lib/postgresql
+    depends_on:
+      kestra:
+        condition: service_started
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - "8085:80"
+    depends_on:
+      pgdatabase:
+        condition: service_started
+
+  kestra_postgres:
+    image: postgres:18
+    volumes:
+      - kestra_postgres_data:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: kestra
+      POSTGRES_USER: kestra
+      POSTGRES_PASSWORD: k3str4
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
+  kestra:
+    image: kestra/kestra:v1.1
+    pull_policy: always
+    # Note that this setup with a root user is intended for development purpose.
+    # Our base image runs without root, but the Docker Compose implementation needs root to access the Docker socket
+    # To run Kestra in a rootless mode in production, see: https://kestra.io/docs/installation/podman-compose
+    user: "root"
+    command: server standalone
+    volumes:
+      - kestra_data:/app/storage
+      - /var/run/docker.sock:/var/run/docker.sock
+      - kestra_tmp:/tmp/kestra-wd
+    environment:
+      KESTRA_CONFIGURATION: |
+        datasources:
+          postgres:
+            url: jdbc:postgresql://kestra_postgres:5432/kestra
+            driverClassName: org.postgresql.Driver
+            username: kestra
+            password: k3str4
+        kestra:
+          server:
+            basicAuth:
+              username: "admin@kestra.io" # it must be a valid email address
+              password: Admin1234!
+          repository:
+            type: postgres
+          storage:
+            type: local
+            local:
+              basePath: "/app/storage"
+          queue:
+            type: postgres
+          tasks:
+            tmpDir:
+              path: /tmp/kestra-wd/tmp
+          url: http://localhost:8080/
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      kestra_postgres:
+        condition: service_started</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-summary">🧪</div>
+          3.3 Docker Compose cheatsheet + 3.4 verify checklist
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Lệnh</th><th>Mục đích</th></tr></thead>
+            <tbody>
+              <tr><td><code>docker compose up -d</code></td><td>Khởi chạy toàn bộ services ở chế độ nền</td></tr>
+              <tr><td><code>docker compose down</code></td><td>Dừng và remove containers/network</td></tr>
+              <tr><td><code>docker compose down -v</code></td><td>Dừng và xóa luôn volumes (reset dữ liệu local)</td></tr>
+              <tr><td><code>docker compose ps</code></td><td>Kiểm tra trạng thái services</td></tr>
+              <tr><td><code>docker compose logs kestra --tail=20</code></td><td>Xem nhanh 20 log cuối của Kestra</td></tr>
+              <tr><td><code>docker compose logs kestra --tail=30 -f</code></td><td>Follow log realtime để debug startup</td></tr>
+              <tr><td><code>docker compose restart kestra</code></td><td>Restart riêng service Kestra</td></tr>
+              <tr><td><code>docker exec -it &lt;container&gt; bash</code></td><td>Vào shell container để kiểm tra nội bộ</td></tr>
+            </tbody>
+          </table>
+
+          <ul class="checklist">
+            <li>Kestra UI: http://localhost:8080 (admin@kestra.io / Admin1234!)</li>
+            <li>pgAdmin: http://localhost:8085 (admin@admin.com / root)</li>
+            <li>Postgres: localhost:5432 (root/root, db: ny_taxi)</li>
+            <li><code>docker compose ps</code> hiển thị tất cả services ở trạng thái UP</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(1,document.querySelectorAll('.nav-item')[1])">← Section 2</button>
+        <button class="nav-btn primary" onclick="showModule(3,document.querySelectorAll('.nav-item')[3])">Tiếp Section 4 →</button>
+      </div>
+    </div>
+
+    <div class="module" id="m3">
+      <div class="module-header">
+        <div class="module-tag">Section 4 · Hands-on Flows 01–03</div>
+        <div class="module-title">4) Flows 01–03: Concepts &amp; Python</div>
+        <div class="module-subtitle">Mỗi flow: mục đích → concepts → YAML gốc → test steps.</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:82%"></div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-detail">👋</div>
+          4.1 Flow 01 — Hello World
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Mục đích:</strong> làm quen input, variable, output chaining, trigger schedule và concurrency.</p>
+          <p><strong>Concepts học được:</strong> <code>inputs</code>, <code>variables</code>, <code>pluginDefaults</code>, <code>concurrency</code>, trigger có <code>disabled: true</code>, khác biệt giữa <code>{{ vars.x }}</code> và <code>{{ render(vars.x) }}</code>.</p>
+
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>flows/01_hello_world.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">id: 01_hello_world
+namespace: zoomcamp
+
+inputs:
+  - id: name
+    type: STRING
+    defaults: Will
+
+concurrency:
+  behavior: FAIL
+  limit: 2
+
+variables:
+  welcome_message: "Hello, {{ inputs.name }}!"
+
+tasks:
+  - id: hello_message
+    type: io.kestra.plugin.core.log.Log
+    message: "{{ render(vars.welcome_message) }}"
+
+  - id: generate_output
+    type: io.kestra.plugin.core.debug.Return
+    format: I was generated during this workflow.
+
+  - id: sleep
+    type: io.kestra.plugin.core.flow.Sleep
+    duration: PT15S
+
+  - id: log_output
+    type: io.kestra.plugin.core.log.Log
+    message: "This is an output: {{ outputs.generate_output.value }}"
+
+  - id: goodbye_message
+    type: io.kestra.plugin.core.log.Log
+    message: "Goodbye, {{ inputs.name }}!"
+
+pluginDefaults:
+  - type: io.kestra.plugin.core.log.Log
+    values:
+      level: ERROR
+
+triggers:
+  - id: schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 10 * * *"
+    inputs:
+      name: Sarah
+    disabled: true</pre></div>
+          </div>
+
+          <h3 class="green">Test steps</h3>
+          <ol>
+            <li>Import flow vào Kestra UI.</li>
+            <li>Execute với input <code>name="TestUser"</code>.</li>
+            <li>Mở Logs để quan sát chuỗi message và output task <code>generate_output</code>.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-detail">🐍</div>
+          4.2 Flow 02 — Python Script
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Mục đích:</strong> chạy Python trong task container và trả output ngược về Kestra.</p>
+          <p><strong>Concepts học được:</strong> taskRunner Docker, <code>containerImage</code>, dependencies pip, <code>Kestra.outputs()</code>.</p>
+
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>flows/02_python.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">id: 02_python
+namespace: zoomcamp
+
+description: This flow will install the pip package in a Docker container, and use kestra's Python library to generate outputs (number of downloads of the Kestra Docker image) and metrics (duration of the script).
+
+tasks:
+  - id: collect_stats
+    type: io.kestra.plugin.scripts.python.Script
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    containerImage: python:slim
+    dependencies:
+      - requests
+      - kestra
+    script: |
+      from kestra import Kestra
+      import requests
+      def get_docker_image_downloads(image_name: str = "kestra/kestra"):
+          """Queries the Docker Hub API to get the number of downloads for a specific Docker image."""
+          url = f"https://hub.docker.com/v2/repositories/{image_name}/"
+          response = requests.get(url)
+          data = response.json()
+          downloads = data.get('pull_count', 'Not available')
+          return downloads
+      downloads = get_docker_image_downloads()
+      outputs = {
+          'downloads': downloads
+      }
+      Kestra.outputs(outputs)</pre></div>
+          </div>
+
+          <h3 class="green">Test steps</h3>
+          <ol>
+            <li>Execute flow 02 từ UI.</li>
+            <li>Kiểm tra task <code>collect_stats</code> completed.</li>
+            <li>Xem Outputs và xác nhận <code>downloads &gt; 0</code>.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-detail">🧪</div>
+          4.3 Flow 03 — Mini ETL Pipeline
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Mục đích:</strong> minh họa pipeline nhiều bước extract → transform → query.</p>
+          <p><strong>Concepts học được:</strong> multi-step pipeline, <code>inputFiles</code>/<code>outputFiles</code>, env vars, DuckDB query task.</p>
+
+          <div class="diagram">[HTTP Download] → [Python Transform] → [DuckDB Query]</div>
+
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>flows/03_getting_started_data_pipeline.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">id: 03_getting_started_data_pipeline
+namespace: zoomcamp
+
+inputs:
+  - id: columns_to_keep
+    type: ARRAY
+    itemType: STRING
+    defaults:
+      - brand
+      - price
+
+tasks:
+  - id: extract
+    type: io.kestra.plugin.core.http.Download
+    uri: https://dummyjson.com/products
+
+  - id: transform
+    type: io.kestra.plugin.scripts.python.Script
+    containerImage: python:3.11-alpine
+    inputFiles:
+      data.json: "{{outputs.extract.uri}}"
+    outputFiles:
+      - "*.json"
+    env:
+      COLUMNS_TO_KEEP: "{{inputs.columns_to_keep}}"
+    script: |
+      import json
+      import os
+
+      columns_to_keep_str = os.getenv("COLUMNS_TO_KEEP")
+      columns_to_keep = json.loads(columns_to_keep_str)
+
+      with open("data.json", "r") as file:
+          data = json.load(file)
+
+      filtered_data = [
+          {column: product.get(column, "N/A") for column in columns_to_keep}
+          for product in data["products"]
+      ]
+
+      with open("products.json", "w") as file:
+          json.dump(filtered_data, file, indent=4)
+
+  - id: query
+    type: io.kestra.plugin.jdbc.duckdb.Queries
+    inputFiles:
+      products.json: "{{outputs.transform.outputFiles['products.json']}}"
+    sql: |
+      INSTALL json;
+      LOAD json;
+      SELECT brand, round(avg(price), 2) as avg_price
+      FROM read_json_auto('{{workingDir}}/products.json')
+      GROUP BY brand
+      ORDER BY avg_price DESC;
+    fetchType: STORE</pre></div>
+          </div>
+
+          <h3 class="green">Test steps</h3>
+          <ol>
+            <li>Execute với input <code>columns_to_keep=["brand","price"]</code>.</li>
+            <li>Kiểm tra task transform tạo <code>products.json</code>.</li>
+            <li>Xem output query: bảng <code>avg_price by brand</code>.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(2,document.querySelectorAll('.nav-item')[2])">← Section 3</button>
+        <button class="nav-btn primary" onclick="showModule(4,document.querySelectorAll('.nav-item')[4])">Section 5 (PASS 2) →</button>
+      </div>
+    </div>
+
+    <div class="module" id="m4">
+      <div class="module-header">
+        <div class="module-tag">Section 5 · ETL Postgres Taxi</div>
+        <div class="module-title">5) Flows 04–05: ETL Postgres Taxi</div>
+        <div class="module-subtitle">Tập trung vào idempotency bằng staging + MERGE để chạy lại không duplicate data.</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:88%"></div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-purpose">🧱</div>
+          5.1 Kiến trúc ETL Postgres
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="diagram">[GitHub .csv.gz]
+→ wget/gunzip → [Kestra Storage]
+→ CREATE TABLE IF NOT EXISTS (main + staging)
+→ TRUNCATE staging
+→ COPY IN to staging
+→ UPDATE (md5 unique_row_id + filename)
+→ MERGE staging → main (ON unique_row_id)</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-summary">♻️</div>
+          5.2 Idempotency Pattern: staging + MERGE
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Hash key</strong> được tạo từ các field trong flow SQL update:</p>
+          <ul>
+            <li>VendorID</li>
+            <li>pickup_datetime (yellow: tpep_*, green: lpep_*)</li>
+            <li>dropoff_datetime (yellow: tpep_*, green: lpep_*)</li>
+            <li>PULocationID</li>
+            <li>DOLocationID</li>
+            <li>fare_amount</li>
+            <li>trip_distance</li>
+          </ul>
+          <p><code>WHEN NOT MATCHED THEN INSERT</code> giúp chỉ insert record mới theo <code>unique_row_id</code>, nên chạy lại cùng file sẽ không nhân đôi dữ liệu.</p>
+          <table>
+            <thead><tr><th>Pattern</th><th>Kết quả khi re-run cùng input</th></tr></thead>
+            <tbody>
+              <tr><td>INSERT trực tiếp vào main</td><td>Dễ duplicate records</td></tr>
+              <tr><td>Staging + MERGE theo unique_row_id</td><td>Idempotent, row count ổn định</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-detail">🚕</div>
+          5.3 Flow 04 — Manual ETL
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Task group mapping:</strong></p>
+          <ol>
+            <li><code>set_label</code> — tag execution theo file + taxi</li>
+            <li><code>extract</code> — wget + gunzip CSV</li>
+            <li><code>if_yellow_taxi</code> — 6 subtasks</li>
+            <li><code>if_green_taxi</code> — 6 subtasks</li>
+            <li><code>purge_files</code> — dọn Kestra storage</li>
+          </ol>
+          <p><strong>Schema diff:</strong> yellow dùng <code>tpep_pickup_datetime</code>/<code>tpep_dropoff_datetime</code>; green dùng <code>lpep_pickup_datetime</code>/<code>lpep_dropoff_datetime</code> và có thêm <code>ehail_fee</code>, <code>trip_type</code>.</p>
+
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>flows/04_postgres_taxi.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">id: 04_postgres_taxi
+namespace: zoomcamp
+description: |
+  The CSV Data used in the course: https://github.com/DataTalksClub/nyc-tlc-data/releases
+
+inputs:
+  - id: taxi
+    type: SELECT
+    displayName: Select taxi type
+    values: [yellow, green]
+    defaults: yellow
+
+  - id: year
+    type: SELECT
+    displayName: Select year
+    values: ["2019", "2020"]
+    defaults: "2019"
+
+  - id: month
+    type: SELECT
+    displayName: Select month
+    values: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+    defaults: "01"
+
+variables:
+  file: "{{inputs.taxi}}_tripdata_{{inputs.year}}-{{inputs.month}}.csv"
+  staging_table: "public.{{inputs.taxi}}_tripdata_staging"
+  table: "public.{{inputs.taxi}}_tripdata"
+  data: "{{outputs.extract.outputFiles[inputs.taxi ~ '_tripdata_' ~ inputs.year ~ '-' ~ inputs.month ~ '.csv']}}"
+
+tasks:
+  - id: set_label
+    type: io.kestra.plugin.core.execution.Labels
+    labels:
+      file: "{{render(vars.file)}}"
+      taxi: "{{inputs.taxi}}"
+
+  - id: extract
+    type: io.kestra.plugin.scripts.shell.Commands
+    outputFiles:
+      - "*.csv"
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - wget -qO- https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{{inputs.taxi}}/{{render(vars.file)}}.gz | gunzip > {{render(vars.file)}}
+
+  - id: if_yellow_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.taxi == 'yellow'}}"
+    then:
+      - id: yellow_create_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          CREATE TABLE IF NOT EXISTS {{render(vars.table)}} (
+              unique_row_id          text,
+              filename               text,
+              VendorID               text,
+              tpep_pickup_datetime   timestamp,
+              tpep_dropoff_datetime  timestamp,
+              passenger_count        integer,
+              trip_distance          double precision,
+              RatecodeID             text,
+              store_and_fwd_flag     text,
+              PULocationID           text,
+              DOLocationID           text,
+              payment_type           integer,
+              fare_amount            double precision,
+              extra                  double precision,
+              mta_tax                double precision,
+              tip_amount             double precision,
+              tolls_amount           double precision,
+              improvement_surcharge  double precision,
+              total_amount           double precision,
+              congestion_surcharge   double precision
+          );
+
+      - id: yellow_create_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          CREATE TABLE IF NOT EXISTS {{render(vars.staging_table)}} (
+              unique_row_id          text,
+              filename               text,
+              VendorID               text,
+              tpep_pickup_datetime   timestamp,
+              tpep_dropoff_datetime  timestamp,
+              passenger_count        integer,
+              trip_distance          double precision,
+              RatecodeID             text,
+              store_and_fwd_flag     text,
+              PULocationID           text,
+              DOLocationID           text,
+              payment_type           integer,
+              fare_amount            double precision,
+              extra                  double precision,
+              mta_tax                double precision,
+              tip_amount             double precision,
+              tolls_amount           double precision,
+              improvement_surcharge  double precision,
+              total_amount           double precision,
+              congestion_surcharge   double precision
+          );
+
+      - id: yellow_truncate_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          TRUNCATE TABLE {{render(vars.staging_table)}};
+
+      - id: yellow_copy_in_to_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.CopyIn
+        format: CSV
+        from: "{{render(vars.data)}}"
+        table: "{{render(vars.staging_table)}}"
+        header: true
+        columns: [VendorID,tpep_pickup_datetime,tpep_dropoff_datetime,passenger_count,trip_distance,RatecodeID,store_and_fwd_flag,PULocationID,DOLocationID,payment_type,fare_amount,extra,mta_tax,tip_amount,tolls_amount,improvement_surcharge,total_amount,congestion_surcharge]
+
+      - id: yellow_add_unique_id_and_filename
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          UPDATE {{render(vars.staging_table)}}
+          SET
+            unique_row_id = md5(
+              COALESCE(CAST(VendorID AS text), '') ||
+              COALESCE(CAST(tpep_pickup_datetime AS text), '') ||
+              COALESCE(CAST(tpep_dropoff_datetime AS text), '') ||
+              COALESCE(PULocationID, '') ||
+              COALESCE(DOLocationID, '') ||
+              COALESCE(CAST(fare_amount AS text), '') ||
+              COALESCE(CAST(trip_distance AS text), '')
+            ),
+            filename = '{{render(vars.file)}}';
+
+      - id: yellow_merge_data
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          MERGE INTO {{render(vars.table)}} AS T
+          USING {{render(vars.staging_table)}} AS S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN
+            INSERT (
+              unique_row_id, filename, VendorID, tpep_pickup_datetime, tpep_dropoff_datetime,
+              passenger_count, trip_distance, RatecodeID, store_and_fwd_flag, PULocationID,
+              DOLocationID, payment_type, fare_amount, extra, mta_tax, tip_amount, tolls_amount,
+              improvement_surcharge, total_amount, congestion_surcharge
+            )
+            VALUES (
+              S.unique_row_id, S.filename, S.VendorID, S.tpep_pickup_datetime, S.tpep_dropoff_datetime,
+              S.passenger_count, S.trip_distance, S.RatecodeID, S.store_and_fwd_flag, S.PULocationID,
+              S.DOLocationID, S.payment_type, S.fare_amount, S.extra, S.mta_tax, S.tip_amount, S.tolls_amount,
+              S.improvement_surcharge, S.total_amount, S.congestion_surcharge
+            );
+
+  - id: if_green_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.taxi == 'green'}}"
+    then:
+      - id: green_create_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          CREATE TABLE IF NOT EXISTS {{render(vars.table)}} (
+              unique_row_id          text,
+              filename               text,
+              VendorID               text,
+              lpep_pickup_datetime   timestamp,
+              lpep_dropoff_datetime  timestamp,
+              store_and_fwd_flag     text,
+              RatecodeID             text,
+              PULocationID           text,
+              DOLocationID           text,
+              passenger_count        integer,
+              trip_distance          double precision,
+              fare_amount            double precision,
+              extra                  double precision,
+              mta_tax                double precision,
+              tip_amount             double precision,
+              tolls_amount           double precision,
+              ehail_fee              double precision,
+              improvement_surcharge  double precision,
+              total_amount           double precision,
+              payment_type           integer,
+              trip_type              integer,
+              congestion_surcharge   double precision
+          );
+
+      - id: green_create_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          CREATE TABLE IF NOT EXISTS {{render(vars.staging_table)}} (
+              unique_row_id          text,
+              filename               text,
+              VendorID               text,
+              lpep_pickup_datetime   timestamp,
+              lpep_dropoff_datetime  timestamp,
+              store_and_fwd_flag     text,
+              RatecodeID             text,
+              PULocationID           text,
+              DOLocationID           text,
+              passenger_count        integer,
+              trip_distance          double precision,
+              fare_amount            double precision,
+              extra                  double precision,
+              mta_tax                double precision,
+              tip_amount             double precision,
+              tolls_amount           double precision,
+              ehail_fee              double precision,
+              improvement_surcharge  double precision,
+              total_amount           double precision,
+              payment_type           integer,
+              trip_type              integer,
+              congestion_surcharge   double precision
+          );
+
+      - id: green_truncate_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          TRUNCATE TABLE {{render(vars.staging_table)}};
+
+      - id: green_copy_in_to_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.CopyIn
+        format: CSV
+        from: "{{render(vars.data)}}"
+        table: "{{render(vars.staging_table)}}"
+        header: true
+        columns: [VendorID,lpep_pickup_datetime,lpep_dropoff_datetime,store_and_fwd_flag,RatecodeID,PULocationID,DOLocationID,passenger_count,trip_distance,fare_amount,extra,mta_tax,tip_amount,tolls_amount,ehail_fee,improvement_surcharge,total_amount,payment_type,trip_type,congestion_surcharge]
+
+      - id: green_add_unique_id_and_filename
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          UPDATE {{render(vars.staging_table)}}
+          SET
+            unique_row_id = md5(
+              COALESCE(CAST(VendorID AS text), '') ||
+              COALESCE(CAST(lpep_pickup_datetime AS text), '') ||
+              COALESCE(CAST(lpep_dropoff_datetime AS text), '') ||
+              COALESCE(PULocationID, '') ||
+              COALESCE(DOLocationID, '') ||
+              COALESCE(CAST(fare_amount AS text), '') ||
+              COALESCE(CAST(trip_distance AS text), '')
+            ),
+            filename = '{{render(vars.file)}}';
+
+      - id: green_merge_data
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          MERGE INTO {{render(vars.table)}} AS T
+          USING {{render(vars.staging_table)}} AS S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN
+            INSERT (
+              unique_row_id, filename, VendorID, lpep_pickup_datetime, lpep_dropoff_datetime,
+              store_and_fwd_flag, RatecodeID, PULocationID, DOLocationID, passenger_count,
+              trip_distance, fare_amount, extra, mta_tax, tip_amount, tolls_amount, ehail_fee,
+              improvement_surcharge, total_amount, payment_type, trip_type, congestion_surcharge
+            )
+            VALUES (
+              S.unique_row_id, S.filename, S.VendorID, S.lpep_pickup_datetime, S.lpep_dropoff_datetime,
+              S.store_and_fwd_flag, S.RatecodeID, S.PULocationID, S.DOLocationID, S.passenger_count,
+              S.trip_distance, S.fare_amount, S.extra, S.mta_tax, S.tip_amount, S.tolls_amount, S.ehail_fee,
+              S.improvement_surcharge, S.total_amount, S.payment_type, S.trip_type, S.congestion_surcharge
+            );
+
+  - id: purge_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
+    description: This will remove output files. If you'd like to explore Kestra outputs, disable it.
+
+pluginDefaults:
+  - type: io.kestra.plugin.jdbc.postgresql
+    values:
+      url: jdbc:postgresql://pgdatabase:5432/ny_taxi
+      username: root
+      password: root</pre></div>
+          </div>
+
+          <ul class="checklist">
+            <li>Execute yellow/2019/01 → <code>public.yellow_tripdata</code> tồn tại, rows &gt; 0</li>
+            <li>Execute lại cùng input → row count KHÔNG thay đổi</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-detail">⏱️</div>
+          5.4 Flow 05 — Scheduled ETL + Backfill
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Flow 05 dùng <code>trigger.date</code> để sinh file theo lịch, thay vì nhập year/month bằng tay.</p>
+          <p>Format date trong source:</p>
+          <ul>
+            <li><code>{{trigger.date | date('yyyy-MM')}}</code></li>
+            <li><code>{{trigger.date | date('yyyy')}}</code></li>
+            <li><code>{{trigger.date | date('MM')}}</code></li>
+          </ul>
+
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>flows/05_postgres_taxi_scheduled.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">id: 05_postgres_taxi_scheduled
+namespace: zoomcamp
+description: |
+  Best to add a label `backfill:true` from the UI to track executions created via a backfill.
+  CSV data used here comes from: https://github.com/DataTalksClub/nyc-tlc-data/releases
+
+concurrency:
+  limit: 1
+
+inputs:
+  - id: taxi
+    type: SELECT
+    displayName: Select taxi type
+    values: [yellow, green]
+    defaults: yellow
+
+variables:
+  file: "{{inputs.taxi}}_tripdata_{{trigger.date | date('yyyy-MM')}}.csv"
+  staging_table: "public.{{inputs.taxi}}_tripdata_staging"
+  table: "public.{{inputs.taxi}}_tripdata"
+  data: "{{outputs.extract.outputFiles[inputs.taxi ~ '_tripdata_' ~ (trigger.date | date('yyyy-MM')) ~ '.csv']}}"
+
+tasks:
+  - id: set_label
+    type: io.kestra.plugin.core.execution.Labels
+    labels:
+      file: "{{render(vars.file)}}"
+      taxi: "{{inputs.taxi}}"
+
+  - id: extract
+    type: io.kestra.plugin.scripts.shell.Commands
+    outputFiles:
+      - "*.csv"
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - wget -qO- https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{{inputs.taxi}}/{{render(vars.file)}}.gz | gunzip > {{render(vars.file)}}
+
+  - id: if_yellow_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.taxi == 'yellow'}}"
+    then:
+      - id: yellow_create_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          CREATE TABLE IF NOT EXISTS {{render(vars.table)}} (
+              unique_row_id          text,
+              filename               text,
+              VendorID               text,
+              tpep_pickup_datetime   timestamp,
+              tpep_dropoff_datetime  timestamp,
+              passenger_count        integer,
+              trip_distance          double precision,
+              RatecodeID             text,
+              store_and_fwd_flag     text,
+              PULocationID           text,
+              DOLocationID           text,
+              payment_type           integer,
+              fare_amount            double precision,
+              extra                  double precision,
+              mta_tax                double precision,
+              tip_amount             double precision,
+              tolls_amount           double precision,
+              improvement_surcharge  double precision,
+              total_amount           double precision,
+              congestion_surcharge   double precision
+          );
+
+      - id: yellow_create_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          CREATE TABLE IF NOT EXISTS {{render(vars.staging_table)}} (
+              unique_row_id          text,
+              filename               text,
+              VendorID               text,
+              tpep_pickup_datetime   timestamp,
+              tpep_dropoff_datetime  timestamp,
+              passenger_count        integer,
+              trip_distance          double precision,
+              RatecodeID             text,
+              store_and_fwd_flag     text,
+              PULocationID           text,
+              DOLocationID           text,
+              payment_type           integer,
+              fare_amount            double precision,
+              extra                  double precision,
+              mta_tax                double precision,
+              tip_amount             double precision,
+              tolls_amount           double precision,
+              improvement_surcharge  double precision,
+              total_amount           double precision,
+              congestion_surcharge   double precision
+          );
+
+      - id: yellow_truncate_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          TRUNCATE TABLE {{render(vars.staging_table)}};
+
+      - id: yellow_copy_in_to_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.CopyIn
+        format: CSV
+        from: "{{render(vars.data)}}"
+        table: "{{render(vars.staging_table)}}"
+        header: true
+        columns: [VendorID,tpep_pickup_datetime,tpep_dropoff_datetime,passenger_count,trip_distance,RatecodeID,store_and_fwd_flag,PULocationID,DOLocationID,payment_type,fare_amount,extra,mta_tax,tip_amount,tolls_amount,improvement_surcharge,total_amount,congestion_surcharge]
+
+      - id: yellow_add_unique_id_and_filename
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          UPDATE {{render(vars.staging_table)}}
+          SET
+            unique_row_id = md5(
+              COALESCE(CAST(VendorID AS text), '') ||
+              COALESCE(CAST(tpep_pickup_datetime AS text), '') ||
+              COALESCE(CAST(tpep_dropoff_datetime AS text), '') ||
+              COALESCE(PULocationID, '') ||
+              COALESCE(DOLocationID, '') ||
+              COALESCE(CAST(fare_amount AS text), '') ||
+              COALESCE(CAST(trip_distance AS text), '')
+            ),
+            filename = '{{render(vars.file)}}';
+
+      - id: yellow_merge_data
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          MERGE INTO {{render(vars.table)}} AS T
+          USING {{render(vars.staging_table)}} AS S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN
+            INSERT (
+              unique_row_id, filename, VendorID, tpep_pickup_datetime, tpep_dropoff_datetime,
+              passenger_count, trip_distance, RatecodeID, store_and_fwd_flag, PULocationID,
+              DOLocationID, payment_type, fare_amount, extra, mta_tax, tip_amount, tolls_amount,
+              improvement_surcharge, total_amount, congestion_surcharge
+            )
+            VALUES (
+              S.unique_row_id, S.filename, S.VendorID, S.tpep_pickup_datetime, S.tpep_dropoff_datetime,
+              S.passenger_count, S.trip_distance, S.RatecodeID, S.store_and_fwd_flag, S.PULocationID,
+              S.DOLocationID, S.payment_type, S.fare_amount, S.extra, S.mta_tax, S.tip_amount, S.tolls_amount,
+              S.improvement_surcharge, S.total_amount, S.congestion_surcharge
+            );
+
+  - id: if_green_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.taxi == 'green'}}"
+    then:
+      - id: green_create_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          CREATE TABLE IF NOT EXISTS {{render(vars.table)}} (
+              unique_row_id          text,
+              filename               text,
+              VendorID               text,
+              lpep_pickup_datetime   timestamp,
+              lpep_dropoff_datetime  timestamp,
+              store_and_fwd_flag     text,
+              RatecodeID             text,
+              PULocationID           text,
+              DOLocationID           text,
+              passenger_count        integer,
+              trip_distance          double precision,
+              fare_amount            double precision,
+              extra                  double precision,
+              mta_tax                double precision,
+              tip_amount             double precision,
+              tolls_amount           double precision,
+              ehail_fee              double precision,
+              improvement_surcharge  double precision,
+              total_amount           double precision,
+              payment_type           integer,
+              trip_type              integer,
+              congestion_surcharge   double precision
+          );
+
+      - id: green_create_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          CREATE TABLE IF NOT EXISTS {{render(vars.staging_table)}} (
+              unique_row_id          text,
+              filename               text,
+              VendorID               text,
+              lpep_pickup_datetime   timestamp,
+              lpep_dropoff_datetime  timestamp,
+              store_and_fwd_flag     text,
+              RatecodeID             text,
+              PULocationID           text,
+              DOLocationID           text,
+              passenger_count        integer,
+              trip_distance          double precision,
+              fare_amount            double precision,
+              extra                  double precision,
+              mta_tax                double precision,
+              tip_amount             double precision,
+              tolls_amount           double precision,
+              ehail_fee              double precision,
+              improvement_surcharge  double precision,
+              total_amount           double precision,
+              payment_type           integer,
+              trip_type              integer,
+              congestion_surcharge   double precision
+          );
+
+      - id: green_truncate_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          TRUNCATE TABLE {{render(vars.staging_table)}};
+
+      - id: green_copy_in_to_staging_table
+        type: io.kestra.plugin.jdbc.postgresql.CopyIn
+        format: CSV
+        from: "{{render(vars.data)}}"
+        table: "{{render(vars.staging_table)}}"
+        header: true
+        columns: [VendorID,lpep_pickup_datetime,lpep_dropoff_datetime,store_and_fwd_flag,RatecodeID,PULocationID,DOLocationID,passenger_count,trip_distance,fare_amount,extra,mta_tax,tip_amount,tolls_amount,ehail_fee,improvement_surcharge,total_amount,payment_type,trip_type,congestion_surcharge]
+
+      - id: green_add_unique_id_and_filename
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          UPDATE {{render(vars.staging_table)}}
+          SET
+            unique_row_id = md5(
+              COALESCE(CAST(VendorID AS text), '') ||
+              COALESCE(CAST(lpep_pickup_datetime AS text), '') ||
+              COALESCE(CAST(lpep_dropoff_datetime AS text), '') ||
+              COALESCE(PULocationID, '') ||
+              COALESCE(DOLocationID, '') ||
+              COALESCE(CAST(fare_amount AS text), '') ||
+              COALESCE(CAST(trip_distance AS text), '')
+            ),
+            filename = '{{render(vars.file)}}';
+
+      - id: green_merge_data
+        type: io.kestra.plugin.jdbc.postgresql.Queries
+        sql: |
+          MERGE INTO {{render(vars.table)}} AS T
+          USING {{render(vars.staging_table)}} AS S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN
+            INSERT (
+              unique_row_id, filename, VendorID, lpep_pickup_datetime, lpep_dropoff_datetime,
+              store_and_fwd_flag, RatecodeID, PULocationID, DOLocationID, passenger_count,
+              trip_distance, fare_amount, extra, mta_tax, tip_amount, tolls_amount, ehail_fee,
+              improvement_surcharge, total_amount, payment_type, trip_type, congestion_surcharge
+            )
+            VALUES (
+              S.unique_row_id, S.filename, S.VendorID, S.lpep_pickup_datetime, S.lpep_dropoff_datetime,
+              S.store_and_fwd_flag, S.RatecodeID, S.PULocationID, S.DOLocationID, S.passenger_count,
+              S.trip_distance, S.fare_amount, S.extra, S.mta_tax, S.tip_amount, S.tolls_amount, S.ehail_fee,
+              S.improvement_surcharge, S.total_amount, S.payment_type, S.trip_type, S.congestion_surcharge
+            );
+
+  - id: purge_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
+    description: To avoid cluttering your storage, we will remove the downloaded files
+
+pluginDefaults:
+  - type: io.kestra.plugin.jdbc.postgresql
+    values:
+      url: jdbc:postgresql://pgdatabase:5432/ny_taxi
+      username: root
+      password: root
+
+triggers:
+  - id: green_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 9 1 * *"
+    inputs:
+      taxi: green
+
+  - id: yellow_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 10 1 * *"
+    inputs:
+      taxi: yellow</pre></div>
+          </div>
+
+          <h3 class="green">Backfill từ Kestra UI (step-by-step)</h3>
+          <ol>
+            <li>Mở flow <code>05_postgres_taxi_scheduled</code> trong Kestra UI.</li>
+            <li>Chọn tab <strong>Triggers</strong>, chọn trigger tương ứng (<code>green_schedule</code> hoặc <code>yellow_schedule</code>).</li>
+            <li>Chọn <strong>Backfill</strong>.</li>
+            <li>Đặt start date theo yêu cầu, ví dụ <code>2019-01-01T09:00:00Z</code>.</li>
+            <li>Chọn end date/time theo phạm vi muốn chạy.</li>
+            <li>Submit và theo dõi executions được tạo hàng loạt theo lịch.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(3,document.querySelectorAll('.nav-item')[3])">← Section 4</button>
+        <button class="nav-btn primary" onclick="showModule(5,document.querySelectorAll('.nav-item')[5])">Tiếp Section 6 →</button>
+      </div>
+    </div>
+
+    <div class="module" id="m5">
+      <div class="module-header">
+        <div class="module-tag">Section 6 · GCP Setup</div>
+        <div class="module-title">6) GCP Setup (Flows 06–07)</div>
+        <div class="module-subtitle">Chuẩn bị KV + Secrets và dựng hạ tầng bucket/dataset idempotent.</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:92%"></div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-purpose">✅</div>
+          6.1 Prerequisites checklist
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul class="checklist">
+            <li>GCP project đã tạo xong</li>
+            <li>Service account có roles: Storage Admin + BigQuery Admin</li>
+            <li>JSON key đã download</li>
+            <li>Kestra UI → Settings → Secrets → <code>GCP_CREDS</code> = nội dung JSON key</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-detail">🗂️</div>
+          6.2 Flow 06 — Set KV Store
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>KV Store</strong> dùng cho config bền vững (project_id, dataset, bucket, location). <strong>Secrets</strong> dùng cho dữ liệu nhạy cảm (service account JSON).</p>
+          <p>Sau khi import flow 06, execute ngay để lưu các key-value cho các flow 07–09.</p>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>flows/06_gcp_kv.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">id: 06_gcp_kv
+namespace: zoomcamp
+
+tasks:
+  - id: gcp_project_id
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_PROJECT_ID
+    kvType: STRING
+    value: &lt;YOUR_PROJECT_ID&gt; # TODO replace with your project id
+
+  - id: gcp_location
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_LOCATION
+    kvType: STRING
+    value: europe-west2
+
+  - id: gcp_bucket_name
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_BUCKET_NAME
+    kvType: STRING
+    value: &lt;YOUR_BUCKET_NAME&gt; # TODO make sure it's globally unique!
+
+  - id: gcp_dataset
+    type: io.kestra.plugin.core.kv.Set
+    key: GCP_DATASET
+    kvType: STRING
+    value: zoomcamp</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-detail">☁️</div>
+          6.3 Flow 07 — Create GCS Bucket + BQ Dataset
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><code>ifExists: SKIP</code> giúp setup idempotent: chạy lại flow không fail khi resource đã tồn tại.</p>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>flows/07_gcp_setup.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">id: 07_gcp_setup
+namespace: zoomcamp
+
+tasks:
+  - id: create_gcs_bucket
+    type: io.kestra.plugin.gcp.gcs.CreateBucket
+    ifExists: SKIP
+    storageClass: REGIONAL
+    name: "{{kv('GCP_BUCKET_NAME')}}" # make sure it's globally unique!
+
+  - id: create_bq_dataset
+    type: io.kestra.plugin.gcp.bigquery.CreateDataset
+    name: "{{kv('GCP_DATASET')}}"
+    ifExists: SKIP
+
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{secret('GCP_CREDS')}}"
+      projectId: "{{kv('GCP_PROJECT_ID')}}"
+      location: "{{kv('GCP_LOCATION')}}"
+      bucket: "{{kv('GCP_BUCKET_NAME')}}"</pre></div>
+          </div>
+          <p>Execute flow và verify trong GCP Console: bucket + dataset đã xuất hiện.</p>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(4,document.querySelectorAll('.nav-item')[4])">← Section 5</button>
+        <button class="nav-btn primary" onclick="showModule(6,document.querySelectorAll('.nav-item')[6])">Tiếp Section 7 →</button>
+      </div>
+    </div>
+
+    <div class="module" id="m6">
+      <div class="module-header">
+        <div class="module-tag">Section 7 · ELT BigQuery</div>
+        <div class="module-title">7) Flows 08–09: ELT BigQuery</div>
+        <div class="module-subtitle">Tải file lên GCS trước, transform bằng BigQuery SQL sau để scale cloud.</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:96%"></div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-summary">⚖️</div>
+          7.1 So sánh ETL vs ELT
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead>
+              <tr><th>Tiêu chí</th><th>ETL Postgres (F04)</th><th>ELT BigQuery (F08)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Transform ở đâu</td><td>Kestra + Postgres SQL</td><td>BigQuery SQL</td></tr>
+              <tr><td>Staging</td><td>Staging table trong DB</td><td>External Table → Temp Table</td></tr>
+              <tr><td>Storage</td><td>Postgres volume</td><td>GCS + BigQuery</td></tr>
+              <tr><td>Scale</td><td>Medium (local)</td><td>Large (cloud, petabyte)</td></tr>
+              <tr><td>Cost</td><td>Free (local)</td><td>Pay per query</td></tr>
+              <tr><td>Idempotency</td><td>MERGE</td><td>MERGE</td></tr>
+              <tr><td>Partitioning</td><td>Không</td><td>DATE(tpep_pickup_datetime)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-purpose">🏗️</div>
+          7.2–7.4 ELT Architecture + External Table + Partitioning
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="diagram">[GitHub .csv.gz]
+→ wget/gunzip → [Kestra Storage]
+→ Upload → [GCS Bucket]
+→ CREATE EXTERNAL TABLE (đọc thẳng từ GCS, không copy data)
+→ CREATE TABLE AS SELECT (materialize + add unique_row_id)
+→ CREATE main table IF NOT EXISTS (PARTITIONED BY DATE)
+→ MERGE into main table</div>
+          <p><strong>External Table:</strong> BigQuery query trực tiếp file trong GCS, phù hợp bước ingest nhanh trước khi materialize sang native table.</p>
+          <p><strong>Partitioning:</strong> <code>PARTITION BY DATE(tpep_pickup_datetime)</code> (hoặc <code>DATE(lpep_pickup_datetime)</code> cho green) giúp giảm lượng data scan khi filter theo ngày, từ đó giảm cost query.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-detail">📥</div>
+          7.5 Flow 08 — Manual ELT GCP
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ol>
+            <li>Task 1: <code>set_label</code></li>
+            <li>Task 2: <code>extract</code> (wget + gunzip)</li>
+            <li>Task 3: <code>upload_to_gcs</code></li>
+            <li>Task 4: <code>if_yellow_taxi</code> (4 BQ tasks: ext → tmp → main → merge)</li>
+            <li>Task 5: <code>if_green_taxi</code> (4 BQ tasks)</li>
+            <li>Task 6: <code>purge_files</code></li>
+          </ol>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>flows/08_gcp_taxi.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">id: 08_gcp_taxi
+namespace: zoomcamp
+description: |
+  The CSV Data used in the course: https://github.com/DataTalksClub/nyc-tlc-data/releases
+
+inputs:
+  - id: taxi
+    type: SELECT
+    displayName: Select taxi type
+    values: [yellow, green]
+    defaults: green
+
+  - id: year
+    type: SELECT
+    displayName: Select year
+    values: ["2019", "2020"]
+    defaults: "2019"
+    allowCustomValue: true # allows you to type 2021 from the UI for the homework 🤗
+
+  - id: month
+    type: SELECT
+    displayName: Select month
+    values: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+    defaults: "01"
+
+variables:
+  file: "{{inputs.taxi}}_tripdata_{{inputs.year}}-{{inputs.month}}.csv"
+  gcs_file: "gs://{{kv('GCP_BUCKET_NAME')}}/{{vars.file}}"
+  table: "{{kv('GCP_DATASET')}}.{{inputs.taxi}}_tripdata_{{inputs.year}}_{{inputs.month}}"
+  data: "{{outputs.extract.outputFiles[inputs.taxi ~ '_tripdata_' ~ inputs.year ~ '-' ~ inputs.month ~ '.csv']}}"
+
+tasks:
+  - id: set_label
+    type: io.kestra.plugin.core.execution.Labels
+    labels:
+      file: "{{render(vars.file)}}"
+      taxi: "{{inputs.taxi}}"
+
+  - id: extract
+    type: io.kestra.plugin.scripts.shell.Commands
+    outputFiles:
+      - "*.csv"
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - wget -qO- https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{{inputs.taxi}}/{{render(vars.file)}}.gz | gunzip > {{render(vars.file)}}
+
+  - id: upload_to_gcs
+    type: io.kestra.plugin.gcp.gcs.Upload
+    from: "{{render(vars.data)}}"
+    to: "{{render(vars.gcs_file)}}"
+
+  - id: if_yellow_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.taxi == 'yellow'}}"
+    then:
+      - id: bq_yellow_tripdata
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE TABLE IF NOT EXISTS `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.yellow_tripdata`
+          (
+              unique_row_id BYTES OPTIONS (description = 'A unique identifier for the trip, generated by hashing key trip attributes.'),
+              filename STRING OPTIONS (description = 'The source filename from which the trip data was loaded.'),
+              VendorID STRING OPTIONS (description = 'A code indicating the LPEP provider that provided the record. 1= Creative Mobile Technologies, LLC; 2= VeriFone Inc.'),
+              tpep_pickup_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was engaged'),
+              tpep_dropoff_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was disengaged'),
+              passenger_count INTEGER OPTIONS (description = 'The number of passengers in the vehicle. This is a driver-entered value.'),
+              trip_distance NUMERIC OPTIONS (description = 'The elapsed trip distance in miles reported by the taximeter.'),
+              RatecodeID STRING OPTIONS (description = 'The final rate code in effect at the end of the trip. 1= Standard rate 2=JFK 3=Newark 4=Nassau or Westchester 5=Negotiated fare 6=Group ride'),
+              store_and_fwd_flag STRING OPTIONS (description = 'This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, aka "store and forward," because the vehicle did not have a connection to the server. TRUE = store and forward trip, FALSE = not a store and forward trip'),
+              PULocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was engaged'),
+              DOLocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was disengaged'),
+              payment_type INTEGER OPTIONS (description = 'A numeric code signifying how the passenger paid for the trip. 1= Credit card 2= Cash 3= No charge 4= Dispute 5= Unknown 6= Voided trip'),
+              fare_amount NUMERIC OPTIONS (description = 'The time-and-distance fare calculated by the meter'),
+              extra NUMERIC OPTIONS (description = 'Miscellaneous extras and surcharges. Currently, this only includes the $0.50 and $1 rush hour and overnight charges'),
+              mta_tax NUMERIC OPTIONS (description = '$0.50 MTA tax that is automatically triggered based on the metered rate in use'),
+              tip_amount NUMERIC OPTIONS (description = 'Tip amount. This field is automatically populated for credit card tips. Cash tips are not included.'),
+              tolls_amount NUMERIC OPTIONS (description = 'Total amount of all tolls paid in trip.'),
+              improvement_surcharge NUMERIC OPTIONS (description = '$0.30 improvement surcharge assessed on hailed trips at the flag drop. The improvement surcharge began being levied in 2015.'),
+              total_amount NUMERIC OPTIONS (description = 'The total amount charged to passengers. Does not include cash tips.'),
+              congestion_surcharge NUMERIC OPTIONS (description = 'Congestion surcharge applied to trips in congested zones')
+          )
+          PARTITION BY DATE(tpep_pickup_datetime);
+
+      - id: bq_yellow_table_ext
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE OR REPLACE EXTERNAL TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`
+          (
+              VendorID STRING OPTIONS (description = 'A code indicating the LPEP provider that provided the record. 1= Creative Mobile Technologies, LLC; 2= VeriFone Inc.'),
+              tpep_pickup_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was engaged'),
+              tpep_dropoff_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was disengaged'),
+              passenger_count INTEGER OPTIONS (description = 'The number of passengers in the vehicle. This is a driver-entered value.'),
+              trip_distance NUMERIC OPTIONS (description = 'The elapsed trip distance in miles reported by the taximeter.'),
+              RatecodeID STRING OPTIONS (description = 'The final rate code in effect at the end of the trip. 1= Standard rate 2=JFK 3=Newark 4=Nassau or Westchester 5=Negotiated fare 6=Group ride'),
+              store_and_fwd_flag STRING OPTIONS (description = 'This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, aka "store and forward," because the vehicle did not have a connection to the server. TRUE = store and forward trip, FALSE = not a store and forward trip'),
+              PULocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was engaged'),
+              DOLocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was disengaged'),
+              payment_type INTEGER OPTIONS (description = 'A numeric code signifying how the passenger paid for the trip. 1= Credit card 2= Cash 3= No charge 4= Dispute 5= Unknown 6= Voided trip'),
+              fare_amount NUMERIC OPTIONS (description = 'The time-and-distance fare calculated by the meter'),
+              extra NUMERIC OPTIONS (description = 'Miscellaneous extras and surcharges. Currently, this only includes the $0.50 and $1 rush hour and overnight charges'),
+              mta_tax NUMERIC OPTIONS (description = '$0.50 MTA tax that is automatically triggered based on the metered rate in use'),
+              tip_amount NUMERIC OPTIONS (description = 'Tip amount. This field is automatically populated for credit card tips. Cash tips are not included.'),
+              tolls_amount NUMERIC OPTIONS (description = 'Total amount of all tolls paid in trip.'),
+              improvement_surcharge NUMERIC OPTIONS (description = '$0.30 improvement surcharge assessed on hailed trips at the flag drop. The improvement surcharge began being levied in 2015.'),
+              total_amount NUMERIC OPTIONS (description = 'The total amount charged to passengers. Does not include cash tips.'),
+              congestion_surcharge NUMERIC OPTIONS (description = 'Congestion surcharge applied to trips in congested zones')
+          )
+          OPTIONS (
+              format = 'CSV',
+              uris = ['{{render(vars.gcs_file)}}'],
+              skip_leading_rows = 1,
+              ignore_unknown_values = TRUE
+          );
+
+      - id: bq_yellow_table_tmp
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE OR REPLACE TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}`
+          AS
+          SELECT
+            MD5(CONCAT(
+              COALESCE(CAST(VendorID AS STRING), ""),
+              COALESCE(CAST(tpep_pickup_datetime AS STRING), ""),
+              COALESCE(CAST(tpep_dropoff_datetime AS STRING), ""),
+              COALESCE(CAST(PULocationID AS STRING), ""),
+              COALESCE(CAST(DOLocationID AS STRING), "")
+            )) AS unique_row_id,
+            "{{render(vars.file)}}" AS filename,
+            *
+          FROM `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`;
+
+      - id: bq_yellow_merge
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          MERGE INTO `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.yellow_tripdata` T
+          USING `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}` S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN
+            INSERT (unique_row_id, filename, VendorID, tpep_pickup_datetime, tpep_dropoff_datetime, passenger_count, trip_distance, RatecodeID, store_and_fwd_flag, PULocationID, DOLocationID, payment_type, fare_amount, extra, mta_tax, tip_amount, tolls_amount, improvement_surcharge, total_amount, congestion_surcharge)
+            VALUES (S.unique_row_id, S.filename, S.VendorID, S.tpep_pickup_datetime, S.tpep_dropoff_datetime, S.passenger_count, S.trip_distance, S.RatecodeID, S.store_and_fwd_flag, S.PULocationID, S.DOLocationID, S.payment_type, S.fare_amount, S.extra, S.mta_tax, S.tip_amount, S.tolls_amount, S.improvement_surcharge, S.total_amount, S.congestion_surcharge);
+
+  - id: if_green_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.taxi == 'green'}}"
+    then:
+      - id: bq_green_tripdata
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE TABLE IF NOT EXISTS `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.green_tripdata`
+          (
+              unique_row_id BYTES OPTIONS (description = 'A unique identifier for the trip, generated by hashing key trip attributes.'),
+              filename STRING OPTIONS (description = 'The source filename from which the trip data was loaded.'),
+              VendorID STRING OPTIONS (description = 'A code indicating the LPEP provider that provided the record. 1= Creative Mobile Technologies, LLC; 2= VeriFone Inc.'),
+              lpep_pickup_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was engaged'),
+              lpep_dropoff_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was disengaged'),
+              store_and_fwd_flag STRING OPTIONS (description = 'This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, aka "store and forward," because the vehicle did not have a connection to the server. Y= store and forward trip N= not a store and forward trip'),
+              RatecodeID STRING OPTIONS (description = 'The final rate code in effect at the end of the trip. 1= Standard rate 2=JFK 3=Newark 4=Nassau or Westchester 5=Negotiated fare 6=Group ride'),
+              PULocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was engaged'),
+              DOLocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was disengaged'),
+              passenger_count INT64 OPTIONS (description = 'The number of passengers in the vehicle. This is a driver-entered value.'),
+              trip_distance NUMERIC OPTIONS (description = 'The elapsed trip distance in miles reported by the taximeter.'),
+              fare_amount NUMERIC OPTIONS (description = 'The time-and-distance fare calculated by the meter'),
+              extra NUMERIC OPTIONS (description = 'Miscellaneous extras and surcharges. Currently, this only includes the $0.50 and $1 rush hour and overnight charges'),
+              mta_tax NUMERIC OPTIONS (description = '$0.50 MTA tax that is automatically triggered based on the metered rate in use'),
+              tip_amount NUMERIC OPTIONS (description = 'Tip amount. This field is automatically populated for credit card tips. Cash tips are not included.'),
+              tolls_amount NUMERIC OPTIONS (description = 'Total amount of all tolls paid in trip.'),
+              ehail_fee NUMERIC,
+              improvement_surcharge NUMERIC OPTIONS (description = '$0.30 improvement surcharge assessed on hailed trips at the flag drop. The improvement surcharge began being levied in 2015.'),
+              total_amount NUMERIC OPTIONS (description = 'The total amount charged to passengers. Does not include cash tips.'),
+              payment_type INTEGER OPTIONS (description = 'A numeric code signifying how the passenger paid for the trip. 1= Credit card 2= Cash 3= No charge 4= Dispute 5= Unknown 6= Voided trip'),
+              trip_type STRING OPTIONS (description = 'A code indicating whether the trip was a street-hail or a dispatch that is automatically assigned based on the metered rate in use but can be altered by the driver. 1= Street-hail 2= Dispatch'),
+              congestion_surcharge NUMERIC OPTIONS (description = 'Congestion surcharge applied to trips in congested zones')
+          )
+          PARTITION BY DATE(lpep_pickup_datetime);
+
+      - id: bq_green_table_ext
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE OR REPLACE EXTERNAL TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`
+          (
+              VendorID STRING OPTIONS (description = 'A code indicating the LPEP provider that provided the record. 1= Creative Mobile Technologies, LLC; 2= VeriFone Inc.'),
+              lpep_pickup_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was engaged'),
+              lpep_dropoff_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was disengaged'),
+              store_and_fwd_flag STRING OPTIONS (description = 'This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, aka "store and forward," because the vehicle did not have a connection to the server. Y= store and forward trip N= not a store and forward trip'),
+              RatecodeID STRING OPTIONS (description = 'The final rate code in effect at the end of the trip. 1= Standard rate 2=JFK 3=Newark 4=Nassau or Westchester 5=Negotiated fare 6=Group ride'),
+              PULocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was engaged'),
+              DOLocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was disengaged'),
+              passenger_count INT64 OPTIONS (description = 'The number of passengers in the vehicle. This is a driver-entered value.'),
+              trip_distance NUMERIC OPTIONS (description = 'The elapsed trip distance in miles reported by the taximeter.'),
+              fare_amount NUMERIC OPTIONS (description = 'The time-and-distance fare calculated by the meter'),
+              extra NUMERIC OPTIONS (description = 'Miscellaneous extras and surcharges. Currently, this only includes the $0.50 and $1 rush hour and overnight charges'),
+              mta_tax NUMERIC OPTIONS (description = '$0.50 MTA tax that is automatically triggered based on the metered rate in use'),
+              tip_amount NUMERIC OPTIONS (description = 'Tip amount. This field is automatically populated for credit card tips. Cash tips are not included.'),
+              tolls_amount NUMERIC OPTIONS (description = 'Total amount of all tolls paid in trip.'),
+              ehail_fee NUMERIC,
+              improvement_surcharge NUMERIC OPTIONS (description = '$0.30 improvement surcharge assessed on hailed trips at the flag drop. The improvement surcharge began being levied in 2015.'),
+              total_amount NUMERIC OPTIONS (description = 'The total amount charged to passengers. Does not include cash tips.'),
+              payment_type INTEGER OPTIONS (description = 'A numeric code signifying how the passenger paid for the trip. 1= Credit card 2= Cash 3= No charge 4= Dispute 5= Unknown 6= Voided trip'),
+              trip_type STRING OPTIONS (description = 'A code indicating whether the trip was a street-hail or a dispatch that is automatically assigned based on the metered rate in use but can be altered by the driver. 1= Street-hail 2= Dispatch'),
+              congestion_surcharge NUMERIC OPTIONS (description = 'Congestion surcharge applied to trips in congested zones')
+          )
+          OPTIONS (
+              format = 'CSV',
+              uris = ['{{render(vars.gcs_file)}}'],
+              skip_leading_rows = 1,
+              ignore_unknown_values = TRUE
+          );
+
+      - id: bq_green_table_tmp
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE OR REPLACE TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}`
+          AS
+          SELECT
+            MD5(CONCAT(
+              COALESCE(CAST(VendorID AS STRING), ""),
+              COALESCE(CAST(lpep_pickup_datetime AS STRING), ""),
+              COALESCE(CAST(lpep_dropoff_datetime AS STRING), ""),
+              COALESCE(CAST(PULocationID AS STRING), ""),
+              COALESCE(CAST(DOLocationID AS STRING), "")
+            )) AS unique_row_id,
+            "{{render(vars.file)}}" AS filename,
+            *
+          FROM `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`;
+
+      - id: bq_green_merge
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          MERGE INTO `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.green_tripdata` T
+          USING `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}` S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN
+            INSERT (unique_row_id, filename, VendorID, lpep_pickup_datetime, lpep_dropoff_datetime, store_and_fwd_flag, RatecodeID, PULocationID, DOLocationID, passenger_count, trip_distance, fare_amount, extra, mta_tax, tip_amount, tolls_amount, ehail_fee, improvement_surcharge, total_amount, payment_type, trip_type, congestion_surcharge)
+            VALUES (S.unique_row_id, S.filename, S.VendorID, S.lpep_pickup_datetime, S.lpep_dropoff_datetime, S.store_and_fwd_flag, S.RatecodeID, S.PULocationID, S.DOLocationID, S.passenger_count, S.trip_distance, S.fare_amount, S.extra, S.mta_tax, S.tip_amount, S.tolls_amount, S.ehail_fee, S.improvement_surcharge, S.total_amount, S.payment_type, S.trip_type, S.congestion_surcharge);
+
+  - id: purge_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
+    description: If you'd like to explore Kestra outputs, disable it.
+    disabled: false
+
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{secret('GCP_CREDS')}}"
+      projectId: "{{kv('GCP_PROJECT_ID')}}"
+      location: "{{kv('GCP_LOCATION')}}"
+      bucket: "{{kv('GCP_BUCKET_NAME')}}"</pre></div>
+          </div>
+
+          <ul class="checklist">
+            <li>Execute yellow/2019/01 → GCS object tồn tại</li>
+            <li>BigQuery table <code>yellow_tripdata</code> có data</li>
+            <li>Execute lại cùng input → row count KHÔNG thay đổi</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-detail">📆</div>
+          7.6 Flow 09 — Scheduled ELT GCP + Backfill
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Flow 09 tương tự Flow 05 nhưng target là GCS + BigQuery và dùng <code>trigger.date</code> để generate file/table theo kỳ.</p>
+          <p>Backfill khuyến nghị theo module: từ <code>2019-01</code> đến <code>2020-12</code>.</p>
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>flows/09_gcp_taxi_scheduled.yaml</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy YAML</button>
+            </div>
+            <div class="cmd-body"><pre class="yaml-code">id: 09_gcp_taxi_scheduled
+namespace: zoomcamp
+description: |
+  Best to add a label `backfill:true` from the UI to track executions created via a backfill.
+  CSV data used here comes from: https://github.com/DataTalksClub/nyc-tlc-data/releases
+
+inputs:
+  - id: taxi
+    type: SELECT
+    displayName: Select taxi type
+    values: [yellow, green]
+    defaults: green
+
+variables:
+  file: "{{inputs.taxi}}_tripdata_{{trigger.date | date('yyyy-MM')}}.csv"
+  gcs_file: "gs://{{kv('GCP_BUCKET_NAME')}}/{{vars.file}}"
+  table: "{{kv('GCP_DATASET')}}.{{inputs.taxi}}_tripdata_{{trigger.date | date('yyyy_MM')}}"
+  data: "{{outputs.extract.outputFiles[inputs.taxi ~ '_tripdata_' ~ (trigger.date | date('yyyy-MM')) ~ '.csv']}}"
+
+tasks:
+  - id: set_label
+    type: io.kestra.plugin.core.execution.Labels
+    labels:
+      file: "{{render(vars.file)}}"
+      taxi: "{{inputs.taxi}}"
+
+  - id: extract
+    type: io.kestra.plugin.scripts.shell.Commands
+    outputFiles:
+      - "*.csv"
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - wget -qO- https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{{inputs.taxi}}/{{render(vars.file)}}.gz | gunzip > {{render(vars.file)}}
+
+  - id: upload_to_gcs
+    type: io.kestra.plugin.gcp.gcs.Upload
+    from: "{{render(vars.data)}}"
+    to: "{{render(vars.gcs_file)}}"
+
+  - id: if_yellow_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.taxi == 'yellow'}}"
+    then:
+      - id: bq_yellow_tripdata
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE TABLE IF NOT EXISTS `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.yellow_tripdata`
+          (
+              unique_row_id BYTES OPTIONS (description = 'A unique identifier for the trip, generated by hashing key trip attributes.'),
+              filename STRING OPTIONS (description = 'The source filename from which the trip data was loaded.'),
+              VendorID STRING OPTIONS (description = 'A code indicating the LPEP provider that provided the record. 1= Creative Mobile Technologies, LLC; 2= VeriFone Inc.'),
+              tpep_pickup_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was engaged'),
+              tpep_dropoff_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was disengaged'),
+              passenger_count INTEGER OPTIONS (description = 'The number of passengers in the vehicle. This is a driver-entered value.'),
+              trip_distance NUMERIC OPTIONS (description = 'The elapsed trip distance in miles reported by the taximeter.'),
+              RatecodeID STRING OPTIONS (description = 'The final rate code in effect at the end of the trip. 1= Standard rate 2=JFK 3=Newark 4=Nassau or Westchester 5=Negotiated fare 6=Group ride'),
+              store_and_fwd_flag STRING OPTIONS (description = 'This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, aka "store and forward," because the vehicle did not have a connection to the server. TRUE = store and forward trip, FALSE = not a store and forward trip'),
+              PULocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was engaged'),
+              DOLocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was disengaged'),
+              payment_type INTEGER OPTIONS (description = 'A numeric code signifying how the passenger paid for the trip. 1= Credit card 2= Cash 3= No charge 4= Dispute 5= Unknown 6= Voided trip'),
+              fare_amount NUMERIC OPTIONS (description = 'The time-and-distance fare calculated by the meter'),
+              extra NUMERIC OPTIONS (description = 'Miscellaneous extras and surcharges. Currently, this only includes the $0.50 and $1 rush hour and overnight charges'),
+              mta_tax NUMERIC OPTIONS (description = '$0.50 MTA tax that is automatically triggered based on the metered rate in use'),
+              tip_amount NUMERIC OPTIONS (description = 'Tip amount. This field is automatically populated for credit card tips. Cash tips are not included.'),
+              tolls_amount NUMERIC OPTIONS (description = 'Total amount of all tolls paid in trip.'),
+              improvement_surcharge NUMERIC OPTIONS (description = '$0.30 improvement surcharge assessed on hailed trips at the flag drop. The improvement surcharge began being levied in 2015.'),
+              total_amount NUMERIC OPTIONS (description = 'The total amount charged to passengers. Does not include cash tips.'),
+              congestion_surcharge NUMERIC OPTIONS (description = 'Congestion surcharge applied to trips in congested zones')
+          )
+          PARTITION BY DATE(tpep_pickup_datetime);
+
+      - id: bq_yellow_table_ext
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE OR REPLACE EXTERNAL TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`
+          (
+              VendorID STRING OPTIONS (description = 'A code indicating the LPEP provider that provided the record. 1= Creative Mobile Technologies, LLC; 2= VeriFone Inc.'),
+              tpep_pickup_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was engaged'),
+              tpep_dropoff_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was disengaged'),
+              passenger_count INTEGER OPTIONS (description = 'The number of passengers in the vehicle. This is a driver-entered value.'),
+              trip_distance NUMERIC OPTIONS (description = 'The elapsed trip distance in miles reported by the taximeter.'),
+              RatecodeID STRING OPTIONS (description = 'The final rate code in effect at the end of the trip. 1= Standard rate 2=JFK 3=Newark 4=Nassau or Westchester 5=Negotiated fare 6=Group ride'),
+              store_and_fwd_flag STRING OPTIONS (description = 'This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, aka "store and forward," because the vehicle did not have a connection to the server. TRUE = store and forward trip, FALSE = not a store and forward trip'),
+              PULocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was engaged'),
+              DOLocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was disengaged'),
+              payment_type INTEGER OPTIONS (description = 'A numeric code signifying how the passenger paid for the trip. 1= Credit card 2= Cash 3= No charge 4= Dispute 5= Unknown 6= Voided trip'),
+              fare_amount NUMERIC OPTIONS (description = 'The time-and-distance fare calculated by the meter'),
+              extra NUMERIC OPTIONS (description = 'Miscellaneous extras and surcharges. Currently, this only includes the $0.50 and $1 rush hour and overnight charges'),
+              mta_tax NUMERIC OPTIONS (description = '$0.50 MTA tax that is automatically triggered based on the metered rate in use'),
+              tip_amount NUMERIC OPTIONS (description = 'Tip amount. This field is automatically populated for credit card tips. Cash tips are not included.'),
+              tolls_amount NUMERIC OPTIONS (description = 'Total amount of all tolls paid in trip.'),
+              improvement_surcharge NUMERIC OPTIONS (description = '$0.30 improvement surcharge assessed on hailed trips at the flag drop. The improvement surcharge began being levied in 2015.'),
+              total_amount NUMERIC OPTIONS (description = 'The total amount charged to passengers. Does not include cash tips.'),
+              congestion_surcharge NUMERIC OPTIONS (description = 'Congestion surcharge applied to trips in congested zones')
+          )
+          OPTIONS (
+              format = 'CSV',
+              uris = ['{{render(vars.gcs_file)}}'],
+              skip_leading_rows = 1,
+              ignore_unknown_values = TRUE
+          );
+
+      - id: bq_yellow_table_tmp
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE OR REPLACE TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}`
+          AS
+          SELECT
+            MD5(CONCAT(
+              COALESCE(CAST(VendorID AS STRING), ""),
+              COALESCE(CAST(tpep_pickup_datetime AS STRING), ""),
+              COALESCE(CAST(tpep_dropoff_datetime AS STRING), ""),
+              COALESCE(CAST(PULocationID AS STRING), ""),
+              COALESCE(CAST(DOLocationID AS STRING), "")
+            )) AS unique_row_id,
+            "{{render(vars.file)}}" AS filename,
+            *
+          FROM `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`;
+
+      - id: bq_yellow_merge
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          MERGE INTO `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.yellow_tripdata` T
+          USING `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}` S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN
+            INSERT (unique_row_id, filename, VendorID, tpep_pickup_datetime, tpep_dropoff_datetime, passenger_count, trip_distance, RatecodeID, store_and_fwd_flag, PULocationID, DOLocationID, payment_type, fare_amount, extra, mta_tax, tip_amount, tolls_amount, improvement_surcharge, total_amount, congestion_surcharge)
+            VALUES (S.unique_row_id, S.filename, S.VendorID, S.tpep_pickup_datetime, S.tpep_dropoff_datetime, S.passenger_count, S.trip_distance, S.RatecodeID, S.store_and_fwd_flag, S.PULocationID, S.DOLocationID, S.payment_type, S.fare_amount, S.extra, S.mta_tax, S.tip_amount, S.tolls_amount, S.improvement_surcharge, S.total_amount, S.congestion_surcharge);
+
+  - id: if_green_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.taxi == 'green'}}"
+    then:
+      - id: bq_green_tripdata
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE TABLE IF NOT EXISTS `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.green_tripdata`
+          (
+              unique_row_id BYTES OPTIONS (description = 'A unique identifier for the trip, generated by hashing key trip attributes.'),
+              filename STRING OPTIONS (description = 'The source filename from which the trip data was loaded.'),
+              VendorID STRING OPTIONS (description = 'A code indicating the LPEP provider that provided the record. 1= Creative Mobile Technologies, LLC; 2= VeriFone Inc.'),
+              lpep_pickup_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was engaged'),
+              lpep_dropoff_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was disengaged'),
+              store_and_fwd_flag STRING OPTIONS (description = 'This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, aka "store and forward," because the vehicle did not have a connection to the server. Y= store and forward trip N= not a store and forward trip'),
+              RatecodeID STRING OPTIONS (description = 'The final rate code in effect at the end of the trip. 1= Standard rate 2=JFK 3=Newark 4=Nassau or Westchester 5=Negotiated fare 6=Group ride'),
+              PULocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was engaged'),
+              DOLocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was disengaged'),
+              passenger_count INT64 OPTIONS (description = 'The number of passengers in the vehicle. This is a driver-entered value.'),
+              trip_distance NUMERIC OPTIONS (description = 'The elapsed trip distance in miles reported by the taximeter.'),
+              fare_amount NUMERIC OPTIONS (description = 'The time-and-distance fare calculated by the meter'),
+              extra NUMERIC OPTIONS (description = 'Miscellaneous extras and surcharges. Currently, this only includes the $0.50 and $1 rush hour and overnight charges'),
+              mta_tax NUMERIC OPTIONS (description = '$0.50 MTA tax that is automatically triggered based on the metered rate in use'),
+              tip_amount NUMERIC OPTIONS (description = 'Tip amount. This field is automatically populated for credit card tips. Cash tips are not included.'),
+              tolls_amount NUMERIC OPTIONS (description = 'Total amount of all tolls paid in trip.'),
+              ehail_fee NUMERIC,
+              improvement_surcharge NUMERIC OPTIONS (description = '$0.30 improvement surcharge assessed on hailed trips at the flag drop. The improvement surcharge began being levied in 2015.'),
+              total_amount NUMERIC OPTIONS (description = 'The total amount charged to passengers. Does not include cash tips.'),
+              payment_type INTEGER OPTIONS (description = 'A numeric code signifying how the passenger paid for the trip. 1= Credit card 2= Cash 3= No charge 4= Dispute 5= Unknown 6= Voided trip'),
+              trip_type STRING OPTIONS (description = 'A code indicating whether the trip was a street-hail or a dispatch that is automatically assigned based on the metered rate in use but can be altered by the driver. 1= Street-hail 2= Dispatch'),
+              congestion_surcharge NUMERIC OPTIONS (description = 'Congestion surcharge applied to trips in congested zones')
+          )
+          PARTITION BY DATE(lpep_pickup_datetime);
+
+      - id: bq_green_table_ext
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE OR REPLACE EXTERNAL TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`
+          (
+              VendorID STRING OPTIONS (description = 'A code indicating the LPEP provider that provided the record. 1= Creative Mobile Technologies, LLC; 2= VeriFone Inc.'),
+              lpep_pickup_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was engaged'),
+              lpep_dropoff_datetime TIMESTAMP OPTIONS (description = 'The date and time when the meter was disengaged'),
+              store_and_fwd_flag STRING OPTIONS (description = 'This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, aka "store and forward," because the vehicle did not have a connection to the server. Y= store and forward trip N= not a store and forward trip'),
+              RatecodeID STRING OPTIONS (description = 'The final rate code in effect at the end of the trip. 1= Standard rate 2=JFK 3=Newark 4=Nassau or Westchester 5=Negotiated fare 6=Group ride'),
+              PULocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was engaged'),
+              DOLocationID STRING OPTIONS (description = 'TLC Taxi Zone in which the taximeter was disengaged'),
+              passenger_count INT64 OPTIONS (description = 'The number of passengers in the vehicle. This is a driver-entered value.'),
+              trip_distance NUMERIC OPTIONS (description = 'The elapsed trip distance in miles reported by the taximeter.'),
+              fare_amount NUMERIC OPTIONS (description = 'The time-and-distance fare calculated by the meter'),
+              extra NUMERIC OPTIONS (description = 'Miscellaneous extras and surcharges. Currently, this only includes the $0.50 and $1 rush hour and overnight charges'),
+              mta_tax NUMERIC OPTIONS (description = '$0.50 MTA tax that is automatically triggered based on the metered rate in use'),
+              tip_amount NUMERIC OPTIONS (description = 'Tip amount. This field is automatically populated for credit card tips. Cash tips are not included.'),
+              tolls_amount NUMERIC OPTIONS (description = 'Total amount of all tolls paid in trip.'),
+              ehail_fee NUMERIC,
+              improvement_surcharge NUMERIC OPTIONS (description = '$0.30 improvement surcharge assessed on hailed trips at the flag drop. The improvement surcharge began being levied in 2015.'),
+              total_amount NUMERIC OPTIONS (description = 'The total amount charged to passengers. Does not include cash tips.'),
+              payment_type INTEGER OPTIONS (description = 'A numeric code signifying how the passenger paid for the trip. 1= Credit card 2= Cash 3= No charge 4= Dispute 5= Unknown 6= Voided trip'),
+              trip_type STRING OPTIONS (description = 'A code indicating whether the trip was a street-hail or a dispatch that is automatically assigned based on the metered rate in use but can be altered by the driver. 1= Street-hail 2= Dispatch'),
+              congestion_surcharge NUMERIC OPTIONS (description = 'Congestion surcharge applied to trips in congested zones')
+          )
+          OPTIONS (
+              format = 'CSV',
+              uris = ['{{render(vars.gcs_file)}}'],
+              skip_leading_rows = 1,
+              ignore_unknown_values = TRUE
+          );
+
+      - id: bq_green_table_tmp
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          CREATE OR REPLACE TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}`
+          AS
+          SELECT
+            MD5(CONCAT(
+              COALESCE(CAST(VendorID AS STRING), ""),
+              COALESCE(CAST(lpep_pickup_datetime AS STRING), ""),
+              COALESCE(CAST(lpep_dropoff_datetime AS STRING), ""),
+              COALESCE(CAST(PULocationID AS STRING), ""),
+              COALESCE(CAST(DOLocationID AS STRING), "")
+            )) AS unique_row_id,
+            "{{render(vars.file)}}" AS filename,
+            *
+          FROM `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`;
+
+      - id: bq_green_merge
+        type: io.kestra.plugin.gcp.bigquery.Query
+        sql: |
+          MERGE INTO `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.green_tripdata` T
+          USING `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}` S
+          ON T.unique_row_id = S.unique_row_id
+          WHEN NOT MATCHED THEN
+            INSERT (unique_row_id, filename, VendorID, lpep_pickup_datetime, lpep_dropoff_datetime, store_and_fwd_flag, RatecodeID, PULocationID, DOLocationID, passenger_count, trip_distance, fare_amount, extra, mta_tax, tip_amount, tolls_amount, ehail_fee, improvement_surcharge, total_amount, payment_type, trip_type, congestion_surcharge)
+            VALUES (S.unique_row_id, S.filename, S.VendorID, S.lpep_pickup_datetime, S.lpep_dropoff_datetime, S.store_and_fwd_flag, S.RatecodeID, S.PULocationID, S.DOLocationID, S.passenger_count, S.trip_distance, S.fare_amount, S.extra, S.mta_tax, S.tip_amount, S.tolls_amount, S.ehail_fee, S.improvement_surcharge, S.total_amount, S.payment_type, S.trip_type, S.congestion_surcharge);
+
+  - id: purge_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
+    description: To avoid cluttering your storage, we will remove the downloaded files
+
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{secret('GCP_CREDS')}}"
+      projectId: "{{kv('GCP_PROJECT_ID')}}"
+      location: "{{kv('GCP_LOCATION')}}"
+      bucket: "{{kv('GCP_BUCKET_NAME')}}"
+
+triggers:
+  - id: green_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 9 1 * *"
+    inputs:
+      taxi: green
+
+  - id: yellow_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 10 1 * *"
+    inputs:
+      taxi: yellow</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(5,document.querySelectorAll('.nav-item')[5])">← Section 6</button>
+        <button class="nav-btn primary" onclick="showModule(7,document.querySelectorAll('.nav-item')[7])">Section 8 (PASS 3) →</button>
+      </div>
+    </div>
+    <div class="module" id="m7">
+      <div class="module-header"><div class="module-tag">PASS 3 Placeholder</div><div class="module-title">Section 8 sẽ inject ở PASS 3</div><div class="module-subtitle">GCS + BigQuery ELT flow.</div></div>
+    </div>
+    <div class="module" id="m8">
+      <div class="module-header"><div class="module-tag">PASS 3 Placeholder</div><div class="module-title">Section 9 sẽ inject ở PASS 3</div><div class="module-subtitle">AI Copilot + RAG workflow.</div></div>
+    </div>
+    <div class="module" id="m9">
+      <div class="module-header"><div class="module-tag">PASS 3 Placeholder</div><div class="module-title">Section 10 sẽ inject ở PASS 3</div><div class="module-subtitle">Checklist, DoD, interview mapping.</div></div>
+    </div>
+
+    <!-- PASS 2: Sections 5-7 sẽ được inject vào đây -->
+    <!-- PASS 3: Sections 8-10 sẽ được inject vào đây -->
+
+  </main>
+</div>
+
+<script>
+const modules  = document.querySelectorAll('.module');
+const navItems = document.querySelectorAll('.nav-item');
+
+function showModule(idx, el) {
+  modules.forEach(m => m.classList.remove('active'));
+  navItems.forEach(n => n.classList.remove('active'));
+  modules[idx].classList.add('active');
+  if (el) el.classList.add('active');
+  else if (navItems[idx]) navItems[idx].classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goNext(idx) {
+  const nextIdx = Math.min(idx + 1, modules.length - 1);
+  showModule(nextIdx, navItems[nextIdx]);
+}
+
+function goPrev(idx) {
+  const prevIdx = Math.max(idx - 1, 0);
+  showModule(prevIdx, navItems[prevIdx]);
+}
+
+function toggleSection(header) {
+  const content = header.nextElementSibling;
+  const toggle  = header.querySelector('.section-toggle');
+  const isHidden = content.style.display === 'none';
+  content.style.display = isHidden ? 'block' : 'none';
+  toggle.textContent = isHidden ? '▼' : '▶';
+}
+
+function answerQuiz(el, correct, explanation) {
+  const item   = el.closest('.quiz-item');
+  const opts   = item.querySelectorAll('.quiz-opt');
+  const explain = item.querySelector('.quiz-explain');
+  opts.forEach(o => o.style.pointerEvents = 'none');
+  el.classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) {
+    opts.forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes('true'))
+        o.classList.add('correct');
+    });
+  }
+  explain.textContent = (correct ? '✓ Chính xác! ' : '✗ Sai. ') + explanation;
+  explain.classList.add('show');
+}
+
+function toggleSolution(btn) {
+  const box  = btn.nextElementSibling;
+  const show = box.classList.toggle('show');
+  btn.textContent = show ? '🔼 Ẩn lời giải' : '💡 Xem lời giải';
+}
+
+function switchTab(groupId, tabId) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  group.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const clicked = group.querySelector(`[onclick*="${tabId}"]`);
+  if (clicked) clicked.classList.add('active');
+  group.parentElement.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  const target = document.getElementById(tabId);
+  if (target) target.classList.add('active');
+}
+
+function toggleCheck(box) {
+  box.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress() {
+  const allChecks = document.querySelectorAll('.check-box');
+  if (!allChecks.length) return;
+  const checked = document.querySelectorAll('.check-box.checked').length;
+  const percent = Math.round((checked / allChecks.length) * 100);
+  const bar = document.querySelector('.progress-fill');
+  if (bar) bar.style.width = `${percent}%`;
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.cmd-block').querySelector('pre');
+  if (!pre) return;
+  const rawText = pre.innerText;
+  navigator.clipboard.writeText(rawText).then(() => {
+    const old = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = old, 1200);
+  });
+}
+
+function escapeHtml(value) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function highlightYaml(text) {
+  let s = escapeHtml(text);
+  s = s.replace(/^(\s*[-\w\"']+)(\s*:)/gm, '<span class="yaml-key">$1</span><span class="yaml-punc">$2</span>');
+  s = s.replace(/\b(true|false|null)\b/g, '<span class="yaml-bool">$1</span>');
+  s = s.replace(/(["'])(.*?)(["'])/g, '<span class="yaml-str">$1$2$3</span>');
+  s = s.replace(/\b(\d+)\b/g, '<span class="yaml-num">$1</span>');
+  return s;
+}
+
+document.querySelectorAll('pre.yaml-code').forEach(pre => {
+  const raw = pre.textContent;
+  pre.innerHTML = highlightYaml(raw);
+});
+</script>
+</body>
+</html>

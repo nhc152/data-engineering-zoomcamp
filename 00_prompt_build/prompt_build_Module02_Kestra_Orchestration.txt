@@ -1,0 +1,418 @@
+Dựa trên nội dung Module 02, tôi chia theo logic tự nhiên nhất:
+
+---
+
+## PROMPT 1 — FOUNDATION (Setup + Kestra Concepts)
+
+
+Đọc các file sau trước khi làm bất cứ điều gì:
+- .claude/CLAUDE.md
+- .claude/OUTPUT_STANDARD.md
+- .claude/SOURCE_POLICY.md
+- master_de_roadmap.html (phần Module 02)
+- file_mau_tham_khao_can_nang_cap.html (lấy TOÀN BỘ CSS variables, font, component patterns)
+- data-engineering-zoomcamp/02-workflow-orchestration/ (đọc README + liệt kê toàn bộ files)
+
+Tạo file: .\00_nhc_learning\Module02_Kestra_Orchestration.html
+Đây là PASS 1/3 — chỉ build phần skeleton + Sections 1→4.
+
+════════════════════════════════════════════════
+PASS 1 — BUILD CÁC PHẦN SAU
+════════════════════════════════════════════════
+
+## HEADER
+- Tiêu đề: "Module 02 — Workflow Orchestration với Kestra"
+- Sub-title: "Kestra · PostgreSQL · GCS · BigQuery · ETL vs ELT"
+- Badge: Module 02/9 | tuần học từ roadmap
+- Progress bar: 2/9
+
+---
+
+## SECTION 1 — Tổng quan & Mục tiêu
+
+- Tại sao cần Workflow Orchestration? (so sánh cron thủ công vs orchestrator)
+- Kestra là gì? (định nghĩa, vị trí trong DE stack)
+- Mục tiêu cuối module: ETL Postgres local + ELT GCS/BigQuery
+- Stack: Kestra v1.1, Postgres 18, pgAdmin, GCS, BigQuery
+- Sơ đồ kiến trúc tổng quan (HTML/CSS diagram):
+  [GitHub CSV] → [Kestra Flow] → [Postgres local]   (Flows 04-05)
+  [GitHub CSV] → [Kestra Flow] → [GCS] → [BigQuery]  (Flows 08-09)
+
+---
+
+## SECTION 2 — Kestra Core Concepts
+
+Mỗi concept: giải thích + ví dụ YAML nhỏ (copyable code block).
+
+2.1 Namespace — nhóm flows theo project/team
+2.2 Flow structure — id, namespace, description, inputs, variables, tasks, triggers
+2.3 Task types phổ biến (bảng: Task type | Plugin | Dùng để làm gì):
+    - io.kestra.plugin.core.log.Log
+    - io.kestra.plugin.core.debug.Return
+    - io.kestra.plugin.core.flow.Sleep
+    - io.kestra.plugin.core.flow.If
+    - io.kestra.plugin.scripts.python.Script
+    - io.kestra.plugin.scripts.shell.Commands
+    - io.kestra.plugin.jdbc.postgresql.Queries
+    - io.kestra.plugin.jdbc.postgresql.CopyIn
+    - io.kestra.plugin.gcp.gcs.Upload
+    - io.kestra.plugin.gcp.bigquery.Query
+2.4 Inputs vs Variables — SELECT input, ARRAY input, template syntax
+    {{ inputs.name }} | {{ render(vars.file) }}
+2.5 Outputs & Dependencies — {{ outputs.task_id.value }}
+2.6 Triggers — Schedule (cron), Backfill, disabled: true
+2.7 pluginDefaults — set JDBC URL một lần cho tất cả Postgres tasks
+2.8 Concurrency & Labels — behavior: FAIL, limit: 2
+2.9 Secrets & KV Store — secret('KEY') vs kv('KEY')
+
+---
+
+## SECTION 3 — Local Stack Setup
+
+3.1 Kiến trúc 4 services (dependency diagram):
+    kestra_postgres → kestra → pgdatabase → pgadmin
+
+3.2 Full docker-compose.yml (copyable YAML block)
+    — lấy nguyên từ source, KHÔNG tự viết lại
+
+3.3 Cheatsheet Docker Compose (bảng 2 cột: Lệnh | Mục đích):
+    docker compose up -d
+    docker compose down
+    docker compose down -v
+    docker compose ps
+    docker compose logs kestra --tail=20
+    docker compose logs kestra --tail=30 -f
+    docker compose restart kestra
+    docker exec -it <container> bash
+
+3.4 Verify checklist:
+    □ Kestra UI: http://localhost:8080 (admin@kestra.io / Admin1234!)
+    □ pgAdmin: http://localhost:8085 (admin@admin.com / root)
+    □ Postgres: localhost:5432 (root/root, db: ny_taxi)
+    □ docker compose ps → tất cả services UP
+
+---
+
+## SECTION 4 — Flows 01–03: Concepts & Python
+
+Pattern mỗi flow: [Mục đích] → [Concepts học được] → [Full YAML copyable] → [Test steps]
+
+4.1 Flow 01 — Hello World
+    Concepts: inputs, variables, pluginDefaults, concurrency, disabled trigger
+    Lưu ý: render() vs không render(), log level ERROR
+    YAML: 01_hello_world.yaml (lấy từ source)
+    Test: Execute name="TestUser" → quan sát logs
+
+4.2 Flow 02 — Python Script
+    Concepts: taskRunner Docker, containerImage, dependencies, Kestra.outputs()
+    YAML: 02_python.yaml (lấy từ source)
+    Test: Execute → output downloads > 0
+
+4.3 Flow 03 — Mini ETL Pipeline
+    Concepts: multi-step pipeline, inputFiles/outputFiles, env vars, DuckDB
+    Pipeline diagram: [HTTP Download] → [Python Transform] → [DuckDB Query]
+    YAML: 03_getting_started_data_pipeline.yaml (lấy từ source)
+    Test: Execute columns_to_keep=["brand","price"] → xem avg_price by brand
+
+════════════════════════════════════════════════
+CONSTRAINTS PASS 1
+════════════════════════════════════════════════
+
+- CSS/JS/font: lấy 100% từ file_mau_tham_khao_can_nang_cap.html
+- YAML blocks: có copy button, syntax highlight
+- Diagram: HTML/CSS hoặc ASCII, không external image
+- File self-contained (inline CSS+JS), không CDN
+- KHÔNG tự sáng tác nội dung kỹ thuật
+- Cuối file chừa comment placeholder:
+  <!-- PASS 2: Sections 5-7 sẽ được inject vào đây -->
+  <!-- PASS 3: Sections 8-10 sẽ được inject vào đây -->
+- Sau khi xong: báo cáo số sections, số YAML blocks đã build
+
+
+---
+
+## PROMPT 2 — ETL/ELT CORE (Postgres + GCP)
+
+
+Đọc các file sau trước khi làm bất cứ điều gì:
+- .claude/CLAUDE.md
+- .claude/OUTPUT_STANDARD.md
+- .claude/SOURCE_POLICY.md
+- Module02_Kestra_Orchestration.html (file đang build, đọc để hiểu structure hiện tại)
+- data-engineering-zoomcamp/02-workflow-orchestration/ (đọc lại toàn bộ YAML flows 04-09)
+
+## PROMPT 2 — ETL/ELT CORE (Postgres + GCP)
+
+Đây là PASS 2/3 — inject Sections 5→7 vào placeholder của file hiện tại.
+
+════════════════════════════════════════════════
+PASS 2 — BUILD CÁC PHẦN SAU
+════════════════════════════════════════════════
+
+## SECTION 5 — Flows 04–05: ETL Postgres Taxi
+
+5.1 Kiến trúc ETL Postgres (diagram):
+    [GitHub .csv.gz]
+    → wget/gunzip → [Kestra Storage]
+    → CREATE TABLE IF NOT EXISTS (main + staging)
+    → TRUNCATE staging
+    → COPY IN to staging
+    → UPDATE (md5 unique_row_id + filename)
+    → MERGE staging → main (ON unique_row_id)
+
+5.2 Idempotency Pattern — giải thích tại sao staging + MERGE:
+    - md5() hash từ fields: VendorID, pickup_datetime, dropoff_datetime,
+      PULocationID, DOLocationID, fare_amount, trip_distance
+    - WHEN NOT MATCHED THEN INSERT → chạy lại không duplicate
+    - So sánh: INSERT trực tiếp (bad) vs MERGE (idempotent)
+
+5.3 Flow 04 — Manual ETL (giải thích từng task group):
+    Task 1: set_label → tag execution
+    Task 2: extract → wget + gunzip
+    Task 3: if_yellow_taxi → 6 sub-tasks
+    Task 4: if_green_taxi → 6 sub-tasks
+    Task 5: purge_files → dọn storage
+    Schema diff yellow vs green:
+      Yellow: tpep_pickup_datetime, tpep_dropoff_datetime
+      Green:  lpep_pickup_datetime, lpep_dropoff_datetime, ehail_fee, trip_type
+    Full YAML: 04_postgres_taxi.yaml (lấy từ source)
+    Test:
+      □ Execute yellow/2019/01 → public.yellow_tripdata tồn tại, rows > 0
+      □ Execute lại cùng input → row count KHÔNG thay đổi
+
+5.4 Flow 05 — Scheduled ETL + Backfill:
+    Khác Flow 04: không inputs, dùng trigger.date
+    Date formatting: trigger.date | date('yyyy-MM'), date('yyyy'), date('MM')
+    Backfill: start: "2019-01-01T09:00:00Z"
+    Full YAML: 05_postgres_taxi_scheduled.yaml (lấy từ source)
+    Hướng dẫn kích hoạt backfill từ Kestra UI (step by step)
+
+---
+
+## SECTION 6 — GCP Setup (Flows 06–07)
+
+6.1 Prerequisites checklist:
+    □ GCP project tạo xong
+    □ Service account: roles Storage Admin + BigQuery Admin
+    □ JSON key downloaded
+    □ Kestra UI → Settings → Secrets → GCP_CREDS = <JSON content>
+
+6.2 Flow 06 — Set KV Store:
+    Giải thích KV Store: persistent config, khác Secrets ở chỗ nào
+    Full YAML: 06_gcp_kv.yaml (chú thích <YOUR_PROJECT_ID>, <YOUR_BUCKET_NAME>)
+    → Execute ngay sau import
+
+6.3 Flow 07 — Create GCS Bucket + BQ Dataset:
+    ifExists: SKIP → tại sao quan trọng (idempotent setup)
+    Full YAML: 07_gcp_setup.yaml (lấy từ source)
+    → Execute, verify GCP Console
+
+---
+
+## SECTION 7 — Flows 08–09: ELT BigQuery
+
+7.1 So sánh ETL vs ELT (bảng):
+
+    | Tiêu chí        | ETL Postgres (F04)        | ELT BigQuery (F08)         |
+    |-----------------|---------------------------|----------------------------|
+    | Transform ở đâu | Kestra + Postgres SQL      | BigQuery SQL               |
+    | Staging         | Staging table trong DB     | External Table → Temp Table|
+    | Storage         | Postgres volume            | GCS + BigQuery             |
+    | Scale           | Medium (local)             | Large (cloud, petabyte)    |
+    | Cost            | Free (local)               | Pay per query              |
+    | Idempotency     | MERGE                      | MERGE                      |
+    | Partitioning    | Không                      | DATE(tpep_pickup_datetime) |
+
+7.2 ELT Pipeline Architecture (diagram):
+    [GitHub .csv.gz]
+    → wget/gunzip → [Kestra Storage]
+    → Upload → [GCS Bucket]
+    → CREATE EXTERNAL TABLE (đọc thẳng từ GCS, không copy data)
+    → CREATE TABLE AS SELECT (materialize + add unique_row_id)
+    → CREATE main table IF NOT EXISTS (PARTITIONED BY DATE)
+    → MERGE into main table
+
+7.3 External Table concept:
+    - BQ đọc thẳng từ GCS, không lưu data vào BQ storage
+    - Dùng để ingest nhanh → materialize sang native table
+
+7.4 Partitioning trong BigQuery:
+    - PARTITION BY DATE(tpep_pickup_datetime)
+    - Lợi ích: scan ít data hơn khi filter theo ngày → tiết kiệm cost
+
+7.5 Flow 08 — Manual ELT GCP (giải thích từng task):
+    Task 1: set_label
+    Task 2: extract → wget + gunzip
+    Task 3: upload_to_gcs
+    Task 4: if_yellow_taxi → 4 BQ tasks (ext → tmp → main → merge)
+    Task 5: if_green_taxi → 4 BQ tasks
+    Task 6: purge_files
+    Full YAML: 08_gcp_taxi.yaml (lấy từ source)
+    Test:
+      □ Execute yellow/2019/01 → GCS object exist
+      □ BQ table yellow_tripdata có data
+      □ Execute lại → row count KHÔNG thay đổi
+
+7.6 Flow 09 — Scheduled ELT GCP + Backfill:
+    Tương tự Flow 05 nhưng target GCS + BigQuery
+    Full YAML: 09_gcp_taxi_scheduled.yaml (lấy từ source)
+    Backfill: 2019-01 → 2020-12
+
+════════════════════════════════════════════════
+CONSTRAINTS PASS 2
+════════════════════════════════════════════════
+
+- Inject vào đúng placeholder <!-- PASS 2: Sections 5-7 -->
+- Giữ nguyên toàn bộ HTML/CSS/JS của Pass 1
+- YAML blocks: có copy button, syntax highlight
+- Diagram: HTML/CSS hoặc ASCII, không external image
+- KHÔNG tự sáng tác nội dung kỹ thuật — lấy từ source YAML files
+- Cuối file giữ nguyên placeholder:
+  <!-- PASS 3: Sections 8-10 sẽ được inject vào đây -->
+- Sau khi xong: báo cáo tổng số sections, YAML blocks toàn file
+
+
+---
+
+## PROMPT 3 — WRAP UP (Rebuild Guide + Quiz + Reference)
+
+
+Đọc các file sau trước khi làm bất cứ điều gì:
+- .claude/CLAUDE.md
+- .claude/OUTPUT_STANDARD.md
+- .claude/SOURCE_POLICY.md
+- Module02_Kestra_Orchestration.html (file đang build, đọc để hiểu structure hiện tại)
+
+## PROMPT 3 — WRAP UP (Rebuild Guide + Quiz + Reference)
+
+Đây là PASS 3/3 — inject Sections 8→10 vào placeholder, hoàn thiện file.
+
+════════════════════════════════════════════════
+PASS 3 — BUILD CÁC PHẦN SAU
+════════════════════════════════════════════════
+
+## SECTION 8 — Full Rebuild Guide
+
+8.1 Teardown:
+    docker compose down -v  (giải thích tại sao cần -v)
+    Verify: docker volume ls | grep -E "ny_taxi|kestra"
+            docker ps -a | grep -E "pgdatabase|pgadmin|kestra"
+
+8.2 Rebuild Local Stack:
+    docker compose up -d
+    docker compose logs kestra --tail=30 -f  (chờ healthy ~30-60s)
+
+8.3 Re-import Flows (bảng thứ tự đúng):
+    | Thứ tự | Flow | File | Action sau import |
+    |--------|------|------|-------------------|
+    | 1 | 01 | 01_hello_world.yaml | — |
+    | 2 | 02 | 02_python.yaml | — |
+    | 3 | 03 | 03_getting_started_data_pipeline.yaml | — |
+    | 4 | 04 | 04_postgres_taxi.yaml | — |
+    | 5 | 05 | 05_postgres_taxi_scheduled.yaml | — |
+    | 6 | 06 | 06_gcp_kv.yaml | Execute ngay |
+    | 7 | 07 | 07_gcp_setup.yaml | Execute ngay |
+    | 8 | 08 | 08_gcp_taxi.yaml | — |
+    | 9 | 09 | 09_gcp_taxi_scheduled.yaml | — |
+
+8.4 Re-set GCP Credentials:
+    Secrets: GCP_CREDS = <JSON>
+    KV Store verify sau Flow 06:
+      GCP_PROJECT_ID, GCP_LOCATION, GCP_BUCKET_NAME, GCP_DATASET
+
+8.5 GCP Reset (nếu cần xóa sạch):
+    bq rm -r -f <PROJECT>:zoomcamp
+    gsutil rm -r gs://<BUCKET>
+    → Re-run Flow 07 để tạo lại
+
+8.6 Smoke Test Checklist (interactive checkboxes):
+    □ Flow 01: Execute → logs OK
+    □ Flow 02: Execute → downloads > 0
+    □ Flow 03: Execute → avg_price by brand trả về kết quả
+    □ Flow 04: Execute yellow/2019/01 → rows > 0
+    □ Flow 04: Execute lại → row count KHÔNG đổi (idempotency)
+    □ Flow 07: Execute → GCS bucket + BQ dataset exist
+    □ Flow 08: Execute yellow/2019/01 → GCS + BQ có data
+    □ Flow 08: Execute lại → row count KHÔNG đổi (idempotency)
+
+---
+
+## SECTION 9 — Interactive Quiz (15 câu)
+
+Phân bổ:
+- 3 câu: Kestra concepts (namespace, task types, triggers)
+- 2 câu: Template syntax (render(), outputs., secret(), kv())
+- 2 câu: Docker Compose (commands, services)
+- 3 câu: ETL Postgres (staging table, MERGE, idempotency)
+- 2 câu: ELT BigQuery (external table, partitioning)
+- 2 câu: So sánh ETL vs ELT
+- 1 câu: Backfill concept
+
+Format:
+- A/B/C/D
+- Hiển thị đáp án + giải thích ngắn sau khi chọn
+- Score hiển thị cuối: X/15
+- Nút "Làm lại" để reset
+
+---
+
+## SECTION 10 — Quick Reference Card
+
+10.1 Bảng tổng hợp 9 flows:
+    | Flow | File | Loại | Target | Trigger |
+    |------|------|------|--------|---------|
+    | 01 | 01_hello_world.yaml | Concepts | — | Manual + Schedule |
+    | 02 | 02_python.yaml | Python | Docker | Manual |
+    | 03 | 03_getting_started_data_pipeline.yaml | Mini ETL | DuckDB | Manual |
+    | 04 | 04_postgres_taxi.yaml | ETL | Postgres | Manual |
+    | 05 | 05_postgres_taxi_scheduled.yaml | ETL | Postgres | Schedule + Backfill |
+    | 06 | 06_gcp_kv.yaml | Config | KV Store | Manual |
+    | 07 | 07_gcp_setup.yaml | Setup | GCS + BQ | Manual |
+    | 08 | 08_gcp_taxi.yaml | ELT | GCS + BQ | Manual |
+    | 09 | 09_gcp_taxi_scheduled.yaml | ELT | GCS + BQ | Schedule + Backfill |
+
+10.2 Ports & Credentials box:
+    Kestra UI  : http://localhost:8080 | admin@kestra.io / Admin1234!
+    pgAdmin    : http://localhost:8085 | admin@admin.com / root
+    Postgres   : localhost:5432        | root/root | db: ny_taxi
+
+10.3 Template Syntax Cheatsheet (bảng):
+    | Syntax | Dùng để |
+    |--------|---------|
+    | {{ inputs.name }} | Đọc input từ user |
+    | {{ render(vars.file) }} | Render variable có template bên trong |
+    | {{ outputs.task_id.value }} | Lấy output từ task trước |
+    | {{ outputs.extract.outputFiles['file.csv'] }} | Lấy file output |
+    | {{ secret('GCP_CREDS') }} | Đọc secret |
+    | {{ kv('GCP_PROJECT_ID') }} | Đọc KV Store |
+    | {{ trigger.date \| date('yyyy-MM') }} | Format trigger date |
+
+════════════════════════════════════════════════
+CONSTRAINTS PASS 3 + FINAL CHECKS
+════════════════════════════════════════════════
+
+- Inject vào đúng placeholder <!-- PASS 3: Sections 8-10 -->
+- Giữ nguyên toàn bộ HTML/CSS/JS của Pass 1 và Pass 2
+- Quiz: pure JavaScript, không external library, có nút Reset
+- Checkboxes Section 8.6: interactive (click để tick), lưu state bằng JS
+- Xóa toàn bộ comment placeholder sau khi inject xong
+- Kiểm tra sidebar navigation (nếu có) đã link đúng tất cả 10 sections
+- Self-contained: không có link external nào (CDN, image URL)
+
+FINAL REPORT sau khi hoàn thành:
+- Tổng số sections: X
+- Tổng số YAML code blocks: X
+- Tổng số câu quiz: X
+- File size ước tính: X KB
+- Confirm: tất cả copy buttons hoạt động / quiz hoạt động / checkboxes hoạt động
+
+
+---
+
+**Tóm tắt 3 prompts:**
+
+| Pass | Sections | Nội dung chính | Output |
+|------|----------|----------------|--------|
+| **P1** | 1–4 | Skeleton + Concepts + Docker + Flows 01-03 | File mới tạo |
+| **P2** | 5–7 | ETL Postgres + GCP Setup + ELT BigQuery | Inject vào P1 |
+| **P3** | 8–10 | Rebuild Guide + Quiz + Reference Card | File hoàn chỉnh |
