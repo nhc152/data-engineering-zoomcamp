@@ -8,14 +8,14 @@
 - .claude/OUTPUT_STANDARD.md
 - .claude/SOURCE_POLICY.md
 - master_de_roadmap.html (phần Module 01 và section 3-Level System)
-- file_mau_tham_khao_can_nang_cap.html (lấy TOÀN BỘ CSS variables, font, component patterns)
+- module_template.html (lấy TOÀN BỘ CSS variables, font, component patterns)
 - data-engineering-zoomcamp/01-docker-terraform/ (đọc README + liệt kê toàn bộ files)
 
 Tạo file mới: Module01_Docker_Terraform.html
 
 File phải có:
 - Toàn bộ HTML boilerplate: <!DOCTYPE>, <head>, CSS inline, fonts Google
-- Copy NGUYÊN XI CSS variables và styles từ file_mau_tham_khao_can_nang_cap.html
+- Copy NGUYÊN XI CSS variables và styles từ module_template.html
 - Hero banner: "Module 01 — Docker & Terraform", badges (Beginner→Senior, ~7 ngày, Infrastructure)
 - Sidebar với 9 nav items: S0 đến S8 (S0 active mặc định)
 - JavaScript: showModule(), toggleSection(), answerQuiz(), toggleSolution(), switchTab(), toggleCheck(), updateProgress()

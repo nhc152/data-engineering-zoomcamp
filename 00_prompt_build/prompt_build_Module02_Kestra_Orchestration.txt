@@ -10,7 +10,7 @@ Dựa trên nội dung Module 02, tôi chia theo logic tự nhiên nhất:
 - .claude/OUTPUT_STANDARD.md
 - .claude/SOURCE_POLICY.md
 - master_de_roadmap.html (phần Module 02)
-- file_mau_tham_khao_can_nang_cap.html (lấy TOÀN BỘ CSS variables, font, component patterns)
+- module_template.html (lấy TOÀN BỘ CSS variables, font, component patterns)
 - data-engineering-zoomcamp/02-workflow-orchestration/ (đọc README + liệt kê toàn bộ files)
 
 Tạo file: .\00_nhc_learning\Module02_Kestra_Orchestration.html
@@ -118,7 +118,7 @@ Pattern mỗi flow: [Mục đích] → [Concepts học được] → [Full YAML 
 CONSTRAINTS PASS 1
 ════════════════════════════════════════════════
 
-- CSS/JS/font: lấy 100% từ file_mau_tham_khao_can_nang_cap.html
+- CSS/JS/font: lấy 100% từ module_template.html
 - YAML blocks: có copy button, syntax highlight
 - Diagram: HTML/CSS hoặc ASCII, không external image
 - File self-contained (inline CSS+JS), không CDN

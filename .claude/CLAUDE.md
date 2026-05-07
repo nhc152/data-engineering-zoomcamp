@@ -31,11 +31,11 @@ DE-Learning/
 │   ├── 06-batch/
 │   └── 07-streaming/
 ├── master_de_roadmap.md       ← master reference, đọc đầu tiên
-├── file_mau_tham_khao_can_nang_cap.html ← UI/CSS/JS reference
-├── Module01_Docker_Terraform.html
-├── Module02_Orchestration.html
+├── module_template.html ← UI/CSS/JS reference
+├── 00_nhc_learning/Module01_Docker_Terraform.html
+├── 00_nhc_learning/Module02_Orchestration.html
 │   ...
-└── Module07_Streaming.html
+└── 00_nhc_learning/Module07_Streaming.html
 ```
 
 ---

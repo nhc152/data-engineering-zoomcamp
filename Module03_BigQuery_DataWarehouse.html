@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 03 — Data Warehouse & BigQuery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+    --accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;
+    --text:#e6edf3;--text-muted:#8b949e;--code-bg:#0d1117;--highlight:#388bfd26;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter','Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+  .hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 40%,#1a2a1e 100%);border-bottom:2px solid var(--accent4);padding:40px 24px 30px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#6e40c922,transparent 70%);pointer-events:none}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--accent4);letter-spacing:-0.5px}
+  .hero p{color:var(--text-muted);margin-top:8px;font-size:.95rem}
+  .badge-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;border:1px solid}
+  .badge-blue{color:var(--accent);border-color:var(--accent);background:#1f6feb1a}
+  .badge-green{color:var(--accent2);border-color:var(--accent2);background:#2ea04326}
+  .badge-orange{color:var(--accent5);border-color:var(--accent5);background:#d2940026}
+  .badge-purple{color:var(--accent4);border-color:var(--accent4);background:#6e40c926}
+  .container{display:flex;min-height:calc(100vh - 160px)}
+  .sidebar{width:290px;min-width:290px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:0 16px 12px}
+  .level-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 16px 4px;color:var(--accent4)}
+  .nav-item{display:block;padding:7px 16px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-left:3px solid transparent;transition:all .15s}
+  .nav-item:hover{color:var(--text);background:var(--surface2)}
+  .nav-item.active{color:var(--accent4);border-left-color:var(--accent4);background:#6e40c915;font-weight:600}
+  .nav-number{display:inline-block;width:44px;font-size:.7rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .main{flex:1;padding:32px 40px;max-width:980px}
+  .module{display:none}
+  .module.active{display:block}
+  .module-header{border:1px solid var(--border);border-radius:12px;padding:24px 28px;background:var(--surface);margin-bottom:24px;position:relative;overflow:hidden}
+  .module-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent4)}
+  .module-tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent4);margin-bottom:8px}
+  .module-title{font-size:1.6rem;font-weight:800;margin-bottom:8px}
+  .module-subtitle{color:var(--text-muted);font-size:.9rem}
+  .section{margin-bottom:28px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .section-header{padding:14px 20px;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--surface2);border-bottom:1px solid var(--border);user-select:none}
+  .section-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .icon-purpose{background:#1f6feb33}
+  .icon-detail{background:#2ea04326}
+  .icon-quiz{background:#d2940026}
+  .icon-summary{background:#6e40c926}
+  .icon-practice{background:#f7816626}
+  .section-content{padding:20px;background:var(--surface)}
+  .section-toggle{margin-left:auto;color:var(--text-muted);font-size:12px}
+  h3{font-size:1rem;font-weight:700;color:var(--accent4);margin:18px 0 10px}
+  h3:first-child{margin-top:0}
+  h3.blue{color:var(--accent)}
+  h3.green{color:var(--accent2)}
+  h3.orange{color:var(--accent5)}
+  h3.red{color:var(--accent3)}
+  p{margin-bottom:12px;color:var(--text);font-size:.88rem}
+  ul,ol{padding-left:20px;margin-bottom:12px}
+  li{font-size:.88rem;margin-bottom:5px}
+  strong{color:var(--text)}
+  .cmd-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .cmd-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .cmd-body{padding:14px}
+  pre{font-family:'JetBrains Mono','Courier New','Consolas',monospace;font-size:.82rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--text)}
+  .kw{color:#ff7b72}.kw2{color:var(--accent)}.str{color:var(--accent5)}.fn{color:var(--accent4)}.num{color:#79c0ff}.comment{color:var(--text-muted)}
+  .db-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.68rem;font-weight:700;letter-spacing:.5px;margin-bottom:6px}
+  .db-pg{background:#4169e122;color:#4d9de0;border:1px solid #4169e155}
+  .db-oracle{background:#cc000022;color:#f97316;border:1px solid #cc000055}
+  code{font-family:'JetBrains Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:.82rem;color:var(--accent4)}
+  .quiz-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
+  .quiz-q{font-weight:600;font-size:.88rem;margin-bottom:10px}
+  .quiz-q::before{content:'Q';display:inline-block;width:22px;height:22px;background:var(--accent4);color:#000;border-radius:50%;font-size:.7rem;font-weight:800;text-align:center;line-height:22px;margin-right:8px}
+  .quiz-options{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .quiz-opt{padding:8px 12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.84rem;transition:all .15s;background:var(--bg)}
+  .quiz-opt:hover{border-color:var(--accent4);color:var(--accent4)}
+  .quiz-opt.correct{border-color:var(--accent2);color:var(--accent2);background:#2ea04310}
+  .quiz-opt.wrong{border-color:var(--accent3);color:var(--accent3);background:#f7816610}
+  .quiz-explain{font-size:.82rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px;margin-top:8px;display:none}
+  .quiz-explain.show{display:block}
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .summary-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:.82rem}
+  .summary-item strong{color:var(--accent4);display:block;margin-bottom:4px}
+  .practice-task{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
+  .practice-task-header{padding:12px 16px;background:#6e40c915;border-bottom:1px solid var(--border);font-weight:700;font-size:.85rem;color:var(--accent4)}
+  .practice-task-body{padding:16px}
+  .solution-toggle{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:.8rem;cursor:pointer;color:var(--accent2);margin-top:10px;transition:all .15s}
+  .solution-toggle:hover{background:var(--surface2)}
+  .solution-box{margin-top:10px;display:none;border-top:1px solid var(--border);padding-top:12px}
+  .solution-box.show{display:block}
+  .info-box{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:.84rem;border:1px solid;display:flex;gap:10px}
+  .info-box.tip{border-color:var(--accent2);background:#2ea04310;color:var(--accent2)}
+  .info-box.warn{border-color:var(--accent5);background:#d2940015;color:var(--accent5)}
+  .info-box.note{border-color:var(--accent4);background:#6e40c915;color:var(--accent4)}
+  .info-box.danger{border-color:var(--accent3);background:#f7816610;color:var(--accent3)}
+  .info-box span{color:var(--text)}
+  .progress-bar{background:var(--surface2);border-radius:4px;height:4px;margin:16px 0;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent4),var(--accent2));border-radius:4px;width:0;transition:width .2s}
+  .nav-buttons{display:flex;gap:12px;margin-top:32px;justify-content:space-between}
+  .nav-btn{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:6px}
+  .nav-btn:hover{border-color:var(--accent4);color:var(--accent4)}
+  .nav-btn.primary{background:var(--accent4);color:#000;border-color:var(--accent4)}
+  .nav-btn.primary:hover{background:#e2c0ff}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.83rem}
+  th{background:var(--surface2);padding:8px 12px;text-align:left;border:1px solid var(--border);color:var(--accent4)}
+  td{padding:8px 12px;border:1px solid var(--border)}
+  tr:nth-child(even) td{background:#ffffff05}
+  .checklist{list-style:none;padding:0}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:.88rem;border-bottom:1px solid var(--border)}
+  .checklist li:last-child{border-bottom:none}
+  .checklist li::before{content:'□';color:var(--accent4);font-size:1.1rem;flex-shrink:0;margin-top:-1px}
+  .test-question{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px}
+  .test-question.correct{border-color:var(--accent2);background:#2ea04312}
+  .test-question.wrong{border-color:var(--accent3);background:#f7816612}
+  .test-question.unanswered{border-color:var(--accent5);background:#d2940015}
+  .test-question-title{font-size:.86rem;font-weight:600;margin-bottom:8px}
+  .test-options{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+  .test-option{display:flex;align-items:center;gap:6px;font-size:.83rem;color:var(--text)}
+  .test-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .test-result{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)}
+  .score-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .score-chip{border:1px solid var(--border);border-radius:14px;padding:4px 10px;font-size:.78rem;color:var(--text);background:var(--bg)}
+  .score-chip.good{border-color:var(--accent2);color:var(--accent2)}
+  .score-chip.warn{border-color:var(--accent5);color:var(--accent5)}
+  .score-chip.bad{border-color:var(--accent3);color:var(--accent3)}
+  .mistake-list{margin-top:8px;padding-left:18px}
+  .tab-group{display:flex;gap:0;margin-bottom:0;border-bottom:1px solid var(--border)}
+  .tab{padding:8px 18px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab.active{color:var(--accent4);border-bottom-color:var(--accent4);font-weight:600}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  .schema-box{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin:14px 0;overflow-x:auto}
+  .schema-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+  .schema-table{border:1px solid var(--border);border-radius:8px;min-width:160px;overflow:hidden}
+  .schema-table-header{padding:8px 12px;font-size:.75rem;font-weight:700;text-align:center}
+  .schema-table-header.fact{background:#1f6feb33;color:var(--accent)}
+  .schema-table-header.dim{background:#6e40c926;color:var(--accent4)}
+  .schema-col{padding:5px 12px;font-size:.73rem;border-top:1px solid var(--border);display:flex;gap:6px}
+  .schema-col .pk{color:var(--accent5);font-weight:700;font-size:.65rem}
+  .schema-col .fk{color:var(--accent3);font-weight:700;font-size:.65rem}
+  .schema-col .col{color:var(--text-muted)}
+  .schema-arrow{align-self:center;color:var(--text-muted);font-size:1.4rem;padding:0 2px}
+  .mental-model{border-left:4px solid var(--accent);background:#1f6feb1a;padding:12px 14px;border-radius:6px;margin:12px 0;font-size:.88rem}
+  .checklist-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .check-box{width:16px;height:16px;border:1px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:.25rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  .check-box.checked{background:var(--accent2);border-color:var(--accent2)}
+  .check-box.checked::after{content:'✓';font-size:10px;color:#000;font-weight:600}
+  .progress-text{font-size:.8rem;color:var(--text-muted);margin-bottom:8px}
+  @media(max-width:768px){.sidebar{display:none}.main{padding:16px}.summary-grid{grid-template-columns:1fr}.test-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Module 03 — Data Warehouse & BigQuery</h1>
+  <p>Xây nền tảng OLAP từ source files đến analytics và ML bằng tư duy cost/performance của production DE.</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">Beginner → Senior</span>
+    <span class="badge badge-green">~7 ngày</span>
+    <span class="badge badge-blue">Data Warehouse</span>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="sidebar-title">Module Navigation</div>
+    <div class="level-label">MODULE 03 · BIGQUERY & DWH</div>
+    <div class="nav-item active" onclick="showModule(0,this)"><span class="nav-number">S0</span>Tổng quan & Mục tiêu</div>
+    <div class="nav-item" onclick="showModule(1,this)"><span class="nav-number">S1</span>Lý thuyết nền</div>
+    <div class="nav-item" onclick="showModule(2,this)"><span class="nav-number">S2</span>Đọc hiểu code repo</div>
+    <div class="nav-item" onclick="showModule(3,this)"><span class="nav-number">S3</span>Thực hành từng bước</div>
+    <div class="nav-item" onclick="showModule(4,this)"><span class="nav-number">S4</span>Production Thinking</div>
+    <div class="nav-item" onclick="showModule(5,this)"><span class="nav-number">S5</span>Kiến thức nâng cao</div>
+    <div class="nav-item" onclick="showModule(6,this)"><span class="nav-number">S6</span>Lỗi thường gặp</div>
+    <div class="nav-item" onclick="showModule(7,this)"><span class="nav-number">S7</span>Interview Prep</div>
+    <div class="nav-item" onclick="showModule(8,this)"><span class="nav-number">S8</span>Checklist & Tổng kết</div>
+  </nav>
+
+  <main class="main">
+
+    <div class="module active" id="s0">
+      <div class="module-header">
+        <div class="module-tag">S0 · Orientation</div>
+        <div class="module-title">Tổng quan & Mục tiêu Module 03</div>
+        <div class="module-subtitle">WHY trước HOW: tách workload analytics khỏi OLTP để production app không bị chậm vì query phân tích nặng.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🧭</span>
+          Roadmap 9 sections của module
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Section</th><th>Tên section</th><th>Thời gian ước tính</th></tr></thead>
+            <tbody>
+              <tr><td>S0</td><td>Tổng quan & Mục tiêu</td><td>30–45 phút</td></tr>
+              <tr><td>S1</td><td>Lý thuyết nền</td><td>2–3 giờ</td></tr>
+              <tr><td>S2</td><td>Đọc hiểu code repo</td><td>2 giờ</td></tr>
+              <tr><td>S3</td><td>Thực hành từng bước</td><td>2–3 ngày</td></tr>
+              <tr><td>S4</td><td>Production Thinking</td><td>2 giờ</td></tr>
+              <tr><td>S5</td><td>Kiến thức nâng cao</td><td>2 giờ</td></tr>
+              <tr><td>S6</td><td>Lỗi thường gặp</td><td>1.5 giờ</td></tr>
+              <tr><td>S7</td><td>Interview Prep</td><td>2 giờ</td></tr>
+              <tr><td>S8</td><td>Checklist & Tổng kết</td><td>45–60 phút</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">🎯</span>
+          Data Warehouse giải quyết vấn đề gì trong thực tế?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Vấn đề gốc: analytics query làm nghẽn OLTP</h3>
+          <p>Trong hệ thống transactional, app cần phản hồi nhanh cho user (insert/update đơn lẻ, latency thấp). Khi team BI chạy query scan nhiều tháng dữ liệu ngay trên OLTP DB, CPU/IO bị tranh chấp, lock tăng, dashboard có thể xong nhưng production app thì chậm hoặc timeout.</p>
+          <div class="info-box danger">🔥 <span><strong>Nguy hiểm:</strong> "Tiện tay query luôn DB production" là anti-pattern kinh điển; hệ quả là user-facing workload trả giá cho nhu cầu analytics.</span></div>
+
+          <h3 class="green">Tại sao phải tách DW khỏi OLTP?</h3>
+          <ul>
+            <li><strong>Workload isolation:</strong> OLTP tối ưu cho write nhỏ, OLAP tối ưu cho scan lớn.</li>
+            <li><strong>Schema strategy khác nhau:</strong> OLTP thường normalized để tránh anomaly; DW thường denormalized/star để đọc nhanh.</li>
+            <li><strong>Cost control:</strong> với BigQuery, bạn theo dõi bytes scanned theo query thay vì nuôi cluster cố định.</li>
+          </ul>
+          <div class="info-box tip">💡 <span><strong>Tip:</strong> Mục tiêu của DW không chỉ "lưu nhiều", mà là tách đúng loại bài toán để từng hệ thống làm đúng việc của nó.</span></div>
+
+          <h3 class="orange">Trước BigQuery, người ta làm gì?</h3>
+          <p>Nhiều team dùng on-prem Hadoop/Hive hoặc tự quản cluster DWH (kể cả Redshift đời đầu). Bài toán lớn không phải chỉ SQL, mà là vận hành cluster: sizing, capacity planning, tuning storage/compute, backup, nâng cấp version, xử lý node fail. BigQuery giảm tải phần vận hành đó bằng mô hình serverless.</p>
+          <div class="info-box warn">⚠️ <span><strong>Cảnh báo:</strong> Serverless không có nghĩa là "không cần design"; nếu query kém hoặc partition sai, chi phí vẫn đội rất nhanh.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🔁</span>
+          Data flow diagram (ASCII)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3>Flow 1 — Analytics + BQML + Serving</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>module03_flow_dw.txt</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">Source Files (GCS)</span>
+    │
+    ▼
+<span class="kw2">External Table</span>
+    │
+    ▼
+<span class="kw2">Native Table (Partitioned + Clustered)</span>
+    │
+    ├──► <span class="kw2">Analytics Queries</span>
+    └──► <span class="kw2">BQML</span>
+              │
+              ▼
+         <span class="kw2">Model Serving</span></pre>
+            </div>
+          </div>
+
+          <h3>Flow 2 — Script ingest trong repo</h3>
+          <p>Repo có script <code>03-data-warehouse/extras/web_to_gcs.py</code> download taxi data, convert sang parquet và upload GCS trước khi load/query bằng BigQuery.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>module03_flow_ingest.txt</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">Python Script (web_to_gcs.py)</span>
+    │
+    ▼
+<span class="kw2">GCS Bucket</span>
+    │
+    ▼
+<span class="kw2">BigQuery</span>
+    │
+    ▼
+<span class="kw2">Dashboard</span></pre>
+            </div>
+          </div>
+          <div class="info-box note">📌 <span><strong>Lưu ý:</strong> `big_query.sql` đi theo pattern rõ ràng: External table → non-partitioned/native table → partitioned table → partition+cluster table để benchmark bytes scan.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">✅</span>
+          Exit criteria: "Bạn đã nắm module này khi..."
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li>Bạn giải thích rõ được vì sao analytics query trên OLTP DB có thể làm chậm production.</li>
+            <li>Bạn mô tả được trade-off giữa External Table và Native Table trong BigQuery.</li>
+            <li>Bạn đọc được và giải thích được benchmark trong <code>big_query.sql</code> (1.6GB → ~106MB và 1.1GB → 864.5MB).</li>
+            <li>Bạn chọn được partition key và cluster key hợp lý cho use case thực tế.</li>
+            <li>Bạn ước tính được chi phí query cơ bản với on-demand và biết khi nào cần Reservations.</li>
+            <li>Bạn trình bày được flow từ ingest script đến analytics/BQML và serving ở mức system-thinking.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s1">
+      <div class="module-header">
+        <div class="module-tag">S1 · Foundation Theory</div>
+        <div class="module-title">Lý thuyết nền — Data Warehouse & BigQuery (3-Level)</div>
+        <div class="module-subtitle">Đừng học syntax rời rạc: hiểu cơ chế lưu trữ, execution, cost model trước thì mới optimize đúng trong production.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🏗️</span>
+          Data Warehouse Fundamentals (Beginner → Senior)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Beginner — OLTP vs OLAP</h3>
+          <table>
+            <thead>
+              <tr><th>Khía cạnh</th><th>OLTP</th><th>OLAP / Data Warehouse</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Mục đích</td><td>Xử lý transaction hằng ngày (create order, payment, update profile)</td><td>Phân tích, tổng hợp, reporting, ML feature extraction</td></tr>
+              <tr><td>Query pattern</td><td>Nhiều query nhỏ, point lookup, latency mili-giây</td><td>Ít query hơn nhưng scan lớn, join/aggregate nặng</td></tr>
+              <tr><td>Index strategy</td><td>Dùng index để lookup nhanh từng row</td><td>Ưu tiên partition/clustering, giảm scan bytes thay vì index dày đặc</td></tr>
+              <tr><td>Normalization</td><td>Thường chuẩn hóa cao (3NF) để đảm bảo tính nhất quán write</td><td>Thường denormalized/star schema để đọc nhanh và dễ phân tích</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="green">Beginner — Data Warehouse vs Data Lake vs Data Lakehouse</h3>
+          <ul>
+            <li><strong>Data Warehouse:</strong> Dữ liệu đã có schema, tối ưu SQL analytics, governance rõ. Dùng khi KPI/dashboard là trọng tâm.</li>
+            <li><strong>Data Lake:</strong> Lưu raw data đa định dạng (CSV/JSON/Parquet/Avro). Dùng khi cần lưu trữ linh hoạt, khám phá dữ liệu, data science.</li>
+            <li><strong>Lakehouse:</strong> Kết hợp linh hoạt lake + quản trị/ACID gần warehouse. Dùng khi muốn một nền tảng cho cả BI lẫn ML với volume rất lớn.</li>
+          </ul>
+          <div class="info-box note">📌 <span><strong>Lưu ý:</strong> Chọn kiến trúc theo workload và team maturity, không theo trend tool.</span></div>
+
+          <h3 class="orange">Intermediate — Column-oriented storage: vì sao BigQuery không row-store?</h3>
+          <p>Phân tích dữ liệu thường chỉ chạm vài cột nhưng trên rất nhiều dòng. Row-store buộc đọc cả row (nhiều cột không cần), còn columnar chỉ đọc cột cần thiết nên giảm I/O mạnh. Đó là lý do BigQuery tối ưu tốt cho <code>SELECT colA, SUM(colB) ...</code> trên hàng tỷ rows.</p>
+          <div class="info-box tip">💡 <span><strong>Tip:</strong> Với BigQuery, số cột bạn chọn ảnh hưởng trực tiếp bytes scanned; tránh <code>SELECT *</code> trừ khi đang khám phá data ban đầu.</span></div>
+
+          <h3 class="orange">Intermediate — External Table vs Native Table</h3>
+          <table>
+            <thead><tr><th>Tiêu chí</th><th>External Table</th><th>Native Table</th></tr></thead>
+            <tbody>
+              <tr><td>Storage</td><td>Dữ liệu nằm ở GCS, BQ chỉ tham chiếu</td><td>Dữ liệu được nạp vào BigQuery storage</td></tr>
+              <tr><td>Cost</td><td>Không tốn storage BQ cho bản copy</td><td>Tốn storage BQ nhưng query ổn định hơn</td></tr>
+              <tr><td>Performance</td><td>Thường chậm hơn, ít tối ưu hơn</td><td>Tối ưu tốt hơn, hỗ trợ partition/cluster mạnh</td></tr>
+              <tr><td>Use case</td><td>Khám phá nhanh, staging, tránh duplicate data tạm thời</td><td>Analytics thường xuyên, dashboard, dữ liệu được curate</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="red">Senior — BigQuery storage internals & execution</h3>
+          <ul>
+            <li><strong>Capacitor format:</strong> engine cột nén cao, tối ưu scan theo column chunk.</li>
+            <li><strong>Execution tree / stages:</strong> query được chia nhiều stage, mỗi stage xử lý song song rồi shuffle/aggregate theo execution plan.</li>
+            <li><strong>Slot management:</strong> slot là đơn vị compute; query cạnh tranh slot nên thiết kế workload và lịch chạy ảnh hưởng latency/cost rõ rệt.</li>
+          </ul>
+          <div class="info-box danger">🔥 <span><strong>Nguy hiểm:</strong> Tuning SQL mà bỏ qua execution stages và slot contention thường dẫn tới tối ưu "ảo" (một query nhanh hơn nhưng cả hệ thống chậm hơn).</span></div>
+
+          <h3 class="red">Senior — On-demand vs Reservations pricing</h3>
+          <table>
+            <thead><tr><th>Mô hình</th><th>Khi nào phù hợp</th><th>Trade-off cost</th></tr></thead>
+            <tbody>
+              <tr><td>On-demand</td><td>Workload dao động, team nhỏ, khó dự báo</td><td>Trả theo bytes scanned; dễ bắt đầu nhưng có thể tăng sốc nếu query kém</td></tr>
+              <tr><td>Reservations (slot commitments)</td><td>Workload ổn định, khối lượng lớn, cần predictability</td><td>Chi phí compute ổn định hơn nhưng cần capacity planning</td></tr>
+            </tbody>
+          </table>
+          <p>Cách nghĩ nhanh: estimate <strong>TB scanned/ngày × ngày/tháng × đơn giá</strong> cho on-demand; nếu số này cao và ổn định, thử mô phỏng slot-based reservation để tìm điểm hòa vốn.</p>
+
+          <div class="mental-model">💡 <strong>Mental model:</strong> BigQuery = serverless data warehouse, trả tiền theo bytes scanned không phải theo cluster.</div>
+
+          <h3 class="purple">So sánh thực tế: BigQuery vs Snowflake vs Redshift vs Databricks</h3>
+          <table>
+            <thead><tr><th>Nền tảng</th><th>Điểm mạnh</th><th>Khi cần cân nhắc</th></tr></thead>
+            <tbody>
+              <tr><td>BigQuery</td><td>Serverless, SQL mạnh, tích hợp GCP/BQML sâu</td><td>Cost có thể tăng nhanh nếu governance query kém</td></tr>
+              <tr><td>Snowflake</td><td>Compute/storage tách tốt, multi-cloud, UX analytics tốt</td><td>Chi phí compute theo warehouse dễ cao khi nhiều team chạy song song</td></tr>
+              <tr><td>Redshift</td><td>Mạnh trong hệ AWS, kiểm soát cluster chi tiết</td><td>Cần vận hành/sizing nhiều hơn, tuning nặng hơn serverless</td></tr>
+              <tr><td>Databricks</td><td>Lakehouse + Spark mạnh cho data engineering/ML end-to-end</td><td>Đòi hỏi năng lực platform cao hơn, không phải team nào cũng cần ngay</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧩</span>
+          Partitioning & Clustering (Beginner → Senior)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Beginner — Partition là gì?</h3>
+          <p>Partition = chia table thành các "ngăn" theo một key (thường là ngày). Analogy: tủ hồ sơ chia theo năm/tháng; khi cần hồ sơ tháng 06/2019, bạn mở đúng ngăn đó thay vì lục toàn bộ tủ.</p>
+
+          <h3 class="green">Beginner — Clustering là gì?</h3>
+          <p>Clustering = sắp xếp dữ liệu trong từng partition theo một hoặc vài cột. Analogy: trong ngăn hồ sơ tháng 06, bạn sắp theo alphabet/vendor để tìm nhanh hơn.</p>
+
+          <h3 class="orange">Intermediate — Partition types: DATE / RANGE / INGESTION_TIME</h3>
+          <ul>
+            <li><strong>DATE/TIMESTAMP partition:</strong> dùng khi query luôn lọc theo event date/business date.</li>
+            <li><strong>RANGE partition:</strong> dùng khi cột số có miền rõ (id range, score range).</li>
+            <li><strong>INGESTION_TIME partition:</strong> dùng khi chưa có event time sạch hoặc cần tracking thời điểm dữ liệu vào hệ thống.</li>
+          </ul>
+          <div class="info-box warn">⚠️ <span><strong>Cảnh báo:</strong> Chọn sai partition key sẽ khiến query phải scan nhiều partition, mất gần hết lợi ích thiết kế.</span></div>
+
+          <h3 class="orange">Intermediate — Chọn clustering key theo cardinality thế nào?</h3>
+          <p>Thực tế nên ưu tiên cột có <strong>cardinality vừa đến cao</strong> và thường xuất hiện trong filter/join (ví dụ <code>VendorID</code> hoặc location IDs tùy workload). Cardinality quá thấp thường ít giúp prune; cardinality cực cao nhưng ít được filter cũng không hiệu quả.</p>
+
+          <h3 class="red">Senior — Partition pruning mechanics</h3>
+          <p>Pruning chỉ hiệu quả khi predicate "sargable" với partition column. Với table partition theo <code>DATE(tpep_pickup_datetime)</code>, nên filter trực tiếp khoảng ngày:</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>partition_pruning.sql</span></div>
+            <div class="cmd-body">
+<pre><span class="comment">-- good: filter trực tiếp trên date range</span>
+<span class="kw">WHERE</span> DATE(tpep_pickup_datetime) <span class="kw">BETWEEN</span> <span class="str">'2019-06-01'</span> <span class="kw">AND</span> <span class="str">'2019-06-30'</span></pre>
+            </div>
+          </div>
+          <p>Tránh wrapping hàm phức tạp làm optimizer khó prune. Kiểm tra bytes processed để xác nhận pruning thực sự xảy ra.</p>
+
+          <h3 class="red">Senior — Combined partition + cluster: thứ tự tác động</h3>
+          <ul>
+            <li><strong>Partition</strong> giảm phạm vi dữ liệu theo thời gian trước (macro pruning).</li>
+            <li><strong>Cluster</strong> tiếp tục giảm scan trong partition khi filter theo cluster key (micro pruning).</li>
+          </ul>
+          <p>Từ benchmark trong repo <code>big_query.sql</code>:</p>
+          <ul>
+            <li>Non-partitioned query: scan khoảng <strong>1.6GB</strong>.</li>
+            <li>Partitioned query: scan khoảng <strong>~106MB</strong> cho cùng time window.</li>
+            <li>Partitioned (không cluster) vs partitioned+clustered cho query có <code>VendorID</code>: <strong>1.1GB</strong> vs <strong>864.5MB</strong>.</li>
+          </ul>
+          <div class="mental-model">💡 <strong>Mental model:</strong> Partition cắt theo thời gian, Cluster sắp xếp trong partition theo dimension key.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🧪</span>
+          Quiz scenario-based — Data Warehouse fundamentals (6 câu)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item">
+            <div class="quiz-q">Team BI chạy query tổng hợp 12 tháng trực tiếp trên PostgreSQL production, app bắt đầu timeout. Quyết định đúng nhất?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Đây là dấu hiệu phải tách OLAP workload sang DWH để tránh tranh chấp tài nguyên với OLTP.')">A. Tách analytics sang DWH và chỉ sync dữ liệu cần phân tích</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Tăng CPU có thể giảm đau tạm thời nhưng không giải quyết conflict bản chất giữa workload OLTP và OLAP.')">B. Chỉ nâng cấu hình OLTP DB thêm CPU/RAM</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Cache giúp read pattern lặp lại, không cứu được query scan lớn ad-hoc.')">C. Dùng cache cho toàn bộ query analytics</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Scale app server không xử lý bottleneck ở database analytics query.')">D. Scale horizontal app service</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn cần explore nhanh file mới trên GCS trước khi chốt schema chính thức. Bắt đầu bằng gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Native table phù hợp khi đã ổn định schema và cần hiệu năng tốt hơn.')">A. Load thẳng native table partition+cluster ngay</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. External table cho phép khám phá nhanh không cần ingest đầy đủ trước.')">B. Dùng external table để profiling và validate trước</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Xuống local để query không cần thiết và khó scale khi data lớn.')">C. Download toàn bộ về local rồi query bằng pandas</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Stream vào OLTP không phải mục tiêu của workload analytics.')">D. Ghi vào OLTP DB rồi BI query tại đó</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Query dashboard luôn chỉ cần 5 cột trên table 200 cột. Thói quen nào nên bắt buộc?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Columnar engine hưởng lợi lớn khi chỉ đọc cột cần thiết, giảm bytes scanned.')">A. Chỉ select đúng cột cần dùng</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. SELECT * đốt scan bytes vô ích, chi phí cao hơn.')">B. Giữ SELECT * cho tiện phát triển</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. LIMIT không thay đổi lượng dữ liệu phải scan trước khi trả kết quả.')">C. Dùng LIMIT 100 để giảm cost</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Index không phải đòn bẩy chính trong BigQuery như OLTP.')">D. Tạo index cho mọi cột filter</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Workload analytics ổn định 24/7, nhiều team query liên tục mỗi ngày với volume lớn. Mô hình chi phí nào đáng đánh giá nghiêm túc?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. On-demand tiện ban đầu nhưng có thể kém predictability với workload ổn định rất lớn.')">A. Chỉ on-demand mãi mãi</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Reservations giúp dự báo compute cost tốt hơn khi workload ổn định và lớn.')">B. Reservations/slot commitments</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Xóa partition không phải chiến lược pricing cho workload ổn định.')">C. Giảm chi phí bằng cách bỏ partition</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Export mọi thứ sang local làm mất ưu thế managed warehouse.')">D. Export toàn bộ data ra local để query</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Manager hỏi: "Sao query này hôm qua nhanh, hôm nay chậm?" Bạn xem gì trước ở mức senior?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Chỉ nhìn kết quả cuối không đủ để tìm bottleneck hệ thống.')">A. Chỉ nhìn kết quả trả về của query</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Cần xem execution stages, bytes processed, slot contention để tìm root cause.')">B. Execution stages + bytes scanned + slot usage</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Restart công cụ không giải quyết root cause query/performance.')">C. Chạy lại query nhiều lần rồi so thời gian</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Tăng timeout chỉ che triệu chứng.')">D. Tăng timeout dashboard</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn đang thiết kế luồng học từ repo: external table → native table → BQML. Lý do sequence này hợp lý nhất là gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Đây là tiến trình tự nhiên: khám phá dữ liệu, tối ưu bảng analytics, rồi mới huấn luyện/predict.')">A. Đi từ khám phá dữ liệu đến tối ưu query rồi mới ML</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. ML trước khi ổn định quality/schema thường tạo model yếu và khó tái lập.')">B. Train model ngay trên raw file chưa chuẩn hóa</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Bỏ native table làm mất lợi thế partition/cluster cho analytics thường xuyên.')">C. Chỉ giữ external table cho toàn bộ vòng đời</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. DWH không thay thế hoàn toàn orchestration; chúng giải quyết phần khác nhau.')">D. Không cần orchestration hay quality checks nữa</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🧪</span>
+          Quiz scenario-based — Partitioning & Clustering (6 câu)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item">
+            <div class="quiz-q">Query tháng 06/2019 trên table taxi: thiết kế nào đem lợi ích lớn nhất trước tiên?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Partition theo ngày pickup giúp prune mạnh theo time window.')">A. Partition theo DATE(tpep_pickup_datetime)</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Chỉ clustering mà không partition vẫn có thể scan phạm vi thời gian quá rộng.')">B. Chỉ cluster theo VendorID</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Không chia partition sẽ scan lớn hơn nhiều (như benchmark 1.6GB).')">C. Giữ non-partitioned table</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Partition theo passenger_count không ăn khớp pattern query theo thời gian.')">D. Partition theo passenger_count</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn có query filter theo <code>VendorID</code> lặp lại liên tục sau khi đã partition theo date. Nên làm gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. LIMIT không giảm scan nền tảng cho aggregate/count queries.')">A. Thêm LIMIT vào mọi query</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Cluster theo VendorID giúp prune tốt hơn trong từng partition.')">B. Cluster thêm theo VendorID</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Chuyển về external table thường làm query analytics chậm hơn.')">C. Quay lại external table để tiết kiệm storage</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Cardinality thấp không tự động là "sai"; quan trọng là query pattern.')">D. Tránh mọi cột cardinality thấp dù được filter thường xuyên</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Predicate nào thân thiện nhất với partition pruning cho table partition theo DATE(pickup_ts)?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Filter date range trực tiếp giúp optimizer prune partition rõ ràng.')">A. WHERE DATE(pickup_ts) BETWEEN '2020-01-01' AND '2020-01-31'</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Dạng function phức tạp có thể làm pruning kém hoặc không ổn định.')">B. WHERE FORMAT_TIMESTAMP('%Y-%m', pickup_ts)='2020-01'</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Không có điều kiện thời gian thì hầu như phải quét nhiều partition.')">C. WHERE vendor_id = 1</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. ORDER BY không liên quan pruning.')">D. ORDER BY pickup_ts DESC</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Khi nào nên dùng ingestion-time partition thay vì event-date partition?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Khi event time không đáng tin hoặc chưa có, ingestion-time giúp quản trị dữ liệu nạp vào.')">A. Khi event timestamp thiếu/không tin cậy ở giai đoạn đầu</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Có event date rõ thì partition theo business/event date thường hợp query hơn.')">B. Khi query business luôn theo event date chính xác</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Ingestion-time không thay thế cho clustering theo dimension.')">C. Khi cần filter nhiều theo dimension key</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Ingestion-time không phải công cụ chính để tăng tốc join.')">D. Khi join nhiều fact tables</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Theo benchmark trong repo, cải thiện lớn nhất là từ bước nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Non-partitioned 1.6GB xuống partitioned ~106MB là cú giảm mạnh nhất.')">A. Từ non-partitioned sang partitioned</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Cluster có cải thiện nhưng nhỏ hơn bước partition theo benchmark.')">B. Từ partitioned sang partitioned+clustered</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. External table không phải điểm benchmark hiệu năng tốt nhất cho analytics lặp lại.')">C. Từ external sang non-partitioned</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Không có benchmark cho việc bỏ partition vì đó là hướng ngược.')">D. Bỏ partition để giảm overhead metadata</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn được yêu cầu giảm bill BigQuery nhanh trong tuần này, không đổi business logic. Ưu tiên hành động nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Rà soát query để thêm filter partition + giảm cột select là đòn bẩy cost nhanh nhất.')">A. Enforce filter partition và bỏ SELECT *</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Chỉ mua thêm slot không sửa query kém sẽ không tối ưu bill hiệu quả.')">B. Mua thêm reservations ngay lập tức</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Tăng retention không trực tiếp giảm bytes scanned per query.')">C. Tăng retention dữ liệu</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Export ra hệ khác có thể tăng phức tạp mà chưa chắc giảm cost tức thì.')">D. Export tất cả dữ liệu ra hệ ngoài</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s2" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S2 · Code Reading</div>
+        <div class="module-title">Đọc hiểu code trong repo 03-data-warehouse</div>
+        <div class="module-subtitle">Đọc theo flow dữ liệu thực tế: ingest → GCS → external/native tables → partition/cluster → BQML → model extract.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">📁</span>
+          Cấu trúc thư mục module 03-data-warehouse
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>tree 03-data-warehouse/</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">03-data-warehouse/</span>
+├── <span class="str">README.md</span>                              <span class="comment"># entry doc + links videos/slides/homework</span>
+├── <span class="str">big_query.sql</span>                         <span class="comment"># core demo: external → native → partition/cluster benchmark</span>
+├── <span class="str">big_query_hw.sql</span>                      <span class="comment"># homework script (FHV dataset) + partition/cluster comparison</span>
+├── <span class="str">big_query_ml.sql</span>                      <span class="comment"># BQML end-to-end (feature table, train, evaluate, predict, explain)</span>
+├── <span class="str">extract_model.md</span>                      <span class="comment"># export trained model + serve via TensorFlow Serving</span>
+└── <span class="kw2">extras/</span>
+    ├── <span class="str">README.md</span>                          <span class="comment"># quick run notes for ingestion scripts</span>
+    ├── <span class="str">.env-example</span>                      <span class="comment"># required env vars for GCS bucket + credentials</span>
+    ├── <span class="str">pyproject.toml</span>                    <span class="comment"># Python deps + runtime constraints</span>
+    ├── <span class="str">web_to_gcs.py</span>                     <span class="comment"># baseline ingest script (download→parquet→upload)</span>
+    └── <span class="str">web_to_gcs_with_progress_bar.py</span>   <span class="comment"># enhanced script (progress bars + skip logic + safer HTTP)</span></pre>
+            </div>
+          </div>
+          <div class="info-box note">📌 <span><strong>Định vị nhanh:</strong> `big_query*.sql` là phần học BigQuery SQL; `extras/*.py` là data ingestion pre-step để có files trên GCS.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧭</span>
+          Code tabs: SQL / Python / Config
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2-code-tabs">
+            <div class="tab active" onclick="switchTab('s2-code-tabs','s2-tab-sql')">SQL</div>
+            <div class="tab" onclick="switchTab('s2-code-tabs','s2-tab-python')">Python</div>
+            <div class="tab" onclick="switchTab('s2-code-tabs','s2-tab-config')">Config</div>
+          </div>
+
+          <div class="tab-content active" id="s2-tab-sql">
+            <h3 class="blue">big_query.sql — demo lõi của module</h3>
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>big_query.sql (excerpt)</span></div>
+              <div class="cmd-body">
+<pre><span class="kw">CREATE OR REPLACE EXTERNAL TABLE</span> `taxi-rides-ny.nytaxi.external_yellow_tripdata`
+<span class="kw">OPTIONS</span> (
+  format = <span class="str">'CSV'</span>,
+  uris = [
+    <span class="str">'gs://nyc-tl-data/trip data/yellow_tripdata_2019-*.csv'</span>,
+    <span class="str">'gs://nyc-tl-data/trip data/yellow_tripdata_2020-*.csv'</span>
+  ]
+);
+
+<span class="kw">CREATE OR REPLACE TABLE</span> taxi-rides-ny.nytaxi.yellow_tripdata_non_partitioned <span class="kw">AS</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> taxi-rides-ny.nytaxi.external_yellow_tripdata;
+
+<span class="kw">CREATE OR REPLACE TABLE</span> taxi-rides-ny.nytaxi.yellow_tripdata_partitioned
+<span class="kw">PARTITION BY</span> DATE(tpep_pickup_datetime) <span class="kw">AS</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> taxi-rides-ny.nytaxi.external_yellow_tripdata;
+
+<span class="comment">-- non-partitioned scan: ~1.6GB</span>
+<span class="kw">SELECT DISTINCT</span>(VendorID)
+<span class="kw">FROM</span> taxi-rides-ny.nytaxi.yellow_tripdata_non_partitioned
+<span class="kw">WHERE</span> DATE(tpep_pickup_datetime) <span class="kw">BETWEEN</span> <span class="str">'2019-06-01'</span> <span class="kw">AND</span> <span class="str">'2019-06-30'</span>;
+
+<span class="comment">-- partitioned scan: ~106MB</span>
+<span class="kw">SELECT DISTINCT</span>(VendorID)
+<span class="kw">FROM</span> taxi-rides-ny.nytaxi.yellow_tripdata_partitioned
+<span class="kw">WHERE</span> DATE(tpep_pickup_datetime) <span class="kw">BETWEEN</span> <span class="str">'2019-06-01'</span> <span class="kw">AND</span> <span class="str">'2019-06-30'</span>;</pre>
+              </div>
+            </div>
+            <ul>
+              <li><strong>Wildcard GCS URI (`*_2019-*.csv`):</strong> gom nhiều files theo tháng vào một external table, không cần khai báo từng file.</li>
+              <li><strong>Input → output:</strong> external table đọc trực tiếp object trên GCS; `CREATE TABLE AS SELECT` materialize thành native table trong BigQuery storage.</li>
+              <li><strong>Khi nào scan data:</strong> external table scan file GCS lúc query; native table scan dữ liệu đã lưu nội bộ BQ khi query.</li>
+              <li><strong>Vì sao materialize trước partition/cluster:</strong> tách rõ bước ingest và bước tối ưu schema/query; sau đó mới apply partition/cluster để benchmark kiểm soát.</li>
+              <li><strong>Hiệu năng thực tế từ code:</strong> query cùng điều kiện ngày giảm từ khoảng <strong>1.6GB</strong> xuống <strong>~106MB</strong> nhờ partition pruning.</li>
+            </ul>
+            <div class="info-box warn">⚠️ <span><strong>Lưu ý tên file:</strong> prompt homework thường nhắc FHV wildcard (`fhv_tripdata_2019-*.csv`) vì dùng trong `big_query_hw.sql`; còn `big_query.sql` gốc dùng wildcard cho <code>yellow_tripdata</code>.</span></div>
+
+            <h3 class="green">big_query_hw.sql — homework có chủ đích tối ưu scan</h3>
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>big_query_hw.sql (excerpt)</span></div>
+              <div class="cmd-body">
+<pre><span class="kw">CREATE OR REPLACE EXTERNAL TABLE</span> `taxi-rides-ny.nytaxi.fhv_tripdata`
+<span class="kw">OPTIONS</span> (
+  format = <span class="str">'CSV'</span>,
+  uris = [<span class="str">'gs://nyc-tl-data/trip data/fhv_tripdata_2019-*.csv'</span>]
+);
+
+<span class="kw">CREATE OR REPLACE TABLE</span> `taxi-rides-ny.nytaxi.fhv_partitioned_tripdata`
+<span class="kw">PARTITION BY</span> DATE(dropoff_datetime)
+<span class="kw">CLUSTER BY</span> dispatching_base_num <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> * <span class="kw">FROM</span> `taxi-rides-ny.nytaxi.fhv_tripdata`
+);
+
+<span class="kw">SELECT</span> count(*) <span class="kw">FROM</span> `taxi-rides-ny.nytaxi.fhv_nonpartitioned_tripdata`
+<span class="kw">WHERE</span> DATE(dropoff_datetime) <span class="kw">BETWEEN</span> <span class="str">'2019-01-01'</span> <span class="kw">AND</span> <span class="str">'2019-03-31'</span>
+  <span class="kw">AND</span> dispatching_base_num <span class="kw">IN</span> (<span class="str">'B00987'</span>, <span class="str">'B02279'</span>, <span class="str">'B02060'</span>);</pre>
+              </div>
+            </div>
+            <ul>
+              <li><strong>Đây là file homework:</strong> cấu trúc query tập trung vào so sánh scan và kiểm chứng partition+cluster trên dữ liệu FHV.</li>
+              <li><strong>INFORMATION_SCHEMA.PARTITIONS dùng để làm gì:</strong> kiểm tra partition_id, số rows theo partition, phát hiện skew và validate partition strategy sau khi load.</li>
+              <li><strong>Vì sao cluster giảm ít hơn partition:</strong> partition cắt phạm vi dữ liệu theo thời gian ở mức macro; cluster chỉ tối ưu thêm bên trong các partition đã được chọn.</li>
+            </ul>
+            <div class="info-box tip">💡 <span><strong>Mechanics:</strong> nếu filter chính là date range, lợi ích lớn nhất đến từ partition pruning; cluster phát huy thêm khi filter lặp lại theo key như <code>dispatching_base_num</code>.</span></div>
+
+            <h3 class="orange">big_query_ml.sql — flow BQML end-to-end</h3>
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>big_query_ml.sql (excerpt)</span></div>
+              <div class="cmd-body">
+<pre><span class="kw">CREATE OR REPLACE TABLE</span> `taxi-rides-ny.nytaxi.yellow_tripdata_ml` (...) <span class="kw">AS</span>
+<span class="kw">SELECT</span> passenger_count, trip_distance,
+       <span class="kw">CAST</span>(PULocationID <span class="kw">AS</span> STRING),
+       <span class="kw">CAST</span>(DOLocationID <span class="kw">AS</span> STRING),
+       <span class="kw">CAST</span>(payment_type <span class="kw">AS</span> STRING),
+       fare_amount, tolls_amount, tip_amount
+<span class="kw">FROM</span> `taxi-rides-ny.nytaxi.yellow_tripdata_partitioned`
+<span class="kw">WHERE</span> fare_amount != 0;
+
+<span class="kw">CREATE OR REPLACE MODEL</span> `taxi-rides-ny.nytaxi.tip_model`
+<span class="kw">OPTIONS</span>(model_type=<span class="str">'linear_reg'</span>, input_label_cols=[<span class="str">'tip_amount'</span>]) <span class="kw">AS</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> `taxi-rides-ny.nytaxi.yellow_tripdata_ml` <span class="kw">WHERE</span> tip_amount <span class="kw">IS NOT NULL</span>;
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> ML.EVALUATE(MODEL `taxi-rides-ny.nytaxi.tip_model`, (...));
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> ML.PREDICT(MODEL `taxi-rides-ny.nytaxi.tip_model`, (...));
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> ML.EXPLAIN_PREDICT(MODEL `taxi-rides-ny.nytaxi.tip_model`, (...), STRUCT(3 as top_k_features));</pre>
+              </div>
+            </div>
+            <ul>
+              <li><strong>Flow chuẩn:</strong> feature table → create model → evaluate → predict → explain predict → tune hyperparameters.</li>
+              <li><strong>Vì sao cast LocationID sang STRING:</strong> ID vị trí là categorical, không mang thứ tự tuyến tính; cast giúp BQML xử lý đúng kiểu category thay vì numeric scale.</li>
+              <li><strong>`linear_reg` phù hợp khi:</strong> cần baseline regression dễ giải thích; không phù hợp quan hệ phi tuyến quá mạnh nếu không có feature engineering thêm.</li>
+              <li><strong>`ML.EXPLAIN_PREDICT`:</strong> trả về độ đóng góp feature cho từng prediction, hữu ích để debug model behavior và giải thích cho stakeholder.</li>
+              <li><strong>Hyperparameter tuning:</strong> `num_trials` = số lần thử; `max_parallel_trials` = số trial chạy song song; `l1_reg`/`l2_reg` = regularization chống overfitting.</li>
+            </ul>
+          </div>
+
+          <div class="tab-content" id="s2-tab-python">
+            <h3 class="blue">web_to_gcs.py — baseline ingest script</h3>
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>web_to_gcs.py (excerpt)</span></div>
+              <div class="cmd-body">
+<pre><span class="kw">request_url</span> = <span class="str">f"{init_url}{service}/{file_name}"</span>
+r = requests.get(request_url)
+open(file_name, <span class="str">"wb"</span>).write(r.content)
+
+df = pd.read_csv(file_name, dtype=dtypes, parse_dates=parse_dates, compression=<span class="str">"gzip"</span>)
+file_name = file_name.replace(<span class="str">".csv.gz"</span>, <span class="str">".parquet"</span>)
+df.to_parquet(file_name, engine=<span class="str">"pyarrow"</span>)
+upload_to_gcs(BUCKET, f<span class="str">"{service}/{file_name}"</span>, file_name)</pre>
+              </div>
+            </div>
+            <p><strong>Data flow:</strong> Source URL → download CSV.GZ → parse dtype/date → convert Parquet → upload lên GCS.</p>
+            <div class="info-box note">📌 <span><strong>Vì sao Parquet:</strong> columnar + compression tốt hơn CSV, scan nhanh hơn và giảm bytes processed trong BigQuery.</span></div>
+
+            <h3 class="green">web_to_gcs_with_progress_bar.py — bản tăng cường production-minded</h3>
+            <ul>
+              <li>Có <code>raise_for_status()</code> để fail sớm khi HTTP error.</li>
+              <li>Có progress bar cho download/convert/upload.</li>
+              <li>Có skip logic nếu object đã tồn tại trên GCS hoặc file đã có local.</li>
+              <li>Dùng chunk-based conversion sang parquet để giảm memory pressure trên file lớn.</li>
+            </ul>
+
+            <h3 class="red">Điểm yếu của web_to_gcs.py (baseline)</h3>
+            <ul>
+              <li>Không gọi <code>raise_for_status()</code> nên có thể ghi HTML/error body thành "data file".</li>
+              <li>Không có checksum hoặc data quality check sau convert/upload.</li>
+              <li>Không có retry policy có chủ đích và thiếu structured logging.</li>
+              <li>Năm/service đang hard-coded ở cuối script, chưa linh hoạt theo tham số runtime.</li>
+            </ul>
+          </div>
+
+          <div class="tab-content" id="s2-tab-config">
+            <h3 class="blue">.env-example và dependency config</h3>
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>.env-example</span></div>
+              <div class="cmd-body">
+<pre>GCP_GCS_BUCKET=<span class="str">"your_bucket_name"</span>
+GOOGLE_APPLICATION_CREDENTIALS=<span class="str">Path/to/key/GCP_service_account_key.json</span></pre>
+              </div>
+            </div>
+            <ul>
+              <li><strong>GCP_GCS_BUCKET:</strong> bucket đích để upload parquet files.</li>
+              <li><strong>GOOGLE_APPLICATION_CREDENTIALS:</strong> đường dẫn service-account JSON key để Python client auth vào GCP.</li>
+            </ul>
+
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>pyproject.toml</span></div>
+              <div class="cmd-body">
+<pre>requires-python = <span class="str">">=3.14"</span>
+dependencies = [
+  <span class="str">"google-cloud-storage>=3.8.0"</span>,
+  <span class="str">"pandas>=3.0.0"</span>,
+  <span class="str">"pyarrow>=23.0.0"</span>,
+  <span class="str">"python-dotenv>=1.2.1"</span>,
+  <span class="str">"requests>=2.32.5"</span>,
+  <span class="str">"tqdm>=4.67.1"</span>
+]</pre>
+              </div>
+            </div>
+            <p>Dependencies phản ánh đúng flow ingest: download HTTP, parse dataframe, ghi parquet, upload GCS, hiển thị progress.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔁</span>
+          Data flow tổng hợp + thứ tự chạy đúng
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>module03_s2_flow.txt</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">web_to_gcs.py / web_to_gcs_with_progress_bar.py</span>
+    │
+    ▼
+<span class="kw2">GCS Bucket (parquet/csv files)</span>
+    │
+    ▼
+<span class="kw2">BigQuery External Table</span>
+    │
+    ▼
+<span class="kw2">BigQuery Native Table</span> (partition + cluster)
+    │
+    ├──► <span class="kw2">Analytics SQL</span>
+    └──► <span class="kw2">BQML</span> (CREATE MODEL / EVALUATE / PREDICT)
+                │
+                ▼
+         <span class="kw2">extract_model.md flow</span> (export + serving)</pre>
+            </div>
+          </div>
+          <ol>
+            <li>Chạy script ingest để có dữ liệu trên GCS.</li>
+            <li>Tạo external/native/partitioned tables bằng `big_query.sql` hoặc `big_query_hw.sql` theo thứ tự.</li>
+            <li>Chỉ chạy `big_query_ml.sql` sau khi table `yellow_tripdata_partitioned` đã tồn tại.</li>
+            <li>Chỉ chạy steps trong `extract_model.md` sau khi model `nytaxi.tip_model` train thành công.</li>
+          </ol>
+          <div class="info-box danger">🔥 <span><strong>Dependency quan trọng:</strong> nếu bỏ qua thứ tự này, ML/extract steps sẽ fail do thiếu upstream table/model.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🧪</span>
+          Quiz S2 — Code & Data Flow (6 câu)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item">
+            <div class="quiz-q">Vì sao `CREATE EXTERNAL TABLE` thường dùng wildcard URI (ví dụ `*_2019-*.csv`)?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Wildcard giúp gom nhiều file theo pattern mà không cần list từng object.')">A. Gom nhiều file theo pattern để query như một bảng logic</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Wildcard không làm file nhỏ đi.')">B. Tự động nén file trên GCS</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Wildcard không tự tạo partition native.')">C. Tự tạo partition trong BigQuery native storage</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Không liên quan quyền IAM.')">D. Tự cấp quyền đọc bucket</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Lợi ích lớn nhất trong benchmark đến từ partition hay cluster?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Partition pruning thường mang cú giảm scan lớn nhất khi filter theo thời gian.')">A. Partition</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Cluster thường là tối ưu bổ sung sau partition.')">B. Cluster</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. External table không phải bước tối ưu scan chính cho workload lặp lại.')">C. External table</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Chỉ đổi tên table không ảnh hưởng performance.')">D. Rename table</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Trong `big_query_ml.sql`, vì sao cast `PULocationID`/`DOLocationID` sang STRING?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Đây là categorical IDs, cast string để model không hiểu nhầm thành numeric ordering.')">A. Để BQML coi là category thay vì số có thứ tự</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Cast này không nhằm tiết kiệm storage.')">B. Để giảm kích thước bảng</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Không liên quan quyền truy cập.')">C. Để tránh lỗi IAM</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Parse datetime không phụ thuộc cast location ID.')">D. Để parse datetime nhanh hơn</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">`ML.EXPLAIN_PREDICT` có giá trị thực tế nào trong production?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Nó cho thấy feature contribution trên từng prediction để debug/giải thích model.')">A. Giải thích prediction theo từng feature contribution</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Nó không thay thế training.')">B. Tự retrain model mỗi lần query</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Nó không cấp quyền bảo mật.')">C. Tự động mã hóa dữ liệu nhạy cảm</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Không xuất model qua endpoint trực tiếp.')">D. Tự deploy model lên TensorFlow Serving</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Khác biệt quan trọng của `web_to_gcs_with_progress_bar.py` so với `web_to_gcs.py` là gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Bản enhanced có raise_for_status, progress bar, skip checks và conversion theo chunk.')">A. Có safety/progress/skip logic đầy đủ hơn</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Cả hai đều tải từ cùng source URL pattern.')">B. Dùng nguồn dữ liệu hoàn toàn khác</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Cả hai script đều upload GCS.')">C. Không upload lên GCS</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Cả hai đều convert parquet.')">D. Chỉ giữ nguyên CSV, không convert</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Dependency nào bắt buộc đúng trước khi chạy `extract_model.md`?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Cần model đã train (`nytaxi.tip_model`) để extract/export.')">A. Model `nytaxi.tip_model` đã train thành công</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Chỉ có external table chưa đủ để extract model.')">B. Chỉ cần external table tạo xong</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Clone repo không đảm bảo có model trong BQ.')">C. Chỉ cần clone repo</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai. Dashboard không phải upstream dependency của model extract.')">D. Chỉ cần dashboard chạy được</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s3" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S3 · Hands-On Practice</div>
+        <div class="module-title">Thực hành từng bước với BigQuery Data Warehouse</div>
+        <div class="module-subtitle">Đi đúng thứ tự để tránh lỗi dependency: Setup → Ingest → SQL tables → BQML → Debug scenarios.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🛠️</span>
+          Phần 1 — Setup môi trường
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Prerequisites bắt buộc</h3>
+          <ul>
+            <li>1 GCP account còn hoạt động, có quyền tạo BigQuery dataset + GCS bucket.</li>
+            <li>Project ID rõ ràng (ví dụ <code>my-de-project-123</code>).</li>
+            <li>Service account JSON key có quyền tối thiểu cho Storage và BigQuery.</li>
+          </ul>
+
+          <h3 class="green">Commands setup (copy-paste được)</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>setup_env.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># 1) verify gcloud cài đúng</span>
+<span class="kw">gcloud --version</span>
+
+<span class="comment"># 2) đăng nhập ADC cho local scripts (quan trọng cho google-cloud-storage client)</span>
+<span class="kw">gcloud auth application-default login</span>
+
+<span class="comment"># 3) clone repo và vào đúng module</span>
+<span class="kw">git clone</span> <span class="str">https://github.com/DataTalksClub/data-engineering-zoomcamp.git</span>
+<span class="kw">cd</span> data-engineering-zoomcamp/03-data-warehouse/extras
+
+<span class="comment"># 4) tạo .env từ template</span>
+<span class="kw">cp</span> .env-example .env
+
+<span class="comment"># 5) cài dependencies</span>
+<span class="kw">uv sync</span></pre>
+            </div>
+          </div>
+
+          <h3 class="orange">Điền .env như thế nào?</h3>
+          <ul>
+            <li><code>GCP_GCS_BUCKET</code>: tên bucket đích upload parquet, ví dụ <code>de-zoomcamp-raw-2026</code>.</li>
+            <li><code>GOOGLE_APPLICATION_CREDENTIALS</code>: đường dẫn tuyệt đối đến JSON key (hoặc bỏ qua nếu dùng ADC đầy đủ).</li>
+          </ul>
+          <div class="info-box tip">💡 <span><strong>Vì sao uv thay vì pip:</strong> `uv sync` đọc lock/deps nhanh, tái lập môi trường ổn định hơn cho team và CI.</span></div>
+
+          <h3 class="red">Bạn biết setup đúng khi thấy...</h3>
+          <ul>
+            <li><code>gcloud auth application-default print-access-token</code> trả về access token.</li>
+            <li><code>uv sync</code> hoàn tất không lỗi dependency.</li>
+            <li>Chạy Python import thử được <code>google.cloud.storage</code>, <code>pandas</code>, <code>pyarrow</code>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🐍</span>
+          Phần 2 — Chạy Python ingestion scripts
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Chạy script có progress bar (khuyên dùng)</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>run_ingestion.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw">cd</span> data-engineering-zoomcamp/03-data-warehouse/extras
+<span class="kw">uv run python</span> web_to_gcs_with_progress_bar.py</pre>
+            </div>
+          </div>
+          <p>Output mong đợi: thấy progress cho từng tháng (download/convert/upload), và log kiểu <code>Uploaded to GCS: gs://.../green_tripdata_2019-01.parquet</code>.</p>
+
+          <h3 class="green">Verify upload thành công trên GCS</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>verify_gcs.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw">gsutil ls</span> <span class="str">gs://$GCP_GCS_BUCKET/green/</span>
+<span class="kw">gsutil ls -l</span> <span class="str">gs://$GCP_GCS_BUCKET/green/*.parquet</span></pre>
+            </div>
+          </div>
+
+          <h3 class="orange">Khi nào dùng web_to_gcs.py bản baseline?</h3>
+          <ul>
+            <li>Chạy nhanh trong lab nhỏ, internet ổn định, không cần progress chi tiết.</li>
+            <li>Không phù hợp khi file lớn hoặc cần resume/skip logic an toàn.</li>
+          </ul>
+          <div class="info-box warn">⚠️ <span><strong>Production reality:</strong> ưu tiên `web_to_gcs_with_progress_bar.py` vì có `raise_for_status()` và skip checks.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧮</span>
+          Phần 3 — Chạy SQL trong BigQuery Console
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Thứ tự chạy đúng</h3>
+          <ol>
+            <li>Mở BigQuery Console, chọn đúng project ID.</li>
+            <li>Chạy `big_query.sql` theo block từ trên xuống (external → native → partitioned → clustered → benchmark).</li>
+            <li>Chạy `big_query_ml.sql` sau khi `yellow_tripdata_partitioned` đã có dữ liệu.</li>
+          </ol>
+
+          <h3 class="green">Đọc kết quả query đúng cách</h3>
+          <ul>
+            <li><strong>X seconds elapsed:</strong> thời gian thực thi (latency người dùng cảm nhận).</li>
+            <li><strong>Y bytes processed:</strong> dữ liệu engine phải scan; đây là chỉ số cost quan trọng nhất với on-demand.</li>
+          </ul>
+
+          <h3 class="orange">Queries verify nhanh</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>verify_tables.sql</span></div>
+            <div class="cmd-body">
+<pre><span class="comment">-- external table readable?</span>
+<span class="kw">SELECT</span> COUNT(*) <span class="kw">FROM</span> `taxi-rides-ny.nytaxi.external_yellow_tripdata`;
+
+<span class="comment">-- partition table metadata</span>
+<span class="kw">SELECT</span> table_name, partition_id, total_rows
+<span class="kw">FROM</span> `nytaxi.INFORMATION_SCHEMA.PARTITIONS`
+<span class="kw">WHERE</span> table_name = <span class="str">'yellow_tripdata_partitioned'</span>
+<span class="kw">ORDER BY</span> total_rows <span class="kw">DESC</span>;</pre>
+            </div>
+          </div>
+
+          <h3 class="red">Estimate thời gian cho big_query_ml.sql (tham khảo)</h3>
+          <ul>
+            <li>Create feature table: ~10–60 giây (tùy dữ liệu/project quota).</li>
+            <li>Create linear_reg model: ~30 giây đến vài phút.</li>
+            <li>Evaluate/Predict/Explain: thường vài giây đến dưới 1 phút mỗi step.</li>
+            <li>Hyperparameter tuning (5 trials): có thể vài phút đến >10 phút.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🔧</span>
+          Phần 4 — 3 bài tập thực hành
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="practice-task">
+            <div class="practice-task-header">Task 1 (Beginner) — External table cho yellow taxi 2019+2020</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Tạo external table cho yellow taxi (2019+2020), sau đó query tổng số rows và distinct VendorID.</p>
+              <p><strong>Gợi ý:</strong> Dùng pattern tương tự `big_query_hw.sql`, chỉ đổi URI và table name.</p>
+              <div onclick="toggleSolution(this)" class="solution-toggle">💡 Xem lời giải</div>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>task1_solution.sql</span></div>
+                  <div class="cmd-body">
+<pre><span class="kw">CREATE OR REPLACE EXTERNAL TABLE</span> `taxi-rides-ny.nytaxi.external_yellow_2019_2020`
+<span class="kw">OPTIONS</span>(
+  format=<span class="str">'CSV'</span>,
+  uris=[
+    <span class="str">'gs://nyc-tl-data/trip data/yellow_tripdata_2019-*.csv'</span>,
+    <span class="str">'gs://nyc-tl-data/trip data/yellow_tripdata_2020-*.csv'</span>
+  ]
+);
+
+<span class="kw">SELECT</span> COUNT(*) <span class="kw">AS</span> total_rows
+<span class="kw">FROM</span> `taxi-rides-ny.nytaxi.external_yellow_2019_2020`;
+
+<span class="kw">SELECT</span> COUNT(<span class="kw">DISTINCT</span> VendorID) <span class="kw">AS</span> distinct_vendor
+<span class="kw">FROM</span> `taxi-rides-ny.nytaxi.external_yellow_2019_2020`;</pre>
+                  </div>
+                </div>
+                <p>Giải thích: query 1 validate external table đọc được dữ liệu; query 2 kiểm tra dimension cardinality cơ bản.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">Task 2 (Intermediate) — Partition + Cluster và chứng minh giảm scan</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Tạo bảng `yellow_taxi_partitioned_clustered` partition theo `tpep_pickup_datetime`, cluster theo `payment_type`, rồi so scan bytes với bảng không partition.</p>
+              <p><strong>Gợi ý:</strong> Dùng `INFORMATION_SCHEMA.PARTITIONS` để verify partition đã tạo đúng.</p>
+              <div onclick="toggleSolution(this)" class="solution-toggle">💡 Xem lời giải</div>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>task2_solution.sql</span></div>
+                  <div class="cmd-body">
+<pre><span class="kw">CREATE OR REPLACE TABLE</span> `taxi-rides-ny.nytaxi.yellow_taxi_non_partitioned` <span class="kw">AS</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> `taxi-rides-ny.nytaxi.external_yellow_tripdata`;
+
+<span class="kw">CREATE OR REPLACE TABLE</span> `taxi-rides-ny.nytaxi.yellow_taxi_partitioned_clustered`
+<span class="kw">PARTITION BY</span> DATE(tpep_pickup_datetime)
+<span class="kw">CLUSTER BY</span> payment_type <span class="kw">AS</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> `taxi-rides-ny.nytaxi.external_yellow_tripdata`;
+
+<span class="kw">SELECT</span> table_name, partition_id, total_rows
+<span class="kw">FROM</span> `nytaxi.INFORMATION_SCHEMA.PARTITIONS`
+<span class="kw">WHERE</span> table_name = <span class="str">'yellow_taxi_partitioned_clustered'</span>;
+
+<span class="comment">-- compare bytes processed in UI job details</span>
+<span class="kw">SELECT</span> COUNT(*)
+<span class="kw">FROM</span> `taxi-rides-ny.nytaxi.yellow_taxi_non_partitioned`
+<span class="kw">WHERE</span> DATE(tpep_pickup_datetime) <span class="kw">BETWEEN</span> <span class="str">'2019-06-01'</span> <span class="kw">AND</span> <span class="str">'2019-06-30'</span>
+  <span class="kw">AND</span> payment_type = 1;
+
+<span class="kw">SELECT</span> COUNT(*)
+<span class="kw">FROM</span> `taxi-rides-ny.nytaxi.yellow_taxi_partitioned_clustered`
+<span class="kw">WHERE</span> DATE(tpep_pickup_datetime) <span class="kw">BETWEEN</span> <span class="str">'2019-06-01'</span> <span class="kw">AND</span> <span class="str">'2019-06-30'</span>
+  <span class="kw">AND</span> payment_type = 1;</pre>
+                  </div>
+                </div>
+                <p>Expected: query trên bảng partition+cluster sẽ scan ít bytes hơn (mức giảm phụ thuộc phân phối dữ liệu/payment_type).</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">Task 3 (Advanced) — Nâng cấp web_to_gcs.py (HTTP safety + checksum + logging)</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Bổ sung (1) `raise_for_status()`, (2) MD5 checksum verify sau upload, (3) structured logging có timestamp + file size.</p>
+              <p><strong>Gợi ý:</strong> `requests.Response.raise_for_status()`, `hashlib.md5()`, `storage.Blob.md5_hash`.</p>
+              <div onclick="toggleSolution(this)" class="solution-toggle">💡 Xem lời giải</div>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>task3_solution.py</span></div>
+                  <div class="cmd-body">
+<pre><span class="kw">import</span> hashlib, json, logging
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+logger = logging.getLogger(<span class="str">"web_to_gcs"</span>)
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
+
+<span class="kw">def</span> <span class="fn">md5_file</span>(path):
+    h = hashlib.md5()
+    <span class="kw">with</span> open(path, <span class="str">"rb"</span>) <span class="kw">as</span> f:
+        <span class="kw">for</span> chunk <span class="kw">in</span> iter(<span class="kw">lambda</span>: f.read(8192), b<span class="str">""</span>):
+            h.update(chunk)
+    <span class="kw">return</span> h.digest()
+
+<span class="kw">def</span> <span class="fn">log_event</span>(event, **kwargs):
+    payload = {<span class="str">"ts"</span>: datetime.utcnow().isoformat() + <span class="str">"Z"</span>, <span class="str">"event"</span>: event, **kwargs}
+    logger.info(json.dumps(payload))
+
+r = requests.get(request_url)
+r.raise_for_status()  <span class="comment"># (1) fail-fast HTTP safety</span>
+open(file_name, <span class="str">"wb"</span>).write(r.content)
+
+upload_to_gcs(BUCKET, object_name, local_file)
+local_md5 = md5_file(local_file)
+blob = storage.Client().bucket(BUCKET).blob(object_name)
+blob.reload()
+remote_md5 = blob.md5_hash  <span class="comment"># base64 md5 from GCS metadata</span>
+
+log_event(
+    <span class="str">"upload_complete"</span>,
+    file=local_file,
+    size_bytes=os.path.getsize(local_file),
+    local_md5_hex=local_md5.hex(),
+    remote_md5_b64=remote_md5,
+)</pre>
+                  </div>
+                </div>
+                <p>Ý nghĩa: fail sớm khi HTTP lỗi, có trace log chuẩn để debug, và có lớp verify sau upload để phát hiện corruption/sai file.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🧯</span>
+          Phần 5 — Cố tình phá (6 kịch bản) + hướng dẫn debug
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">1) External table trỏ vào bucket/path sai hoặc đã bị xóa</h3>
+          <ul>
+            <li>Lỗi thường thấy khi query: lỗi đọc object từ GCS (not found/permission denied).</li>
+            <li>Tìm full message trong BigQuery Job details → Execution details / Error tab.</li>
+            <li>Vì sao vẫn CREATE được: external table chỉ lưu metadata URI; dữ liệu được kiểm tra lúc query.</li>
+          </ul>
+
+          <h3 class="green">2) Partition by cột có NULL</h3>
+          <ul>
+            <li>Dữ liệu NULL đi vào partition đặc biệt `__NULL__`.</li>
+            <li>Kiểm tra qua `INFORMATION_SCHEMA.PARTITIONS` để thấy partition_id tương ứng.</li>
+          </ul>
+
+          <h3 class="orange">3) Query partitioned table nhưng WHERE không dùng partition column</h3>
+          <ul>
+            <li>Hệ quả: scan lớn gần full table.</li>
+            <li>`YEAR(pickup_date)=2019` thường không pruning tốt bằng filter range trực tiếp trên date.</li>
+            <li>Nên dùng: <code>DATE(pickup_date) BETWEEN '2019-01-01' AND '2019-12-31'</code>.</li>
+          </ul>
+
+          <h3 class="red">4) Chạy big_query_ml.sql trước khi có yellow_tripdata_partitioned</h3>
+          <ul>
+            <li>Error thực tế: table not found cho nguồn feature.</li>
+            <li>Fix: quay lại chạy `big_query.sql` theo đúng thứ tự, verify bảng tồn tại rồi chạy lại ML script.</li>
+          </ul>
+
+          <h3 class="blue">5) web_to_gcs.py fail giữa chừng (Ctrl+C sau 3/12 files)</h3>
+          <ul>
+            <li>Baseline script có thể upload lại/ghi đè tùy trạng thái file local/GCS.</li>
+            <li>Bản progress-bar an toàn hơn vì có check tồn tại trên GCS/local rồi skip.</li>
+          </ul>
+
+          <h3 class="green">6) GOOGLE_APPLICATION_CREDENTIALS trỏ file không tồn tại</h3>
+          <ul>
+            <li>Python script sẽ báo lỗi auth/credentials file not found.</li>
+            <li>gcloud command có thể báo trạng thái khác nếu CLI login còn nhưng ADC không hợp lệ.</li>
+            <li>Verify nhanh: <code>gcloud auth application-default print-access-token</code>.</li>
+          </ul>
+
+          <div class="info-box danger">🔥 <span><strong>Debug order đề xuất:</strong> (1) đọc full error trong Job details/log, (2) kiểm tra credentials, (3) kiểm tra GCS path, (4) kiểm tra table metadata, (5) kiểm tra bytes scanned/pruning.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s4" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S4 · Production Readiness</div>
+        <div class="module-title">What if this were production?</div>
+        <div class="module-subtitle">Từ bài lab chạy được sang pipeline vận hành ổn định: idempotency, quality, security, observability và cost guardrails.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">🏭</span>
+          6 câu hỏi bắt buộc trước khi đưa pipeline lên production
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="info-box danger">🔥 <span><strong>Reality check:</strong> Script lab trong repo dạy rất tốt về concept, nhưng production cần thêm guardrails để chịu được re-run, lỗi mạng, drift dữ liệu và sai cấu hình IAM.</span></div>
+
+          <h3 class="blue">1) IDEMPOTENCY — Re-run pipeline có an toàn không?</h3>
+          <p>Hiện tại `big_query.sql` dùng pattern <code>CREATE OR REPLACE TABLE ... AS SELECT *</code>. Pattern này nhanh cho demo nhưng mỗi lần chạy lại sẽ replace toàn bộ bảng, không phù hợp daily incremental và có thể quét full dữ liệu GCS lặp lại.</p>
+          <ul>
+            <li><strong>Rủi ro:</strong> tốn bytes scan mỗi ngày, khó backfill theo từng ngày, rollback khó nếu batch hôm nay sai.</li>
+            <li><strong>Hướng đúng:</strong> load theo partition, chỉ nạp partition cần thiết (ví dụ hôm qua), tách logic state bằng watermark table.</li>
+            <li><strong>Watermark concept:</strong> lưu <code>last_processed_date</code>; mỗi run xử lý khoảng mới rồi update watermark sau khi commit thành công.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>incremental_partition_load.sql</span></div>
+            <div class="cmd-body">
+<pre><span class="comment">-- target table đã partition theo DATE(tpep_pickup_datetime)</span>
+<span class="kw">INSERT INTO</span> `taxi-rides-ny.nytaxi.yellow_tripdata_partitioned`
+<span class="kw">SELECT</span> *
+<span class="kw">FROM</span> `taxi-rides-ny.nytaxi.external_yellow_tripdata`
+<span class="kw">WHERE</span> DATE(tpep_pickup_datetime) = DATE_SUB(CURRENT_DATE(), INTERVAL <span class="num">1</span> DAY);
+
+<span class="comment">-- optional watermark update (pseudo)</span>
+<span class="kw">MERGE</span> `taxi-rides-ny.nytaxi.pipeline_watermark` t
+<span class="kw">USING</span> (<span class="kw">SELECT</span> <span class="str">'yellow_tripdata'</span> <span class="kw">AS</span> pipeline_name,
+              DATE_SUB(CURRENT_DATE(), INTERVAL <span class="num">1</span> DAY) <span class="kw">AS</span> last_processed_date) s
+<span class="kw">ON</span> t.pipeline_name = s.pipeline_name
+<span class="kw">WHEN MATCHED THEN</span> <span class="kw">UPDATE SET</span> t.last_processed_date = s.last_processed_date
+<span class="kw">WHEN NOT MATCHED THEN</span> <span class="kw">INSERT</span> (pipeline_name, last_processed_date)
+<span class="kw">VALUES</span> (s.pipeline_name, s.last_processed_date);</pre>
+            </div>
+          </div>
+
+          <h3 class="green">2) ERROR HANDLING — Pipeline fail giữa chừng thì sao?</h3>
+          <p>`extras/web_to_gcs.py` hiện gọi <code>requests.get()</code> rồi ghi file ngay, không có <code>raise_for_status()</code> và không retry. Nếu HTTP trả về 404/500, bạn có thể ghi nhầm error payload thành file dữ liệu rồi upload lên GCS.</p>
+          <ul>
+            <li><strong>Fix 1:</strong> fail-fast bằng <code>raise_for_status()</code> sau mỗi request.</li>
+            <li><strong>Fix 2:</strong> retry có chủ đích với exponential backoff để chịu lỗi mạng tạm thời.</li>
+            <li><strong>Fix 3:</strong> dead-letter strategy: file lỗi/metadata lỗi đưa vào bucket/path riêng để audit và reprocess.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>retry_download.py</span></div>
+            <div class="cmd-body">
+<pre><span class="kw">from</span> tenacity <span class="kw">import</span> retry, stop_after_attempt, wait_exponential
+
+@retry(stop=stop_after_attempt(<span class="num">3</span>), wait=wait_exponential(multiplier=<span class="num">1</span>, min=<span class="num">2</span>, max=<span class="num">30</span>))
+<span class="kw">def</span> <span class="fn">download_csv</span>(url, local_path):
+    r = requests.get(url, timeout=<span class="num">60</span>)
+    r.raise_for_status()
+    <span class="kw">with</span> open(local_path, <span class="str">"wb"</span>) <span class="kw">as</span> f:
+        f.write(r.content)
+
+<span class="comment"># on final failure: write error manifest to gs://.../dead_letter/</span></pre>
+            </div>
+          </div>
+
+          <h3 class="orange">3) COST CONTROL — Query tốn bao nhiêu và chặn vượt ngân sách thế nào?</h3>
+          <p>Với BigQuery on-demand, bạn trả tiền theo bytes billed. <strong>Bytes processed</strong> là dữ liệu engine cần đọc, còn <strong>bytes billed</strong> là lượng tính phí sau chính sách pricing/rounding. Senior mindset là estimate trước, chặn trần cost, và tối ưu retention.</p>
+          <ul>
+            <li><strong>Dry run:</strong> estimate bytes trước khi query thật bằng API (<code>dry_run=True</code>).</li>
+            <li><strong>Cap per query:</strong> đặt <code>maximum_bytes_billed</code> để query fail nếu vượt giới hạn.</li>
+            <li><strong>Storage hygiene:</strong> đặt partition expiration để tự dọn data cũ.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>bq_cost_guardrail.py</span></div>
+            <div class="cmd-body">
+<pre><span class="kw">from</span> google.cloud <span class="kw">import</span> bigquery
+
+client = bigquery.Client()
+query = <span class="str">"""
+SELECT COUNT(*)
+FROM `taxi-rides-ny.nytaxi.yellow_tripdata_partitioned`
+WHERE DATE(tpep_pickup_datetime) BETWEEN '2019-06-01' AND '2019-06-30'
+"""</span>
+
+cfg = bigquery.QueryJobConfig(dry_run=<span class="kw">True</span>, use_query_cache=<span class="kw">False</span>)
+dry_job = client.query(query, job_config=cfg)
+print(<span class="str">f"Estimated bytes: {dry_job.total_bytes_processed:,}"</span>)
+
+run_cfg = bigquery.QueryJobConfig(maximum_bytes_billed=<span class="num">2_000_000_000</span>)
+run_job = client.query(query, job_config=run_cfg)
+run_job.result()</pre>
+            </div>
+          </div>
+
+          <h3 class="red">4) SECURITY — Setup hiện tại có rủi ro gì?</h3>
+          <p>`.env-example` dùng <code>GOOGLE_APPLICATION_CREDENTIALS=Path/to/key.json</code>. JSON key trên disk rất tiện cho local lab nhưng rủi ro cao nếu lộ file hoặc commit nhầm git: attacker có thể truy cập trực tiếp tài nguyên GCP theo quyền service account đó.</p>
+          <ul>
+            <li><strong>Không giữ key file lâu dài trên CI:</strong> ưu tiên Workload Identity Federation cho GitHub Actions/GCE/GKE.</li>
+            <li><strong>Least privilege:</strong> chỉ cấp đúng role cần thiết như <code>roles/storage.objectViewer</code>, <code>roles/bigquery.dataEditor</code>.</li>
+            <li><strong>Không dùng Owner/Editor cho pipeline SA:</strong> blast radius quá lớn nếu credential bị lộ.</li>
+            <li><strong>BQ governance:</strong> row-level/column-level security cho dữ liệu nhạy cảm.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>terraform_iam.tf</span></div>
+            <div class="cmd-body">
+<pre><span class="kw">resource</span> <span class="str">"google_project_iam_member"</span> <span class="str">"pipeline_sa_storage_viewer"</span> {
+  project = var.project_id
+  role    = <span class="str">"roles/storage.objectViewer"</span>
+  member  = <span class="str">"serviceAccount:${google_service_account.pipeline.email}"</span>
+}
+
+<span class="kw">resource</span> <span class="str">"google_project_iam_member"</span> <span class="str">"pipeline_sa_bq_editor"</span> {
+  project = var.project_id
+  role    = <span class="str">"roles/bigquery.dataEditor"</span>
+  member  = <span class="str">"serviceAccount:${google_service_account.pipeline.email}"</span>
+}</pre>
+            </div>
+          </div>
+
+          <h3 class="blue">5) DATA QUALITY — Làm sao biết dữ liệu load đúng?</h3>
+          <p>Script hiện tại tập trung ingest, chưa có assertion sau load. Production cần checks tự động để phát hiện silent corruption hoặc schema drift sớm.</p>
+          <ul>
+            <li><strong>Row count check:</strong> số rows vào table có hợp lý so với source files.</li>
+            <li><strong>Null check:</strong> cột bắt buộc không được NULL (datetime, IDs quan trọng).</li>
+            <li><strong>Date range check:</strong> không có timestamp bất thường (quá khứ/quá tương lai).</li>
+            <li><strong>Schema drift check:</strong> thêm/bớt cột từ source phải bị bắt và cảnh báo.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>data_quality_assertions.sql</span></div>
+            <div class="cmd-body">
+<pre><span class="comment">-- dbt test equivalent: not_null</span>
+<span class="kw">SELECT</span> COUNT(*) <span class="kw">AS</span> null_pickup_rows
+<span class="kw">FROM</span> `taxi-rides-ny.nytaxi.yellow_tripdata_partitioned`
+<span class="kw">WHERE</span> tpep_pickup_datetime <span class="kw">IS NULL</span>;
+
+<span class="comment">-- date sanity check</span>
+<span class="kw">SELECT</span> COUNT(*) <span class="kw">AS</span> invalid_date_rows
+<span class="kw">FROM</span> `taxi-rides-ny.nytaxi.yellow_tripdata_partitioned`
+<span class="kw">WHERE</span> DATE(tpep_pickup_datetime) &lt; <span class="str">'2009-01-01'</span>
+   <span class="kw">OR</span> DATE(tpep_pickup_datetime) &gt; CURRENT_DATE();
+
+<span class="comment">-- fail pipeline if either count > 0 (or emit alert)</span></pre>
+            </div>
+          </div>
+
+          <h3 class="green">6) MONITORING — Làm sao biết pipeline chạy xong và đúng?</h3>
+          <p>Không có observability thì bạn chỉ "hy vọng" pipeline chạy đúng. Production cần theo dõi trạng thái job, throughput, lỗi và cả trường hợp pipeline <strong>không chạy</strong>.</p>
+          <ul>
+            <li><strong>BigQuery Job History:</strong> kiểm tra failed jobs theo user/service account.</li>
+            <li><strong>Structured logging:</strong> ghi log chuẩn hóa để query theo <code>job_id</code>, <code>rows_loaded</code>, <code>duration_ms</code>.</li>
+            <li><strong>Alerting:</strong> Cloud Monitoring cho metric job failures/latency/backlog.</li>
+            <li><strong>Dead man’s switch:</strong> cảnh báo nếu pipeline không có heartbeat trong X giờ.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>structured_pipeline_log.json</span></div>
+            <div class="cmd-body">
+<pre>{
+  <span class="str">"job_id"</span>: <span class="str">"bq_job_20260507_001"</span>,
+  <span class="str">"dataset"</span>: <span class="str">"nytaxi"</span>,
+  <span class="str">"table"</span>: <span class="str">"yellow_tripdata_partitioned"</span>,
+  <span class="str">"rows_loaded"</span>: <span class="num">1287345</span>,
+  <span class="str">"bytes_processed"</span>: <span class="num">106432198</span>,
+  <span class="str">"duration_ms"</span>: <span class="num">48219</span>,
+  <span class="str">"status"</span>: <span class="str">"SUCCESS"</span>
+}</pre>
+            </div>
+          </div>
+
+          <div class="mental-model">💡 <strong>Production mindset:</strong> "chạy được" mới là điểm bắt đầu; đích đến là <strong>reliable + observable + cost-controlled + secure</strong>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s5" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S5 · Advanced Knowledge</div>
+        <div class="module-title">Kiến thức nâng cao cho Senior Data Engineer</div>
+        <div class="module-subtitle">Không chỉ biết viết query: phải hiểu engine internals, ML lifecycle, data modeling trade-offs và dấu hiệu cần nâng cấp platform.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧠</span>
+          Phần 1 — BigQuery internals (Senior must-know)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Capacitor: columnar format của BigQuery</h3>
+          <p>BigQuery dùng storage engine dạng cột (Capacitor) để chỉ đọc cột cần thiết, nén tốt và phục vụ scan lớn. Bạn không thao tác trực tiếp file layout như Parquet/ORC trong object storage vì BigQuery abstraction hóa tầng lưu trữ này để tối ưu nội bộ.</p>
+
+          <h3 class="green">Execution tree (Dremel): root → mixer → leaf</h3>
+          <p>Query được chia thành stages chạy song song: leaf đọc dữ liệu, mixer tổng hợp trung gian, root trả kết quả cuối. Chỗ tốn nhất thường nằm ở shuffle/repartition giữa stages, đặc biệt khi join/group by trên cardinality cao.</p>
+
+          <h3 class="orange">Slot: compute unit và hiểu lầm phổ biến</h3>
+          <p>Slot là đơn vị tài nguyên compute mà query tiêu thụ. Nhiều slot hơn <strong>không luôn</strong> nhanh hơn nếu bottleneck nằm ở data skew, shuffle lớn, hoặc SQL anti-pattern. Quan trọng là tối ưu plan trước khi mua thêm compute.</p>
+
+          <h3 class="red">Join strategies + anti-patterns gây slot contention</h3>
+          <ul>
+            <li><strong>Broadcast join:</strong> table nhỏ được gửi đến worker xử lý table lớn (thường nhanh hơn khi dim nhỏ).</li>
+            <li><strong>Shuffle join:</strong> cả hai phía phải repartition theo key, tốn network/shuffle nhiều hơn.</li>
+            <li><strong>Anti-pattern:</strong> cross join vô ý, <code>DISTINCT</code> trên bảng cực lớn không filter, correlated subquery nặng.</li>
+          </ul>
+          <div class="info-box warn">⚠️ <span><strong>Rule of thumb:</strong> giảm dữ liệu trước join (filter/aggregate sớm), hạn chế `SELECT *`, và đọc execution details thay vì đoán.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🤖</span>
+          Phần 2 — BigQuery ML production (Senior must-know)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Training-serving skew và data drift</h3>
+          <p>`big_query_ml.sql` train trên historical table `yellow_tripdata_ml`. Khi serving thực tế, feature pipeline có thể khác logic transform lúc train, gây skew và giảm chất lượng dự đoán.</p>
+
+          <h3 class="green">Model versioning không làm vỡ production</h3>
+          <ul>
+            <li><strong>Blue/Green:</strong> deploy model mới song song model cũ, chuyển traffic dần.</li>
+            <li><strong>Champion/Challenger:</strong> model mới chạy shadow, so metric trước khi promote.</li>
+          </ul>
+
+          <h3 class="orange">BQML không tự retrain</h3>
+          <p>BQML mạnh ở SQL-first ML nhưng không tự orchestration lifecycle. Scheduled retraining cần Cloud Scheduler/Kestra/Airflow/Vertex AI Pipelines để trigger theo lịch hoặc theo drift signal.</p>
+
+          <h3 class="red">Serving trade-off: TF Serving vs Vertex AI Endpoint</h3>
+          <p>`extract_model.md` mô tả flow export model từ BigQuery rồi serve bằng TensorFlow Serving. Cách này linh hoạt và rẻ ở quy mô nhỏ, nhưng production lớn thường cần managed endpoint (autoscale, IAM, monitoring) như Vertex AI Endpoint.</p>
+          <table>
+            <thead><tr><th>Tiêu chí</th><th>BQML export + TF Serving</th><th>Vertex AI Endpoint</th></tr></thead>
+            <tbody>
+              <tr><td>Ops effort</td><td>Tự vận hành container/service</td><td>Managed nhiều hơn</td></tr>
+              <tr><td>Scale</td><td>Tự xử lý autoscaling</td><td>Autoscale + endpoint controls</td></tr>
+              <tr><td>Cost baseline</td><td>Thấp khi tải nhỏ</td><td>Cao hơn nhưng ổn định khi tải lớn</td></tr>
+              <tr><td>Governance</td><td>Tự ghép logging/monitoring</td><td>Tích hợp IAM + monitoring tốt hơn</td></tr>
+            </tbody>
+          </table>
+          <p>CI/CD cho SQL ML nên có: test feature logic, validation threshold trước deploy, rollback policy rõ khi metric tụt.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🏗️</span>
+          Phần 3 — Data modeling trong DWH (Senior must-know)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Star schema vs wide denormalized table</h3>
+          <p>Star schema (fact + dimensions) giúp rõ semantics và governance; wide table giảm join runtime cho BI query thường dùng. BigQuery thường xử lý tốt wide table có partition/cluster hợp lý, nhưng governance/lineage có thể khó hơn nếu mọi thứ dồn vào một bảng khổng lồ.</p>
+
+          <h3 class="green">SCD Type 1 vs Type 2</h3>
+          <ul>
+            <li><strong>Type 1 (overwrite):</strong> giữ trạng thái mới nhất, mất history; hợp cho dữ liệu sửa lỗi không cần truy vết.</li>
+            <li><strong>Type 2 (history):</strong> thêm dòng mới với <code>valid_from</code>/<code>valid_to</code>/<code>is_current</code>; hợp cho phân tích theo thời điểm.</li>
+          </ul>
+
+          <h3 class="orange">Partition strategy cho fact table</h3>
+          <ul>
+            <li><strong>Partition theo event date:</strong> hợp khi business query theo thời điểm sự kiện.</li>
+            <li><strong>Partition theo ingestion date:</strong> hợp khi event time không sạch hoặc cần operational observability.</li>
+          </ul>
+
+          <h3 class="red">Late-arriving data xử lý thế nào?</h3>
+          <p>Record "hôm qua mới đến hôm nay" vẫn nên ghi vào partition của <strong>event date</strong> nếu mục tiêu là báo cáo business đúng lịch sử. Điều này kéo theo nhu cầu re-open partition cũ và incremental MERGE thay vì append mù.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">⚖️</span>
+          Phần 4 — Trade-off matrix (Khi dùng vs không dùng)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead>
+              <tr><th>Scenario</th><th>Khi DÙNG</th><th>Khi KHÔNG DÙNG</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>External Table vs Native Table</td>
+                <td>Explore nhanh, staging tạm, chưa chốt schema</td>
+                <td>Dashboard production lặp lại, cần latency/cost ổn định</td>
+              </tr>
+              <tr>
+                <td>Partition by DATE vs RANGE</td>
+                <td>DATE cho workload time-series rõ ràng; RANGE cho numeric bins có ý nghĩa</td>
+                <td>Không chọn nếu query pattern không filter theo key partition</td>
+              </tr>
+              <tr>
+                <td>Cluster by 1 column vs 4 columns</td>
+                <td>1–2 cột filter chính, cardinality phù hợp; thêm cột khi có bằng chứng workload cần</td>
+                <td>Không cluster quá nhiều cột chỉ vì "cho chắc"</td>
+              </tr>
+              <tr>
+                <td>BigQuery ML vs Vertex AI custom training</td>
+                <td>BQML khi cần baseline nhanh, SQL-first, model chuẩn</td>
+                <td>Không dùng BQML nếu cần thuật toán custom, feature pipeline phức tạp, MLOps sâu</td>
+              </tr>
+              <tr>
+                <td>On-demand pricing vs Flat-rate reservations</td>
+                <td>On-demand cho workload biến động; reservations cho workload lớn, ổn định</td>
+                <td>Không commit reservations dài hạn khi chưa hiểu baseline usage</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🚀</span>
+          Phần 5 — Khi nào outgrow setup BigQuery hiện tại?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div><strong>Cần orchestration mạnh hơn:</strong> pipeline có nhiều dependency, retry/backfill phức tạp, chạy tay bắt đầu không kiểm soát nổi.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div><strong>Cần dbt:</strong> SQL transforms tăng nhanh, khó quản lineage/test/docs nếu chỉ copy script rời rạc.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div><strong>Cần Vertex AI thay BQML:</strong> model vượt khỏi linear baseline, cần custom training/inference stack.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div><strong>Cần data catalog/governance platform:</strong> nhiều team, nhiều dataset, ownership mờ, truy vết lineage khó.</div></div>
+
+          <div class="info-box tip">💡 <span><strong>Decision rule:</strong> chỉ nâng platform khi pain lặp lại và đo được bằng số liệu (incident, cost spike, SLA miss), không nâng vì "tool mới hấp dẫn".</span></div>
+
+          <div class="progress-text" id="s5-checklist-progress-text">0/4 mục hoàn thành (0%)</div>
+          <div class="progress-bar"><div class="progress-fill" id="s5-checklist-progress-fill"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s6" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S6 · Common Failures</div>
+        <div class="module-title">Lỗi thường gặp trong BigQuery Data Warehouse</div>
+        <div class="module-subtitle">Đọc lỗi như một Senior: xác định nguyên nhân gốc, fix nhanh và thêm guardrail để không lặp lại.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧯</span>
+          Bảng 11 lỗi production hay gặp
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Lỗi (error message thực tế)</th>
+                <th>Nguyên nhân</th>
+                <th>Cách fix</th>
+                <th>Cách phòng tránh</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>Not found: Table project:dataset.table</code></td>
+                <td>Query bảng chưa tạo hoặc sai project/dataset.</td>
+                <td>Tạo bảng trước; kiểm tra đầy đủ <code>project.dataset.table</code>.</td>
+                <td>Dùng migration/checklist pre-run để verify object tồn tại.</td>
+              </tr>
+              <tr>
+                <td><code>Access Denied: BigQuery BigQuery: Permission denied</code></td>
+                <td>Service account/user thiếu role BigQuery cần thiết.</td>
+                <td>Gán role đúng scope (dataset/project) như <code>bigquery.dataViewer</code>/<code>dataEditor</code>.</td>
+                <td>Chuẩn hóa IAM theo least privilege và review định kỳ.</td>
+              </tr>
+              <tr>
+                <td><code>Error while reading data, error message: CSV table encountered too many errors</code></td>
+                <td>External table đọc CSV sai delimiter/schema/quote/header.</td>
+                <td>Sửa OPTIONS schema/format; validate sample file trước khi query full.</td>
+                <td>Chuẩn hóa source format hoặc convert Parquet trước khi load.</td>
+              </tr>
+              <tr>
+                <td><code>Quota exceeded: Your project exceeded quota for free query bytes per day</code></td>
+                <td>Vượt free tier/bytes quota do query scan quá nhiều.</td>
+                <td>Tối ưu query, thêm partition filter, giảm <code>SELECT *</code>, tăng quota nếu cần.</td>
+                <td>Dùng dry run + <code>maximum_bytes_billed</code> và budget alert.</td>
+              </tr>
+              <tr>
+                <td><code>Resources exceeded during query execution</code></td>
+                <td>Query quá nặng (shuffle lớn, join/cardinality cao), thiếu compute hiệu dụng.</td>
+                <td>Refactor query: pre-aggregate, tách bước trung gian, giảm dữ liệu trước join.</td>
+                <td>Review execution details, tránh anti-pattern cross join/DISTINCT bừa bãi.</td>
+              </tr>
+              <tr>
+                <td><code>Invalid value: Cannot set both a partition filter and scan all partitions</code></td>
+                <td>Bảng bật <code>require_partition_filter</code> nhưng query không filter đúng partition column.</td>
+                <td>Thêm predicate trực tiếp trên partition column trong <code>WHERE</code>.</td>
+                <td>Enforce query template chuẩn có time filter bắt buộc.</td>
+              </tr>
+              <tr>
+                <td><code>INFORMATION_SCHEMA.PARTITIONS</code> trả về 0 rows</td>
+                <td>Bảng vừa tạo nhưng chưa có data, hoặc đọc nhầm dataset/project metadata.</td>
+                <td>Load dữ liệu rồi query lại metadata đúng dataset.</td>
+                <td>Thêm bước verify sau load (row count + partition count).</td>
+              </tr>
+              <tr>
+                <td><code>web_to_gcs.py</code> chạy xong nhưng file GCS = 0 bytes</td>
+                <td>Thiếu <code>raise_for_status()</code>; HTTP error body bị ghi thành file dữ liệu.</td>
+                <td>Thêm <code>response.raise_for_status()</code> sau mỗi request và fail-fast.</td>
+                <td>Luôn verify file size sau upload; thêm MD5 checksum.</td>
+              </tr>
+              <tr>
+                <td><code>google.api_core.exceptions.Forbidden: 403 POST ... does not have storage.objects.create access</code></td>
+                <td><code>GOOGLE_APPLICATION_CREDENTIALS</code> sai hoặc thiếu quyền ghi GCS.</td>
+                <td>Trỏ đúng credentials; cấp quyền <code>storage.objects.create</code> qua role phù hợp.</td>
+                <td>Test auth trước run và quản lý IAM bằng Terraform.</td>
+              </tr>
+              <tr>
+                <td><code>Table not found: yellow_tripdata_partitioned</code> (khi chạy <code>big_query_ml.sql</code>)</td>
+                <td>Chạy ML script trước khi tạo feature source table.</td>
+                <td>Chạy đúng thứ tự: <code>web_to_gcs</code> → <code>big_query.sql</code> → <code>big_query_ml.sql</code>.</td>
+                <td>Thêm dependency check ở đầu pipeline.</td>
+              </tr>
+              <tr>
+                <td>Partition pruning không hoạt động (bytes scanned vẫn full scan)</td>
+                <td>Dùng <code>YEAR(pickup_datetime)=2019</code> thay vì filter trực tiếp theo khoảng ngày partition.</td>
+                <td>Viết predicate trực tiếp: <code>DATE(pickup_datetime) BETWEEN '2019-01-01' AND '2019-12-31'</code>.</td>
+                <td>Luôn so bytes processed sau query với expectation trước đó.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔍</span>
+          Debugging checklist theo thứ tự ưu tiên
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ol>
+            <li>Check job history trong BigQuery Console để đọc full error message.</li>
+            <li>Verify credentials: <code>gcloud auth application-default print-access-token</code>.</li>
+            <li>Verify GCS path: <code>gsutil ls gs://your-bucket/path/</code>.</li>
+            <li>Verify table tồn tại: <code>SELECT * FROM dataset.INFORMATION_SCHEMA.TABLES</code>.</li>
+            <li>Check bytes scanned: query đã được partition pruning hay chưa.</li>
+            <li>Check IAM: service account có đúng roles cho BigQuery và GCS không.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s7" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S7 · Interview Prep</div>
+        <div class="module-title">12 câu hỏi phỏng vấn từ Junior đến Senior</div>
+        <div class="module-subtitle">Luyện cách trả lời có cấu trúc: concept đúng, trade-off rõ, và phản xạ incident thực tế.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🔵</span>
+          Junior (4 câu)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge badge-blue">Junior</span> 1) Data Warehouse khác Database thông thường ở điểm nào cơ bản nhất?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> OLTP database tối ưu transaction nhỏ, latency thấp; Data Warehouse tối ưu analytical scans lớn, aggregate/join nặng. Mục tiêu của DW là tách workload phân tích để không ảnh hưởng ứng dụng production.</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng trả lời "DW chỉ là DB lớn hơn".</span></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge badge-blue">Junior</span> 2) External Table và Native Table trong BigQuery khác nhau thế nào?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> External table đọc trực tiếp file trên GCS, tiện explore/staging; Native table lưu trong BigQuery storage, tối ưu hơn cho workload production, partition/cluster mạnh hơn và latency ổn định hơn.</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng nói external luôn rẻ hơn trong mọi trường hợp.</span></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge badge-blue">Junior</span> 3) Tại sao BigQuery tính tiền theo bytes scanned chứ không theo thời gian chạy?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> Mô hình serverless tách người dùng khỏi quản lý cluster; cost phản ánh lượng dữ liệu engine phải đọc. Điều này khuyến khích thiết kế schema/query tốt (partition, cluster, tránh select thừa cột).</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng nhầm rằng query nhanh là luôn rẻ.</span></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge badge-blue">Junior</span> 4) Partition và Clustering trong BigQuery là gì? Khi nào nên dùng?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> Partition chia bảng theo key (thường ngày) để prune dữ liệu theo thời gian; Cluster sắp xếp dữ liệu trong partition theo cột filter/join thường xuyên. Dùng cả hai khi workload analytics lặp lại và cần giảm bytes scan.</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng nghĩ cluster thay thế hoàn toàn partition.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🟡</span>
+          Mid (4 câu)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge badge-orange">Mid</span> 5) Vì sao YEAR(pickup_date)=2019 không prune tốt bằng DATE(...) BETWEEN ...?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> Predicate wrap function khiến optimizer khó ánh xạ trực tiếp vào partition boundaries. Filter theo range trực tiếp trên partition column giúp engine prune partition rõ ràng.</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng nói "vì YEAR chạy chậm hơn DATE" mà bỏ qua cơ chế pruning.</span></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge badge-orange">Mid</span> 6) Ingest fail sau khi load 60% — restart hay resume?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> Thiết kế idempotent + resumable: checkpoint theo partition/file, re-run chỉ phần fail, dùng MERGE/UPSERT để tránh duplicate. Restart full chỉ là fallback khi volume nhỏ.</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng trả lời "chạy lại toàn bộ cho chắc" khi data đã lớn.</span></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge badge-orange">Mid</span> 7) Vì sao nên convert CSV sang Parquet trước khi upload GCS?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> Parquet là columnar + compression tốt, giảm storage I/O và bytes scan khi query theo vài cột; schema rõ hơn, phù hợp analytics engine.</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng chỉ nói "Parquet hiện đại hơn" mà không nêu cost/perf.</span></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge badge-orange">Mid</span> 8) Khi nào BQML linear_reg không phù hợp cho dự đoán tip_amount?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> Khi quan hệ phi tuyến mạnh, feature interactions phức tạp, hoặc cần online inference/feature store nâng cao. Lúc đó cân nhắc boosted tree/DNN hoặc chuyển qua Vertex AI custom pipeline.</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng khẳng định linear_reg luôn đủ vì "dễ chạy".</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🔴</span>
+          Senior (4 câu)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge" style="color:#f78166;border-color:#f78166;background:#f7816620;">Senior</span> 9) Thiết kế schema cho 10TB fact table đáp ứng latency, cost, incremental load?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> Partition theo event date, cluster theo dimension filter chính; tách raw/staging/mart; incremental theo watermark + MERGE; enforce partition filter; precompute/materialized views cho dashboard nóng; đo cost bằng dry run + budgets.</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng chỉ nói "thêm slot" mà không thiết kế schema/workload.</span></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge" style="color:#f78166;border-color:#f78166;background:#f7816620;">Senior</span> 10) JSON key bị commit public GitHub — incident response theo phút?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> Ngay lập tức revoke key, disable/rotate service account credentials, audit access logs, hạn chế blast radius IAM, backfill secret store sạch, tạo postmortem và policy chặn commit secret (pre-commit + scanner).</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng chỉ xóa commit mà không rotate credential đã lộ.</span></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge" style="color:#f78166;border-color:#f78166;background:#f7816620;">Senior</span> 11) Bill BigQuery $15,000 — điều tra và đề xuất giải pháp?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> Phân tích job history theo user/query pattern, tìm query scan đột biến, enforce quota + max bytes billed, refactor query và bảng (partition/cluster), thêm chargeback theo team, cân nhắc reservations nếu workload ổn định.</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng đổ lỗi chung chung "do data lớn" khi chưa có breakdown bằng số liệu.</span></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header" onclick="toggleSection(this)"><span class="badge" style="color:#f78166;border-color:#f78166;background:#f7816620;">Senior</span> 12) BQML production accuracy giảm 20% sau 3 tháng — vì sao và xử lý?<span class="section-toggle">▼</span></div>
+            <div class="section-content">
+              <p><strong>Gợi ý trả lời:</strong> Điều tra data drift, concept drift, feature pipeline mismatch (training-serving skew), thay đổi upstream schema/distribution; bổ sung monitoring metric model/data, retrain định kỳ, champion-challenger và rollback plan.</p>
+              <div class="info-box warn">⚠️ <span><strong>Red flag:</strong> Đừng retrain mù mà không tìm root cause của drift.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s8" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S8 · Checklist & Wrap-up</div>
+        <div class="module-title">Checklist hoàn tất Module 03</div>
+        <div class="module-subtitle">Tick đủ, giải thích được, và bảo vệ được design decisions trước interview thì mới qua Module 04.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">✅</span>
+          Progress checklist (18 items)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="progress-text" id="checklist-progress-text">0/18 mục hoàn thành (0%)</div>
+          <div class="progress-bar"><div class="progress-fill" id="checklist-progress-fill"></div></div>
+
+          <h3 class="blue">Beginner (6)</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Giải thích được OLTP vs OLAP cho người không biết IT.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Tạo được External Table từ GCS wildcard trong BigQuery Console.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Chạy được <code>web_to_gcs.py</code> và verify file xuất hiện trong GCS.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Hiểu bytes scanned là gì và tìm thấy con số này sau mỗi query.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Tạo được bảng Partitioned + Clustered từ External Table.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Biết <code>.env</code> file là gì và tại sao không commit lên git.</div></div>
+
+          <h3 class="orange">Intermediate (6)</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Chứng minh được partition pruning bằng số bytes scanned thực tế (trước vs sau).</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Tạo được BQML model, evaluate, predict với <code>big_query_ml.sql</code>.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Query <code>INFORMATION_SCHEMA.PARTITIONS</code> và giải thích output.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Modify <code>web_to_gcs.py</code> để thêm <code>raise_for_status()</code> và retry logic.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Giải thích tại sao convert sang Parquet thay vì giữ CSV.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Biết minimum IAM roles cần thiết cho pipeline này.</div></div>
+
+          <h3 class="red">Senior (6)</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Thiết kế incremental load strategy (watermark, partition-based) cho pipeline daily.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Implement dry run và <code>maximum_bytes_billed</code> trong Python client.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Viết SQL data quality assertions (row count, null check, date range).</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Giải thích BigQuery slot model và tại sao nhiều slot không luôn nhanh hơn.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Trả lời được 4 câu Senior interview không cần nhìn tài liệu.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Giải thích trade-off BQML vs Vertex AI custom training cho người mới.</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🧩</span>
+          Summary grid — 5 điểm chốt cần nhớ
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="summary-grid">
+            <div class="summary-item"><strong>1) BigQuery core</strong>BigQuery = serverless columnar DW, trả tiền theo bytes scanned; thiết kế tốt để giảm scan ngay từ schema/query.</div>
+            <div class="summary-item"><strong>2) Partition + Cluster</strong>Partition cắt theo thời gian, cluster sắp trong partition; predicate phải đúng thì mới được pruning.</div>
+            <div class="summary-item"><strong>3) External → Native</strong>Flow chuẩn: External table để explore, Native table để tối ưu production và workload lặp lại.</div>
+            <div class="summary-item"><strong>4) Idempotency</strong><code>CREATE OR REPLACE</code> là quick fix; production pattern là incremental partition load + watermark.</div>
+            <div class="summary-item"><strong>5) Transferable mapping</strong>GCS → S3, BQ Dataset → Redshift Schema, BQML → SageMaker Autopilot, External Table → Redshift Spectrum/Athena.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">📌</span>
+          Definition of Done (DoD)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div><strong>Chạy được:</strong> Pipeline end-to-end hoạt động ổn định.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div><strong>Hiểu được:</strong> Vẽ lại kiến trúc không cần nhìn tài liệu.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div><strong>Phá được:</strong> Tự tạo ít nhất 1 lỗi và ghi logbook cách fix.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div><strong>Tối ưu được:</strong> Có cải tiến rõ về cost/performance/security.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div><strong>Trả lời được:</strong> Đi qua trôi chảy các câu Senior questions.</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">➡️</span>
+          Preview Module 04
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Module tiếp theo:</strong> Analytics Engineering với dbt.</p>
+          <p><strong>Cần chuẩn bị:</strong> BigQuery đang hoạt động ổn định (module này) và hiểu khái niệm SQL transform cơ bản.</p>
+          <p><a href="Module04_Analytics_Engineering.html">→ Module 04: Analytics Engineering</a></p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const modules=document.querySelectorAll('.module');
+const navItems=document.querySelectorAll('.nav-item');
+
+function showModule(index,navItem){
+  modules.forEach(m=>{m.classList.remove('active');m.style.display='none'});
+  navItems.forEach(i=>i.classList.remove('active'));
+  const target=document.getElementById(`s${index}`);
+  if(target){target.classList.add('active');target.style.display='block'}
+  if(navItem)navItem.classList.add('active');
+  else if(navItems[index])navItems[index].classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toggleSection(header){
+  const content=header.nextElementSibling;
+  const toggle=header.querySelector('.section-toggle');
+  const isHidden=content.style.display==='none';
+  content.style.display=isHidden?'block':'none';
+  toggle.textContent=isHidden?'▼':'▶';
+}
+
+function answerQuiz(el,isCorrect,msg){
+  const item=el.closest('.quiz-item');
+  const opts=item.querySelectorAll('.quiz-opt');
+  const explain=item.querySelector('.quiz-explain');
+  opts.forEach(opt=>(opt.style.pointerEvents='none'));
+  el.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect){opts.forEach(opt=>{const o=opt.getAttribute('onclick');if(o&&o.includes('true'))opt.classList.add('correct')})}
+  explain.textContent=(isCorrect?'✓ Chính xác! ':'✗ Sai. ')+msg;
+  explain.classList.add('show');
+}
+
+function toggleSolution(btn){
+  const box=btn.nextElementSibling;
+  if(!box)return;
+  const show=box.classList.toggle('show');
+  btn.textContent=show?'🔼 Ẩn lời giải':'💡 Xem lời giải';
+}
+
+function switchTab(groupId,tabId){
+  const group=document.getElementById(groupId);
+  if(!group)return;
+  group.querySelectorAll('.tab').forEach(tab=>tab.classList.remove('active'));
+  const clicked=group.querySelector(`[onclick*="${tabId}"]`);
+  if(clicked)clicked.classList.add('active');
+  const container=group.parentElement;
+  container.querySelectorAll('.tab-content').forEach(content=>content.classList.remove('active'));
+  const target=document.getElementById(tabId);
+  if(target)target.classList.add('active');
+}
+
+function toggleCheck(box){
+  box.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress(){
+  const s8MainChecklist=document.querySelector('#s8 .section .section-content');
+  if(!s8MainChecklist)return;
+  const checks=s8MainChecklist.querySelectorAll('.check-box');
+  const checked=s8MainChecklist.querySelectorAll('.check-box.checked').length;
+  const total=checks.length;
+  const pct=total===0?0:Math.round((checked/total)*100);
+  const fill=document.getElementById('checklist-progress-fill');
+  const text=document.getElementById('checklist-progress-text');
+  if(fill)fill.style.width=`${pct}%`;
+  if(text)text.textContent=`${checked}/${total} mục hoàn thành (${pct}%)`;
+}
+
+showModule(0,navItems[0]);
+updateProgress();
+</script>
+</body>
+</html>

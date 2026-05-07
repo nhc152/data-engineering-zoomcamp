@@ -2,7 +2,7 @@
 # Dùng trong Claude Code CLI sau khi có output từ Antigravity review
 
 ```
-Đọc file [D:\TaiLieu\Data Engineer\data-engineering-zoomcamp\data-engineering-zoomcamp\00_nhc_learning\Module01_Docker_Terraform.html] toàn bộ.
+Nâng cấp nội dung file .\data-engineering-zoomcamp\00_nhc_learning\Module02_Kestra_Orchestration.html
 
 Thực hiện các thay đổi sau theo đúng Patch Checklist từ review:
 

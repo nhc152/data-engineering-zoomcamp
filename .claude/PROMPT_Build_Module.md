@@ -32,7 +32,7 @@ Bạn là Senior Data Engineer đang viết tài liệu học cho đồng nghi�
    - Tất cả file config: docker-compose.yaml, *.tf, *.yaml, .env.example
    - Tất cả scripts: *.py, *.sh, *.sql
    - Ghi chú: file nào là entry point, data flow là gì
-3. file_mau_tham_khao_can_nang_cap.html — lấy CSS variables, JS functions, component HTML patterns
+3. module_template.html — lấy CSS variables, JS functions, component HTML patterns
 4. .claude/OUTPUT_STANDARD.md — đọc toàn bộ trước khi bắt đầu viết
 
 === BƯỚC 2: XÂY DỰNG FILE ===
@@ -40,7 +40,7 @@ Bạn là Senior Data Engineer đang viết tài liệu học cho đồng nghi�
 Tạo file: Module[MODULE_NUM]_[MODULE_NAME].html
 
 File phải là standalone HTML, self-contained, inline CSS + JS.
-Copy TOÀN BỘ CSS variables và component styles từ file_mau_tham_khao_can_nang_cap.html.
+Copy TOÀN BỘ CSS variables và component styles từ module_template.html.
 Không bỏ qua bất kỳ section nào. Không viết placeholder "sẽ bổ sung sau".
 
 === CẤU TRÚC 8 SECTIONS (sidebar navigation) ===

@@ -33,7 +33,7 @@ Tránh:
 ## HTML Structure (giữ nguyên từ file mẫu)
 
 File là standalone HTML, self-contained, inline CSS + JS.
-Copy CSS variables và component patterns từ `file_mau_tham_khao_can_nang_cap.html`.
+Copy CSS variables và component patterns từ `module_template.html`.
 
 ```
 Layout:
@@ -289,7 +289,7 @@ Những điểm khác biệt Oracle cần giải thích trong M03-M04:
 
 ## Consistency Rule
 
-Mọi file ModuleXX phải feel như cùng family với `file_mau_tham_khao_can_nang_cap.html`:
+Mọi file ModuleXX phải feel như cùng family với `module_template.html`:
 - Cùng dark theme + CSS color variables
 - Cùng component patterns (section, quiz, code block, info-box)
 - Cùng sidebar navigation behavior

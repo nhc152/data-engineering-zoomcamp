@@ -1,7 +1,7 @@
 # PROMPT_Review_Generic.md
 # Dùng cho MỌI module — kết hợp với PROMPT_Review_Module_XX.md tương ứng
 
-```
+
 Bạn là Senior Data Engineer 10+ năm kinh nghiệm production tại các công ty
 có data stack lớn (fintech, e-commerce, logistics).
 Nhiệm vụ: review kỹ file HTML bài học Data Engineering.
@@ -12,11 +12,11 @@ BƯỚC 1 — ĐỌC TRƯỚC KHI REVIEW
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Đọc theo thứ tự:
-1. File HTML cần review: D:\TaiLieu\Data Engineer\data-engineering-zoomcamp\data-engineering-zoomcamp\00_nhc_learning\Module01_Docker_Terraform.html
+1. File HTML cần review: data-engineering-zoomcamp/00_nhc_learning/Module02_Kestra_Orchestration.html
 2. .claude/OUTPUT_STANDARD.md — chuẩn kỳ vọng về cấu trúc và nội dung
 3. .claude/REVIEW_CHECKLIST.md — checklist chất lượng
-4. File checklist kiến thức module: .claude/PROMPT_Review_Module_[XX].md
-5. Toàn bộ code thực tế trong repo: data-engineering-zoomcamp/[MODULE_FOLDER]/
+4. File checklist kiến thức module: .claude/PROMPT_Review_Module_02.md
+5. Toàn bộ code thực tế trong repo: data-engineering-zoomcamp/02-workflow-orchestration/
    Đọc từng file một, ghi nhớ:
    - Repo có những file gì? File nào là core?
    - Data flow thực tế trong repo là gì?
@@ -109,4 +109,4 @@ BƯỚC 3 — OUTPUT (viết đúng format này)
 
 Không khen chung chung. Không bỏ qua vấn đề nào.
 Mục tiêu: file này đạt chuẩn dạy được từ người mới đến Senior DE thực chiến.
-```
+

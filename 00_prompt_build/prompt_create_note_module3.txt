@@ -1,0 +1,139 @@
+Đọc TOÀN BỘ các file sau trong data-engineering-zoomcamp/03-data-warehouse/:
+
+BIG QUERY SQL:
+- 03-data-warehouse/big_query.sql
+- 03-data-warehouse/big_query_hw.sql
+- 03-data-warehouse/big_query_ml.sql
+
+PYTHON SCRIPTS:
+- 03-data-warehouse/extras/web_to_gcs.py
+- 03-data-warehouse/extras/web_to_gcs_with_progress_bar.py
+
+CONFIG FILES:
+- 03-data-warehouse/extras/pyproject.toml
+- 03-data-warehouse/extras/.env-example
+- 03-data-warehouse/extras/.gitignore
+
+DOCUMENTATION:
+- 03-data-warehouse/README.md
+- 03-data-warehouse/extract_model.md
+- 03-data-warehouse/extras/README.md
+
+Sau khi đọc xong TOÀN BỘ, tạo file repo_notes_M03.md:
+
+═══════════════════════════════
+1. CẤU TRÚC THƯ MỤC
+═══════════════════════════════
+Tree đầy đủ + mục đích từng folder và file
+
+═══════════════════════════════
+2. NỘI DUNG CÁC FILE .MD
+═══════════════════════════════
+Tóm tắt từng file .md theo format:
+[Tên file]
+- Dạy về: [topic]
+- Concepts chính: [list]
+- Commands được dùng: [list commands thực tế]
+- Lưu ý đặc biệt: [nếu có]
+
+═══════════════════════════════
+3. PHÂN TÍCH CODE FILES
+═══════════════════════════════
+Với mỗi file code, ghi rõ:
+
+[big_query.sql]
+- Từng query làm gì (mục đích, bảng input → output)
+- Concepts BigQuery được demo: partitioning, clustering, external tables...
+- Copy nguyên văn toàn bộ file
+
+[big_query_hw.sql]
+- Từng query làm gì
+- Đây là homework hay demo?
+- Copy nguyên văn toàn bộ file
+
+[big_query_ml.sql]
+- ML model được tạo: loại model, features, target
+- Các bước: CREATE MODEL → EVALUATE → PREDICT
+- Copy nguyên văn toàn bộ file
+
+[web_to_gcs.py]
+- Arguments nhận vào
+- Logic chính từng bước
+- Flow: source URL → download → upload GCS
+- Libraries dùng
+- Copy nguyên văn toàn bộ file
+
+[web_to_gcs_with_progress_bar.py]
+- Khác gì so với web_to_gcs.py
+- Progress bar implementation
+- Copy nguyên văn toàn bộ file
+
+[pyproject.toml]
+- Dependencies list
+- Copy nguyên văn toàn bộ file
+
+[.env-example]
+- Các env vars cần thiết
+- Copy nguyên văn toàn bộ file
+
+═══════════════════════════════
+4. BIGQUERY CONCEPTS DEEP DIVE
+═══════════════════════════════
+Trích xuất từ code thực tế trong repo:
+
+EXTERNAL TABLES:
+- Cú pháp tạo, options
+- Khi nào dùng vs native table
+
+PARTITIONING:
+- Partition by gì (date/int range/ingestion time)
+- Câu lệnh thực tế trong repo
+- Performance impact được demo
+
+CLUSTERING:
+- Cluster by gì
+- Kết hợp với partition thế nào
+- Query cost comparison nếu có
+
+BIGQUERY ML:
+- Model type được dùng
+- Feature engineering steps
+- Evaluation metrics
+
+═══════════════════════════════
+5. DATA FLOW THỰC TẾ
+═══════════════════════════════
+- Flow đầy đủ: source data → GCS → BigQuery External Table → Native Table
+- File nào trigger file nào
+- Thứ tự chạy đúng
+- Dependency giữa các bước
+
+═══════════════════════════════
+6. ĐIỂM YẾU & THIẾU SÓT
+═══════════════════════════════
+- Security issues (hardcode credentials, .env handling...)
+- Idempotency issues trong SQL scripts
+- Production readiness gaps
+- Cost optimization gaps
+- Monitoring/logging gaps
+- Những gì repo dạy nhưng không đủ cho Senior DE
+
+═══════════════════════════════
+7. KIẾN THỨC NGOÀI REPO
+═══════════════════════════════
+Dựa trên những gì repo đang cover, liệt kê những concept
+Senior DE phải biết nhưng repo KHÔNG dạy:
+- BigQuery internals: [list cụ thể]
+- BigQuery ML production: [list cụ thể]
+- GCS best practices: [list cụ thể]
+- Cost optimization: [list cụ thể]
+- Data modeling trong DW: [list cụ thể]
+- Query optimization: [list cụ thể]
+
+Lưu file: repo_notes_M03.md
+
+QUAN TRỌNG:
+- Copy nguyên văn toàn bộ nội dung các file code và SQL
+- Không tóm tắt bỏ qua bất kỳ dòng nào
+- Không bỏ qua file nào trong danh sách trên
+- Mục tiêu: đọc file notes này là hiểu hoàn toàn repo mà không cần mở repo

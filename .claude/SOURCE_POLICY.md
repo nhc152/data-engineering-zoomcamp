@@ -4,7 +4,7 @@
 
 1. `master_de_roadmap.md` — đọc section tương ứng với module đang build
 2. `data-engineering-zoomcamp/[module]/` — đọc TOÀN BỘ code thực tế
-3. `file_mau_tham_khao_can_nang_cap.html` — lấy CSS variables, JS patterns, component structure
+3. `module_template.html` — lấy CSS variables, JS patterns, component structure
 4. File output đang build — giữ consistency nếu đang update file đã có
 
 ---
@@ -79,5 +79,5 @@ Khi dùng external knowledge:
 
 - KHÔNG modify bất kỳ file nào trong `data-engineering-zoomcamp/` — read-only
 - KHÔNG modify `master_de_roadmap.md` trừ khi được yêu cầu rõ
-- KHÔNG modify `file_mau_tham_khao_can_nang_cap.html` — chỉ đọc để lấy patterns
+- KHÔNG modify `module_template.html` — chỉ đọc để lấy patterns
 - Output HTML luôn là file mới, tên theo convention `ModuleXX_TopicName.html`

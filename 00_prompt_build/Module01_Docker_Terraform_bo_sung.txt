@@ -1,6 +1,6 @@
 ## Prompt Patch — Bổ sung 6 đoạn vào Module01_Docker_Terraform.html
 
-```
+
 Đọc các file sau trước khi làm:
 - Module01_Docker_Terraform.html (đọc toàn bộ để hiểu structure hiện tại)
 - data-engineering-zoomcamp/01-docker-terraform/docker-sql/pipeline/ingest_data.py

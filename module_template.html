@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MODULE XX — [Tên Module]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+    --accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;
+    --text:#e6edf3;--text-muted:#8b949e;--code-bg:#0d1117;--highlight:#388bfd26;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter','Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+  .hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 40%,#1a2a1e 100%);border-bottom:2px solid var(--accent4);padding:40px 24px 30px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#6e40c922,transparent 70%);pointer-events:none}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--accent4);letter-spacing:-0.5px}
+  .hero p{color:var(--text-muted);margin-top:8px;font-size:.95rem}
+  .badge-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;border:1px solid}
+  .badge-blue{color:var(--accent);border-color:var(--accent);background:#1f6feb1a}
+  .badge-green{color:var(--accent2);border-color:var(--accent2);background:#2ea04326}
+  .badge-orange{color:var(--accent5);border-color:var(--accent5);background:#d2940026}
+  .badge-purple{color:var(--accent4);border-color:var(--accent4);background:#6e40c926}
+  .container{display:flex;min-height:calc(100vh - 160px)}
+  .sidebar{width:290px;min-width:290px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:0 16px 12px}
+  .level-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 16px 4px;color:var(--accent4)}
+  .nav-item{display:block;padding:7px 16px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-left:3px solid transparent;transition:all .15s}
+  .nav-item:hover{color:var(--text);background:var(--surface2)}
+  .nav-item.active{color:var(--accent4);border-left-color:var(--accent4);background:#6e40c915;font-weight:600}
+  .nav-number{display:inline-block;width:44px;font-size:.7rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .main{flex:1;padding:32px 40px;max-width:980px}
+  .module{display:none}
+  .module.active{display:block}
+  .module-header{border:1px solid var(--border);border-radius:12px;padding:24px 28px;background:var(--surface);margin-bottom:24px;position:relative;overflow:hidden}
+  .module-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent4)}
+  .module-tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent4);margin-bottom:8px}
+  .module-title{font-size:1.6rem;font-weight:800;margin-bottom:8px}
+  .module-subtitle{color:var(--text-muted);font-size:.9rem}
+  .section{margin-bottom:28px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .section-header{padding:14px 20px;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--surface2);border-bottom:1px solid var(--border);user-select:none}
+  .section-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .icon-purpose{background:#1f6feb33}
+  .icon-detail{background:#2ea04326}
+  .icon-quiz{background:#d2940026}
+  .icon-summary{background:#6e40c926}
+  .icon-practice{background:#f7816626}
+  .section-content{padding:20px;background:var(--surface)}
+  .section-toggle{margin-left:auto;color:var(--text-muted);font-size:12px}
+  h3{font-size:1rem;font-weight:700;color:var(--accent4);margin:18px 0 10px}
+  h3:first-child{margin-top:0}
+  h3.blue{color:var(--accent)}
+  h3.green{color:var(--accent2)}
+  h3.orange{color:var(--accent5)}
+  h3.red{color:var(--accent3)}
+  p{margin-bottom:12px;color:var(--text);font-size:.88rem}
+  ul,ol{padding-left:20px;margin-bottom:12px}
+  li{font-size:.88rem;margin-bottom:5px}
+  strong{color:var(--text)}
+  .cmd-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .cmd-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .cmd-body{padding:14px}
+  pre{font-family:'JetBrains Mono','Courier New','Consolas',monospace;font-size:.82rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--text)}
+  .kw{color:#ff7b72}.kw2{color:var(--accent)}.str{color:var(--accent5)}.fn{color:var(--accent4)}.num{color:#79c0ff}.comment{color:var(--text-muted)}
+  .db-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.68rem;font-weight:700;letter-spacing:.5px;margin-bottom:6px}
+  .db-pg{background:#4169e122;color:#4d9de0;border:1px solid #4169e155}
+  .db-oracle{background:#cc000022;color:#f97316;border:1px solid #cc000055}
+  code{font-family:'JetBrains Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:.82rem;color:var(--accent4)}
+  .quiz-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
+  .quiz-q{font-weight:600;font-size:.88rem;margin-bottom:10px}
+  .quiz-q::before{content:'Q';display:inline-block;width:22px;height:22px;background:var(--accent4);color:#000;border-radius:50%;font-size:.7rem;font-weight:800;text-align:center;line-height:22px;margin-right:8px}
+  .quiz-options{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .quiz-opt{padding:8px 12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.84rem;transition:all .15s;background:var(--bg)}
+  .quiz-opt:hover{border-color:var(--accent4);color:var(--accent4)}
+  .quiz-opt.correct{border-color:var(--accent2);color:var(--accent2);background:#2ea04310}
+  .quiz-opt.wrong{border-color:var(--accent3);color:var(--accent3);background:#f7816610}
+  .quiz-explain{font-size:.82rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px;margin-top:8px;display:none}
+  .quiz-explain.show{display:block}
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .summary-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:.82rem}
+  .summary-item strong{color:var(--accent4);display:block;margin-bottom:4px}
+  .practice-task{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
+  .practice-task-header{padding:12px 16px;background:#6e40c915;border-bottom:1px solid var(--border);font-weight:700;font-size:.85rem;color:var(--accent4)}
+  .practice-task-body{padding:16px}
+  .solution-toggle{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:.8rem;cursor:pointer;color:var(--accent2);margin-top:10px;transition:all .15s}
+  .solution-toggle:hover{background:var(--surface2)}
+  .solution-box{margin-top:10px;display:none;border-top:1px solid var(--border);padding-top:12px}
+  .solution-box.show{display:block}
+  .info-box{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:.84rem;border:1px solid;display:flex;gap:10px}
+  .info-box.tip{border-color:var(--accent2);background:#2ea04310;color:var(--accent2)}
+  .info-box.warn{border-color:var(--accent5);background:#d2940015;color:var(--accent5)}
+  .info-box.note{border-color:var(--accent4);background:#6e40c915;color:var(--accent4)}
+  .info-box.danger{border-color:var(--accent3);background:#f7816610;color:var(--accent3)}
+  .info-box span{color:var(--text)}
+  .progress-bar{background:var(--surface2);border-radius:4px;height:4px;margin:16px 0;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent4),var(--accent2));border-radius:4px;width:0;transition:width .2s}
+  .nav-buttons{display:flex;gap:12px;margin-top:32px;justify-content:space-between}
+  .nav-btn{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:6px}
+  .nav-btn:hover{border-color:var(--accent4);color:var(--accent4)}
+  .nav-btn.primary{background:var(--accent4);color:#000;border-color:var(--accent4)}
+  .nav-btn.primary:hover{background:#e2c0ff}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.83rem}
+  th{background:var(--surface2);padding:8px 12px;text-align:left;border:1px solid var(--border);color:var(--accent4)}
+  td{padding:8px 12px;border:1px solid var(--border)}
+  tr:nth-child(even) td{background:#ffffff05}
+  .checklist{list-style:none;padding:0}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:.88rem;border-bottom:1px solid var(--border)}
+  .checklist li:last-child{border-bottom:none}
+  .checklist li::before{content:'□';color:var(--accent4);font-size:1.1rem;flex-shrink:0;margin-top:-1px}
+  .test-question{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px}
+  .test-question.correct{border-color:var(--accent2);background:#2ea04312}
+  .test-question.wrong{border-color:var(--accent3);background:#f7816612}
+  .test-question.unanswered{border-color:var(--accent5);background:#d2940015}
+  .test-question-title{font-size:.86rem;font-weight:600;margin-bottom:8px}
+  .test-options{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+  .test-option{display:flex;align-items:center;gap:6px;font-size:.83rem;color:var(--text)}
+  .test-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .test-result{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)}
+  .score-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .score-chip{border:1px solid var(--border);border-radius:14px;padding:4px 10px;font-size:.78rem;color:var(--text);background:var(--bg)}
+  .score-chip.good{border-color:var(--accent2);color:var(--accent2)}
+  .score-chip.warn{border-color:var(--accent5);color:var(--accent5)}
+  .score-chip.bad{border-color:var(--accent3);color:var(--accent3)}
+  .mistake-list{margin-top:8px;padding-left:18px}
+  .tab-group{display:flex;gap:0;margin-bottom:0;border-bottom:1px solid var(--border)}
+  .tab{padding:8px 18px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab.active{color:var(--accent4);border-bottom-color:var(--accent4);font-weight:600}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  .schema-box{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin:14px 0;overflow-x:auto}
+  .schema-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+  .schema-table{border:1px solid var(--border);border-radius:8px;min-width:160px;overflow:hidden}
+  .schema-table-header{padding:8px 12px;font-size:.75rem;font-weight:700;text-align:center}
+  .schema-table-header.fact{background:#1f6feb33;color:var(--accent)}
+  .schema-table-header.dim{background:#6e40c926;color:var(--accent4)}
+  .schema-col{padding:5px 12px;font-size:.73rem;border-top:1px solid var(--border);display:flex;gap:6px}
+  .schema-col .pk{color:var(--accent5);font-weight:700;font-size:.65rem}
+  .schema-col .fk{color:var(--accent3);font-weight:700;font-size:.65rem}
+  .schema-col .col{color:var(--text-muted)}
+  .schema-arrow{align-self:center;color:var(--text-muted);font-size:1.4rem;padding:0 2px}
+  .mental-model{border-left:4px solid var(--accent);background:#1f6feb1a;padding:12px 14px;border-radius:6px;margin:12px 0;font-size:.88rem}
+  .checklist-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .check-box{width:16px;height:16px;border:1px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:.25rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  .check-box.checked{background:var(--accent2);border-color:var(--accent2)}
+  .check-box.checked::after{content:'✓';font-size:10px;color:#000;font-weight:600}
+  .progress-text{font-size:.8rem;color:var(--text-muted);margin-bottom:8px}
+  @media(max-width:768px){.sidebar{display:none}.main{padding:16px}.summary-grid{grid-template-columns:1fr}.test-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Module XX — [Tên Module]</h1>
+  <p>[Mô tả ngắn gọn mục tiêu module — 1 câu]</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">Beginner → Senior</span>
+    <span class="badge badge-green">~X ngày</span>
+    <span class="badge badge-blue">[Category]</span>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="sidebar-title">Module Navigation</div>
+    <div class="level-label">MODULE XX · [TÊN MODULE]</div>
+    <div class="nav-item active" onclick="showModule(0,this)"><span class="nav-number">S0</span>Tổng quan & Mục tiêu</div>
+    <div class="nav-item" onclick="showModule(1,this)"><span class="nav-number">S1</span>Lý thuyết nền</div>
+    <div class="nav-item" onclick="showModule(2,this)"><span class="nav-number">S2</span>Đọc hiểu code repo</div>
+    <div class="nav-item" onclick="showModule(3,this)"><span class="nav-number">S3</span>Thực hành từng bước</div>
+    <div class="nav-item" onclick="showModule(4,this)"><span class="nav-number">S4</span>Production Thinking</div>
+    <div class="nav-item" onclick="showModule(5,this)"><span class="nav-number">S5</span>Kiến thức nâng cao</div>
+    <div class="nav-item" onclick="showModule(6,this)"><span class="nav-number">S6</span>Lỗi thường gặp</div>
+    <div class="nav-item" onclick="showModule(7,this)"><span class="nav-number">S7</span>Interview Prep</div>
+    <div class="nav-item" onclick="showModule(8,this)"><span class="nav-number">S8</span>Checklist & Tổng kết</div>
+  </nav>
+
+  <main class="main">
+
+    <!-- ═══════════════════════════════════════════════════════
+         S0 · ORIENTATION — Tổng quan & Mục tiêu
+    ════════════════════════════════════════════════════════ -->
+    <div class="module active" id="s0">
+      <div class="module-header">
+        <div class="module-tag">S0 · Orientation</div>
+        <div class="module-title">Tổng quan & Mục tiêu Module XX</div>
+        <div class="module-subtitle">[Vấn đề gốc module giải quyết — 1 câu WHY trước HOW]</div>
+      </div>
+
+      <!-- Roadmap table -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🧭</span>
+          Roadmap 9 sections của module
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Section</th><th>Tên section</th><th>Thời gian ước tính</th></tr></thead>
+            <tbody>
+              <tr><td>S0</td><td>Tổng quan & Mục tiêu</td><td>30–45 phút</td></tr>
+              <tr><td>S1</td><td>Lý thuyết nền</td><td>[X giờ]</td></tr>
+              <tr><td>S2</td><td>Đọc hiểu code repo</td><td>[X giờ]</td></tr>
+              <tr><td>S3</td><td>Thực hành từng bước</td><td>[X ngày]</td></tr>
+              <tr><td>S4</td><td>Production Thinking</td><td>[X giờ]</td></tr>
+              <tr><td>S5</td><td>Kiến thức nâng cao</td><td>[X giờ]</td></tr>
+              <tr><td>S6</td><td>Lỗi thường gặp</td><td>[X giờ]</td></tr>
+              <tr><td>S7</td><td>Interview Prep</td><td>[X giờ]</td></tr>
+              <tr><td>S8</td><td>Checklist & Tổng kết</td><td>[X giờ]</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Vấn đề thực tế -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">🎯</span>
+          [Tool/Concept] giải quyết vấn đề gì?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">[Concept A] giải quyết gì?</h3>
+          <p>[Mô tả vấn đề + ví dụ thực tế từ repo]</p>
+          <div class="info-box warn">⚠️ <span><strong>Cảnh báo:</strong> [Pitfall phổ biến]</span></div>
+
+          <h3 class="green">[Concept B] giải quyết gì?</h3>
+          <p>[Mô tả vấn đề + ví dụ thực tế từ repo]</p>
+          <div class="info-box note">📌 <span><strong>Lưu ý:</strong> [Ghi chú quan trọng]</span></div>
+
+          <h3 class="orange">Trước đây người ta làm gì?</h3>
+          <ul>
+            <li>[Cách cũ 1]</li>
+            <li>[Cách cũ 2]</li>
+            <li>[Cách cũ 3]</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Data flow diagram -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🔁</span>
+          Data flow diagram (ASCII)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3>[Tên flow]</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>[filename].txt</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">[Step 1]</span>
+    │
+    ▼
+<span class="kw2">[Step 2]</span>
+    │
+    ▼
+<span class="kw2">[Step 3]</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exit criteria -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">✅</span>
+          Exit criteria: "Bạn đã nắm module này khi..."
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li>[Criteria 1]</li>
+            <li>[Criteria 2]</li>
+            <li>[Criteria 3]</li>
+            <li>[Criteria 4]</li>
+            <li>[Criteria 5]</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         S1 · FOUNDATION THEORY — Lý thuyết nền
+    ════════════════════════════════════════════════════════ -->
+    <div class="module" id="s1">
+      <div class="module-header">
+        <div class="module-tag">S1 · Foundation Theory</div>
+        <div class="module-title">Lý thuyết nền — [Topic] (3-Level)</div>
+        <div class="module-subtitle">WHY trước HOW: hiểu bản chất để debug và ra quyết định đúng trong production.</div>
+      </div>
+
+      <!-- Level 1: Beginner -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">📘</span>
+          [Topic] — Beginner Level
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Khái niệm cốt lõi</h3>
+          <p>[Giải thích bằng ngôn ngữ đơn giản, có analogy thực tế]</p>
+          <div class="mental-model">💡 <strong>Mental model:</strong> [Analogy dễ nhớ]</div>
+
+          <h3 class="green">Các thành phần chính</h3>
+          <ul>
+            <li><strong>[Component 1]:</strong> [Giải thích]</li>
+            <li><strong>[Component 2]:</strong> [Giải thích]</li>
+            <li><strong>[Component 3]:</strong> [Giải thích]</li>
+          </ul>
+
+          <h3 class="orange">Command / Syntax cơ bản</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>terminal</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># [Mô tả lệnh]</span>
+<span class="kw">[command]</span> <span class="str">[args]</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level 2: Intermediate -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">📗</span>
+          [Topic] — Intermediate Level
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Cơ chế bên trong</h3>
+          <p>[Giải thích cơ chế hoạt động, layer by layer]</p>
+
+          <h3 class="green">Pattern thường dùng trong DE</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>[filename]</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># [Mô tả pattern]</span>
+<span class="kw">[code block]</span></pre>
+            </div>
+          </div>
+
+          <div class="info-box tip">✅ <span><strong>Best practice:</strong> [Tip quan trọng]</span></div>
+        </div>
+      </div>
+
+      <!-- Level 3: Senior -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">📕</span>
+          [Topic] — Senior Level
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Production concerns</h3>
+          <ul>
+            <li><strong>[Concern 1]:</strong> [Giải thích + cách xử lý]</li>
+            <li><strong>[Concern 2]:</strong> [Giải thích + cách xử lý]</li>
+            <li><strong>[Concern 3]:</strong> [Giải thích + cách xử lý]</li>
+          </ul>
+
+          <h3 class="red">Anti-patterns cần tránh</h3>
+          <div class="info-box danger">🚨 <span><strong>Danger:</strong> [Anti-pattern nghiêm trọng nhất]</span></div>
+        </div>
+      </div>
+
+      <!-- Quick quiz S1 -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🧪</span>
+          Quick Quiz — Kiểm tra S1
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item">
+            <div class="quiz-q">[Câu hỏi 1]</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích tại sao sai]')">A. [Đáp án A]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'[Giải thích tại sao đúng]')">B. [Đáp án B — đúng]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích tại sao sai]')">C. [Đáp án C]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích tại sao sai]')">D. [Đáp án D]</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">[Câu hỏi 2]</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'[Giải thích]')">A. [Đáp án A — đúng]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích]')">B. [Đáp án B]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích]')">C. [Đáp án C]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích]')">D. [Đáp án D]</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         S2 · CODE READING — Đọc hiểu code repo
+    ════════════════════════════════════════════════════════ -->
+    <div class="module" id="s2">
+      <div class="module-header">
+        <div class="module-tag">S2 · Code Reading</div>
+        <div class="module-title">Đọc hiểu code trong repo</div>
+        <div class="module-subtitle">Đọc code như Senior: hiểu WHY, không chỉ biết WHAT.</div>
+      </div>
+
+      <!-- Cấu trúc thư mục -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">📁</span>
+          Cấu trúc thư mục repo
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>tree</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">[module-folder]/</span>
+├── <span class="str">[file/folder 1]</span>          <span class="comment"># [Giải thích]</span>
+├── <span class="str">[file/folder 2]</span>          <span class="comment"># [Giải thích]</span>
+│   ├── <span class="fn">[sub-file]</span>           <span class="comment"># [Giải thích]</span>
+│   └── <span class="fn">[sub-file]</span>           <span class="comment"># [Giải thích]</span>
+└── <span class="str">[file/folder 3]</span>          <span class="comment"># [Giải thích]</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- File phân tích chính -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🔍</span>
+          Phân tích file chính: [filename]
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Mục đích file</h3>
+          <p>[Giải thích file làm gì, tại sao cần thiết]</p>
+
+          <h3 class="green">Đoạn code quan trọng</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>[filename]</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># [Annotation giải thích từng phần]</span>
+<span class="kw">[code block chính]</span>
+
+<span class="comment"># [Annotation tiếp theo]</span>
+<span class="kw2">[code block tiếp]</span></pre>
+            </div>
+          </div>
+
+          <div class="info-box note">📌 <span><strong>Key insight:</strong> [Điểm quan trọng cần chú ý]</span></div>
+        </div>
+      </div>
+
+      <!-- Câu hỏi đọc code -->
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">❓</span>
+          Câu hỏi tự kiểm tra sau khi đọc code
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li>[Câu hỏi 1 về code đã đọc]</li>
+            <li>[Câu hỏi 2 về code đã đọc]</li>
+            <li>[Câu hỏi 3 về code đã đọc]</li>
+            <li>[Câu hỏi 4 về code đã đọc]</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         S3 · HANDS-ON — Thực hành từng bước
+    ════════════════════════════════════════════════════════ -->
+    <div class="module" id="s3">
+      <div class="module-header">
+        <div class="module-tag">S3 · Hands-On Practice</div>
+        <div class="module-title">Thực hành từng bước</div>
+        <div class="module-subtitle">Làm theo thứ tự — mỗi bước build on bước trước.</div>
+      </div>
+
+      <div class="practice-task">
+        <div class="practice-task-header">Task 1: [Tên task 1]</div>
+        <div class="practice-task-body">
+          <p><strong>Mục tiêu:</strong> [Kết quả cần đạt được]</p>
+          <p><strong>Bước thực hiện:</strong></p>
+          <ol>
+            <li>[Bước 1]</li>
+            <li>[Bước 2]</li>
+            <li>[Bước 3]</li>
+          </ol>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>terminal</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># [Lệnh thực hành]</span>
+<span class="kw">[command]</span></pre>
+            </div>
+          </div>
+          <div onclick="toggleSolution(this)" class="solution-toggle">💡 Xem lời giải</div>
+          <div class="solution-box">
+            <p>[Lời giải chi tiết + giải thích]</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="practice-task">
+        <div class="practice-task-header">Task 2: [Tên task 2]</div>
+        <div class="practice-task-body">
+          <p><strong>Mục tiêu:</strong> [Kết quả cần đạt được]</p>
+          <ol>
+            <li>[Bước 1]</li>
+            <li>[Bước 2]</li>
+            <li>[Bước 3]</li>
+          </ol>
+          <div onclick="toggleSolution(this)" class="solution-toggle">💡 Xem lời giải</div>
+          <div class="solution-box">
+            <p>[Lời giải chi tiết]</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="practice-task">
+        <div class="practice-task-header">Task 3: [Tên task 3 — nâng cao hơn]</div>
+        <div class="practice-task-body">
+          <p><strong>Mục tiêu:</strong> [Kết quả cần đạt được]</p>
+          <ol>
+            <li>[Bước 1]</li>
+            <li>[Bước 2]</li>
+            <li>[Bước 3]</li>
+          </ol>
+          <div onclick="toggleSolution(this)" class="solution-toggle">💡 Xem lời giải</div>
+          <div class="solution-box">
+            <p>[Lời giải chi tiết]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         S4 · PRODUCTION THINKING
+    ════════════════════════════════════════════════════════ -->
+    <div class="module" id="s4">
+      <div class="module-header">
+        <div class="module-tag">S4 · Production Thinking</div>
+        <div class="module-title">Production Thinking</div>
+        <div class="module-subtitle">Suy nghĩ như Senior DE: reliability, observability, security, cost.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">🏭</span>
+          Production checklist
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Reliability</h3>
+          <ul>
+            <li>[Reliability concern 1]</li>
+            <li>[Reliability concern 2]</li>
+          </ul>
+
+          <h3 class="green">Observability</h3>
+          <ul>
+            <li>[Metrics cần monitor]</li>
+            <li>[Alert cần setup]</li>
+          </ul>
+
+          <h3 class="orange">Security</h3>
+          <ul>
+            <li>[Security concern 1]</li>
+            <li>[Security concern 2]</li>
+          </ul>
+
+          <h3 class="red">Cost optimization</h3>
+          <ul>
+            <li>[Cost concern 1]</li>
+            <li>[Cost concern 2]</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">⚖️</span>
+          Trade-offs & Decision framework
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Tình huống</th><th>Nên dùng</th><th>Lý do</th></tr></thead>
+            <tbody>
+              <tr><td>[Situation 1]</td><td>[Option A]</td><td>[Lý do]</td></tr>
+              <tr><td>[Situation 2]</td><td>[Option B]</td><td>[Lý do]</td></tr>
+              <tr><td>[Situation 3]</td><td>[Option C]</td><td>[Lý do]</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         S5 · ADVANCED — Kiến thức nâng cao
+    ════════════════════════════════════════════════════════ -->
+    <div class="module" id="s5">
+      <div class="module-header">
+        <div class="module-tag">S5 · Advanced Knowledge</div>
+        <div class="module-title">Kiến thức nâng cao</div>
+        <div class="module-subtitle">Deep dives cho những ai muốn đi xa hơn core requirements.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🚀</span>
+          [Advanced Topic 1]
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>[Giải thích advanced concept]</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>[filename]</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># [Advanced code example]</span>
+<span class="kw">[code]</span></pre>
+            </div>
+          </div>
+          <div class="info-box tip">✅ <span><strong>When to use:</strong> [Khi nào nên dùng advanced pattern này]</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🔬</span>
+          [Advanced Topic 2]
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>[Giải thích advanced concept 2]</p>
+          <div class="info-box note">📌 <span><strong>Note:</strong> [Ghi chú quan trọng]</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         S6 · COMMON ERRORS — Lỗi thường gặp
+    ════════════════════════════════════════════════════════ -->
+    <div class="module" id="s6">
+      <div class="module-header">
+        <div class="module-tag">S6 · Common Errors</div>
+        <div class="module-title">Lỗi thường gặp & Cách fix</div>
+        <div class="module-subtitle">Gặp lỗi là bình thường — quan trọng là biết diagnose nhanh.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🐛</span>
+          Error catalog
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Error / Triệu chứng</th><th>Root cause</th><th>Fix</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>[Error message 1]</code></td>
+                <td>[Root cause]</td>
+                <td>[Cách fix]</td>
+              </tr>
+              <tr>
+                <td><code>[Error message 2]</code></td>
+                <td>[Root cause]</td>
+                <td>[Cách fix]</td>
+              </tr>
+              <tr>
+                <td><code>[Error message 3]</code></td>
+                <td>[Root cause]</td>
+                <td>[Cách fix]</td>
+              </tr>
+              <tr>
+                <td><code>[Error message 4]</code></td>
+                <td>[Root cause]</td>
+                <td>[Cách fix]</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🔧</span>
+          Debug workflow
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Khi gặp lỗi, làm theo thứ tự</h3>
+          <ol>
+            <li>[Debug step 1: đọc error message đầy đủ]</li>
+            <li>[Debug step 2: kiểm tra X]</li>
+            <li>[Debug step 3: kiểm tra Y]</li>
+            <li>[Debug step 4: kiểm tra logs]</li>
+            <li>[Debug step 5: search / escalate]</li>
+          </ol>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>debug commands</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># [Lệnh debug hữu ích]</span>
+<span class="kw">[debug command 1]</span>
+<span class="kw">[debug command 2]</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         S7 · INTERVIEW PREP
+    ════════════════════════════════════════════════════════ -->
+    <div class="module" id="s7">
+      <div class="module-header">
+        <div class="module-tag">S7 · Interview Prep</div>
+        <div class="module-title">Interview Prep — [Topic]</div>
+        <div class="module-subtitle">Câu hỏi thực tế từ interview DE Banking/Fintech.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🎤</span>
+          Junior-level questions
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item">
+            <div class="quiz-q">[Junior question 1]</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích]')">A. [Option A]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'[Giải thích đúng]')">B. [Option B — đúng]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích]')">C. [Option C]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích]')">D. [Option D]</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">[Junior question 2]</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích]')">A. [Option A]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích]')">B. [Option B]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'[Giải thích đúng]')">C. [Option C — đúng]</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'[Giải thích]')">D. [Option D]</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🎯</span>
+          Senior-level questions (open-ended)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="practice-task">
+            <div class="practice-task-header">Senior Q1: [Câu hỏi open-ended 1]</div>
+            <div class="practice-task-body">
+              <p><strong>Gợi ý trả lời:</strong></p>
+              <ul>
+                <li>[Key point 1]</li>
+                <li>[Key point 2]</li>
+                <li>[Key point 3]</li>
+              </ul>
+              <div onclick="toggleSolution(this)" class="solution-toggle">💡 Xem sample answer</div>
+              <div class="solution-box">
+                <p>[Sample answer đầy đủ]</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">Senior Q2: [Câu hỏi open-ended 2]</div>
+            <div class="practice-task-body">
+              <p><strong>Gợi ý trả lời:</strong></p>
+              <ul>
+                <li>[Key point 1]</li>
+                <li>[Key point 2]</li>
+              </ul>
+              <div onclick="toggleSolution(this)" class="solution-toggle">💡 Xem sample answer</div>
+              <div class="solution-box">
+                <p>[Sample answer đầy đủ]</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         S8 · CHECKLIST & TỔNG KẾT
+    ════════════════════════════════════════════════════════ -->
+    <div class="module" id="s8">
+      <div class="module-header">
+        <div class="module-tag">S8 · Checklist & Wrap-up</div>
+        <div class="module-title">Checklist & Tổng kết Module XX</div>
+        <div class="module-subtitle">Tick đủ mới sang module tiếp theo.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">📊</span>
+          Progress tracker
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p class="progress-text" id="checklist-progress-text">0/5 mục hoàn thành (0%)</p>
+          <div class="progress-bar"><div class="progress-fill" id="checklist-progress-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧠</span>
+          Summary grid — điểm chốt
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="summary-grid">
+            <div class="summary-item"><strong>1) [Key concept 1]</strong>[Mô tả ngắn gọn]</div>
+            <div class="summary-item"><strong>2) [Key concept 2]</strong>[Mô tả ngắn gọn]</div>
+            <div class="summary-item"><strong>3) [Key concept 3]</strong>[Mô tả ngắn gọn]</div>
+            <div class="summary-item"><strong>4) [Key concept 4]</strong>[Mô tả ngắn gọn]</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">✅</span>
+          Definition of Done (DoD) — phải tick đủ mới sang module tiếp
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Chạy được:</strong> Code/pipeline chạy thành công từ đầu đến cuối.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Hiểu được:</strong> Vẽ lại kiến trúc module mà không cần nhìn tài liệu.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Phá được:</strong> Tự tạo ít nhất 1 lỗi và ghi lại cách fix vào Logbook.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Tối ưu được:</strong> Không hardcode secrets, cấu trúc gọn, đọc được.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Trả lời được:</strong> Giải quyết mạch lạc Senior Questions của module.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">⏭️</span>
+          Preview Module [XX+1]
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Module tiếp theo:</strong> [Tên module tiếp]</p>
+          <p><strong>Cần chuẩn bị:</strong> [Prerequisites từ module này]</p>
+          <p><a href="Module[XX+1]_[Topic].html">→ Module [XX+1]: [Tên]</a></p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const modules=document.querySelectorAll('.module');
+const navItems=document.querySelectorAll('.nav-item');
+
+function showModule(index,navItem){
+  modules.forEach(m=>{m.classList.remove('active');m.style.display='none'});
+  navItems.forEach(i=>i.classList.remove('active'));
+  const target=document.getElementById(`s${index}`);
+  if(target){target.classList.add('active');target.style.display='block'}
+  if(navItem)navItem.classList.add('active');
+  else if(navItems[index])navItems[index].classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toggleSection(header){
+  const content=header.nextElementSibling;
+  const toggle=header.querySelector('.section-toggle');
+  const isHidden=content.style.display==='none';
+  content.style.display=isHidden?'block':'none';
+  toggle.textContent=isHidden?'▼':'▶';
+}
+
+function answerQuiz(el,isCorrect,msg){
+  const item=el.closest('.quiz-item');
+  const opts=item.querySelectorAll('.quiz-opt');
+  const explain=item.querySelector('.quiz-explain');
+  opts.forEach(opt=>(opt.style.pointerEvents='none'));
+  el.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect){opts.forEach(opt=>{const o=opt.getAttribute('onclick');if(o&&o.includes('true'))opt.classList.add('correct')})}
+  explain.textContent=(isCorrect?'✓ Chính xác! ':'✗ Sai. ')+msg;
+  explain.classList.add('show');
+}
+
+function toggleSolution(btn){
+  const box=btn.nextElementSibling;
+  const show=box.classList.toggle('show');
+  btn.textContent=show?'🔼 Ẩn lời giải':'💡 Xem lời giải';
+}
+
+function switchTab(groupId,tabId){
+  const group=document.getElementById(groupId);
+  if(!group)return;
+  group.querySelectorAll('.tab').forEach(tab=>tab.classList.remove('active'));
+  const clicked=group.querySelector(`[onclick*="${tabId}"]`);
+  if(clicked)clicked.classList.add('active');
+  const container=group.parentElement;
+  container.querySelectorAll('.tab-content').forEach(content=>content.classList.remove('active'));
+  const target=document.getElementById(tabId);
+  if(target)target.classList.add('active');
+}
+
+function toggleCheck(box){
+  box.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress(){
+  const checks=document.querySelectorAll('.check-box');
+  const checked=document.querySelectorAll('.check-box.checked').length;
+  const total=checks.length;
+  const pct=total===0?0:Math.round((checked/total)*100);
+  const fill=document.getElementById('checklist-progress-fill');
+  const text=document.getElementById('checklist-progress-text');
+  if(fill)fill.style.width=`${pct}%`;
+  if(text)text.textContent=`${checked}/${total} mục hoàn thành (${pct}%)`;
+}
+
+showModule(0,navItems[0]);
+updateProgress();
+</script>
+</body>
+</html>

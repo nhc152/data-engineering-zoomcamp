@@ -135,8 +135,16 @@
   .checklist{list-style:none;padding:0;}
   .checklist li{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:0.88rem;border-bottom:1px solid var(--border);}
   .checklist li:last-child{border-bottom:none;}
-  .checklist li::before{content:'□';color:var(--accent4);font-size:1.1rem;flex-shrink:0;margin-top:-1px;}
 
+  .check-row{display:flex;align-items:flex-start;gap:10px;width:100%;}
+  .check-box{width:20px;height:20px;border:1px solid var(--accent4);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:1px;background:var(--bg);color:transparent;transition:all .15s;}
+  .check-box.checked{background:#2ea04320;border-color:var(--accent2);color:var(--accent2);}
+  .check-label{flex:1;}
+  .smoke-progress-wrap{margin:12px 0 16px;}
+
+  .quiz-score-board{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:14px;}
+  .quiz-score-text{font-size:0.84rem;color:var(--text-muted);}
+  .quiz-score-text strong{color:var(--accent4);}
   .test-question{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;}
   .test-question.correct{border-color:var(--accent2);background:#2ea04312;}
   .test-question.wrong{border-color:var(--accent3);background:#f7816612;}
@@ -204,26 +212,25 @@
 
 <div class="container">
   <nav class="sidebar">
-    <div class="sidebar-title">Module 02 Learning Map</div>
-    <div class="level-label">▶ PASS 1 · FOUNDATION</div>
-    <div class="nav-item active" onclick="showModule(0,this)"><span class="nav-number">02.01</span>Tổng quan &amp; Mục tiêu</div>
-    <div class="nav-item" onclick="showModule(1,this)"><span class="nav-number">02.02</span>Kestra Core Concepts</div>
-    <div class="nav-item" onclick="showModule(2,this)"><span class="nav-number">02.03</span>Local Stack Setup</div>
-    <div class="nav-item" onclick="showModule(3,this)"><span class="nav-number">02.04</span>Flows 01–03</div>
-    <div class="nav-item" onclick="showModule(4,this)"><span class="nav-number">02.05</span>ETL Local Postgres</div>
-    <div class="nav-item" onclick="showModule(5,this)"><span class="nav-number">02.06</span>Scheduling &amp; Backfill</div>
-    <div class="nav-item" onclick="showModule(6,this)"><span class="nav-number">02.07</span>GCP Setup</div>
-    <div class="nav-item" onclick="showModule(7,this)"><span class="nav-number">02.08</span>GCS + BigQuery ELT</div>
-    <div class="nav-item" onclick="showModule(8,this)"><span class="nav-number">02.09</span>AI + RAG in Kestra</div>
-    <div class="nav-item" onclick="showModule(9,this)"><span class="nav-number">02.10</span>Checklist &amp; Interview Prep</div>
+    <div class="sidebar-title">Module 02 Learning Map (S0–S8)</div>
+    <div class="level-label">▶ OUTPUT_STANDARD STRUCTURE</div>
+    <div class="nav-item active" onclick="showModule(0,this)"><span class="nav-number">S0</span>Tổng quan &amp; Mục tiêu</div>
+    <div class="nav-item" onclick="showModule(1,this)"><span class="nav-number">S1</span>Lý thuyết nền</div>
+    <div class="nav-item" onclick="showModule(2,this)"><span class="nav-number">S2</span>Đọc hiểu code trong repo</div>
+    <div class="nav-item" onclick="showModule(3,this)"><span class="nav-number">S3</span>Thực hành + Break/Debug</div>
+    <div class="nav-item" onclick="showModule(4,this)"><span class="nav-number">S4</span>Production Thinking</div>
+    <div class="nav-item" onclick="showModule(5,this)"><span class="nav-number">S5</span>Kiến thức nâng cao</div>
+    <div class="nav-item" onclick="showModule(6,this)"><span class="nav-number">S6</span>Lỗi thường gặp</div>
+    <div class="nav-item" onclick="showModule(7,this)"><span class="nav-number">S7</span>Interview Prep</div>
+    <div class="nav-item" onclick="showModule(8,this)"><span class="nav-number">S8</span>Checklist &amp; Tổng kết</div>
   </nav>
 
   <main class="main">
 
     <div class="module active" id="m0">
       <div class="module-header">
-        <div class="module-tag">Section 1 · Orientation</div>
-        <div class="module-title">1) Tổng quan &amp; Mục tiêu Module</div>
+        <div class="module-tag">S0 — Tổng quan &amp; Mục tiêu</div>
+        <div class="module-title">S0) Bức tranh lớn của Workflow Orchestration</div>
         <div class="module-subtitle">Vì sao orchestration là bắt buộc khi pipeline đi vào production.</div>
         <div class="progress-bar"><div class="progress-fill" style="width:22%"></div></div>
       </div>
@@ -276,8 +283,8 @@
 
     <div class="module" id="m1">
       <div class="module-header">
-        <div class="module-tag">Section 2 · Foundation Concepts</div>
-        <div class="module-title">2) Kestra Core Concepts</div>
+        <div class="module-tag">S1 — Lý thuyết nền</div>
+        <div class="module-title">S1) Kestra Core Concepts & Mental Model</div>
         <div class="module-subtitle">Nắm các building blocks trước khi đọc flow lớn.</div>
         <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
       </div>
@@ -442,8 +449,8 @@ tasks:
 
     <div class="module" id="m2">
       <div class="module-header">
-        <div class="module-tag">Section 3 · Setup</div>
-        <div class="module-title">3) Local Stack Setup</div>
+        <div class="module-tag">S2 — Đọc hiểu code trong repo</div>
+        <div class="module-title">S2) Cấu trúc repo + Local stack + flow wiring</div>
         <div class="module-subtitle">Kestra + Postgres + pgAdmin local stack cho workshop Module 02.</div>
         <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
       </div>
@@ -608,8 +615,8 @@ services:
 
     <div class="module" id="m3">
       <div class="module-header">
-        <div class="module-tag">Section 4 · Hands-on Flows 01–03</div>
-        <div class="module-title">4) Flows 01–03: Concepts &amp; Python</div>
+        <div class="module-tag">S3 — Thực hành từng bước</div>
+        <div class="module-title">S3) Runbook thực hành + Cố tình phá + SQL verify</div>
         <div class="module-subtitle">Mỗi flow: mục đích → concepts → YAML gốc → test steps.</div>
         <div class="progress-bar"><div class="progress-fill" style="width:82%"></div></div>
       </div>
@@ -829,16 +836,88 @@ tasks:
         </div>
       </div>
 
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-practice">🧪</div>
+          S3.4 SQL Verification Queries (PostgreSQL)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header code-toolbar">
+              <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
+              <span>verify_postgres.sql</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy SQL</button>
+            </div>
+            <div class="cmd-body"><pre>SELECT COUNT(*) AS total_rows,
+       COUNT(DISTINCT unique_row_id) AS unique_rows,
+       COUNT(*) - COUNT(DISTINCT unique_row_id) AS suspected_duplicates
+FROM yellow_tripdata;
+
+SELECT filename, COUNT(*) AS rows_per_file
+FROM yellow_tripdata
+GROUP BY filename
+ORDER BY rows_per_file DESC
+LIMIT 20;</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-practice">🛠️</div>
+          S3.5 Bài tập thực hành tăng dần + Cố tình phá
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="practice-task">
+            <div class="practice-task-header">🔧 Task 1 (Beginner) — Run lại Flows 01–03</div>
+            <div class="practice-task-body">
+              <p>Import và chạy lại 3 flow đầu, chụp execution logs chứng minh từng flow pass.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">💡 Xem lời giải</button>
+              <div class="solution-box">Checklist pass: Flow 01 có output log, Flow 02 có downloads &gt; 0, Flow 03 trả về bảng avg_price by brand.</div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">🔧 Task 2 (Intermediate) — Tự đổi input & verify lại</div>
+            <div class="practice-task-body">
+              <p>Chạy Flow 04 với taxi=green, year=2020, month=03 và verify row count bằng SQL.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">💡 Xem lời giải</button>
+              <div class="solution-box">Sau run, dùng <code>COUNT(*)</code> và <code>COUNT(DISTINCT unique_row_id)</code>. Chạy lại cùng input, row count phải giữ ổn định.</div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">🔧 Task 3 (Advanced) — Backfill an toàn</div>
+            <div class="practice-task-body">
+              <p>Backfill Flow 09 cho 3 tháng liên tiếp và quan sát trạng thái MERGE theo từng execution.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">💡 Xem lời giải</button>
+              <div class="solution-box">Thêm <code>concurrency: limit: 1</code> trước khi backfill dài kỳ. Theo dõi BigQuery job history để phát hiện contention.</div>
+            </div>
+          </div>
+
+          <h3 class="red">Cố tình phá (Break system) + Debug</h3>
+          <ul>
+            <li>Xóa secret <code>GCP_CREDS</code> rồi chạy Flow 08 → expected lỗi auth.</li>
+            <li>Đặt sai <code>GCP_BUCKET_NAME</code> trong KV → expected lỗi upload.</li>
+            <li>Bỏ <code>render()</code> khỏi <code>gcs_file</code> → filename literal chứa dấu ngoặc nhọn.</li>
+            <li>Backfill Flow 09 không giới hạn concurrency → quan sát race/lock contention.</li>
+            <li>Tắt <code>purge_files</code> và chạy nhiều lần → quan sát storage tăng bất thường.</li>
+          </ul>
+        </div>
+      </div>
+
       <div class="nav-buttons">
-        <button class="nav-btn" onclick="showModule(2,document.querySelectorAll('.nav-item')[2])">← Section 3</button>
-        <button class="nav-btn primary" onclick="showModule(4,document.querySelectorAll('.nav-item')[4])">Section 5 (PASS 2) →</button>
+        <button class="nav-btn" onclick="showModule(2,document.querySelectorAll('.nav-item')[2])">← S2</button>
+        <button class="nav-btn primary" onclick="showModule(4,document.querySelectorAll('.nav-item')[4])">Tiếp S4 →</button>
       </div>
     </div>
 
     <div class="module" id="m4">
       <div class="module-header">
-        <div class="module-tag">Section 5 · ETL Postgres Taxi</div>
-        <div class="module-title">5) Flows 04–05: ETL Postgres Taxi</div>
+        <div class="module-tag">S4 — Production Thinking</div>
+        <div class="module-title">S4) Failure · Scale · Idempotency · Monitoring · Cost · Security</div>
         <div class="module-subtitle">Tập trung vào idempotency bằng staging + MERGE để chạy lại không duplicate data.</div>
         <div class="progress-bar"><div class="progress-fill" style="width:88%"></div></div>
       </div>
@@ -1500,16 +1579,38 @@ triggers:
         </div>
       </div>
 
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-summary">🏭</div>
+          S4.6 Bộ 6 câu hỏi Production Thinking
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="red">1) Failure</h3>
+          <p>Nếu 3h sáng flow fail, bắt đầu từ Kestra execution log → task fail đầu tiên → query/HTTP/network context; sau đó đối chiếu trạng thái Postgres/BigQuery để xác định partial write.</p>
+          <h3 class="orange">2) Scale</h3>
+          <p>Khi volume x100, bottleneck thường ở download/network và MERGE contention. Hướng xử lý: partition tốt hơn, chia batch, giới hạn concurrency, chuyển compute nặng sang warehouse.</p>
+          <h3 class="green">3) Idempotency</h3>
+          <p>Chỉ an toàn khi hash-key contract ổn định và MERGE theo <code>unique_row_id</code>. Cần verify định kỳ bằng <code>COUNT(*)</code> vs <code>COUNT(DISTINCT unique_row_id)</code>.</p>
+          <h3 class="blue">4) Monitoring</h3>
+          <p>Core metrics: success_rate, duration, row_count_delta, duplicate_delta, retry_count, storage growth. Alert khi duration/duplicate vượt baseline.</p>
+          <h3 class="orange">5) Cost</h3>
+          <p>BigQuery cost phụ thuộc scan bytes; tối ưu bằng partition pruning, query selective columns, giảm reprocessing không cần thiết.</p>
+          <h3 class="red">6) Security</h3>
+          <p>Secrets tuyệt đối không hardcode; credentials ở Secret Store, config thường ở KV. Review logs để tránh vô tình lộ JSON key trong output.</p>
+        </div>
+      </div>
+
       <div class="nav-buttons">
-        <button class="nav-btn" onclick="showModule(3,document.querySelectorAll('.nav-item')[3])">← Section 4</button>
-        <button class="nav-btn primary" onclick="showModule(5,document.querySelectorAll('.nav-item')[5])">Tiếp Section 6 →</button>
+        <button class="nav-btn" onclick="showModule(3,document.querySelectorAll('.nav-item')[3])">← S3</button>
+        <button class="nav-btn primary" onclick="showModule(5,document.querySelectorAll('.nav-item')[5])">Tiếp S5 →</button>
       </div>
     </div>
 
     <div class="module" id="m5">
       <div class="module-header">
-        <div class="module-tag">Section 6 · GCP Setup</div>
-        <div class="module-title">6) GCP Setup (Flows 06–07)</div>
+        <div class="module-tag">S5 — Kiến thức nâng cao</div>
+        <div class="module-title">S5) Error handling, Subflow pattern, Cleanup strategy</div>
         <div class="module-subtitle">Chuẩn bị KV + Secrets và dựng hạ tầng bucket/dataset idempotent.</div>
         <div class="progress-bar"><div class="progress-fill" style="width:92%"></div></div>
       </div>
@@ -1617,18 +1718,69 @@ pluginDefaults:
         </div>
       </div>
 
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-summary">🚀</div>
+          S5.4 Advanced patterns: Error handling · Cleanup · Subflow
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="orange">Error handling & retry policy</h3>
+          <p>Task <code>wget</code> gọi network ngoài nên cần retry có kiểm soát để giảm lỗi transient. Không retry vô hạn; nên giới hạn số lần và timeout rõ ràng.</p>
+          <h3 class="green">Cleanup fail-safe</h3>
+          <p><code>purge_files</code> ở cuối flow là happy-path. Senior pattern là đảm bảo cleanup vẫn chạy khi task giữa chừng fail (dùng error branch/finally concept) để tránh rò rỉ storage.</p>
+          <h3 class="blue">Subflow refactor</h3>
+          <p>Flows 04/05/08/09 đang lặp mạnh đoạn download + schema + merge. Có thể tách subflow theo pattern <code>extract</code>, <code>upsert_postgres</code>, <code>upsert_bigquery</code> để giảm technical debt.</p>
+          <table>
+            <tr><th>Pattern</th><th>Khi dùng</th><th>Khi chưa cần</th></tr>
+            <tr><td>Subflow</td><td>Nhiều flow lặp logic giống nhau</td><td>POC nhỏ, ít hơn 2 flow</td></tr>
+            <tr><td>Error branch/finally</td><td>Task tạo file tạm hoặc tài nguyên đắt</td><td>Task read-only không side effect</td></tr>
+            <tr><td>Retry</td><td>Network/API dễ transient fail</td><td>Lỗi deterministic do syntax/data</td></tr>
+          </table>
+        </div>
+      </div>
+
       <div class="nav-buttons">
-        <button class="nav-btn" onclick="showModule(4,document.querySelectorAll('.nav-item')[4])">← Section 5</button>
-        <button class="nav-btn primary" onclick="showModule(6,document.querySelectorAll('.nav-item')[6])">Tiếp Section 7 →</button>
+        <button class="nav-btn" onclick="showModule(4,document.querySelectorAll('.nav-item')[4])">← S4</button>
+        <button class="nav-btn primary" onclick="showModule(6,document.querySelectorAll('.nav-item')[6])">Tiếp S6 →</button>
       </div>
     </div>
 
     <div class="module" id="m6">
       <div class="module-header">
-        <div class="module-tag">Section 7 · ELT BigQuery</div>
-        <div class="module-title">7) Flows 08–09: ELT BigQuery</div>
+        <div class="module-tag">S6 — Lỗi thường gặp</div>
+        <div class="module-title">S6) Incident patterns khi chạy Flows 08–09</div>
         <div class="module-subtitle">Tải file lên GCS trước, transform bằng BigQuery SQL sau để scale cloud.</div>
         <div class="progress-bar"><div class="progress-fill" style="width:96%"></div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-icon icon-practice">🧯</div>
+          S6.0 Bảng lỗi thường gặp (incident table)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <tr><th>Lỗi</th><th>Nguyên nhân</th><th>Cách fix</th><th>Cách phòng tránh</th></tr>
+            <tr><td>Upload GCS fail</td><td>Bucket/KV sai hoặc thiếu quyền</td><td>Kiểm tra KV + IAM role</td><td>Validate Flow 06/07 trước Flow 08</td></tr>
+            <tr><td>Filename literal có <code>{{...}}</code></td><td>Thiếu <code>render()</code> trong biến lồng</td><td>Dùng <code>{{render(vars.file)}}</code></td><td>Review template variables trước deploy</td></tr>
+            <tr><td>MERGE contention khi backfill</td><td>Flow 09 không giới hạn concurrency</td><td>Thêm <code>concurrency: limit: 1</code></td><td>Dry-run phạm vi nhỏ trước backfill dài</td></tr>
+            <tr><td>Duplicate sau re-run</td><td>Hash-key contract không ổn định</td><td>Chuẩn hóa cột hash + verify SQL</td><td>Track <code>COUNT(*)</code> vs <code>DISTINCT unique_row_id</code></td></tr>
+            <tr><td>Storage tăng nhanh</td><td>Cleanup không chạy sau fail</td><td>Thêm error/finally cleanup branch</td><td>Alert dung lượng storage execution</td></tr>
+            <tr><td>403 BigQuery/GCS</td><td>Service account thiếu role</td><td>Gán đúng role storage/bigquery</td><td>Checklist IAM trước onboarding</td></tr>
+            <tr><td>Flow success nhưng data rỗng</td><td>Input tháng/năm sai hoặc file không tồn tại</td><td>Kiểm tra input + source URL</td><td>Thêm precheck file existence</td></tr>
+            <tr><td>Backfill tạo quá nhiều run</td><td>Window thời gian quá dài</td><td>Chia window theo batch tháng</td><td>Kế hoạch backfill theo đợt</td></tr>
+          </table>
+          <h3 class="blue">Debug priority checklist</h3>
+          <ol>
+            <li>Xem task fail đầu tiên trong Kestra execution graph.</li>
+            <li>Kiểm tra Secrets/KV và quyền IAM.</li>
+            <li>Đối chiếu input runtime (taxi, year, month, trigger.date).</li>
+            <li>Chạy SQL verify để xác nhận duplicate/partial write.</li>
+            <li>Ghi logbook incident (triệu chứng, root cause, fix, prevention).</li>
+          </ol>
+        </div>
       </div>
 
       <div class="section">
@@ -1671,6 +1823,8 @@ pluginDefaults:
 → MERGE into main table</div>
           <p><strong>External Table:</strong> BigQuery query trực tiếp file trong GCS, phù hợp bước ingest nhanh trước khi materialize sang native table.</p>
           <p><strong>Partitioning:</strong> <code>PARTITION BY DATE(tpep_pickup_datetime)</code> (hoặc <code>DATE(lpep_pickup_datetime)</code> cho green) giúp giảm lượng data scan khi filter theo ngày, từ đó giảm cost query.</p>
+          <div class="info-box warn">⚠️ <span><strong>Hash key inconsistency cần chú ý:</strong> trong repo hiện tại, nhánh Yellow và Green đang dùng tập cột hash không hoàn toàn đồng nhất giữa các flow ETL/ELT (thực tế dễ gặp nhất là chênh giữa bộ 7 cột vs 5 cột). Nếu khóa cho Green thiếu <code>fare_amount</code> hoặc <code>trip_distance</code>, nguy cơ collision sẽ tăng khi nhiều trip trùng pickup/dropoff/time, dẫn tới MERGE nhầm record.</span></div>
+          <div class="info-box note">📌 <span><strong>Khuyến nghị Senior:</strong> chuẩn hóa một contract hash-key duy nhất cho cả Yellow/Green, version hóa rõ ràng và chạy đối chiếu <code>COUNT(*)</code> vs <code>COUNT(DISTINCT unique_row_id)</code> sau mỗi backfill.</span></div>
         </div>
       </div>
 
@@ -1722,7 +1876,7 @@ inputs:
 
 variables:
   file: "{{inputs.taxi}}_tripdata_{{inputs.year}}-{{inputs.month}}.csv"
-  gcs_file: "gs://{{kv('GCP_BUCKET_NAME')}}/{{vars.file}}"
+  gcs_file: "gs://{{kv('GCP_BUCKET_NAME')}}/{{render(vars.file)}}"
   table: "{{kv('GCP_DATASET')}}.{{inputs.taxi}}_tripdata_{{inputs.year}}_{{inputs.month}}"
   data: "{{outputs.extract.outputFiles[inputs.taxi ~ '_tripdata_' ~ inputs.year ~ '-' ~ inputs.month ~ '.csv']}}"
 
@@ -1950,6 +2104,17 @@ pluginDefaults:
             <li>BigQuery table <code>yellow_tripdata</code> có data</li>
             <li>Execute lại cùng input → row count KHÔNG thay đổi</li>
           </ul>
+          <h3 class="blue">SQL Verification Queries (BigQuery)</h3>
+          <div class="cmd-block"><div class="cmd-header code-toolbar"><div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div><span>verify_bq_idempotency.sql</span><button class="copy-btn" onclick="copyCode(this)">Copy SQL</button></div><div class="cmd-body"><pre>SELECT COUNT(*) AS total_rows,
+       COUNT(DISTINCT unique_row_id) AS unique_rows,
+       COUNT(*) - COUNT(DISTINCT unique_row_id) AS suspected_duplicates
+FROM `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.yellow_tripdata`;
+
+SELECT filename, COUNT(*) AS rows_per_file
+FROM `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.yellow_tripdata`
+GROUP BY filename
+ORDER BY rows_per_file DESC
+LIMIT 20;</pre></div></div>
         </div>
       </div>
 
@@ -1962,6 +2127,9 @@ pluginDefaults:
         <div class="section-content">
           <p>Flow 09 tương tự Flow 05 nhưng target là GCS + BigQuery và dùng <code>trigger.date</code> để generate file/table theo kỳ.</p>
           <p>Backfill khuyến nghị theo module: từ <code>2019-01</code> đến <code>2020-12</code>.</p>
+          <div class="info-box danger">🔥 <span><strong>Critical review fix:</strong> Flow 09 trong repo không có <code>concurrency: limit: 1</code>. Khi backfill 24–48 tháng, Kestra có thể spawn hàng chục execution đồng thời, khiến nhiều lệnh <code>MERGE</code> đập vào cùng bảng BigQuery và tạo race condition/lock contention.</span></div>
+          <div class="cmd-block"><div class="cmd-header code-toolbar"><div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div><span>Patch gợi ý cho Flow 09</span><button class="copy-btn" onclick="copyCode(this)">Copy YAML</button></div><div class="cmd-body"><pre class="yaml-code">concurrency:
+  limit: 1</pre></div></div>
           <div class="cmd-block">
             <div class="cmd-header code-toolbar">
               <div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div>
@@ -1983,7 +2151,7 @@ inputs:
 
 variables:
   file: "{{inputs.taxi}}_tripdata_{{trigger.date | date('yyyy-MM')}}.csv"
-  gcs_file: "gs://{{kv('GCP_BUCKET_NAME')}}/{{vars.file}}"
+  gcs_file: "gs://{{kv('GCP_BUCKET_NAME')}}/{{render(vars.file)}}"
   table: "{{kv('GCP_DATASET')}}.{{inputs.taxi}}_tripdata_{{trigger.date | date('yyyy_MM')}}"
   data: "{{outputs.extract.outputFiles[inputs.taxi ~ '_tripdata_' ~ (trigger.date | date('yyyy-MM')) ~ '.csv']}}"
 
@@ -2222,21 +2390,181 @@ triggers:
 
       <div class="nav-buttons">
         <button class="nav-btn" onclick="showModule(5,document.querySelectorAll('.nav-item')[5])">← Section 6</button>
-        <button class="nav-btn primary" onclick="showModule(7,document.querySelectorAll('.nav-item')[7])">Section 8 (PASS 3) →</button>
+        <button class="nav-btn primary" onclick="showModule(7,document.querySelectorAll('.nav-item')[7])">Tiếp S7 →</button>
       </div>
     </div>
     <div class="module" id="m7">
-      <div class="module-header"><div class="module-tag">PASS 3 Placeholder</div><div class="module-title">Section 8 sẽ inject ở PASS 3</div><div class="module-subtitle">GCS + BigQuery ELT flow.</div></div>
-    </div>
-    <div class="module" id="m8">
-      <div class="module-header"><div class="module-tag">PASS 3 Placeholder</div><div class="module-title">Section 9 sẽ inject ở PASS 3</div><div class="module-subtitle">AI Copilot + RAG workflow.</div></div>
-    </div>
-    <div class="module" id="m9">
-      <div class="module-header"><div class="module-tag">PASS 3 Placeholder</div><div class="module-title">Section 10 sẽ inject ở PASS 3</div><div class="module-subtitle">Checklist, DoD, interview mapping.</div></div>
+      <div class="module-header">
+        <div class="module-tag">S7 — Interview Prep</div>
+        <div class="module-title">S7) 12 câu hỏi phỏng vấn theo 3 level</div>
+        <div class="module-subtitle">Teardown, rebuild, re-import flows, reset credentials và smoke test theo thứ tự production-safe.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><div class="section-icon icon-quiz">🟦</div>S7.0 Interview Questions (12 câu)<div class="section-toggle">▼</div></div>
+        <div class="section-content">
+          <h3 class="blue">Junior (4 câu)</h3>
+          <ol>
+            <li>Namespace trong Kestra có vai trò gì trong tổ chức flow?</li>
+            <li>Khác nhau giữa Manual trigger và Schedule trigger?</li>
+            <li>Vì sao cần staging table trước MERGE?</li>
+            <li><code>render(vars.file)</code> giải quyết lỗi gì?</li>
+          </ol>
+          <h3 class="orange">Mid (4 câu)</h3>
+          <ol start="5">
+            <li>Trade-off ETL local vs ELT BigQuery trong module này?</li>
+            <li>Khi backfill dài kỳ, bạn kiểm soát concurrency thế nào?</li>
+            <li>Bạn dùng query nào để verify idempotency?</li>
+            <li>Khi nào dùng KV Store, khi nào dùng Secret?</li>
+          </ol>
+          <h3 class="red">Senior (4 câu)</h3>
+          <ol start="9">
+            <li>Thiết kế monitoring + alert cho flows 08/09 ra sao?</li>
+            <li>Hash-key inconsistency (7 cột vs 5 cột) gây rủi ro gì?</li>
+            <li>Khi BigQuery MERGE contention do backfill song song, playbook xử lý?</li>
+            <li>Refactor subflow nào để giảm duplication giữa 04/05/08/09?</li>
+          </ol>
+          <div class="info-box warn">⚠️ <span><strong>Red flags:</strong> trả lời không có metric/SQL chứng minh, bỏ qua idempotency, hoặc không nói rõ failure handling.</span></div>
+          <div class="info-box tip">💡 <span><strong>STAR:</strong> Situation → Task → Action → Result, luôn gắn với execution log và dữ liệu verify.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><div class="section-icon icon-purpose">♻️</div>8.1 Teardown sạch local state<div class="section-toggle">▼</div></div>
+        <div class="section-content">
+          <p>Dùng <code>docker compose down -v</code> để dừng stack và <strong>xóa volumes</strong>. Flag <code>-v</code> quan trọng vì nếu chỉ <code>down</code>, dữ liệu cũ trong volume vẫn giữ lại và có thể làm sai kết quả khi bạn muốn rebuild từ trạng thái trắng.</p>
+          <div class="cmd-block"><div class="cmd-header"><div class="code-toolbar"><span>Docker teardown</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div></div><div class="cmd-body"><pre>docker compose down -v</pre></div></div>
+          <div class="cmd-block"><div class="cmd-header"><div class="code-toolbar"><span>Verify resources đã cleanup</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div></div><div class="cmd-body"><pre>docker volume ls | grep -E "ny_taxi|kestra"
+docker ps -a | grep -E "pgdatabase|pgadmin|kestra"</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><div class="section-icon icon-detail">🧱</div>8.2 Rebuild Local Stack<div class="section-toggle">▼</div></div>
+        <div class="section-content">
+          <div class="cmd-block"><div class="cmd-header"><div class="code-toolbar"><span>Rebuild command</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div></div><div class="cmd-body"><pre>docker compose up -d
+docker compose logs kestra --tail=30 -f</pre></div></div>
+          <div class="info-box note">ℹ️ <span>Chờ Kestra healthy khoảng 30–60 giây trước khi import flows để tránh lỗi API/UI chưa sẵn sàng.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><div class="section-icon icon-summary">🧭</div>8.3 Re-import Flows đúng thứ tự<div class="section-toggle">▼</div></div>
+        <div class="section-content">
+          <table>
+            <tr><th>Thứ tự</th><th>Flow</th><th>File</th><th>Action sau import</th></tr>
+            <tr><td>1</td><td>01</td><td><code>01_hello_world.yaml</code></td><td>—</td></tr>
+            <tr><td>2</td><td>02</td><td><code>02_python.yaml</code></td><td>—</td></tr>
+            <tr><td>3</td><td>03</td><td><code>03_getting_started_data_pipeline.yaml</code></td><td>—</td></tr>
+            <tr><td>4</td><td>04</td><td><code>04_postgres_taxi.yaml</code></td><td>—</td></tr>
+            <tr><td>5</td><td>05</td><td><code>05_postgres_taxi_scheduled.yaml</code></td><td>—</td></tr>
+            <tr><td>6</td><td>06</td><td><code>06_gcp_kv.yaml</code></td><td>Execute ngay</td></tr>
+            <tr><td>7</td><td>07</td><td><code>07_gcp_setup.yaml</code></td><td>Execute ngay</td></tr>
+            <tr><td>8</td><td>08</td><td><code>08_gcp_taxi.yaml</code></td><td>—</td></tr>
+            <tr><td>9</td><td>09</td><td><code>09_gcp_taxi_scheduled.yaml</code></td><td>—</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><div class="section-icon icon-practice">🔐</div>8.4 Re-set GCP Credentials<div class="section-toggle">▼</div></div>
+        <div class="section-content">
+          <p>Thiết lập lại secret và verify KV sau Flow 06:</p>
+          <ul>
+            <li><code>GCP_CREDS</code> = JSON service account</li>
+            <li><code>GCP_PROJECT_ID</code>, <code>GCP_LOCATION</code>, <code>GCP_BUCKET_NAME</code>, <code>GCP_DATASET</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><div class="section-icon icon-practice">🧹</div>8.5 GCP Reset khi cần xóa sạch<div class="section-toggle">▼</div></div>
+        <div class="section-content">
+          <div class="cmd-block"><div class="cmd-header"><div class="code-toolbar"><span>GCP cleanup</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div><div class="cmd-dots"><span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span></div></div><div class="cmd-body"><pre>bq rm -r -f &lt;PROJECT&gt;:zoomcamp
+gsutil rm -r gs://&lt;BUCKET&gt;</pre></div></div>
+          <p>Sau khi cleanup, re-run Flow 07 để tạo lại dataset và bucket chuẩn trước khi chạy Flow 08/09.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><div class="section-icon icon-quiz">✅</div>8.6 Smoke Test Checklist<div class="section-toggle">▼</div></div>
+        <div class="section-content">
+          <div class="smoke-progress-wrap">
+            <p id="smokeProgressText" class="quiz-score-text">Tiến độ smoke test: <strong>0/8</strong></p>
+            <div class="progress-bar"><div class="progress-fill smoke-progress-fill" style="width:0%"></div></div>
+          </div>
+          <ul class="checklist" id="smokeChecklist">
+            <li><div class="check-row"><button class="check-box" data-check-id="smoke-1" onclick="toggleCheck(this)">✓</button><div class="check-label">Flow 01: Execute → logs OK</div></div></li>
+            <li><div class="check-row"><button class="check-box" data-check-id="smoke-2" onclick="toggleCheck(this)">✓</button><div class="check-label">Flow 02: Execute → downloads &gt; 0</div></div></li>
+            <li><div class="check-row"><button class="check-box" data-check-id="smoke-3" onclick="toggleCheck(this)">✓</button><div class="check-label">Flow 03: Execute → avg_price by brand trả về kết quả</div></div></li>
+            <li><div class="check-row"><button class="check-box" data-check-id="smoke-4" onclick="toggleCheck(this)">✓</button><div class="check-label">Flow 04: Execute yellow/2019/01 → rows &gt; 0</div></div></li>
+            <li><div class="check-row"><button class="check-box" data-check-id="smoke-5" onclick="toggleCheck(this)">✓</button><div class="check-label">Flow 04: Execute lại → row count KHÔNG đổi (idempotency)</div></div></li>
+            <li><div class="check-row"><button class="check-box" data-check-id="smoke-6" onclick="toggleCheck(this)">✓</button><div class="check-label">Flow 07: Execute → GCS bucket + BQ dataset exist</div></div></li>
+            <li><div class="check-row"><button class="check-box" data-check-id="smoke-7" onclick="toggleCheck(this)">✓</button><div class="check-label">Flow 08: Execute yellow/2019/01 → GCS + BQ có data</div></div></li>
+            <li><div class="check-row"><button class="check-box" data-check-id="smoke-8" onclick="toggleCheck(this)">✓</button><div class="check-label">Flow 08: Execute lại → row count KHÔNG đổi (idempotency)</div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(6,document.querySelectorAll('.nav-item')[6])">← Section 7</button>
+        <button class="nav-btn primary" onclick="showModule(8,document.querySelectorAll('.nav-item')[8])">Tiếp Section 9 →</button>
+      </div>
     </div>
 
-    <!-- PASS 2: Sections 5-7 sẽ được inject vào đây -->
-    <!-- PASS 3: Sections 8-10 sẽ được inject vào đây -->
+    <div class="module" id="m8">
+      <div class="module-header">
+        <div class="module-tag">S8 — Checklist & Tổng kết</div>
+        <div class="module-title">S8) Definition of Done + Next Steps</div>
+        <div class="module-subtitle">Tự kiểm tra nhanh kiến thức Kestra, Docker, ETL/ELT, BigQuery và backfill.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><div class="section-icon icon-quiz">🧠</div>Quiz tổng hợp 15 câu<div class="section-toggle">▼</div></div>
+        <div class="section-content">
+          <div class="quiz-score-board">
+            <div class="quiz-score-text" id="quizScoreText">Điểm hiện tại: <strong>0/15</strong> · Đã trả lời: <strong>0/15</strong></div>
+            <button class="nav-btn" type="button" onclick="resetQuiz()">Làm lại</button>
+          </div>
+
+          <div class="quiz-item"><div class="quiz-q">Namespace trong Kestra dùng để làm gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Namespace không phải nơi chứa secret credential.')">A. Lưu credentials cloud</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: namespace tổ chức flow theo domain/team và scope tài nguyên.')">B. Tổ chức flows theo domain/team</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Trigger được định nghĩa trong flow, không phụ thuộc namespace.')">C. Tạo cron trigger</div><div class="quiz-opt" onclick="answerQuiz(this,false,'UI user thuộc auth, không phải namespace.')">D. Quản lý user UI</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Task type nào phù hợp để chạy lệnh shell trong container?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Flow task chỉ điều phối logic.')">A. io.kestra.plugin.core.flow.If</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: Commands task chạy command trong runtime container.')">B. io.kestra.plugin.scripts.shell.Commands</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Schedule là trigger, không chạy shell.')">C. io.kestra.plugin.core.trigger.Schedule</div><div class="quiz-opt" onclick="answerQuiz(this,false,'HTTP task gọi API thay vì shell local.')">D. io.kestra.plugin.core.http.Request</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Backfill trong schedule flow có ý nghĩa chính là gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: chạy bù các khoảng thời gian lịch sử bị thiếu.')">A. Chạy bù cho các kỳ thời gian đã miss</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Backfill không reset secret.')">B. Reset secret về mặc định</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Backfill không xóa logs cũ.')">C. Xóa logs execution cũ</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Backfill không đổi cron expression.')">D. Đổi timezone cron</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Ý nghĩa của <code>{{ render(vars.file) }}</code> là gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'inputs khác với vars.')">A. Đọc input user</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: render chuỗi template bên trong biến vars.')">B. Render biến có template expression bên trong</div><div class="quiz-opt" onclick="answerQuiz(this,false,'outputs lấy kết quả task trước.')">C. Lấy output từ task trước</div><div class="quiz-opt" onclick="answerQuiz(this,false,'secret() mới đọc secret store.')">D. Đọc secret credential</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Cách lấy output file từ task extract là?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'inputs.* không truy cập output task.')">A. {{ inputs.extract.outputFiles['file.csv'] }}</div><div class="quiz-opt" onclick="answerQuiz(this,false,'kv() đọc key-value store.')">B. {{ kv('extract.file.csv') }}</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: outputs.task_id.outputFiles là map file artifacts.')">C. {{ outputs.extract.outputFiles['file.csv'] }}</div><div class="quiz-opt" onclick="answerQuiz(this,false,'secret() không chứa file artifact.')">D. {{ secret('extract.file.csv') }}</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Lệnh nào dùng để khởi động local stack ở background?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: up -d chạy detached.')">A. docker compose up -d</div><div class="quiz-opt" onclick="answerQuiz(this,false,'down -v là teardown.')">B. docker compose down -v</div><div class="quiz-opt" onclick="answerQuiz(this,false,'logs chỉ theo dõi log.')">C. docker compose logs kestra -f</div><div class="quiz-opt" onclick="answerQuiz(this,false,'ps -a chỉ liệt kê container.')">D. docker ps -a</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Service nào cung cấp UI orchestration chính trong module này?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'pgAdmin là UI quản trị Postgres.')">A. pgAdmin</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: Kestra UI là control-plane cho flows.')">B. Kestra</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Postgres lưu dữ liệu pipeline.')">C. Postgres</div><div class="quiz-opt" onclick="answerQuiz(this,false,'DuckDB dùng cho mini ETL flow.')">D. DuckDB</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Vì sao ETL Postgres flow tạo bảng staging trước khi MERGE?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: tách bước ingest thô và upsert giúp idempotent, dễ debug.')">A. Để tách ingest thô và merge idempotent</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không trực tiếp làm giảm CPU Kestra.')">B. Để giảm CPU của Kestra</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Staging không đổi cron schedule.')">C. Để tạo trigger schedule</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Staging không thay thế requirement secret.')">D. Để khỏi cần GCP secret</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">MERGE trong Postgres/BigQuery ở đây chủ yếu đảm bảo điều gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Không phải để đổi format CSV.')">A. Chuyển đổi CSV sang Parquet</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: tránh duplicate khi re-run cùng dữ liệu.')">B. Idempotency khi chạy lại flow</div><div class="quiz-opt" onclick="answerQuiz(this,false,'MERGE không dùng để tạo bucket.')">C. Tạo bucket GCS</div><div class="quiz-opt" onclick="answerQuiz(this,false,'MERGE không cấu hình timezone trigger.')">D. Set timezone trigger</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Khi re-run Flow 04 cùng tháng dữ liệu, tín hiệu đúng là gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Nếu tăng nhiều thường là duplicate.')">A. Row count tăng mạnh vì append</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: row count giữ ổn định nếu khóa unique + merge chuẩn.')">B. Row count không đổi đáng kể</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không nên xóa bảng mỗi lần chạy.')">C. Bảng bị drop trước khi load</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không cần lỗi để chứng minh đúng.')">D. Flow phải fail mới đúng</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Trong ELT BigQuery flow, external table dùng để làm gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: query trực tiếp dữ liệu file trên GCS trước khi materialize.')">A. Đọc dữ liệu từ file GCS mà chưa ingest vào bảng chính</div><div class="quiz-opt" onclick="answerQuiz(this,false,'External table không thay auth service account.')">B. Thay cho service account</div><div class="quiz-opt" onclick="answerQuiz(this,false,'External table không dùng để tạo cron.')">C. Tạo trigger schedule</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không có vai trò nén file tự động.')">D. Nén CSV thành gzip</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Partitioning theo pickup date trong BigQuery giúp gì nhiều nhất?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Không phải mục tiêu chính về cột metadata.')">A. Tăng số cột metadata</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: giảm scan cost và tăng tốc query theo thời gian.')">B. Giảm scan cost cho truy vấn theo thời gian</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Partitioning không thay được secret.')">C. Bỏ nhu cầu secret</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không tự động sửa dữ liệu lỗi.')">D. Tự sửa dữ liệu null</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">So sánh đúng giữa ETL và ELT trong module này?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: ETL transform trước load; ELT load vào warehouse rồi transform.')">A. ETL transform trước load, ELT load trước rồi transform</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Mô tả này bị đảo ngược.')">B. ETL load trước rồi transform, ELT transform trước load</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không đúng vì cả hai đều có transform.')">C. ETL không có transform</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không đúng, ELT thường tận dụng compute warehouse.')">D. ELT chỉ chạy local laptop</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Trade-off phổ biến khi chuyển từ ETL local sang ELT BigQuery là?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'ELT không loại bỏ hoàn toàn chi phí.')">A. Không còn chi phí vận hành nào</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không phải luôn chậm hơn local.')">B. Luôn chậm hơn ETL local</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: scale tốt hơn nhưng cần kiểm soát chi phí scan/query.')">C. Scale tốt hơn nhưng cần quản trị cost chặt hơn</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không phải kém tự động hóa hơn local.')">D. Kém tự động hóa hơn ETL local</div></div><div class="quiz-explain"></div></div>
+
+          <div class="quiz-item"><div class="quiz-q">Backfill nên dùng khi nào?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Không chỉ dùng cho run đầu tiên.')">A. Chỉ khi chạy flow lần đầu</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Backfill không để đổi password UI.')">B. Khi cần đổi credentials UI</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: khi có khoảng thời gian dữ liệu lịch sử chưa được xử lý.')">C. Khi bị miss nhiều kỳ dữ liệu lịch sử cần xử lý bù</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Backfill không phải cơ chế xóa dataset.')">D. Khi muốn xóa toàn bộ dataset</div></div><div class="quiz-explain"></div></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(7,document.querySelectorAll('.nav-item')[7])">← S7</button>
+        <button class="nav-btn primary" onclick="showModule(0,document.querySelectorAll('.nav-item')[0])">Hoàn tất S8 ↺</button>
+      </div>
+    </div>
+
 
   </main>
 </div>
@@ -2273,19 +2601,54 @@ function toggleSection(header) {
 }
 
 function answerQuiz(el, correct, explanation) {
-  const item   = el.closest('.quiz-item');
-  const opts   = item.querySelectorAll('.quiz-opt');
+  const item = el.closest('.quiz-item');
+  if (!item || item.dataset.answered === '1') return;
+
+  const opts = item.querySelectorAll('.quiz-opt');
   const explain = item.querySelector('.quiz-explain');
   opts.forEach(o => o.style.pointerEvents = 'none');
+
+  item.dataset.answered = '1';
+  item.dataset.correct = correct ? '1' : '0';
+
   el.classList.add(correct ? 'correct' : 'wrong');
   if (!correct) {
     opts.forEach(o => {
-      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes('true'))
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes('true')) {
         o.classList.add('correct');
+      }
     });
   }
+
   explain.textContent = (correct ? '✓ Chính xác! ' : '✗ Sai. ') + explanation;
   explain.classList.add('show');
+  updateQuizScore();
+}
+
+function updateQuizScore() {
+  const quizItems = document.querySelectorAll('#m8 .quiz-item');
+  const answered = Array.from(quizItems).filter(item => item.dataset.answered === '1').length;
+  const correct = Array.from(quizItems).filter(item => item.dataset.correct === '1').length;
+  const scoreText = document.getElementById('quizScoreText');
+  if (scoreText) {
+    scoreText.innerHTML = `Điểm hiện tại: <strong>${correct}/${quizItems.length}</strong> · Đã trả lời: <strong>${answered}/${quizItems.length}</strong>`;
+  }
+}
+
+function resetQuiz() {
+  const quizItems = document.querySelectorAll('#m8 .quiz-item');
+  quizItems.forEach(item => {
+    delete item.dataset.answered;
+    delete item.dataset.correct;
+    item.querySelectorAll('.quiz-opt').forEach(opt => {
+      opt.style.pointerEvents = 'auto';
+      opt.classList.remove('correct', 'wrong');
+    });
+    const explain = item.querySelector('.quiz-explain');
+    explain.textContent = '';
+    explain.classList.remove('show');
+  });
+  updateQuizScore();
 }
 
 function toggleSolution(btn) {
@@ -2307,16 +2670,36 @@ function switchTab(groupId, tabId) {
 
 function toggleCheck(box) {
   box.classList.toggle('checked');
-  updateProgress();
+  const checkId = box.dataset.checkId;
+  if (checkId) {
+    localStorage.setItem(`m2-${checkId}`, box.classList.contains('checked') ? '1' : '0');
+  }
+  updateSmokeProgress();
 }
 
-function updateProgress() {
-  const allChecks = document.querySelectorAll('.check-box');
+function updateSmokeProgress() {
+  const allChecks = document.querySelectorAll('#smokeChecklist .check-box');
   if (!allChecks.length) return;
-  const checked = document.querySelectorAll('.check-box.checked').length;
+
+  const checked = document.querySelectorAll('#smokeChecklist .check-box.checked').length;
   const percent = Math.round((checked / allChecks.length) * 100);
-  const bar = document.querySelector('.progress-fill');
+
+  const bar = document.querySelector('.smoke-progress-fill');
   if (bar) bar.style.width = `${percent}%`;
+
+  const txt = document.getElementById('smokeProgressText');
+  if (txt) txt.innerHTML = `Tiến độ smoke test: <strong>${checked}/${allChecks.length}</strong>`;
+}
+
+function initSmokeChecklist() {
+  const allChecks = document.querySelectorAll('#smokeChecklist .check-box');
+  allChecks.forEach(box => {
+    const checkId = box.dataset.checkId;
+    if (checkId && localStorage.getItem(`m2-${checkId}`) === '1') {
+      box.classList.add('checked');
+    }
+  });
+  updateSmokeProgress();
 }
 
 function copyCode(btn) {
@@ -2350,6 +2733,9 @@ document.querySelectorAll('pre.yaml-code').forEach(pre => {
   const raw = pre.textContent;
   pre.innerHTML = highlightYaml(raw);
 });
+
+updateQuizScore();
+initSmokeChecklist();
 </script>
 </body>
 </html>
