@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phỏng Vấn DE - Phần 1 (Core Technical)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+    --accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;
+    --text:#e6edf3;--text-muted:#8b949e;--code-bg:#0d1117;--highlight:#388bfd26;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter','Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+  .hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 40%,#1a2a1e 100%);border-bottom:2px solid var(--accent4);padding:40px 24px 30px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#6e40c922,transparent 70%);pointer-events:none}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--accent4);letter-spacing:-0.5px}
+  .hero p{color:var(--text-muted);margin-top:8px;font-size:.95rem}
+  .badge-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;border:1px solid}
+  .badge-blue{color:var(--accent);border-color:var(--accent);background:#1f6feb1a}
+  .badge-green{color:var(--accent2);border-color:var(--accent2);background:#2ea04326}
+  .badge-orange{color:var(--accent5);border-color:var(--accent5);background:#d2940026}
+  .badge-purple{color:var(--accent4);border-color:var(--accent4);background:#6e40c926}
+  .badge-red{color:var(--accent3);border-color:var(--accent3);background:#f7816610}
+  .container{display:flex;min-height:calc(100vh - 160px)}
+  .sidebar{width:320px;min-width:320px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:0 16px 12px}
+  .level-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 16px 4px;color:var(--accent4)}
+  .nav-item{display:flex;align-items:center;padding:7px 16px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-left:3px solid transparent;transition:all .15s;justify-content:space-between}
+  .nav-item-left{display:flex;align-items:center;}
+  .nav-item:hover{color:var(--text);background:var(--surface2)}
+  .nav-item.active{color:var(--accent4);border-left-color:var(--accent4);background:#6e40c915;font-weight:600}
+  .nav-number{display:inline-block;width:30px;font-size:.7rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .nav-priority{font-size:12px;margin-left:8px;}
+  .main{flex:1;padding:32px 40px;max-width:1000px}
+  .module{display:none}
+  .module.active{display:block}
+  .module-header{border:1px solid var(--border);border-radius:12px;padding:24px 28px;background:var(--surface);margin-bottom:24px;position:relative;overflow:hidden}
+  .module-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent4)}
+  .module-tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent4);margin-bottom:8px}
+  .module-title{font-size:1.6rem;font-weight:800;margin-bottom:8px}
+  .module-subtitle{color:var(--text-muted);font-size:.9rem}
+  
+  .controls-bar {display:flex; gap:10px; margin-bottom:20px; align-items:center; flex-wrap:wrap;}
+  .search-box {padding:8px 12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:0.85rem; flex:1; min-width:200px;}
+  
+  .section{margin-bottom:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface)}
+  .section-header{padding:14px 20px;font-weight:600;font-size:.9rem;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--surface2);border-bottom:1px solid transparent;transition:all 0.2s}
+  .section-header:hover{background:var(--highlight)}
+  .section-header.open{border-bottom-color:var(--border);background:var(--surface)}
+  
+  .q-badge{font-size:0.75rem; padding:2px 6px; border-radius:4px; font-weight:700; flex-shrink:0;}
+  .q-lvl-1{background:#1f6feb33; color:var(--accent);}
+  .q-lvl-2{background:#d2940026; color:var(--accent5);}
+  .q-lvl-3{background:#6e40c926; color:var(--accent4);}
+  
+  .section-icon{display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .section-content{padding:20px;display:none;}
+  .section-toggle{margin-left:auto;color:var(--text-muted);font-size:12px; transition:transform 0.2s}
+  .section-header.open .section-toggle{transform:rotate(180deg)}
+  
+  h3{font-size:1rem;font-weight:700;color:var(--accent4);margin:18px 0 10px}
+  h3:first-child{margin-top:0}
+  h3.blue{color:var(--accent)}
+  h3.green{color:var(--accent2)}
+  h3.orange{color:var(--accent5)}
+  h3.red{color:var(--accent3)}
+  p{margin-bottom:12px;color:var(--text);font-size:.88rem}
+  ul,ol{padding-left:20px;margin-bottom:12px}
+  li{font-size:.88rem;margin-bottom:5px}
+  strong{color:var(--text); font-weight:600;}
+  em{color:var(--accent2); font-style:italic;}
+  
+  .cmd-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .cmd-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .cmd-body{padding:14px}
+  pre{font-family:'JetBrains Mono','Courier New','Consolas',monospace;font-size:.82rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--text)}
+  code{font-family:'JetBrains Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:.82rem;color:var(--accent4)}
+  
+  .info-box{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:.84rem;border:1px solid;display:flex;gap:10px}
+  .info-box.tip{border-color:var(--accent2);background:#2ea04310;color:var(--accent2)}
+  .info-box.warn{border-color:var(--accent5);background:#d2940015;color:var(--accent5)}
+  .info-box.note{border-color:var(--accent4);background:#6e40c915;color:var(--accent4)}
+  .info-box.danger{border-color:var(--accent3);background:#f7816610;color:var(--accent3)}
+  .info-box span{color:var(--text)}
+  
+  .nav-buttons{display:flex;gap:12px;margin-top:32px;justify-content:space-between}
+  .nav-btn{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:6px;text-decoration:none;}
+  .nav-btn:hover{border-color:var(--accent4);color:var(--accent4)}
+  
+  .check-box{width:16px;height:16px;border:1px solid var(--border);border-radius:3px;flex-shrink:0;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;background:var(--surface)}
+  .check-box.checked{background:var(--accent2);border-color:var(--accent2)}
+  .check-box.checked::after{content:'✓';font-size:10px;color:#000;font-weight:600}
+  
+  .progress-container{background:var(--surface2); padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid var(--border)}
+  .progress-header{display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;}
+  .progress-bar{background:var(--bg);border-radius:4px;height:8px;overflow:hidden; border:1px solid var(--border)}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent4));border-radius:4px;width:0;transition:width .3s ease}
+  
+  .level-header {font-size:1.1rem; color:var(--text-muted); border-bottom:1px solid var(--border); padding-bottom:8px; margin:24px 0 16px; display:flex; align-items:center; gap:8px}
+  .level-header span {font-size:0.75rem; background:var(--surface2); padding:2px 8px; border-radius:12px; color:var(--text)}
+
+  @media(max-width:768px){.sidebar{display:none}.main{padding:16px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Phỏng Vấn Data Engineer — Phần 1</h1>
+  <p>Tài liệu ôn tập chuyên sâu: Core Technical (Nhóm 1-5)</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">Beginner → Senior</span>
+    <span class="badge badge-blue">Tương tác</span>
+    <span class="badge badge-green">Part 1/2</span>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="sidebar-title">Menu Ôn Tập</div>
+    <div class="nav-item active" onclick="showModule('s0',this)">
+      <div class="nav-item-left"><span class="nav-number">S0</span>Tổng quan</div>
+    </div>
+    
+    <div class="level-label">PHẦN 1: CORE TECHNICAL</div>
+    <div class="nav-item" onclick="showModule('g1',this)">
+      <div class="nav-item-left"><span class="nav-number">G1</span>ETL & Pipeline</div>
+      <span class="nav-priority">🔴 Cao nhất</span>
+    </div>
+    <div class="nav-item" onclick="showModule('g2',this)">
+      <div class="nav-item-left"><span class="nav-number">G2</span>ODI & ETL Tools</div>
+      <span class="nav-priority">🔴 Cao nhất</span>
+    </div>
+    <div class="nav-item" onclick="showModule('g3',this)">
+      <div class="nav-item-left"><span class="nav-number">G3</span>SQL & Tuning</div>
+      <span class="nav-priority">🔴 Cao nhất</span>
+    </div>
+    <div class="nav-item" onclick="showModule('g4',this)">
+      <div class="nav-item-left"><span class="nav-number">G4</span>DBA & Admin</div>
+      <span class="nav-priority">🟡 Quan trọng</span>
+    </div>
+    <div class="nav-item" onclick="showModule('g5',this)">
+      <div class="nav-item-left"><span class="nav-number">G5</span>HA/DR & Sync</div>
+      <span class="nav-priority">🔴 Cao nhất</span>
+    </div>
+
+    <div class="level-label">LIÊN KẾT</div>
+    <a href="interview_de_index.html" class="nav-item">
+      <div class="nav-item-left"><span class="nav-number">🏠</span>Trang Chủ</div>
+    </a>
+    <a href="interview_de_part2.html" class="nav-item">
+      <div class="nav-item-left"><span class="nav-number">→</span>Phần 2 (Nhóm 6-11)</div>
+    </a>
+  </nav>
+
+  <main class="main">
+
+    <!-- S0: Tổng quan -->
+    <div class="module active" id="s0">
+      <div class="module-header">
+        <div class="module-tag">S0 · Orientation</div>
+        <div class="module-title">Hướng dẫn ôn tập</div>
+        <div class="module-subtitle">Chiến lược sử dụng tài liệu này hiệu quả nhất.</div>
+      </div>
+
+      <div class="info-box note">
+        📌 <span><strong>Tip:</strong> Click vào từng câu hỏi để xem đáp án. Hãy tự trả lời nhẩm trong đầu trước khi xem gợi ý để tăng khả năng ghi nhớ. Đánh dấu ✓ vào các câu đã nắm vững.</span>
+      </div>
+
+      <div class="section">
+        <div class="section-header open" onclick="toggleSection(this)">
+          <span class="section-icon">📊</span>
+          Phân loại cấp độ
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content" style="display:block">
+          <ul>
+            <li><span class="q-badge q-lvl-1">L1</span> <strong>Kiến thức nền tảng:</strong> Kiểm tra hiểu biết bản chất, khái niệm. (Thường hỏi lúc bắt đầu)</li>
+            <li><span class="q-badge q-lvl-2">L2</span> <strong>Chuyên sâu kỹ thuật:</strong> Kiểm tra khả năng thiết kế, tối ưu, kinh nghiệm thực tế. (Vòng technical deep-dive)</li>
+            <li><span class="q-badge q-lvl-3">L3</span> <strong>Tình huống thực chiến:</strong> Kịch bản sự cố, xử lý dưới áp lực. (Phân loại ứng viên Senior)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- G1: ETL & Pipeline Design -->
+    <div class="module" id="g1">
+      <div class="module-header">
+        <div class="module-tag">G1 · Core Technical</div>
+        <div class="module-title">Nhóm 1: ETL & Pipeline Design</div>
+        <div class="module-subtitle">12 câu hỏi | Mức độ ưu tiên: ⭐⭐⭐ Cao nhất</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Tiến độ ôn tập nhóm này:</span>
+          <span class="progress-count">0/12</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 1 — Kiến thức nền tảng <span>Interviewer muốn biết bạn hiểu khái niệm hay chỉ làm theo template</span></div>
+
+      <!-- Q1 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q1. ETL và ELT khác nhau thế nào? Approach nào bạn dùng?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"ETL và ELT khác nhau thế nào? Trong các dự án của bạn, bạn dùng approach nào và tại sao?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>ETL:</strong> Transform trước rồi mới load — phù hợp với hệ thống enterprise có rule nghiệp vụ phức tạp như AML, OFSAA.
+            <br>• <strong>ELT:</strong> Load raw trước, transform sau trong data warehouse — phù hợp cloud/big data.
+            <br>• <strong>Trải nghiệm:</strong> Bạn dùng ETL vì môi trường Oracle/ODI enterprise, rule nghiệp vụ banking cần kiểm soát chặt trước khi vào Core.</span>
+          </div>
+          <div class="info-box note">
+            ⚡ <span><strong>Bổ sung:</strong> Nếu bị hỏi thêm "ELT dùng tool gì?", hãy nhắc đến dbt (data build tool) kết hợp Snowflake/BigQuery.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q2. Tại sao cần Staging layer?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Tại sao cần Staging layer? Nếu bỏ Staging, load thẳng từ Source vào Core thì có vấn đề gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• Không thể rerun riêng bước transform nếu lỗi — phải extract lại từ nguồn tốn kết nối và thời gian.
+            <br>• Không có chỗ để làm DQ checks trước khi vào Core.
+            <br>• Nếu source system thay đổi schema → ảnh hưởng thẳng vào Core.
+            <br>• Staging là buffer: tách extract khỏi transform, dễ debug, dễ audit.
+            <br>• <em>Dẫn chứng:</em> Đã thiết kế Staging với 30+ bảng cho AML làm ví dụ.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q3. Full load và Incremental load</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Full load và incremental load khác nhau thế nào? Khi nào bạn chọn cái nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Full load:</strong> Truncate rồi insert lại toàn bộ — đơn giản, an toàn, dùng cho bảng nhỏ hoặc dimension ít thay đổi.
+            <br>• <strong>Incremental:</strong> Chỉ lấy dữ liệu mới/thay đổi — dùng cho bảng transaction lớn, giảm tải source.
+            <br>• Incremental cần cơ chế xác định "mới": timestamp, sequence number, CDC.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q4. Idempotency trong ETL là gì?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Idempotency trong ETL là gì? Tại sao nó quan trọng?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong> 
+            <br>Idempotent nghĩa là chạy lại nhiều lần vẫn cho kết quả như chạy 1 lần — không duplicate data. 
+            <br>Quan trọng vì batch ETL có thể fail và cần rerun. 
+            <br><strong>Cách đảm bảo:</strong> dùng MERGE thay INSERT, dùng batch_id để track, truncate staging trước khi load, check tồn tại trước khi insert.
+            <br><em>Dẫn chứng:</em> Đã dùng batch_id trong stored procedure AML.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 2 — Chuyên sâu kỹ thuật <span>Interviewer muốn kiểm tra bạn thực sự thiết kế hay chỉ execute</span></div>
+
+      <!-- Q5 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q5. Cơ chế handshake & kiểm soát batch (AML)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Trong dự án AML Agribank, bạn thiết kế cơ chế handshake và kiểm soát batch như thế nào? Giải thích chi tiết luồng từ khi batch bắt đầu đến khi kết thúc."</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Thiết kế thực tế):</strong>
+            <br>• <strong>Bắt đầu:</strong> tạo record trong job_log với batch_id, status = RUNNING, start_time.
+            <br>• <strong>Handshake:</strong> kiểm tra DB link còn sống, kiểm tra source system đã sẵn sàng chưa.
+            <br>• <strong>Extract:</strong> pull data từ source vào Staging, ghi số bản ghi vào proc_log.
+            <br>• <strong>Transform:</strong> gọi stored procedure theo thứ tự, mỗi SP nhận batch_id.
+            <br>• <strong>DQ check:</strong> chạy validation, bản ghi lỗi → error_table.
+            <br>• <strong>Load:</strong> chỉ load bản ghi đã pass DQ vào Core.
+            <br>• <strong>Kết thúc:</strong> update job_log status = SUCCESS/FAILED, end_time, row_count.
+            <br>• <strong>Rollback:</strong> nếu fail giữa chừng → rollback transaction, status = FAILED, alert email.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q6. SCD & SCD-like change tracking</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"SCD là gì? Bạn đề cập SCD-like change tracking trong dự án AML — bạn xử lý thế nào và tại sao không dùng SCD chuẩn?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>SCD 1:</strong> overwrite — không giữ lịch sử.
+            <br>• <strong>SCD 2:</strong> thêm row mới với effective_date, giữ lịch sử đầy đủ.
+            <br>• <strong>SCD 3:</strong> thêm cột previous_value.
+            <br>• <strong>"SCD-like" trong AML:</strong> so sánh hash hoặc checksum của record hiện tại với record mới, nếu khác → đánh dấu changed. Không dùng SCD Type 2 chuẩn vì schema AML do vendor quy định, không thể thêm cột effective_date tùy ý.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q7. Xử lý Batch Overrun</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Batch window là gì? Nếu batch ETL hằng đêm bị overrun — chạy quá giờ quy định — bạn xử lý thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Batch window: khung giờ cho phép ETL chạy (vd: 22h–5h sáng).
+            <br>Nếu overrun:
+            <br>• <strong>Short-term:</strong> kill job ít quan trọng nhất, ưu tiên bảng core chạy trước.
+            <br>• <strong>Phân tích:</strong> query nào chậm? Volume tăng? Resource contention?
+            <br>• <strong>Giải pháp:</strong> tối ưu query, tăng parallelism, chia nhỏ batch, chạy incremental thay full load.
+            <br>• <strong>Reporting:</strong> báo cáo cho stakeholder bảng nào bị delay, impact.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q8. Dependency trong 200+ Programs (ODI)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn thiết kế ~200 Program trong ODI cho LPBank OFSAA. Làm thế nào để đảm bảo dependency giữa các program được xử lý đúng? Nếu program 150 fail thì sao?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>ODI Package:</strong> các Step được nối theo On Success/On Failure.
+            <br>• <strong>Dependency:</strong> program B chỉ chạy sau A thành công → dùng conditional branch.
+            <br>• <strong>Fail xử lý:</strong> Program 150 fail → Package dừng lại hoặc route sang error branch.
+            <br>• <strong>Idempotency:</strong> rerun từ program 150 được, không cần chạy lại từ đầu.
+            <br>• <strong>Alert:</strong> gửi email notification kèm log chi tiết.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 3 — Tình huống thực chiến <span>Interviewer muốn thấy bạn xử lý vấn đề dưới áp lực</span></div>
+
+      <!-- Q9 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q9. Điều tra data giảm 60% đột ngột</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Sáng thứ Hai, team nghiệp vụ AML báo: 'Số lượng giao dịch đáng ngờ hôm nay giảm 60% so với thứ Sáu, có vẻ dữ liệu bị thiếu.' Bạn điều tra theo thứ tự nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Systematic thinking):</strong>
+            <br>1. <strong>Kiểm tra job_log:</strong> batch T7, CN có chạy đủ không? Status?
+            <br>2. <strong>Kiểm tra row count:</strong> Staging có đủ bản ghi không?
+            <br>3. <strong>Kiểm tra error_table:</strong> reject bao nhiêu? Lý do?
+            <br>4. <strong>Kiểm tra DB link:</strong> IPCAS, SWIFT còn sống không?
+            <br>5. <strong>Kiểm tra source:</strong> cuối tuần có maintenance? Missing file?
+            <br>6. <strong>Kiểm tra DQ:</strong> rule nào vô tình reject quá nhiều?
+            <br>7. <strong>Report:</strong> xác định nguyên nhân, ước tính data thiếu, plan recovery.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q10. Cutover migration 300+ bảng (VAECO)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn cần migrate 300+ bảng sang hệ thống mới trong thời gian cutover 8 tiếng cuối tuần. Kế hoạch đảm bảo 0 data loss và rollback?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• Phân loại bảng: critical (chạy trước), non-critical.
+            <br>• Chạy thử dry-run nhiều lần trên môi trường test.
+            <br>• Backup toàn bộ trước khi bắt đầu.
+            <br>• Song song hóa: chia bảng thành nhóm, chạy nhiều luồng cùng lúc.
+            <br>• Reconciliation: sau mỗi nhóm kiểm tra row count, checksum.
+            <br>• Rollback plan: nếu >X bảng fail → restore backup, revert.
+            <br>• Communication: update status mỗi 30 phút.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q11 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q11. Debug pipeline chậm đột ngột</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Một pipeline ETL đang chạy ổn 3 tháng, đột nhiên hôm nay chạy chậm gấp 5 lần dù không có thay đổi code. Nguyên nhân và cách debug?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Checklist):</strong>
+            <br>• <strong>Data volume:</strong> source tăng đột biến (cuối tháng/quý).
+            <br>• <strong>Statistics cũ:</strong> Oracle/PostgreSQL chọn sai execution plan → gather stats lại.
+            <br>• <strong>Index phân mảnh:</strong> sau nhiều tháng insert/delete → rebuild index.
+            <br>• <strong>Resource contention:</strong> có job khác chạy cùng giờ tranh CPU/RAM/IO?
+            <br>• <strong>DB link chậm:</strong> network degraded.
+            <br>• <strong>Lock/blocking:</strong> session đang hold lock trên bảng target.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q12. Redesign pipeline AML (Growth mindset)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Nếu được thiết kế lại pipeline AML từ đầu với kinh nghiệm hiện tại, bạn sẽ thay đổi gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• Thêm data lineage tracking: biết mỗi bản ghi Core đến từ source nào.
+            <br>• Tách config khỏi code: rule mapping lưu trong bảng config, không hardcode.
+            <br>• <em>(Tự bổ sung theo kinh nghiệm bản thân)</em></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule('s0', document.querySelectorAll('.nav-item')[0])">← Quay lại</button>
+        <button class="nav-btn primary" onclick="showModule('g2', document.querySelectorAll('.nav-item')[2])">Tiếp theo: Nhóm 2 →</button>
+      </div>
+    </div>
+
+    <!-- G2: ODI & ETL Tools -->
+    <div class="module" id="g2">
+      <div class="module-header">
+        <div class="module-tag">G2 · Core Technical</div>
+        <div class="module-title">Nhóm 2: ODI & ETL Tools</div>
+        <div class="module-subtitle">14 câu hỏi | Mức độ ưu tiên: ⭐⭐⭐ Cao nhất</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Tiến độ ôn tập nhóm này:</span>
+          <span class="progress-count">0/14</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 1 — Kiến thức nền tảng</div>
+
+      <!-- Q1 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q1. Kiến trúc ODI 12c gồm những thành phần nào?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"ODI 12c có kiến trúc gồm những thành phần chính nào? Mỗi thành phần làm gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Master Repository:</strong> lưu metadata toàn hệ thống — security, topology, version control. Chỉ có 1 Master Repository cho toàn organization.
+            <br>• <strong>Work Repository:</strong> lưu project — Models, Mappings, Packages, Procedures. Có thể có nhiều Work Repository (dev/test/prod).
+            <br>• <strong>Agent:</strong> runtime engine thực sự execute code. Standalone Agent chạy như service trên server.
+            <br>• <strong>ODI Studio:</strong> GUI để design, develop, monitor.
+            <br>• <strong>ODI Console:</strong> web interface để monitor job đang chạy.
+            <br><em>Dẫn chứng:</em> Đã cài đặt và cấu hình toàn bộ stack này cho LPBank và AML.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q2. Model trong ODI là gì?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Model trong ODI là gì? Tại sao phải tạo Model trước khi làm Mapping?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Model là metadata representation của một data store — bảng, view, file. Khi tạo Model, ODI reverse-engineer schema từ DB thực tế vào repository.
+            <br>Mapping cần Model vì nó tham chiếu đến các Datastore (bảng) đã được đăng ký trong Model — không có Model thì không biết cấu trúc source/target để map.
+            <br><em>Thực tế:</em> mỗi khi source thay đổi schema, bạn phải reverse lại Model.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q3. Mapping, Procedure và Package khác nhau thế nào?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Mapping, Procedure và Package trong ODI khác nhau thế nào? Bạn dùng cái nào cho việc gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Mapping:</strong> Di chuyển và transform data giữa source → target. Có visual canvas kéo thả.
+            <br>• <strong>Procedure:</strong> Chạy code tùy ý: SQL, PL/SQL, shell script. Không có visual canvas.
+            <br>• <strong>Package:</strong> Orchestrate: sắp xếp thứ tự chạy Mapping/Procedure, xử lý điều kiện rẽ nhánh, loop, error handling.
+            <br><em>Ví dụ:</em> Mapping extract từ IPCAS vào Staging → Procedure transform/chuẩn hóa → Package gọi tất cả theo đúng thứ tự.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q4. IKM là gì? Tại sao IKM ảnh hưởng lớn performance?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"IKM là gì? Tại sao chọn đúng IKM lại ảnh hưởng lớn đến performance?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>IKM (Integration Knowledge Module) là template quy định cách ODI load data vào target.
+            <br>Ví dụ với Oracle:
+            <br>• <strong>IKM Oracle Insert:</strong> bulk insert, dùng APPEND hint → nhanh nhất.
+            <br>• <strong>IKM Oracle Merge:</strong> insert + update trong 1 statement → dùng cho incremental.
+            <br>• <strong>IKM SQL Control Append:</strong> row-by-row → chậm nhất, tránh dùng với bảng lớn.
+            <br><em>Dẫn chứng:</em> Đã tối ưu IKM ở LPBank — từ row-by-row sang bulk insert.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q5. Variable trong ODI dùng làm gì?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Variable trong ODI dùng để làm gì? Bạn đã dùng Variable như thế nào trong thực tế?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Variable lưu giá trị runtime, dùng để:
+            <br>• Truyền tham số vào Mapping/Procedure: ngày xử lý, batch_id.
+            <br>• Điều kiện rẽ nhánh trong Package: nếu row_count > 0 thì chạy tiếp, ngược lại skip.
+            <br>• Lưu kết quả trung gian: đếm số bản ghi lỗi sau DQ check.
+            <br><em>Ví dụ:</em> Variable V_BATCH_DATE truyền ngày xử lý vào tất cả Mapping trong một Package.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 2 — Chuyên sâu kỹ thuật</div>
+
+      <!-- Q6 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q6. Debug và tối ưu Mapping chạy chậm</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Khi một ODI Mapping chạy chậm, bạn debug và tối ưu theo quy trình nào? Kể case cụ thể."</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Quy trình 5 bước):</strong>
+            <br>1. <strong>ODI Operator:</strong> xem execution statistics — step nào tốn thời gian nhất.
+            <br>2. <strong>Xem generated SQL:</strong> ODI generate SQL thực tế ra gì? Copy ra IDE chạy thử.
+            <br>3. <strong>Explain Plan:</strong> phân tích execution plan của SQL đó.
+            <br>4. <strong>IKM:</strong> đang dùng IKM gì? Đổi sang bulk insert chưa?
+            <br>5. <strong>Parallel hint:</strong> thêm /*+ PARALLEL(t, 4) */ vào generated SQL qua LKM/IKM override.
+            <br><em>Ví dụ LPBank:</em> Mapping chạy 45p do IKM row-by-row, đổi sang Oracle Insert + APPEND + PARALLEL → còn 8 phút.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q7. LKM vs IKM? Customize KM</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"LKM là gì và khác IKM như thế nào? Bạn đã customize LKM/IKM bao giờ chưa?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>LKM (Loading Knowledge Module):</strong> quy định cách load data từ source vào C$ (staging table tạm). Quan trọng khi source và target ở DB khác nhau.
+            <br>• <strong>IKM:</strong> quy định cách integrate từ C$ vào target.
+            <br>• <strong>Customize KM:</strong> Mở KM ra, sửa template SQL, thêm hint, thêm log statement (dùng khi default KM không đáp ứng đủ).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q8. Error handling & Transactions trong ODI</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"ODI error handling hoạt động như thế nào? Nếu một Mapping fail giữa chừng khi đang load 1 triệu bản ghi?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• Mặc định Mapping chạy trong 1 transaction. Nếu fail → rollback toàn bộ → target sạch.
+            <br>• Có thể cấu hình commit interval để commit từng X bản ghi.
+            <br>• Với bảng lớn: tốt nhất để full transaction để đảm bảo data integrity.
+            <br>• Có thể dùng CKM (Check Knowledge Module) để ghi bản ghi lỗi vào E$ table thay vì rollback toàn bộ.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q9. So sánh ODI vs Talend Studio</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Talend Studio bạn đã dùng để làm gì? So sánh với ODI, tool nào phù hợp cho task nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>ODI 12c:</strong> Thế mạnh là Oracle-to-Oracle, tích hợp Oracle stack (OFSAA). Metadata mạnh, repository đầy đủ.
+            <br>• <strong>Talend:</strong> Thế mạnh Multi-platform (DB2/SQL Server/File), dễ dùng cho cross-platform migration.
+            <br><em>Ví dụ VAECO:</em> Dùng Talend migrate từ DB2 sang Oracle Staging vì connector tốt hơn.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q10. Version Control & Deployment trong ODI</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Trong dự án LPBank với ~200 Program, bạn quản lý version và deploy như thế nào? Cần rollback thì sao?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Version Control:</strong> ODI có versioning built-in lưu trong Master Repository.
+            <br>• <strong>Export/Import:</strong> export Scenario ra XML, import vào môi trường khác.
+            <br>• <strong>Rollback:</strong> giữ Scenario version cũ, delete Scenario mới và deploy lại bản cũ.
+            <br>• <strong>Best Practice:</strong> Dev trên WR dev, export sang Prod. Không sửa trực tiếp trên Prod.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 3 — Tình huống thực chiến</div>
+
+      <!-- Q11 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q11. Xử lý lỗi "ORA-01555: snapshot too old"</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Hệ thống LPBank có ~200 Program chạy hằng đêm. Sáng dậy thấy Package fail lỗi 'ORA-01555: snapshot too old'. Bạn xử lý thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• Xảy ra khi UNDO segment bị overwrite trước khi query đọc xong (do query chạy quá lâu khi có nhiều DML khác).
+            <br>• <strong>Immediate fix:</strong> tăng UNDO_RETENTION, tăng UNDO tablespace.
+            <br>• <strong>Root cause:</strong> Mapping đang full scan bảng lớn trong khi batch khác đang chạy song song gây nhiều UNDO.
+            <br>• <strong>Dài hạn:</strong> tối ưu Mapping chạy nhanh hơn, reschedule tránh chạy cùng giờ.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q12. Tích hợp REST API vào ODI (Không có connector)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Cần tích hợp nguồn dữ liệu mới (REST API). ODI không có connector native. Bạn xử lý thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Tư duy giải quyết vấn đề):</strong>
+            <br>• <strong>Option 1:</strong> Python script call API, flatten JSON, insert Staging table → ODI đọc từ Staging.
+            <br>• <strong>Option 2:</strong> ODI Procedure gọi external script.
+            <br>• <strong>Option 3:</strong> Talend handle API call, load vào Staging.
+            <br>• <strong>Best Practice:</strong> tách concern — ODI làm ETL trong DB, code (Python/Talend) làm data ingestion.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q13 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q13. Scenario là gì? Tại sao phải generate?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Scenario trong ODI là gì? Tại sao phải generate Scenario trước khi chạy trên Production?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Scenario là compiled, executable version. Giống như compile code:
+            <br>• Design-time object (Mapping) có thể bị sửa, chưa chạy được.
+            <br>• Scenario là snapshot tại thời điểm generate.
+            <br>• <strong>Lý do:</strong> Đảm bảo stability, Production chỉ chạy Scenario để không ai có thể sửa design làm hỏng job đang chạy. Phục vụ versioning.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q14 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q14. Quy trình deploy 200 Mapping lên Prod an toàn</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Quy trình chuyển toàn bộ ODI project (~200 Mapping) từ dev sang prod để đảm bảo không miss gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>1. Export Smart Export từ dev kèm dependencies.
+            <br>2. Kiểm tra Topology (physical/logical schema) trên Prod.
+            <br>3. Import vào Prod Work Repository.
+            <br>4. Generate tất cả Scenario mới hoàn toàn.
+            <br>5. Test Simulation từng Package.
+            <br>6. Verify DB link, Agent connection.
+            <br>7. Cutover với monitor chặt chẽ.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule('g1', document.querySelectorAll('.nav-item')[1])">← Nhóm 1</button>
+        <button class="nav-btn primary" onclick="showModule('g3', document.querySelectorAll('.nav-item')[3])">Tiếp theo: Nhóm 3 →</button>
+      </div>
+    </div>
+
+    <!-- G3: SQL & Performance Tuning -->
+    <div class="module" id="g3">
+      <div class="module-header">
+        <div class="module-tag">G3 · Core Technical</div>
+        <div class="module-title">Nhóm 3: SQL & Performance Tuning</div>
+        <div class="module-subtitle">14 câu hỏi | Mức độ ưu tiên: ⭐⭐⭐ Cao nhất</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Tiến độ ôn tập nhóm này:</span>
+          <span class="progress-count">0/14</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 1 — Kiến thức nền tảng</div>
+
+      <!-- Q1 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q1. Cách đọc Execution Plan tìm bottleneck</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Execution Plan là gì? Bạn đọc Execution Plan như thế nào để tìm ra điểm bottleneck?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Execution Plan là kế hoạch CSDL chọn để thực thi query (join method, access path...).
+            <br><strong>Cách đọc (tìm bottleneck):</strong>
+            <br>• Full Table Scan trên bảng lớn → thiếu Index.
+            <br>• Nested Loop với bảng triệu dòng → nên dùng Hash Join.
+            <br>• Estimated rows lệch xa Actual rows → statistics cũ.
+            <br>• Buffer Gets cao → đọc quá nhiều block.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q2. Các loại Index? Khi nào nên/không nên tạo Index?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Index là gì? Các loại Index phổ biến? Khi nào nên tạo Index, khi nào không?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>B-tree Index:</strong> default, tốt cho equality/range query.
+            <br>• <strong>Bitmap Index:</strong> cột ít giá trị (gender, status), tốt cho DWH read-heavy.
+            <br>• <strong>Function-based Index:</strong> UPPER(name).
+            <br>• <strong>Composite Index:</strong> index nhiều cột.
+            <br><strong>Nên tạo:</strong> cột hay xuất hiện trong WHERE, JOIN, ORDER BY, high cardinality.
+            <br><strong>KHÔNG nên tạo:</strong> bảng nhỏ, bảng DML nhiều (insert/update), ETL staging (truncate/insert tốn overhead).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q3. Partition là gì? Giúp ích gì cho ETL?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Partition trong Oracle là gì? Các loại Partition? Giúp ích gì cho ETL?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Range Partition:</strong> theo khoảng (ngày/tháng). Phổ biến nhất DWH.
+            <br>• <strong>List Partition:</strong> danh sách cố định (region).
+            <br>• <strong>Hash Partition:</strong> phân tán đều.
+            <br><strong>Giúp ích ETL:</strong>
+            <br>• <strong>Partition Pruning:</strong> query chỉ scan partition cần thiết.
+            <br>• <strong>Partition Exchange:</strong> swap data cực nhanh O(1).
+            <br>• Drop partition cũ nhanh hơn Delete. Parallel load dễ dàng.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q4. MERGE statement (UPSERT) tại sao tốt hơn?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"MERGE statement dùng khi nào? Tại sao MERGE thường tốt hơn INSERT + UPDATE riêng biệt?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>MERGE = UPSERT (có thì update, chưa có thì insert).
+            <br>Tốt hơn vì:
+            <br>• <strong>Một lần scan:</strong> chỉ join source-target 1 lần (Insert+Update phải scan 2 lần).
+            <br>• <strong>Atomic:</strong> 1 transaction.
+            <br>• <strong>Idempotent:</strong> chạy lại vẫn kết quả đúng. Less locking.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q5. Statistics cũ làm query chậm đột ngột?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Statistics trong Database là gì? Tại sao Statistics cũ lại làm query chậm đột ngột?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Statistics là metadata về data (số dòng, phân phối...). Optimizer dùng để tính cost & chọn plan.
+            <br><strong>Nếu cũ:</strong> Optimizer ước tính sai (tưởng 1k dòng nhưng thật 10M dòng) → chọn sai plan (ví dụ chọn Nested Loop thay vì Hash Join).
+            <br><strong>Giải pháp:</strong> DBMS_STATS.GATHER_TABLE_STATS hoặc ANALYZE table định kỳ.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 2 — Chuyên sâu kỹ thuật</div>
+
+      <!-- Q6 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q6. Kỹ thuật song song hóa (giảm 4h xuống 30p)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Giải thích kỹ thuật song song hóa bạn đã dùng để giảm batch VAECO từ 4 giờ xuống 30 phút."</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Phân tích:</strong> dữ liệu có thể chia theo khoảng thời gian độc lập.
+            <br>• <strong>Song song hóa:</strong> Thay vì xử lý tuần tự từng tháng, dùng đa luồng xử lý đồng thời các Quý.
+            <br>• <strong>Tại sao work:</strong> Data partition theo thời gian nên không lock contention, I/O và CPU được tận dụng tối đa. (Giảm 87.5% thời gian).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q7. Xử lý query Nested Loop siêu chậm</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Có query JOIN 3 bảng, 1 bảng 50 triệu dòng. Đang dùng Nested Loop cực chậm. Bạn xử lý sao?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>1. <strong>Statistics:</strong> Gather stats lại để Optimizer thấy bảng to và đổi Plan.
+            <br>2. <strong>Hint:</strong> Dùng hint force Hash Join (/*+ USE_HASH */).
+            <br>3. <strong>Kiểm tra Index:</strong> Nếu có index mà không dùng, có thể do implicit conversion.
+            <br>4. <strong>Parallel:</strong> Thêm hint /*+ PARALLEL */.
+            <br>5. <strong>Rewrite:</strong> Dùng CTE materialize kết quả trước khi JOIN.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q8. Debug SP chậm gấp 10 lần đột ngột</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Stored Procedure đang ổn, hôm nay chậm gấp 10. Thứ tự debug?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>1. <strong>Data volume:</strong> volume có tăng vọt không?
+            <br>2. <strong>Statistics:</strong> LAST_ANALYZED bao giờ? Gather lại.
+            <br>3. <strong>Execution Plan:</strong> lệch giữa estimate và actual?
+            <br>4. <strong>Locking:</strong> có ai đang hold lock?
+            <br>5. <strong>Resource:</strong> có job khác tranh CPU/IO?
+            <br>6. <strong>Index:</strong> bị phân mảnh không?</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q9. Load 100M rows trong 2 tiếng (Batch window)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Load 100M bản ghi vào bảng Oracle trong batch window 2 tiếng. Approach?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>1. Disable constraints & indexes.
+            <br>2. Direct Path Insert (/*+ APPEND PARALLEL NOLOGGING */). Bypass buffer cache.
+            <br>3. Rebuild indexes PARALLEL.
+            <br>4. Enable constraints lại.
+            <br>5. Gather Stats.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q10. CTE (WITH) có thực sự cải thiện performance?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"WITH clause (CTE) dùng khi nào? Nó có thực sự cải thiện performance không?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• CTE giúp query dễ đọc, tái sử dụng subquery.
+            <br>• Về Performance: Oracle mặc định không materialize, PostgreSQL mặc định có.
+            <br>• CTE giúp performance nếu: được tham chiếu nhiều lần (tránh tính toán lại), hoặc chứa aggregate phức tạp cần materialize.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 3 — Tình huống thực chiến</div>
+
+      <!-- Q11 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q11. Tối ưu SP 3 tiếng trong 1 buổi chiều</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"SP tổng hợp mất 3 tiếng, không kịp T+1. Chỉ có 1 buổi chiều để tối ưu. Quy trình?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Time-boxed):</strong>
+            <br>• <strong>30p đầu:</strong> Phân tích (TIMING ON) tìm top query chậm nhất, lấy Explain Plan.
+            <br>• <strong>60p tiếp:</strong> Quick wins (Gather stats, tạo Index dễ thấy, đổi bulk insert). Thường giảm 30-50% time.
+            <br>• <strong>60p tiếp:</strong> Deep optimization (Rewrite subquery → Join, set-based, thêm PARALLEL).
+            <br>• <strong>30p cuối:</strong> Verify & Document kết quả.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q12. Query dùng Index vẫn chạy rất chậm</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Phát hiện query đang dùng Index nhưng vẫn chậm. Nguyên nhân có thể là gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>1. Selectivity thấp (Scan index mà trả về 30% bảng thì full scan tốt hơn).
+            <br>2. Index range scan + table access by rowid (random I/O lớn).
+            <br>3. Index bị phân mảnh quá mức (cần rebuild).
+            <br>4. Sai Index (composite index sai thứ tự cột leading).
+            <br>5. Implicit conversion hoặc function làm vô hiệu hoá index.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q13 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q13. TRUNCATE vs DELETE trong ETL</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Sự khác nhau giữa TRUNCATE và DELETE? Khi nào dùng cái nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>TRUNCATE:</strong> DDL, cực nhanh O(1), không rollback, reset HWM, ít Redo log. Dùng cho Staging table load lại từ đầu.
+            <br>• <strong>DELETE:</strong> DML, quét từng dòng, chậm, rollback được, kích hoạt trigger, có WHERE. Dùng khi xoá có điều kiện (xóa record lỗi) hoặc cần safety (rollback).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q14 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q14. Scaling Anti-pattern (10k rows nhanh, 50M rows chậm)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Query test 10k rows nhanh, Production 50M rows chậm kinh khủng. Anti-pattern gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Scaling problem):</strong>
+            <br>1. <strong>N+1 query trong vòng lặp (FOR row IN ... UPDATE):</strong> Cần chuyển sang set-based (MERGE/JOIN).
+            <br>2. <strong>Correlated Subquery:</strong> Subquery chạy cho mỗi dòng outer query → cần đổi sang JOIN hoặc Window function.
+            <br>3. <strong>Function trong WHERE:</strong> Làm mất Index → cần đổi sang Range condition.
+            <br>4. <strong>SELECT *:</strong> Gây nghẽn memory/network với 50M dòng.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule('g2', document.querySelectorAll('.nav-item')[2])">← Nhóm 2</button>
+        <button class="nav-btn primary" onclick="showModule('g4', document.querySelectorAll('.nav-item')[4])">Tiếp theo: Nhóm 4 →</button>
+      </div>
+    </div>
+
+    <!-- G4: Database Administration -->
+    <div class="module" id="g4">
+      <div class="module-header">
+        <div class="module-tag">G4 · Database Admin</div>
+        <div class="module-title">Nhóm 4: Database Administration</div>
+        <div class="module-subtitle">14 câu hỏi | Mức độ ưu tiên: 🟡 Quan trọng</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Tiến độ ôn tập nhóm này:</span>
+          <span class="progress-count">0/14</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 1 — Kiến thức nền tảng</div>
+
+      <!-- Q1 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q1. Checklist cài đặt Oracle 19c</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Khi cài đặt Oracle 19c trên Linux lần đầu tiên cho dự án mới, cần chuẩn bị và cấu hình những gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Checklist thực tế):</strong>
+            <br>• <strong>Pre-install:</strong> OS requirements (kernel, swap, ulimit), tạo OS user/group, cấu hình sysctl.conf & limits.conf.
+            <br>• <strong>Install:</strong> Chạy OUI, tạo DB bằng DBCA, cấu hình character set (AL32UTF8).
+            <br>• <strong>Post-install:</strong> listener.ora, tnsnames.ora; tạo tablespace (DATA, INDEX, TEMP); UNDO đủ lớn; REDO log groups (>=3); setup RMAN; tạo schema/users.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q2. Thiết kế Tablespace cho ETL</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Tablespace là gì? Thiết kế tablespace như thế nào cho hệ thống ETL?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Tablespace là logical storage unit nhóm các data files.
+            <br>• <strong>DATA_TS:</strong> bảng chính.
+            <br>• <strong>INDEX_TS:</strong> index tách riêng (để dễ rebuild mà ko ảnh hưởng DATA, có thể khác disk).
+            <br>• <strong>STAGING_TS:</strong> staging ETL (NOLOGGING).
+            <br>• <strong>UNDOTBS:</strong> UNDO cực lớn cho long-running ETL.
+            <br>• <strong>TEMP:</strong> sort/hash join.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q3. UNDO trong Oracle & ORA-01555</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"UNDO làm gì? Tại sao ETL cần UNDO đủ lớn?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>UNDO lưu before-image để Rollback, Read Consistency và Flashback.
+            <br>ETL chạy lâu (hàng giờ) nên cần UNDO giữ history suốt thời gian đó, tránh bị overwrite. Nếu overwrite sẽ dính lỗi ORA-01555: Snapshot too old.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q4. Archive Log mode</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Archive Log mode là gì? Khi nào cần/không cần?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Archive Log lưu trữ lại Redo log trước khi bị overwrite.
+            <br>• <strong>Cần (Prod):</strong> Để online backup, Point-in-Time Recovery, Data Guard/Replication.
+            <br>• <strong>Không cần:</strong> Dev/Test, Staging DB thuần trung gian (có thể reload).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q5. PostgreSQL Key Parameters</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Các parameter quan trọng cần tune trong postgresql.conf?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Memory:</strong> shared_buffers (25% RAM), effective_cache_size (75%), work_mem (cho sort/hash), maintenance_work_mem (vacuum/index).
+            <br>• <strong>WAL:</strong> wal_level (replica), archive_mode (on), max_wal_senders.
+            <br>• <strong>Connections:</strong> max_connections (nên dùng kèm PgBouncer).</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 2 — Chuyên sâu kỹ thuật</div>
+
+      <!-- Q6 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q6. RMAN Backup Strategy</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"RMAN hoạt động thế nào? Thiết kế backup strategy cho Production?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>RMAN backup datafiles, control file, archive logs. Hỗ trợ incremental (chỉ copy block đổi) và nén.
+            <br>• <strong>Daily:</strong> Incremental Level 1.
+            <br>• <strong>Weekly:</strong> Full Level 0.
+            <br>• <strong>Archive Log:</strong> Tần suất phụ thuộc vào RPO.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q7. Dùng pg_repack xử lý TOAST table bloat 81GB</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Tại sao backup PostgreSQL chậm 3 tiếng? Phân tích và dùng pg_repack giải quyết?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Case VAECO):</strong>
+            <br>• Phát hiện bảng dbfs_data có TOAST table phình to lên 81GB do dead tuples (bloat). Backup parallel không tác dụng với 1 bảng to.
+            <br>• <strong>Giải pháp:</strong> Dùng pg_repack rebuild lại TOAST table online (ko lock).
+            <br>• <strong>Kết quả:</strong> Giảm từ 81GB xuống 4GB, thời gian backup giảm từ 3h05 xuống 15p (giảm 92%).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q8. So sánh DBA Oracle vs PostgreSQL</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Oracle và PostgreSQL có điểm khác biệt quan trọng nào DBA cần biết?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Auto-commit:</strong> PostgreSQL mặc định ON, Oracle mặc định OFF.
+            <br>• <strong>Connections:</strong> Postgres tốn RAM per process → Cần PgBouncer cho hệ thống nhiều connection.
+            <br>• <strong>Vacuum:</strong> Postgres bắt buộc cần VACUUM thu dọn dead tuples; Oracle có auto UNDO.
+            <br>• <strong>NULL:</strong> Oracle coi chuỗi rỗng ('') là NULL, Postgres thì không.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q9. VACUUM và vấn đề table bloat / wraparound</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"VACUUM là gì? Bỏ qua VACUUM gây hậu quả gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>PostgreSQL dùng MVCC nên UPDATE/DELETE tạo dead tuples. VACUUM dọn chúng.
+            <br><strong>Hậu quả nếu bỏ qua:</strong> 
+            <br>1. Table/Index Bloat (tốn disk, query chậm).
+            <br>2. Nguy hiểm nhất: <em>Transaction ID Wraparound</em> (sau ~2 tỷ tx) DB sẽ shutdown để bảo vệ integrity.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q10. Quản lý 1000+ connections bằng PgBouncer</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Quản lý DB cho 1000+ users concurrent. Handle connections hiệu quả?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Postgres tạo 1 process (~10MB RAM) cho mỗi connection. 1000 conn = nghẽn RAM/CPU.
+            <br><strong>Giải pháp:</strong> Dùng PgBouncer (Transaction pooling). 1000 app connections -> PgBouncer -> duy trì pool 50 DB connections. DB nhẹ nhàng xử lý.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 3 — Tình huống thực chiến</div>
+
+      <!-- Q11 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q11. Xử lý sự cố đầy Disk 95% lúc 2h sáng</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"2h sáng, disk Oracle đạt 95%. ETL đang chạy. Xử lý sao?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• Xác định Disk nào (Archive, Temp, hay Data).
+            <br>• <strong>Archive đầy:</strong> RMAN xóa archivelog cũ (thường gặp nhất).
+            <br>• <strong>TEMP đầy:</strong> Tìm query gây sort lớn, tăng temp tablespace hoặc kill session.
+            <br>• <strong>DATA đầy:</strong> Dừng batch ngay, xóa file rác OS hoặc add thêm Datafile.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q12. Tìm và xử lý Blocking Session</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Query bị lock, chờ lâu. Tìm và xử lý blocking session?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Oracle:</strong> Query v$lock, v$session (join lại) tìm session ID đang block. Dùng ALTER SYSTEM KILL SESSION.
+            <br>• <strong>Postgres:</strong> Dùng pg_blocking_pids, pg_stat_activity. Dùng pg_terminate_backend().
+            <br>• <strong>Phân tích:</strong> Thường do developer update ko commit hoặc missing index dẫn đến lock row lâu.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q13 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q13. Clone Production DB (500GB) xuống Test</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Cần clone DB 500GB xuống Test. Quy trình?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Oracle:</strong> RMAN Duplicate (online clone) hoặc Data Pump Export/Import (clone 1 schema).
+            <br>• <strong>Postgres:</strong> pg_basebackup (clone toàn cụm) hoặc pg_dump/restore.
+            <br>• <strong>QUAN TRỌNG:</strong> Phải có bước <strong>Data Masking</strong> (ẩn PII như CCCD, số TK) trước khi giao cho team QA.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q14 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q14. Xử lý Data Block Corruption</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Production bị corrupted một số data blocks. Xử lý?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• Oracle: Dùng <strong>RMAN Block Media Recovery</strong> (BLOCKRECOVER) để khôi phục đúng block lỗi từ backup (không cần restore cả file).
+            <br>• Nếu không có backup: Dùng DBMS_REPAIR đánh dấu bỏ qua block lỗi.
+            <br>• Nguyên nhân thường do phần cứng (disk/storage). Nên bật data_checksums để phát hiện sớm.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule('g3', document.querySelectorAll('.nav-item')[3])">← Nhóm 3</button>
+        <button class="nav-btn primary" onclick="showModule('g5', document.querySelectorAll('.nav-item')[5])">Tiếp theo: Nhóm 5 →</button>
+      </div>
+    </div>
+
+    <!-- G5: HA/DR & Replication -->
+    <div class="module" id="g5">
+      <div class="module-header">
+        <div class="module-tag">G5 · Core Technical</div>
+        <div class="module-title">Nhóm 5: HA/DR & Replication</div>
+        <div class="module-subtitle">12 câu hỏi | Mức độ ưu tiên: ⭐⭐⭐ Cao nhất</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Tiến độ ôn tập nhóm này:</span>
+          <span class="progress-count">0/12</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 1 — Kiến thức nền tảng</div>
+
+      <!-- Q1 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q1. Khác biệt HA vs DR. Mapping vào VAECO</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"HA và DR khác nhau thế nào? Đâu là HA và đâu là DR trong hệ thống VAECO?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>HA:</strong> Tránh downtime lỗi thông thường, RTO/RPO cực thấp, nằm trong cùng 1 DC. (VD: Primary → Backup DC bằng Streaming Sync).
+            <br>• <strong>DR:</strong> Chống thảm họa toàn site, RTO/RPO lớn hơn, đặt khác vùng địa lý. (VD: Backup DC → DR Site bằng WAL Archive).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q2. RPO và RTO trong thiết kế Replication</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"RPO và RTO là gì? Ảnh hưởng đến thiết kế hệ thống thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>RPO (Data Loss):</strong> Mất tối đa bao nhiêu data. RPO=0 cần Synchronous Sync; RPO=5m cần Async Sync.
+            <br>• <strong>RTO (Downtime):</strong> Chịu chết tối đa bao lâu. RTO=1m cần Auto-failover; RTO=1h có thể Manual failover.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q3. Cơ chế Streaming Replication</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Streaming Replication hoạt động thế nào? Primary và Standby giao tiếp ra sao?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Primary sinh WAL. WAL Sender gửi thay đổi qua TCP đến WAL Receiver trên Standby. Standby nhận WAL và apply (replay) liên tục.
+            <br>Có Async (không chờ confirm) và Sync (chờ Standby ghi xong mới commit).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q4. WAL/Redo Log là gì? Tại sao phải có?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"WAL là gì? Không có WAL thì sao?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>WAL ghi thay đổi trước khi ghi vào datafiles.
+            <br>Nếu không có WAL, DB crash giữa chừng lúc write file sẽ gây hỏng data. WAL đảm bảo độ bền vững (Durability) và hỗ trợ Crash Recovery, Replication, PITR.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q5. Replication slot và nguy cơ disk đầy</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Replication slot là gì? Nguy cơ nếu không quản lý cẩn thận?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Slot bắt Primary giữ lại WAL cho đến khi Standby apply xong. Tránh Standby bị đứt kết nối và mất WAL.
+            <br><strong>Nguy cơ:</strong> Nếu Standby chết lâu ngày, Primary sẽ giữ WAL vĩnh viễn gây ĐẦY DISK và crash Primary.
+            <br><strong>Giải pháp:</strong> Monitor slot lag, mạnh tay drop slot nếu Standby down quá lâu.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 2 — Chuyên sâu kỹ thuật</div>
+
+      <!-- Q6 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q6. Kiến trúc HA/DR 4 tầng tại VAECO</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Giải thích kiến trúc 4 tầng bạn xây dựng cho VAECO. Tại sao cần 4 tầng?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Strong Point):</strong>
+            <br>• Tầng 1: Primary (DC chính).
+            <br>• Tầng 2: Backup DC (HA Hot Standby, sync realtime, cùng DC).
+            <br>• Tầng 3: Backup DR (DR Warm Standby qua WAL Archive, site khác).
+            <br>• Tầng 4: DR Standby (Cold Standby nhận Cascade từ Backup DR).
+            <br>Bảo vệ toàn diện trước mọi thảm hoạ máy chủ hoặc datacenter với SLA cực gắt của bảo dưỡng máy bay.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q7. Kịch bản WAL sync 4 luồng song song (Chống trùng)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn viết tool WAL sync 4 luồng. Tại sao song song? Kỹ thuật chống trùng thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• Copy tuần tự hàng trăm file 16MB mất thời gian, gây replication lag qua mạng chậm.
+            <br>• Viết script dùng 4 threads đẩy file song song.
+            <br>• <strong>Chống trùng chạy:</strong> Dùng lock file PID trên OS (hoặc flock) để ngăn cronjob spawn ra process trùng nhau. Dùng queue/DB table track trạng thái file (Đang copy/Hoàn thành).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q8. Khắc phục DR mất đồng bộ 6 tiếng siêu tốc</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Mô tả cách bạn xử lý sự cố DR mất đồng bộ 6 tiếng mà không cần pg_basebackup."</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Case Thực chiến xuất sắc):</strong>
+            <br>• DR ngắt kết nối 6 tiếng, Primary xóa mất WAL cần thiết.
+            <br>• Thay vì tốn hàng giờ copy lại toàn bộ 500GB DB (pg_basebackup).
+            <br>• Sử dụng WAL Archiving Storage: Cấu hình Standby restore_command đọc thẳng 6 tiếng WAL từ Archive (NFS/S3).
+            <br>• Standby tự chạy qua 6 tiếng logs catchup lại rồi tự chuyển về Streaming mode. Xong trong chục phút!</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q9. Failover vs Switchover. Rebuild Standby</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Failover khác Switchover thế nào? Rebuild Primary cũ thành Standby?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Switchover:</strong> Planned, Primary nhường quyền, RPO=0.
+            <br>• <strong>Failover:</strong> Khẩn cấp khi Primary sập, promote Standby gấp, có thể mất xíu data (RPO > 0).
+            <br>• <strong>Rebuild:</strong> Dùng pg_rewind (chỉ đồng bộ lại lượng delta bị lệch) cực kì nhanh. Nếu hỏng nặng mới dùng pg_basebackup từ đầu.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 3 — Tình huống thực chiến</div>
+
+      <!-- Q10 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q10. Alert 2h sáng: Primary Down (Incident Response)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"2h sáng báo Primary không phản hồi. Các bước xử lý của bạn?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Incident Response chuẩn):</strong>
+            <br>1. Xác minh có thật sự down không hay chỉ lỗi network app (Quan trọng để tránh Split-Brain).
+            <br>2. Nếu network partition: Fence node cũ lại.
+            <br>3. Promote Standby lên làm New Primary (pg_promote).
+            <br>4. Đổi App config/PgBouncer trỏ về node mới.
+            <br>5. Check test tính toàn vẹn (smoke test). Update team.
+            <br>6. Sáng hsau rebuild lại node cũ làm Standby.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q11 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q11. Phân tích Replication Lag đột ngột</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Replication lag đột ngột lên 30s. Bạn phân tích nguyên nhân thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Dùng pg_stat_replication bóc tách các loại lag:
+            <br>• <strong>send_lag cao:</strong> Lỗi do network bị tắc, băng thông.
+            <br>• <strong>write_lag cao:</strong> Disk I/O trên Standby bị chậm.
+            <br>• <strong>replay_lag cao:</strong> Standby bị chiếm CPU do đang đọc báo cáo (read-heavy), cản trở apply WAL.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q12. Lên kế hoạch Test DR không ảnh hưởng Production</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Cần test DR failover. Lên kế hoạch test ra sao?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• Chuẩn bị & freeze change. Đảm bảo DR lag = 0.
+            <br>• Ngắt kết nối PostgreSQL (App -> Primary).
+            <br>• Đo thời gian (RTO) từ lúc ngắt đến lúc app online trên DR Site. Đo RPO bằng tx_id.
+            <br>• Switchover ngược lại Primary an toàn. Document report cho sếp.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule('g4', document.querySelectorAll('.nav-item')[4])">← Nhóm 4</button>
+        <button class="nav-btn primary" onclick="location.href='interview_de_part2.html'">Chuyển sang Phần 2 →</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function showModule(id, navItem) {
+    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    document.getElementById(id).classList.add('active');
+    navItem.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function toggleSection(header) {
+    const content = header.nextElementSibling;
+    header.classList.toggle('open');
+    if (header.classList.contains('open')) {
+      content.style.display = 'block';
+    } else {
+      content.style.display = 'none';
+    }
+  }
+
+  function toggleCheck(e, box) {
+    e.stopPropagation(); // Prevent opening accordion
+    box.classList.toggle('checked');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    document.querySelectorAll('.module').forEach(mod => {
+      const checks = mod.querySelectorAll('.check-box');
+      if (checks.length === 0) return;
+      
+      const checked = mod.querySelectorAll('.check-box.checked').length;
+      const total = checks.length;
+      const pct = Math.round((checked / total) * 100);
+      
+      const fill = mod.querySelector('.progress-fill');
+      const text = mod.querySelector('.progress-count');
+      
+      if (fill) fill.style.width = pct + '%';
+      if (text) text.textContent = checked + '/' + total;
+    });
+  }
+  
+  // Initialize progress
+  updateProgress();
+</script>
+</body>
+</html>

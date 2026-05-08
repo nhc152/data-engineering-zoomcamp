@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phỏng Vấn DE - Phần 2 (Advanced & Domain)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+    --accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;
+    --text:#e6edf3;--text-muted:#8b949e;--code-bg:#0d1117;--highlight:#388bfd26;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter','Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+  .hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 40%,#1a2a1e 100%);border-bottom:2px solid var(--accent);padding:40px 24px 30px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#1f6feb22,transparent 70%);pointer-events:none}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--accent);letter-spacing:-0.5px}
+  .hero p{color:var(--text-muted);margin-top:8px;font-size:.95rem}
+  .badge-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;border:1px solid}
+  .badge-blue{color:var(--accent);border-color:var(--accent);background:#1f6feb1a}
+  .badge-green{color:var(--accent2);border-color:var(--accent2);background:#2ea04326}
+  .badge-orange{color:var(--accent5);border-color:var(--accent5);background:#d2940026}
+  .badge-purple{color:var(--accent4);border-color:var(--accent4);background:#6e40c926}
+  .badge-red{color:var(--accent3);border-color:var(--accent3);background:#f7816610}
+  .container{display:flex;min-height:calc(100vh - 160px)}
+  .sidebar{width:320px;min-width:320px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:0 16px 12px}
+  .level-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 16px 4px;color:var(--accent)}
+  .nav-item{display:flex;align-items:center;padding:7px 16px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-left:3px solid transparent;transition:all .15s;justify-content:space-between}
+  .nav-item-left{display:flex;align-items:center;}
+  .nav-item:hover{color:var(--text);background:var(--surface2)}
+  .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:#1f6feb15;font-weight:600}
+  .nav-number{display:inline-block;width:30px;font-size:.7rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .nav-priority{font-size:12px;margin-left:8px;}
+  .main{flex:1;padding:32px 40px;max-width:1000px}
+  .module{display:none}
+  .module.active{display:block}
+  .module-header{border:1px solid var(--border);border-radius:12px;padding:24px 28px;background:var(--surface);margin-bottom:24px;position:relative;overflow:hidden}
+  .module-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .module-tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:8px}
+  .module-title{font-size:1.6rem;font-weight:800;margin-bottom:8px}
+  .module-subtitle{color:var(--text-muted);font-size:.9rem}
+  
+  .section{margin-bottom:16px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface)}
+  .section-header{padding:14px 20px;font-weight:600;font-size:.9rem;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--surface2);border-bottom:1px solid transparent;transition:all 0.2s}
+  .section-header:hover{background:var(--highlight)}
+  .section-header.open{border-bottom-color:var(--border);background:var(--surface)}
+  
+  .q-badge{font-size:0.75rem; padding:2px 6px; border-radius:4px; font-weight:700; flex-shrink:0;}
+  .q-lvl-1{background:#1f6feb33; color:var(--accent);}
+  .q-lvl-2{background:#d2940026; color:var(--accent5);}
+  .q-lvl-3{background:#6e40c926; color:var(--accent4);}
+  
+  .section-icon{display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .section-content{padding:20px;display:none;}
+  .section-toggle{margin-left:auto;color:var(--text-muted);font-size:12px; transition:transform 0.2s}
+  .section-header.open .section-toggle{transform:rotate(180deg)}
+  
+  h3{font-size:1rem;font-weight:700;color:var(--accent);margin:18px 0 10px}
+  h3:first-child{margin-top:0}
+  p{margin-bottom:12px;color:var(--text);font-size:.88rem}
+  ul,ol{padding-left:20px;margin-bottom:12px}
+  li{font-size:.88rem;margin-bottom:5px}
+  strong{color:var(--text); font-weight:600;}
+  em{color:var(--accent2); font-style:italic;}
+  
+  .cmd-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .cmd-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .cmd-body{padding:14px}
+  pre{font-family:'JetBrains Mono','Courier New','Consolas',monospace;font-size:.82rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--text)}
+  code{font-family:'JetBrains Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:.82rem;color:var(--accent)}
+  
+  .info-box{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:.84rem;border:1px solid;display:flex;gap:10px}
+  .info-box.tip{border-color:var(--accent2);background:#2ea04310;color:var(--accent2)}
+  .info-box.warn{border-color:var(--accent5);background:#d2940015;color:var(--accent5)}
+  .info-box.note{border-color:var(--accent);background:#1f6feb15;color:var(--accent)}
+  .info-box span{color:var(--text)}
+  
+  .nav-buttons{display:flex;gap:12px;margin-top:32px;justify-content:space-between}
+  .nav-btn{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:6px;text-decoration:none;}
+  .nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+  
+  .check-box{width:16px;height:16px;border:1px solid var(--border);border-radius:3px;flex-shrink:0;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;background:var(--surface)}
+  .check-box.checked{background:var(--accent2);border-color:var(--accent2)}
+  .check-box.checked::after{content:'✓';font-size:10px;color:#000;font-weight:600}
+  
+  .progress-container{background:var(--surface2); padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid var(--border)}
+  .progress-header{display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;}
+  .progress-bar{background:var(--bg);border-radius:4px;height:8px;overflow:hidden; border:1px solid var(--border)}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:4px;width:0;transition:width .3s ease}
+  
+  .level-header {font-size:1.1rem; color:var(--text-muted); border-bottom:1px solid var(--border); padding-bottom:8px; margin:24px 0 16px; display:flex; align-items:center; gap:8px}
+  .level-header span {font-size:0.75rem; background:var(--surface2); padding:2px 8px; border-radius:12px; color:var(--text)}
+
+  @media(max-width:768px){.sidebar{display:none}.main{padding:16px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Phỏng Vấn Data Engineer — Phần 2</h1>
+  <p>Tài liệu ôn tập chuyên sâu: Advanced, Troubleshooting & Domain</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">Senior Tier</span>
+    <span class="badge badge-blue">Tương tác</span>
+    <span class="badge badge-green">Part 2/2</span>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="sidebar-title">Menu Ôn Tập</div>
+    <div class="level-label">PHẦN 2: ADVANCED & DOMAIN</div>
+    <div class="nav-item active" onclick="showModule('g6',this)">
+      <div class="nav-item-left"><span class="nav-number">G6</span>Data Quality</div>
+      <span class="nav-priority">🟡 Quan trọng</span>
+    </div>
+    <div class="nav-item" onclick="showModule('g7',this)">
+      <div class="nav-item-left"><span class="nav-number">G7</span>Troubleshooting</div>
+      <span class="nav-priority">🔴 Cao nhất</span>
+    </div>
+    <div class="nav-item" onclick="showModule('g8',this)">
+      <div class="nav-item-left"><span class="nav-number">G8</span>Data Modeling</div>
+      <span class="nav-priority">🟡 Quan trọng</span>
+    </div>
+    <div class="nav-item" onclick="showModule('g9',this)">
+      <div class="nav-item-left"><span class="nav-number">G9</span>Behavioral</div>
+      <span class="nav-priority">🟢 Bổ trợ</span>
+    </div>
+    <div class="nav-item" onclick="showModule('g10',this)">
+      <div class="nav-item-left"><span class="nav-number">G10</span>Domain Knowledge</div>
+      <span class="nav-priority">🟢 Bổ trợ</span>
+    </div>
+
+    <div class="nav-item" onclick="showModule('g11',this)">
+      <div class="nav-item-left"><span class="nav-number">G11</span>Phần Mở Rộng</div>
+      <span class="nav-priority">🟢 Bổ trợ</span>
+    </div>
+
+    <div class="level-label">LIÊN KẾT</div>
+    <a href="interview_de_index.html" class="nav-item">
+      <div class="nav-item-left"><span class="nav-number">🏠</span>Trang Chủ</div>
+    </a>
+    <a href="interview_de_part1.html" class="nav-item">
+      <div class="nav-item-left"><span class="nav-number">←</span>Phần 1 (Nhóm 1-5)</div>
+    </a>
+  </nav>
+
+  <main class="main">
+
+    <!-- G6: Data Quality & Monitoring -->
+    <div class="module active" id="g6">
+      <div class="module-header">
+        <div class="module-tag">G6 · Advanced</div>
+        <div class="module-title">Nhóm 6: Data Quality & Monitoring</div>
+        <div class="module-subtitle">12 câu hỏi | Mức độ ưu tiên: 🟡 Quan trọng</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Tiến độ ôn tập nhóm này:</span>
+          <span class="progress-count">0/12</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 1 — Kiến thức nền tảng</div>
+
+      <!-- Q1 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q1. 6 Dimension của Data Quality</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Data Quality là gì? Có bao nhiêu dimension của DQ và trong ETL bạn thường kiểm soát dimension nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>6 dimension chính:
+            <br>• <strong>Completeness:</strong> Đầy đủ (vd: amount ko được NULL).
+            <br>• <strong>Accuracy:</strong> Chính xác (mã currency phải chuẩn ISO).
+            <br>• <strong>Consistency:</strong> Nhất quán (customer_id phải tồn tại).
+            <br>• <strong>Timeliness:</strong> Kịp thời (Batch chạy xong đúng giờ).
+            <br>• <strong>Uniqueness:</strong> Duy nhất (Không duplicate transaction_id).
+            <br>• <strong>Validity:</strong> Hợp lệ (Format ngày/số đúng, amount không âm).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q2. DQ Check ở Staging vs Core</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Sự khác nhau giữa check DQ ở Staging layer và Core layer? Tại sao không chỉ check một chỗ?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Staging check:</strong> Bắt lỗi dữ liệu nguồn (format sai, thiếu field). Giúp block data rác ngay từ đầu.
+            <br>• <strong>Core check:</strong> Bắt lỗi logic transform, kiểm tra tính toàn vẹn (referential integrity), tổng lượng amount.
+            <br>Cần check cả 2 để vừa isolate lỗi của Source, vừa kiểm tra logic ETL của mình.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q3. Error Table Design</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Error table trong ETL dùng làm gì? Thiết kế error table như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Error table lưu record bị reject thay vì stop toàn bộ batch.
+            <br>• <strong>Schema:</strong> batch_id, job_name, source_system, source_table, error_type, error_column, error_message, raw_record, status (NEW/RESOLVED).
+            <br>• <strong>Workflow:</strong> Bản ghi lỗi văng vào đây, alert team review, không làm nghẽn pipeline.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q4. Reconciliation (Đối soát) trong ETL</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Reconciliation trong ETL là gì? Bạn thực hiện đối soát thế nào sau mỗi batch?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Reconciliation là so sánh số liệu Source và Target để đảm bảo không mất mát.
+            <br>• Row count check: (Count source == Count target).
+            <br>• Amount check: (Sum(amount) source == Sum(amount) target) -> Quan trọng nhất ngành ngân hàng.
+            <br>• Hash/Checksum: Đảm bảo data không bị corrupt.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q5. Prometheus & Kiến trúc Pull-based</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Prometheus và Grafana hoạt động theo mô hình gì? Tại sao chọn Prometheus?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Mô hình Pull-based:</strong> Prometheus chủ động gọi API (scrape) các endpoint (exporters) để kéo metrics về định kỳ.
+            <br>• <strong>Ưu điểm:</strong> Chuyên trị Time-series data, truy vấn siêu mạnh (PromQL), tích hợp AlertManager tốt, rất nhẹ và scale tốt cho DB monitoring so với Push-based agent nặng nề.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 2 — Chuyên sâu kỹ thuật</div>
+
+      <!-- Q6 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q6. Setup Prometheus PostgreSQL Monitoring</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Setup Prometheus monitor PostgreSQL từ đầu thế nào? Metrics quan trọng nhất?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>1. Cài node_exporter (OS metrics) & postgres_exporter.
+            <br>2. Config scrape_configs trong prometheus.yml trỏ về các exporter port.
+            <br>3. <strong>Key Metrics:</strong> pg_up (health), pg_replication_lag, active connections, pg_locks_count, CPU/Disk IO.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q7. Viết Alert Rule (Prometheus) cho Replication Lag & Disk</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Viết alert rule cụ thể: Disk sắp đầy, Replication lag cao."</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Replication Lag:</strong> <code>expr: pg_replication_lag > 300</code> (lag > 5 phút), <code>for: 2m</code> -> Cảnh báo Critical.
+            <br>• <strong>Disk Space:</strong> <code>expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10</code> (Còn dưới 10%).
+            <br>Rule gửi về AlertManager -> Route gửi mail hoặc slack cho DBA Team.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q8. Monitor ETL Pipeline (Khác với Infra)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Làm thế nào monitor được ETL pipeline chạy hằng đêm có đúng không?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Job Log:</strong> Bảng etl_job_log ghi nhận start/end time, duration, status, rows_processed.
+            <br>• <strong>Baseline Alert:</strong> Alert nếu duration job hôm nay > 1.5 lần avg_duration 30 ngày qua.
+            <br>• <strong>Data Freshness:</strong> Select max(load_dt), nếu bị stale data quá 1 tiếng thì alert.
+            <br>• <strong>Morning Report:</strong> Python script chạy 6h sáng gửi summary report.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q9. Quyết định Fail Batch vs Continue Batch (Thresholds)</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Khi nào batch nên fail hoàn toàn, khi nào tiếp tục chạy dù có lỗi? Thiết kế threshold thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>• <strong>Hard Failure (Stop batch):</strong> Đứt DB link, bảng Core bị lock chết, Error rate > 10% (Data source có biến).
+            <br>• <strong>Soft Failure (Continue):</strong> Lỗi format vài row lẻ, duplicate nhẹ (bị skip đi). Ghi log vào error table, tiếp tục load bảng sạch.
+            <br>Thiết kế PL/SQL đếm số lỗi/tổng số, dùng if-else: < 5% (Warning), 5-10% (Urgent review), > 10% (Raise Exception dừng pipeline).</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="level-header">CẤP ĐỘ 3 — Tình huống thực chiến</div>
+
+      <!-- Q10 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q10. Điều tra số lượng giao dịch giảm 40% đột ngột</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Sáng nay số lượng giao dịch giảm 40% nhưng business không có gì bất thường. Điều tra thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời (Systematic Investigation):</strong>
+            <br>1. Check Job Log xem có batch nào fail không retry không.
+            <br>2. Row count so sánh: Lệch xảy ra ở tầng Source -> Staging (Extract lỗi/thiếu file) hay Staging -> Core (DQ reject quá gắt).
+            <br>3. Check Error Table xem có rule DQ nào vừa update reject nhầm data hợp lệ (VD rule mới không cho amount âm, reject sạch chiều thẻ tín dụng).
+            <br>4. Check tình trạng API/DB Link về Source lúc extract.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q11 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q11. Design Grafana Dashboard</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Grafana dashboard bạn tổ chức như thế nào để cả DBA và Dev cùng dùng được?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>Chia theo Tier/Panel:
+            <br>• <strong>Executive (Cho Manager):</strong> Tình trạng DB UP/DOWN, lag replication, job run/fail.
+            <br>• <strong>DBA/Infra:</strong> CPU, RAM, Disk IO, Active connections, WAL generation rate.
+            <br>• <strong>Developer/DE:</strong> Slow query log, rows inserted, Job duration vs baseline.
+            <br>Sử dụng template variable để chuyển đổi instance dễ dàng.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q12. Oracle Monitoring Custom</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Monitor Oracle không có sẵn exporter chuẩn như Postgres. Monitor thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong>
+            <br>1. Dùng community oracledb_exporter.
+            <br>2. Viết Python script + cx_Oracle truy vấn thẳng các view dba_tablespace_usage_metrics, v$session, v$system_event.
+            <br>3. Push metrics vào thư viện prometheus_client và expose cổng HTTP cho Prom scrape.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn primary" onclick="showModule('g7', document.querySelectorAll('.nav-item')[1])">Tiếp theo: Nhóm 7 →</button>
+      </div>
+    </div>
+
+
+    <!-- G7: Xử lý sự cố thực tế -->
+    <div class="module" id="g7">
+      <div class="module-header">
+        <div class="module-tag">G7 · Thực chiến</div>
+        <div class="module-title">Nhóm 7: Xử lý sự cố thực tế</div>
+        <div class="module-subtitle">12 câu hỏi | Mức độ ưu tiên: 🔴 Cao nhất</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Tiến độ ôn tập nhóm này:</span>
+          <span class="progress-count">0/12</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 1 — Sự cố ETL & Data Pipeline</div>
+
+      <!-- Q1 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q1. Batch ETL hằng đêm fail lúc 3h sáng. Bạn nhận được alert ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Batch ETL hằng đêm fail lúc 3h sáng. Bạn nhận được alert email. Quy trình xử lý của bạn từ lúc nhận alert đến lúc hệ thống hoạt động bình thường?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>BƯỚC 1 — TRIAGE (5 phút đầu):<br><br>  → Đọc error message trong alert email:<br><br>    Job nào fail? Ở step nào? Lỗi gì?<br><br>  → Đánh giá severity:<br><br>    \- Core table bị ảnh hưởng? → Critical<br><br>    \- Chỉ staging fail? → Có thể rerun<br><br>    \- Lỗi DQ nhiều? → Data source problem<br><br>  → Quyết định: fix ngay hay chờ đến sáng?<br><br>    Nếu có báo cáo sáng 8h cần data → fix ngay<br><br>BƯỚC 2 — DIAGNOSE (10-15 phút):<br><br>  → Check job log:<br><br>    SELECT \<em> FROM etl\_job\_log <br><br>    WHERE batch\_date \= TRUNC(SYSDATE) <br><br>    ORDER BY start\_time;<br><br><br>  → Check error table:<br><br>    SELECT error\_type, COUNT(\</em>), sample error\_message<br><br>    FROM etl\_error\_log<br><br>    WHERE batch\_id \= :failed\_batch\_id<br><br>    GROUP BY error\_type;<br><br><br>  → Check system resources:<br><br>    \- Disk còn đủ không?<br><br>    \- DB link còn sống không?<br><br>    \- Lock/blocking không?<br><br><br>  → Xác định bước cuối cùng thành công là gì<br><br>    → Rerun từ bước đó, không chạy lại từ đầu<br><br>BƯỚC 3 — FIX & RERUN:<br><br>  → Nếu lỗi transient (network, timeout):<br><br>    Rerun job ngay<br><br>  → Nếu lỗi data (DQ fail nhiều):<br><br>    Điều tra nguồn trước khi rerun<br><br>  → Nếu lỗi code:<br><br>    Fix code, test trên dev, deploy, rerun<br><br>BƯỚC 4 — VERIFY:<br><br>  → Check row count: staging vs source<br><br>  → Check core table: data có đủ không?<br><br>  → Chạy reconciliation query<br><br>BƯỚC 5 — COMMUNICATE & DOCUMENT:<br><br>  → Notify stakeholder: đã fix, data ready lúc X<br><br>  → Ghi incident log: nguyên nhân, thời gian,<br><br>    action taken, lesson learned<br><br>  → Nếu lỗi có thể tái phát: thêm alert rule mới<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q2. Batch ETL chạy thành công (status \= SUCCESS) nhưng team ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Batch ETL chạy thành công (status \= SUCCESS) nhưng team báo cáo phát hiện số liệu sai. Bạn điều tra như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Batch success nhưng data sai → 3 khả năng:<br><br>  1\. Transform logic sai<br><br>  2\. Source data đã sai từ nguồn<br><br>  3\. DQ check không đủ chặt → data lỗi qua lọt<br><br>BƯỚC 1 — SCOPE THE PROBLEM:<br><br>  → Số liệu nào sai? Bảng nào? Ngày nào?<br><br>  → Sai từ khi nào? Hôm nay mới sai hay lâu rồi?<br><br>  → Sai theo pattern gì? Chi nhánh cụ thể?<br><br>    Loại giao dịch cụ thể? Hay random?<br><br>BƯỚC 2 — TRACE NGƯỢC TỪ OUTPUT:<br><br>  → Lấy sample bản ghi sai từ Core/báo cáo<br><br>  → Trace về Staging: bản ghi đó có trong<br><br>    Staging không? Giá trị là bao nhiêu?<br><br>  → Trace về Source: source gửi giá trị gì?<br><br><br>  → Xác định lỗi ở tầng nào:<br><br>    Source → Staging: lỗi extract hoặc source sai<br><br>    Staging → Core:   lỗi transform<br><br>    Core → Báo cáo:  lỗi query báo cáo<br><br>BƯỚC 3 — KIỂM TRA TRANSFORM LOGIC:<br><br>  SELECT s.transaction\_id,<br><br>         s.amount AS source\_amount,<br><br>         c.amount AS core\_amount,<br><br>         s.currency AS source\_currency,<br><br>         c.currency AS core\_currency<br><br>  FROM stg\_transactions s<br><br>  JOIN core\_transactions c <br><br>    ON s.transaction\_id \= c.transaction\_id<br><br>    AND s.batch\_id \= :affected\_batch<br><br>  WHERE s.amount \!= c.amount;<br><br><br>  → Nếu có chênh lệch: transform logic sai<br><br>  → Kiểm tra: có currency conversion không?<br><br>    Exchange rate dùng đúng ngày chưa?<br><br>BƯỚC 4 — KIỂM TRA SOURCE:<br><br>  → Query trực tiếp từ source system<br><br>    (nếu còn window)<br><br>  → So sánh với Staging<br><br>  → Nếu source đã sai: contact source team<br><br>BƯỚC 5 — FIX & REPROCESS:<br><br>  → Fix transform logic<br><br>  → Rerun từ Staging → Core cho ngày bị ảnh hưởng<br><br>  → Không cần extract lại nếu Staging đã đúng<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q3. Bạn phát hiện pipeline ETL đang tạo duplicate records tro...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn phát hiện pipeline ETL đang tạo duplicate records trong Core table. Chưa biết từ khi nào. Bạn xử lý thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>BƯỚC 1 — QUANTIFY:<br><br>  \-- Đếm duplicate<br><br>  SELECT transaction\_id, COUNT(\<em>) cnt<br><br>  FROM core\_transactions<br><br>  GROUP BY transaction\_id<br><br>  HAVING COUNT(\</em>) \> 1<br><br>  ORDER BY cnt DESC;<br><br><br>  \-- Kết quả: bao nhiêu bản ghi bị duplicate?<br><br>  \-- Từ ngày nào? <br><br>  SELECT MIN(load\_dt), MAX(load\_dt)<br><br>  FROM core\_transactions<br><br>  WHERE transaction\_id IN (<br><br>    SELECT transaction\_id FROM core\_transactions<br><br>    GROUP BY transaction\_id HAVING COUNT(\<em>) \> 1<br><br>  );<br><br>BƯỚC 2 — ROOT CAUSE:<br><br>  Nguyên nhân phổ biến nhất:<br><br>  a) Batch chạy 2 lần (retry không check đã chạy)<br><br>  b) INSERT thay vì MERGE → không detect existing<br><br>  c) Primary key không enforce ở tầng application<br><br>  d) Staging bị duplicate → propagate vào Core<br><br>  → Kiểm tra job\_log: batch nào chạy 2 lần?<br><br>  SELECT batch\_date, COUNT(\</em>) <br><br>  FROM etl\_job\_log <br><br>  WHERE job\_name \= 'LOAD\_CORE\_TRANSACTIONS'<br><br>  GROUP BY batch\_date<br><br>  HAVING COUNT(\<em>) \> 1;<br><br>BƯỚC 3 — CLEAN UP:<br><br>  \-- Giữ record mới nhất, xóa record cũ hơn<br><br>  DELETE FROM core\_transactions<br><br>  WHERE rowid NOT IN (<br><br>    SELECT MAX(rowid)  \-- hoặc MIN theo business rule<br><br>    FROM core\_transactions<br><br>    GROUP BY transaction\_id<br><br>  );<br><br>  COMMIT;<br><br><br>  \-- Verify<br><br>  SELECT COUNT(\</em>) FROM (<br><br>    SELECT transaction\_id<br><br>    FROM core\_transactions<br><br>    GROUP BY transaction\_id<br><br>    HAVING COUNT(\*) \> 1<br><br>  );<br><br>BƯỚC 4 — PREVENT RECURRENCE:<br><br>  → Thêm UNIQUE constraint hoặc PRIMARY KEY<br><br>  → Đổi INSERT → MERGE trong stored procedure<br><br>  → Thêm duplicate check vào DQ layer:<br><br>    trước khi load Core, check xem transaction\_id<br><br>    đã tồn tại chưa<br><br>  → Thêm idempotency check trong job scheduling:<br><br>    nếu batch\_date đã có status SUCCESS thì<br><br>    không chạy lại<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q4. Source system thay đổi schema (thêm cột, đổi tên cột, đổi...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Source system thay đổi schema (thêm cột, đổi tên cột, đổi kiểu dữ liệu) mà không thông báo trước. ETL của bạn fail. Xử lý như thế nào và làm thế nào để ngăn chặn trong tương lai?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>IMMEDIATE FIX:<br><br>  Trường hợp 1 — Đổi tên cột:<br><br>  → ODI Mapping bị lỗi vì column không tồn tại<br><br>  → Reverse Model lại trong ODI để update metadata<br><br>  → Cập nhật Mapping: đổi source column reference<br><br>  → Test và redeploy<br><br>  Trường hợp 2 — Đổi kiểu dữ liệu (VARCHAR → NUMBER):<br><br>  → Kiểm tra xem Staging column có compatible không<br><br>  → Nếu cần: ALTER TABLE stg\_xxx MODIFY column\_name...<br><br>  → Kiểm tra transform logic có cần thay đổi không<br><br>  Trường hợp 3 — Thêm cột bắt buộc mới:<br><br>  → Source gửi thêm data → Staging cần thêm cột<br><br>  → Thêm cột vào Staging (DEFAULT NULL)<br><br>  → Cập nhật Mapping trong ODI<br><br>  → Quyết định: có cần load vào Core không?<br><br>PREVENTION — Hệ thống phát hiện schema change:<br><br>  \-- Script chạy hằng đêm trước khi ETL:<br><br>  \-- So sánh schema hiện tại với schema đã lưu<br><br><br>  CREATE TABLE schema\_snapshot (<br><br>      table\_name    VARCHAR2(100),<br><br>      column\_name   VARCHAR2(100),<br><br>      data\_type     VARCHAR2(50),<br><br>      data\_length   NUMBER,<br><br>      nullable      VARCHAR2(1),<br><br>      snapshot\_date DATE DEFAULT SYSDATE<br><br>  );<br><br><br>  \-- Detect change:<br><br>  SELECT 'COLUMN\_REMOVED' change\_type,<br><br>         s.column\_name, s.data\_type<br><br>  FROM schema\_snapshot s<br><br>  WHERE s.snapshot\_date \= TRUNC(SYSDATE) \- 1<br><br>  AND NOT EXISTS (<br><br>    SELECT 1 FROM all\_tab\_columns c<br><br>    WHERE c.table\_name \= s.table\_name<br><br>    AND c.column\_name \= s.column\_name<br><br>  )<br><br><br>  UNION ALL<br><br><br>  SELECT 'TYPE\_CHANGED',<br><br>         c.column\_name, <br><br>         c.data\_type || ' (was: ' || s.data\_type || ')'<br><br>  FROM all\_tab\_columns c<br><br>  JOIN schema\_snapshot s <br><br>    ON c.table\_name \= s.table\_name<br><br>    AND c.column\_name \= s.column\_name<br><br>    AND s.snapshot\_date \= TRUNC(SYSDATE) \- 1<br><br>  WHERE c.data\_type \!= s.data\_type;<br><br><br>  \-- Nếu có thay đổi → alert email TRƯỚC khi chạy ETL<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 2 — Sự cố Database & Performance</div>
+
+      <!-- Q5 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q5. Lúc 9h sáng, team báo cáo: màn hình ứng dụng AMOS của VAE...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Lúc 9h sáng, team báo cáo: màn hình ứng dụng AMOS của VAECO load rất chậm, có màn hình mất 2-3 phút. Bình thường chỉ vài giây. Bạn điều tra từ góc độ DBA như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>BƯỚC 1 — CHECK NGAY (2 phút):<br><br>  \-- Active sessions đang làm gì?<br><br>  SELECT pid, usename, state, <br><br>         wait\_event\_type, wait\_event,<br><br>         LEFT(query, 100\) query\_preview,<br><br>         now() \- query\_start AS duration<br><br>  FROM pg\_stat\_activity<br><br>  WHERE state \!= 'idle'<br><br>  ORDER BY duration DESC;<br><br>  → Có session nào chạy \>30 giây không?<br><br>  → Wait event là gì?<br><br>    'Lock': có blocking session<br><br>    'IO': disk I/O bottleneck<br><br>    'CPU': query intensive<br><br>BƯỚC 2 — CHECK BLOCKING:<br><br>  SELECT <br><br>    pg\_blocking\_pids(pid) AS blocked\_by,<br><br>    pid, query, state, wait\_event<br><br>  FROM pg\_stat\_activity<br><br>  WHERE cardinality(pg\_blocking\_pids(pid)) \> 0;<br><br>  → Ai đang block ai?<br><br>  → Blocking session đang chạy gì?<br><br>  → Có nên kill không?<br><br>BƯỚC 3 — CHECK SLOW QUERIES:<br><br>  \-- Queries đang chạy lâu nhất<br><br>  SELECT pid,<br><br>         now() \- query\_start AS runtime,<br><br>         wait\_event\_type, wait\_event,<br><br>         LEFT(query, 200\) query<br><br>  FROM pg\_stat\_activity<br><br>  WHERE state \= 'active'<br><br>    AND query\_start \< now() \- INTERVAL '30 seconds'<br><br>  ORDER BY runtime DESC;<br><br>BƯỚC 4 — CHECK SYSTEM RESOURCES (Grafana):<br><br>  → CPU: đột biến không?<br><br>  → Disk I/O: read/write MB/s cao bất thường?<br><br>  → RAM: available memory còn không?<br><br>    Nếu RAM thấp → OS swap → slow<br><br>  → Connections: gần max\_connections?<br><br>BƯỚC 5 — CORRELATE VỚI EVENT:<br><br>  → Có batch ETL nào đang chạy không?<br><br>  → Có deploy nào sáng nay không?<br><br>  → Có autovacuum đang chạy trên bảng lớn không?<br><br>    SELECT relname, last\_autovacuum, last\_autoanalyze<br><br>    FROM pg\_stat\_user\_tables<br><br>    WHERE last\_autovacuum \> now() \- INTERVAL '2 hours';<br><br>BƯỚC 6 — FIX THEO NGUYÊN NHÂN:<br><br>  Blocking: kill session block nếu hợp lệ<br><br>  Slow query: optimize query hoặc add index<br><br>  Autovacuum: điều chỉnh schedule, không chạy giờ cao điểm<br><br>  Resource: contact infra team<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q6. Disk I/O của DB server VAECO đột ngột tăng cao bất thường...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Disk I/O của DB server VAECO đột ngột tăng cao bất thường lúc 10h sáng, ứng dụng bắt đầu slow. Không có batch ETL chạy lúc đó. Nguyên nhân có thể là gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>HYPOTHESIS 1 — Autovacuum đang chạy:<br><br>  → Autovacuum chọn bảng lớn để vacuum<br><br>    → đọc/ghi nhiều<br><br>  → Check:<br><br>    SELECT relname, last\_autovacuum,<br><br>           n\_dead\_tup, n\_live\_tup<br><br>    FROM pg\_stat\_user\_tables<br><br>    WHERE last\_autovacuum \> now() \- INTERVAL '1 hour'<br><br>    ORDER BY n\_dead\_tup DESC;<br><br>  → Fix tạm: pg\_cancel\_backend(autovacuum\_pid)<br><br>  → Fix dài hạn: reschedule autovacuum giờ thấp điểm<br><br>HYPOTHESIS 2 — Query không có Index đang chạy:<br><br>  → Full scan bảng lớn → nhiều disk read<br><br>  → Check pg\_stat\_activity slow queries<br><br>  → EXPLAIN ANALYZE để confirm Full Scan<br><br>  → Fix: thêm Index, reschedule query<br><br>HYPOTHESIS 3 — WAL generation cao:<br><br>  → Bulk update/delete gây nhiều WAL<br><br>  → Check: pg\_stat\_bgwriter, wal\_buffers\_clean<br><br>  → Có developer nào đang chạy migration script?<br><br>HYPOTHESIS 4 — Checkpoint bão hòa:<br><br>  → Checkpoint xảy ra quá thường → nhiều dirty page write<br><br>  → Check: checkpoint\_warning trong log<br><br>  → Fix: tăng max\_wal\_size,<br><br>         tăng checkpoint\_completion\_target<br><br>HYPOTHESIS 5 — Replication lag cao:<br><br>  → Primary generate WAL nhiều để catch up Standby<br><br>  → Check pg\_stat\_replication<br><br>  → Standby có vấn đề gì không?<br><br>DIAGNOSIS APPROACH:<br><br>  → Correlate I/O spike với pg\_stat\_activity<br><br>    tại đúng thời điểm đó<br><br>  → Dùng iostat \-x 1 để xem disk patterns:<br><br>    sequential read (full scan) hay<br><br>    random I/O (index lookup)?<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q7. Sau khi deploy ODI Mapping mới lên Production LPBank, toà...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Sau khi deploy ODI Mapping mới lên Production LPBank, toàn bộ batch đêm đó fail. Backup plan của bạn là gì và bạn rollback như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>PHÒNG NGỪA TRƯỚC KHI DEPLOY:<br><br>  → Luôn giữ Scenario version cũ trong ODI<br><br>  → Không delete Scenario cũ ngay sau deploy<br><br>  → Document: version mới thay đổi gì so với cũ<br><br>KHI XẢY RA SỰ CỐ:<br><br>  BƯỚC 1 — STOP (30 giây):<br><br>    → Dừng tất cả job đang chạy<br><br>    → Ngăn không cho job tiếp theo bắt đầu<br><br>    → Không làm gì thêm khi chưa rõ nguyên nhân<br><br>  BƯỚC 2 — ASSESS (5 phút):<br><br>    → Tất cả job fail hay chỉ job liên quan<br><br>      đến Mapping mới?<br><br>    → Error message là gì?<br><br>      \- Column not found → schema mismatch<br><br>      \- Constraint violation → data issue<br><br>      \- ORA-XXXXX → Oracle error<br><br>    → Data ở Core table bị ảnh hưởng không?<br><br>      Đã có partial load chưa?<br><br>  BƯỚC 3 — ROLLBACK:<br><br>    → Trong ODI: re-deploy Scenario version cũ<br><br>      (đã giữ lại trước khi deploy mới)<br><br>    → Nếu Core table đã bị partial load:<br><br>      DELETE FROM core\_xxx <br><br>      WHERE batch\_id \= :failed\_batch\_id;<br><br>      COMMIT;<br><br>    → Verify: chạy Scenario cũ trên môi trường<br><br>      test với data hôm nay trước khi Production<br><br>  BƯỚC 4 — RERUN:<br><br>    → Chạy lại toàn bộ batch với Scenario cũ<br><br>    → Monitor chặt từng bước<br><br>    → Notify stakeholder: batch delay X tiếng,<br><br>      dự kiến hoàn thành lúc Y<br><br>  BƯỚC 5 — ROOT CAUSE:<br><br>    → Tại sao Mapping mới fail trên Production<br><br>      nhưng không fail trên test?<br><br>    → Production data có edge case mà test data không có?<br><br>    → Fix Mapping mới, test kỹ hơn với<br><br>      production-like data, redeploy lần sau<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 3 — Sự cố dữ liệu nghiêm trọng</div>
+
+      <!-- Q8 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q8. Bạn phát hiện một stored procedure ETL có bug đã chạy sai...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn phát hiện một stored procedure ETL có bug đã chạy sai trong 7 ngày qua. Core table đang có data sai trong 7 ngày đó. Xử lý thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>BƯỚC 1 — STOP THE BLEEDING:<br><br>  → Dừng batch ngay, không cho chạy tiếp<br><br>  → Disable job schedule<br><br>  → Notify stakeholder: có data issue,<br><br>    đang điều tra, chưa dùng data 7 ngày qua<br><br>BƯỚC 2 — QUANTIFY DAMAGE:<br><br>  → Bug ảnh hưởng bảng nào? Cột nào?<br><br>  → Bao nhiêu % records bị sai?<br><br>  → Downstream nào đã dùng data sai này?<br><br>    Báo cáo nào? Hệ thống nào?<br><br>  \-- Sample records bị ảnh hưởng<br><br>  SELECT \* FROM core\_transactions<br><br>  WHERE load\_dt BETWEEN :bug\_start AND :bug\_end<br><br>  AND ROWNUM \<= 100;<br><br>BƯỚC 3 — XÁC ĐỊNH ĐÚNG/SAI:<br><br>  → Staging vẫn còn data gốc không?<br><br>    (Staging thường giữ 7-30 ngày)<br><br>  → Nếu còn: so sánh Staging vs Core<br><br>    để xác định chính xác records nào sai<br><br>  SELECT s.transaction\_id,<br><br>         s.amount AS correct\_amount,<br><br>         c.amount AS wrong\_amount<br><br>  FROM stg\_transactions s<br><br>  JOIN core\_transactions c <br><br>    ON s.transaction\_id \= c.transaction\_id<br><br>  WHERE s.batch\_date BETWEEN :start AND :end<br><br>  AND s.amount \!= c.amount;<br><br>BƯỚC 4 — FIX DATA:<br><br>  Option A — Nếu Staging còn đầy đủ:<br><br>    → Fix stored procedure bug<br><br>    → Delete 7 ngày data sai trong Core<br><br>    → Rerun batch từ Staging cho 7 ngày đó<br><br>    → Reconcile với source để verify<br><br>  Option B — Nếu Staging không còn:<br><br>    → Extract lại từ source (nếu source còn giữ)<br><br>    → Load vào Staging mới<br><br>    → Rerun transform với SP đã fix<br><br>    <br><br>  Option C — Nếu source cũng không còn:<br><br>    → Dùng backup: restore Core về snapshot<br><br>      trước khi bug xuất hiện<br><br>    → Rerun 7 ngày từ đó<br><br>    → Tốn thời gian nhất nhưng chắc chắn nhất<br><br>BƯỚC 5 — VERIFY:<br><br>  → Reconcile số liệu với source<br><br>  → Kiểm tra downstream impact:<br><br>    báo cáo đã gửi đi có cần re-issue không?<br><br>  → Với AML: cần báo cáo ngay với compliance team<br><br>BƯỚC 6 — POST-MORTEM:<br><br>  → Tại sao bug tồn tại 7 ngày không bị phát hiện?<br><br>  → DQ check và reconciliation không đủ?<br><br>  → Thêm automated sanity check:<br><br>    so sánh aggregate với ngày trước,<br><br>    alert nếu chênh lệch \>10%<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q9. Trong dự án VAECO, bạn đang sync dữ liệu từ Production xu...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Trong dự án VAECO, bạn đang sync dữ liệu từ Production xuống Test. Lỡ tay sync ngược lại — overwrite Production bằng Test data. Bạn làm gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>BƯỚC 1 — KHÔNG PANIC, ĐÁNH GIÁ NGAY:<br><br>  → Production đã bị overwrite bao nhiêu?<br><br>  → Sync đã hoàn thành hay đang chạy?<br><br>  → Nếu đang chạy: KILL NGAY lập tức<br><br>    pg\_terminate\_backend(sync\_pid)<br><br>  → Những bảng nào đã bị overwrite?<br><br>BƯỚC 2 — ISOLATE:<br><br>  → Block tất cả application connections<br><br>    để không có thêm data write lên Production<br><br>    (data mới sẽ bị mất khi restore)<br><br>  → Thông báo team: Production đang bị incident,<br><br>    không ai làm gì thêm<br><br>BƯỚC 3 — ASSESS BACKUP AVAILABILITY:<br><br>  → Backup gần nhất là khi nào?<br><br>    (VAECO: backup hằng ngày)<br><br>  → Có WAL archive không?<br><br>    (Có → có thể PITR đến thời điểm trước sync)<br><br>  → Replication lag của Standby là bao nhiêu?<br><br>    → Nếu Standby chưa nhận sync → promote Standby\!<br><br>BƯỚC 4 — FASTEST RECOVERY — PROMOTE STANDBY:<br><br>  → Nếu Standby vẫn còn data Production tốt:<br><br>    pg\_ctl promote \-D /standby\_data<br><br>  → Redirect app sang Standby (New Primary)<br><br>  → RTO: vài phút<br><br>  → Đây là lý do phải có Standby\!<br><br>BƯỚC 5 — NẾU STANDBY CŨNG BỊ ẢNH HƯỞNG:<br><br>  → PITR từ WAL archive:<br><br>    restore\_command để replay WAL<br><br>    đến thời điểm 1 phút trước khi sync bắt đầu<br><br>  → Tốn thời gian hơn nhưng RPO rất tốt<br><br>BƯỚC 6 — SAU KHI PHỤC HỒI:<br><br>  → Verify data integrity<br><br>  → Report full incident<br><br>  → Process improvement:<br><br>    \- Thêm confirmation prompt khi sync Production<br><br>    \- Tạo script riêng cho prod→test và test→prod<br><br>      với tên rõ ràng không thể nhầm<br><br>    \- Yêu cầu 2 người approve trước khi<br><br>      thực hiện data sync Production<br><br>BÀI HỌC: Case này nhấn mạnh tại sao HA/DR<br><br>quan trọng — không phải chỉ cho hardware failure<br><br>mà còn cho human error.<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q10. Bạn đang thực hiện migration 300+ bảng cho VAECO. Đến bản...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn đang thực hiện migration 300+ bảng cho VAECO. Đến bảng thứ 250, phát hiện có 5 bảng đã bị load sai (dữ liệu bị lệch). Bạn dừng lại hay tiếp tục? Xử lý thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>DỪNG LẠI NGAY — không tiếp tục khi chưa rõ nguyên nhân.<br><br>Lý do:<br><br>  → 5 bảng sai có thể là pattern — các bảng sau<br><br>    có thể sai theo cùng cách<br><br>  → Nếu tiếp tục mà bị sai nhiều hơn → <br><br>    phạm vi fix lớn hơn<br><br>  → Migration có cutover window → cần quyết định<br><br>    nhanh: fix và tiếp tục hay rollback toàn bộ<br><br>BƯỚC 1 — PHÂN TÍCH 5 BẢNG SAI:<br><br>  → Sai theo pattern gì?<br><br>    \- Cùng loại data? (binary, CLOB, date format)<br><br>    \- Cùng source table structure?<br><br>    \- Chỉ một số record hay tất cả?<br><br>  → Nguyên nhân là gì?<br><br>    \- Character encoding mismatch DB2→Oracle?<br><br>    \- Date format conversion sai?<br><br>    \- NULL handling khác nhau giữa DB2 và Oracle?<br><br>BƯỚC 2 — QUYẾT ĐỊNH:<br><br>  Nếu nguyên nhân rõ ràng, fix được nhanh:<br><br>    → Fix transform logic<br><br>    → Re-migrate 5 bảng đó<br><br>    → Verify 5 bảng và 10 bảng tiếp theo kỹ hơn<br><br>    → Tiếp tục với bảng 251<br><br>  Nếu nguyên nhân phức tạp, không chắc:<br><br>    → Rollback toàn bộ về 0<br><br>    → Fix đúng vấn đề<br><br>    → Restart migration — tốt hơn<br><br>      là đi tiếp với foundation không chắc<br><br>BƯỚC 3 — RE-MIGRATE 5 BẢNG:<br><br>  → Truncate target table<br><br>  → Fix ETL script<br><br>  → Re-run với verify bật chặt hơn:<br><br>    \- Row count check<br><br>    \- Sample data comparison<br><br>    \- Checksum trên các cột quan trọng<br><br>  → Confirm 5 bảng đúng trước khi đi tiếp<br><br>BƯỚC 4 — PREVENT RECURRENCE:<br><br>  → Hiểu root cause → apply fix cho<br><br>    tất cả bảng còn lại có cùng pattern<br><br>  → Thêm automated verification sau mỗi bảng:<br><br>    không chỉ row count mà còn checksum<br><br>  → Với bảng binary/CLOB: kiểm tra kỹ hơn<br><br>BÀI HỌC TỪ VAECO:<br><br>  Tôi đã làm reconciliation script<br><br>  sau mỗi nhóm 50 bảng — phát hiện sớm<br><br>  thay vì đến cuối mới biết.<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 4 — Sự cố trong giờ cao điểm</div>
+
+      <!-- Q11 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L4</span>
+          <span>Q11. Đúng 8h sáng thứ Hai — giờ cao điểm — DB link từ Oracle O...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Đúng 8h sáng thứ Hai — giờ cao điểm — DB link từ Oracle ODI đến source system IPCAS bị đứt. Batch ETL đêm qua đang dở. Bạn xử lý thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>IMMEDIATE (0-5 phút):<br><br>  BƯỚC 1 — VERIFY DB LINK:<br><br>    SELECT \<em> FROM dual@ipcas\_dblink;<br><br>    → ORA-12541: TNS no listener<br><br>    → ORA-12170: Connect timeout<br><br>    → Lỗi gì? → Biết hướng fix<br><br>  BƯỚC 2 — TRIAGE:<br><br>    → Batch dở đến bước nào?<br><br>      Staging xong chưa? Hay đang extract?<br><br>    → Nếu Staging đã xong trước khi link đứt:<br><br>      → Có thể tiếp tục transform từ Staging<br><br>        mà không cần source<br><br>    → Nếu đang extract dở: <br><br>      → Staging chưa đủ, cần đợi link recover<br><br>  BƯỚC 3 — PARALLEL ACTION:<br><br>    → Liên hệ team network/DBA source: link đứt do đâu?<br><br>    → Ước tính thời gian phục hồi<br><br>    → Trong lúc chờ: tiếp tục các job<br><br>      không phụ thuộc IPCAS (SWIFT, OSB...)<br><br>  BƯỚC 4 — KHI LINK PHỤC HỒI:<br><br>    → Test lại: SELECT \</em> FROM dual@ipcas\_dblink;<br><br>    → Rerun extract từ IPCAS, chỉ lấy data<br><br>      chưa có trong Staging<br><br>    → Dùng incremental: WHERE batch\_date \= :today<br><br>      không lấy lại data đã có<br><br>    → Tiếp tục pipeline bình thường<br><br>  BƯỚC 5 — COMMUNICATE:<br><br>    → Báo cáo sáng 8h có thể delay X tiếng<br><br>    → Update tiến độ mỗi 30 phút<br><br>    → Xác nhận khi data ready<br><br>  PREVENTION:<br><br>    → Alert rule: check DB link connectivity<br><br>      mỗi 5 phút, alert ngay khi fail<br><br>    → Staging buffer: sau khi extract xong<br><br>      giữ data 7 ngày → khi link đứt vẫn<br><br>      có thể process từ Staging có sẵn<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L4</span>
+          <span>Q12. Interviewer đưa ra tình huống: Production PostgreSQL Prim...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Interviewer đưa ra tình huống: Production PostgreSQL Primary bị full disk lúc 2h chiều — giờ cao điểm 800 users đang dùng hệ thống. Mọi write đều fail. Bạn có 15 phút để xử lý. Từng bước?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>PHÚT 0-2 — ASSESS:<br><br>  df \-h                    → disk nào đầy?<br><br>  du \-sh /var/lib/postgresql/  → data dir bao nhiêu?<br><br>  du \-sh /var/log/           → log bao nhiêu?<br><br>  du \-sh /wal\_archive/       → WAL archive bao nhiêu?<br><br>PHÚT 2-5 — QUICK WINS (không risk):<br><br>  → Xóa WAL archive cũ (đã replicate đến Standby):<br><br>    \-- Kiểm tra Standby đã nhận WAL đến đâu<br><br>    SELECT restart\_lsn FROM pg\_replication\_slots;<br><br>    \-- Xóa WAL đã được consume bởi tất cả Standby<br><br>    SELECT pg\_walfile\_name(restart\_lsn) <br><br>    FROM pg\_replication\_slots;<br><br>    \-- Xóa WAL cũ hơn checkpoint đó<br><br>    <br><br>  → Xóa PostgreSQL log cũ:<br><br>    find /var/log/postgresql/ \-name "\<em>.log" <br><br>         \-mtime \+7 \-delete<br><br>  → Xóa temp files:<br><br>    ls \-lh /tmp/ | sort \-k5 \-rh | head \-20<br><br>    → Xóa temp files lớn không cần thiết<br><br>PHÚT 5-10 — NẾU CHƯA ĐỦ:<br><br>  → Tìm file lớn bất thường:<br><br>    find /var/lib/postgresql/ \-size \+1G \\<br><br>         \-exec ls \-lh {} \\;<br><br>    → Core dump file? Temporary sort file?<br><br>    → pg\_dump đang chạy và tạo file lớn?<br><br>  → Check table bloat — bảng nào đang phình:<br><br>    SELECT relname, pg\_size\_pretty(<br><br>      pg\_total\_relation\_size(oid)) size<br><br>    FROM pg\_class ORDER BY <br><br>    pg\_total\_relation\_size(oid) DESC LIMIT 10;<br><br>PHÚT 10-15 — NẾU VẪN CHƯA ĐỦ:<br><br>  → Add storage khẩn cấp:<br><br>    Contact infra team: cần thêm disk NGAY<br><br>    Hoặc: mount NFS storage tạm thời<br><br>    <br><br>  → Relocate WAL archive sang storage khác:<br><br>    Symlink từ /wal\_archive → /new\_mount/archive<br><br>  → CUỐI CÙNG: fail over sang Standby<br><br>    Standby còn disk không?<br><br>    Nếu có: promote Standby → New Primary<br><br>    Cả Primary và Standby đều full → major incident<br><br>SAU KHI XỬ LÝ:<br><br>  → Root cause: tại sao disk đầy bất ngờ?<br><br>  → Alert ở 80% thay vì 95%<br><br>  → Auto-delete WAL archive khi đã verified replicated<br><br>  → Capacity planning: disk growth rate theo tuần<br><br>•--<br><br></em>*</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn primary" onclick="showModule('g8', document.querySelectorAll('.nav-item')[2])">Tiếp theo: Nhóm 8 →</button>
+      </div>
+    </div>
+
+    <!-- G8: Data Modeling & Schema Design -->
+    <div class="module" id="g8">
+      <div class="module-header">
+        <div class="module-tag">G8 · Database</div>
+        <div class="module-title">Nhóm 8: Data Modeling & Schema Design</div>
+        <div class="module-subtitle">11 câu hỏi | Mức độ ưu tiên: 🟡 Quan trọng</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Tiến độ ôn tập nhóm này:</span>
+          <span class="progress-count">0/11</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 1 — Kiến thức nền tảng</div>
+
+      <!-- Q1 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q1. Star Schema và Snowflake Schema khác nhau thế nào? Bạn đã...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Star Schema và Snowflake Schema khác nhau thế nào? Bạn đã dùng loại nào trong các dự án?"</em></p>
+          <div class="info-box tip">
+            💡 \<em>\</em>Gợi ý trả lời:\<em>\</em><br><br>![][image2]<br><br>So sánh thực tế cho công việc DE:<br><br>|  | Star Schema | Snowflake Schema |<br>| :---- | :---- | :---- |<br>| Dim table | Denormalized — tất cả trong 1 bảng | Normalized — tách ra nhiều bảng con |<br>| JOIN | Ít JOIN hơn → query nhanh hơn | Nhiều JOIN → phức tạp hơn |<br>| Storage | Tốn hơn (duplicate data) | Tiết kiệm hơn |<br>| Dùng khi | DWH analytics, báo cáo | Dim có hierarchy phức tạp |<br><br><strong>Mapping vào dự án của bạn:</strong> NHNN DWH và LPBank OFSAA thường dùng Star Schema hoặc biến thể gần với Star — dim\_customer, dim\_date, dim\_account flat để query báo cáo nhanh.<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q2. Fact table và Dimension table khác nhau thế nào? Bảng Bri...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Fact table và Dimension table khác nhau thế nào? Bảng Bridge dùng khi nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br><strong>Fact table</strong>: lưu sự kiện đã xảy ra — transaction, giao dịch, event. Chứa nhiều foreign key đến dimension, và các measure (số, tiền, số lượng).<br><br>\-- Ví dụ fact table AML<br><br>CREATE TABLE fact\_transaction (<br><br>    transaction\_id    NUMBER PK,<br><br>    customer\_sk       NUMBER FK → dim\_customer,<br><br>    date\_sk           NUMBER FK → dim\_date,<br><br>    branch\_sk         NUMBER FK → dim\_branch,<br><br>    transaction\_type\_sk NUMBER FK → dim\_transaction\_type,<br><br>    \-- Measures<br><br>    amount            NUMBER(18,2),<br><br>    fee               NUMBER(18,2),<br><br>    exchange\_rate     NUMBER(10,6)<br><br>);<br><br><strong>Dimension table</strong>: lưu ngữ cảnh mô tả — ai, ở đâu, khi nào, loại gì. Ít thay đổi hơn Fact.<br><br>CREATE TABLE dim\_customer (<br><br>    customer\_sk       NUMBER PK,   \-- Surrogate key<br><br>    customer\_id       VARCHAR2(20), \-- Natural key<br><br>    full\_name         VARCHAR2(200),<br><br>    id\_number         VARCHAR2(20),<br><br>    customer\_type     VARCHAR2(50),<br><br>    risk\_level        VARCHAR2(20),<br><br>    \-- SCD Type 2 fields<br><br>    effective\_date    DATE,<br><br>    expiry\_date       DATE,<br><br>    is\_current        CHAR(1)<br><br>);<br><br><strong>Bridge table</strong> — dùng khi quan hệ Many-to-Many:<br><br>\-- Một transaction có thể liên quan nhiều account<br><br>\-- Một account có thể có nhiều transactions<br><br>\-- → Bridge table<br><br>CREATE TABLE bridge\_transaction\_account (<br><br>    transaction\_sk    NUMBER FK,<br><br>    account\_sk        NUMBER FK,<br><br>    role              VARCHAR2(50)  \-- 'SENDER', 'RECEIVER'<br><br>);<br><br><em>Bạn đã thiết kế 3 nhóm bảng này trong AML Staging — dim, fact và bridge.</em><br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q3. Surrogate key và Natural key khác nhau thế nào? Tại sao D...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Surrogate key và Natural key khác nhau thế nào? Tại sao DWH thường dùng Surrogate key?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br><strong>Natural key</strong>: key có ý nghĩa business — CMND, mã tài khoản, mã giao dịch. Tồn tại trong source system.<br><br><strong>Surrogate key</strong>: key nhân tạo do DWH tự sinh — thường là sequence number (1, 2, 3...). Không có ý nghĩa business.<br><br>Tại sao DWH dùng Surrogate key:<br><br>1\. SCD Type 2: cùng customer\_id nhưng thay đổi thông tin<br><br>   → Cần 2 rows khác nhau trong dim\_customer<br><br>   → Dùng surrogate\_key để phân biệt<br><br>   <br><br>   customer\_sk=1, customer\_id='C001', name='Nguyen A', effective=2020-01-01<br><br>   customer\_sk=2, customer\_id='C001', name='Nguyen B', effective=2023-06-01<br><br>2\. Performance: NUMBER JOIN nhanh hơn VARCHAR2 JOIN<br><br>3\. Source system thay đổi: nếu source đổi format natural key<br><br>   → DWH không bị ảnh hưởng vì đã dùng surrogate<br><br>4\. Integration: nhiều source system cùng customer\_id khác nhau<br><br>   → Surrogate key tạo unified identity<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q4. SCD Type 1, 2, 3 là gì? Trong hệ thống AML, bạn nên dùng ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"SCD Type 1, 2, 3 là gì? Trong hệ thống AML, bạn nên dùng loại nào và tại sao?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br><strong>SCD Type 1 — Overwrite:</strong><br><br>\-- Cập nhật thẳng, không giữ lịch sử<br><br>UPDATE dim\_customer SET risk\_level \= 'HIGH' WHERE customer\_id \= 'C001';<br><br>Dùng khi: data sai cần sửa, hoặc thông tin không cần lịch sử (địa chỉ email).<br><br><strong>SCD Type 2 — Add new row:</strong><br><br>\-- Đóng record cũ<br><br>UPDATE dim\_customer SET expiry\_date \= SYSDATE \- 1, is\_current \= 'N'<br><br>WHERE customer\_id \= 'C001' AND is\_current \= 'Y';<br><br>\-- Thêm record mới<br><br>INSERT INTO dim\_customer VALUES (<br><br>    seq\_customer\_sk.NEXTVAL, 'C001', 'Nguyen A', 'HIGH',<br><br>    SYSDATE, TO\_DATE('9999-12-31'), 'Y'<br><br>);<br><br>Dùng khi: cần toàn bộ lịch sử thay đổi — ai là gì vào ngày nào.<br><br><strong>SCD Type 3 — Add column:</strong><br><br>\-- Thêm cột lưu giá trị trước<br><br>ALTER TABLE dim\_customer ADD prev\_risk\_level VARCHAR2(20);<br><br>UPDATE dim\_customer SET <br><br>    prev\_risk\_level \= risk\_level,<br><br>    risk\_level \= 'HIGH'<br><br>WHERE customer\_id \= 'C001';<br><br>Dùng khi: chỉ cần biết trạng thái trước và hiện tại — không cần toàn bộ lịch sử.<br><br><strong>Trong AML — nên dùng SCD Type 2:</strong><br><br><em> AML yêu cầu audit trail hoàn chỉnh: khách hàng có risk level gì vào ngày giao dịch xảy ra?<br><br></em> Khi điều tra giao dịch đáng ngờ năm 2022, phải biết risk level của customer vào đúng ngày đó<br><br><em> SCD Type 2 join với fact\_transaction theo effective\_date ≤ transaction\_date ≤ expiry\_date<br><br></em>Đây là lý do bạn dùng "SCD-like change tracking" trong AML — về bản chất là Type 2 đơn giản hóa.*<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 2 — Chuyên sâu kỹ thuật</div>
+
+      <!-- Q5 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q5. Bạn thiết kế Staging schema cho hệ thống AML với 5+ hệ th...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn thiết kế Staging schema cho hệ thống AML với 5+ hệ thống nguồn. Kể chi tiết cách bạn tổ chức 30+ bảng trong Staging."</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>\-- Nguyên tắc đặt tên bảng Staging:<br><br>\-- STG\_{SOURCE}\_{ENTITY}<br><br>\-- Nhóm 1: Transaction data<br><br>STG\_IPCAS\_TRANSACTION     \-- Giao dịch từ IPCAS (core banking)<br><br>STG\_IPCAS\_TRANSFER        \-- Chuyển khoản<br><br>STG\_SWIFT\_MESSAGE         \-- Tin nhắn SWIFT quốc tế<br><br>STG\_OSB\_EVENT             \-- Events từ OSB (middleware)<br><br>\-- Nhóm 2: Customer/Party data<br><br>STG\_IPCAS\_CUSTOMER        \-- Thông tin khách hàng<br><br>STG\_IPCAS\_ACCOUNT         \-- Tài khoản<br><br>STG\_IPCAS\_BENEFICIARY     \-- Người thụ hưởng<br><br>\-- Nhóm 3: Reference/Lookup data<br><br>STG\_REF\_CURRENCY          \-- Danh mục tiền tệ<br><br>STG\_REF\_COUNTRY           \-- Danh mục quốc gia<br><br>STG\_REF\_BRANCH            \-- Chi nhánh<br><br>\-- Cột chuẩn mỗi bảng Staging đều có:<br><br>CREATE TABLE STG\_IPCAS\_TRANSACTION (<br><br>    \-- Business columns từ source<br><br>    transaction\_id        VARCHAR2(50),<br><br>    account\_id            VARCHAR2(30),<br><br>    amount                NUMBER(18,2),<br><br>    currency              VARCHAR2(3),<br><br>    transaction\_date      DATE,<br><br>    <br><br>    \-- ETL control columns<br><br>    batch\_id              VARCHAR2(50),   \-- Thuộc batch nào<br><br>    load\_dt               TIMESTAMP,      \-- Khi nào được load<br><br>    source\_system         VARCHAR2(20),   \-- 'IPCAS'<br><br>    record\_status         VARCHAR2(20),   \-- 'LOADED', 'DQ\_FAILED', 'PROCESSED'<br><br>    error\_message         VARCHAR2(500),  \-- Lý do DQ fail nếu có<br><br>    checksum              VARCHAR2(64)    \-- MD5 để detect thay đổi<br><br>);<br><br><strong>Tại sao tách theo source system:</strong><br><br><em> Dễ debug: lỗi trong STG\_SWIFT thì chỉ liên quan SWIFT, không ảnh hưởng IPCAS<br><br></em> Dễ rerun: chỉ cần rerun extract từ SWIFT, không cần rerun toàn bộ<br><br>* Audit: biết rõ mỗi bản ghi đến từ đâu<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q6. Partition strategy trong Staging và Core table của bạn nh...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Partition strategy trong Staging và Core table của bạn như thế nào? Tại sao chọn Range Partition theo ngày?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br><strong>Staging table — partition nhẹ:</strong><br><br>\-- Staging thường chỉ giữ data ngắn hạn (7-30 ngày)<br><br>\-- Partition theo batch\_date để drop partition cũ dễ dàng<br><br>CREATE TABLE STG\_IPCAS\_TRANSACTION (<br><br>    ...<br><br>    batch\_date DATE<br><br>)<br><br>PARTITION BY RANGE (batch\_date) (<br><br>    PARTITION p\_2025\_01 VALUES LESS THAN (DATE '2025-02-01'),<br><br>    PARTITION p\_2025\_02 VALUES LESS THAN (DATE '2025-03-01'),<br><br>    PARTITION p\_max    VALUES LESS THAN (MAXVALUE)<br><br>)<br><br>ENABLE ROW MOVEMENT;<br><br>\-- Dọn dẹp: drop partition cũ hơn 30 ngày<br><br>ALTER TABLE STG\_IPCAS\_TRANSACTION DROP PARTITION p\_2025\_01;<br><br>\-- O(1) thay vì DELETE hàng triệu rows<br><br><strong>Core/Fact table — partition quan trọng hơn:</strong><br><br>\-- Fact transaction: dữ liệu nhiều năm, partition theo tháng<br><br>CREATE TABLE FACT\_TRANSACTION (<br><br>    ...<br><br>    transaction\_date DATE<br><br>)<br><br>PARTITION BY RANGE (transaction\_date)<br><br>INTERVAL (NUMTOYMINTERVAL(1, 'MONTH'))  \-- Auto-partition mỗi tháng<br><br>(<br><br>    PARTITION p\_init VALUES LESS THAN (DATE '2020-01-01')<br><br>);<br><br>\-- INTERVAL partition: Oracle tự tạo partition mới mỗi tháng<br><br>\-- Không cần maintenance thủ công<br><br><strong>Tại sao Range Partition theo ngày:</strong><br><br><em> ETL query theo ngày: WHERE transaction\_date \= :batch\_date → Partition Pruning, chỉ scan đúng partition<br><br></em> Drop partition cũ: xóa data cũ không dùng nhanh<br><br>* Parallel load: mỗi tháng load vào partition riêng → parallel<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q7. Index strategy trong DWH khác với OLTP như thế nào? Bạn t...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Index strategy trong DWH khác với OLTP như thế nào? Bạn tạo Index gì cho Fact table và Dimension table?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br><strong>OLTP (Core banking IPCAS):</strong><br><br><em> Nhiều INSERT/UPDATE/DELETE → Index cần cân nhắc overhead<br><br></em> Index trên PK và FK là chủ yếu<br><br><em> Ít index để không làm chậm write<br><br><strong>DWH (NHNN, OFSAA):</strong><br><br></em> Read-heavy, write ít (chỉ batch load hằng đêm)<br><br><em> Có thể tạo nhiều index hơn vì write không quan trọng tốc độ như OLTP<br><br></em> Disable index khi load, rebuild sau khi load xong<br><br><strong>Index strategy thực tế:</strong><br><br>\-- Dimension table: index trên natural key để lookup nhanh<br><br>CREATE INDEX idx\_dim\_customer\_nk <br><br>ON dim\_customer(customer\_id, is\_current);<br><br>\-- Fact table: index trên các cột join với dimension<br><br>CREATE BITMAP INDEX idx\_fact\_date\_sk <br><br>ON fact\_transaction(date\_sk);<br><br>\-- Bitmap index: phù hợp với cột FK ít giá trị phân biệt<br><br>CREATE BITMAP INDEX idx\_fact\_cust\_sk <br><br>ON fact\_transaction(customer\_sk);<br><br>\-- Composite index cho query phổ biến<br><br>CREATE INDEX idx\_fact\_date\_amount <br><br>ON fact\_transaction(transaction\_date, amount)<br><br>LOCAL;  \-- LOCAL \= index partitioned theo cùng partition với table<br><br><strong>Tại sao Bitmap Index trong DWH:</strong><br><br><em> FK columns như date\_sk, branch\_sk có ít giá trị phân biệt (365 ngày, 100 chi nhánh)<br><br></em> Bitmap index cực kỳ efficient cho AND/OR nhiều điều kiện: WHERE branch\_sk \= 5 AND date\_sk \= 20240101<br><br>* Không dùng Bitmap cho OLTP: Bitmap lock cả bitmap khi update → deadlock<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q8. OFSAA yêu cầu thiết kế schema phức tạp cho phân tích lợi ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"OFSAA yêu cầu thiết kế schema phức tạp cho phân tích lợi nhuận đa chiều. Bạn hiểu cấu trúc dữ liệu của OFSAA như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>OFSAA (Oracle Financial Services Analytical Applications) là platform phân tích tài chính của Oracle, dùng cho:<br><br><em> <strong>FTP (Funds Transfer Pricing)</strong>: tính lãi suất nội bộ<br><br></em> <strong>PFT (Profitability Management)</strong>: phân bổ thu nhập và chi phí theo đơn vị kinh doanh<br><br><em> <strong>TOI</strong>: Thu nhập hoạt động thuần \= Thu nhập lãi \+ Thu nhập phi lãi<br><br></em> <strong>OPEX</strong>: Chi phí vận hành phân bổ theo allocation rule<br><br><strong>Các bảng OFSAA quan trọng:</strong><br><br>FSI\_D\_ACCOUNT      → Thông tin tài khoản<br><br>FSI\_D\_COMMON\_COA   → Chart of Accounts<br><br>FSI\_D\_ORG\_UNIT     → Đơn vị tổ chức<br><br>FSI\_D\_PRODUCT      → Sản phẩm tài chính<br><br>FSI\_D\_GENERAL\_LEDGER → Sổ cái<br><br>STG\_LOAN\_CONTRACTS    → Staging: hợp đồng cho vay<br><br>STG\_CASA\_ACCOUNTS     → Staging: tài khoản CASA<br><br>STG\_TERM\_DEPOSITS     → Staging: tiền gửi có kỳ hạn<br><br><strong>Challenge lớn nhất khi ETL vào OFSAA:</strong><br><br><em> Schema OFSAA rất rigid — không thể thêm/sửa cột<br><br></em> Mapping rule phức tạp: 1 tài khoản nguồn → nhiều bảng OFSAA<br><br><em> Data quality phải 100%: OFSAA tính toán sai nếu thiếu data hoặc data lỗi<br><br></em> Khoảng 200 Program chạy theo dependency order rất chặt<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 3 — Tình huống thực chiến</div>
+
+      <!-- Q9 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q9. Bạn nhận yêu cầu: 'Cần thêm trường phone\_number vào dim\...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn nhận yêu cầu: 'Cần thêm trường phone\_number vào dim\_customer đang có 50 triệu rows trong production DWH.' Bạn xử lý thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>\-- BAD: ALTER TABLE trực tiếp → lock bảng 50 triệu rows → downtime dài<br><br>ALTER TABLE dim\_customer ADD phone\_number VARCHAR2(20);<br><br>\-- → Lock table trong vài chục phút → không thể dùng trong production hours<br><br>\-- GOOD: Oracle online DDL<br><br>ALTER TABLE dim\_customer ADD phone\_number VARCHAR2(20)<br><br>DEFAULT NULL;<br><br>\-- Oracle 12c+: DEFAULT NULL column được add ngay lập tức, O(1)<br><br>\-- Oracle lưu default value trong data dictionary, không update từng row<br><br>\-- Sau đó update dần dần theo batch nhỏ trong off-hours:<br><br>BEGIN<br><br>  FOR i IN 1..1000 LOOP<br><br>    UPDATE dim\_customer <br><br>    SET phone\_number \= get\_phone\_from\_source(customer\_id)<br><br>    WHERE phone\_number IS NULL<br><br>    AND ROWNUM \<= 10000;<br><br>    <br><br>    COMMIT;  \-- Commit mỗi 10.000 rows, không hold lock lâu<br><br>    <br><br>    EXIT WHEN SQL%ROWCOUNT \= 0;<br><br>  END LOOP;<br><br>END;<br><br><strong>Các bước chuẩn:</strong><br><br>1. Thêm column với DEFAULT NULL — online, không lock<br><br>2. Update data trong off-hours theo batch nhỏ có COMMIT giữa chừng<br><br>3. Gather stats lại sau khi update xong<br><br>4. Thêm Index nếu cần — CREATE INDEX ... ONLINE để không lock<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q10. Schema DWH NHNN đang có bảng fact\_transaction 2 tỷ rows....</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Schema DWH NHNN đang có bảng fact\_transaction 2 tỷ rows. Query báo cáo tháng mất 4 tiếng. Bạn thiết kế lại schema như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>PHÂN TÍCH VẤN ĐỀ:<br><br>  2 tỷ rows × full scan \= 4 tiếng<br><br>  → Partition Pruning không work? → Kiểm tra partition strategy<br><br>  → Thiếu summary table? → Aggregation trên 2 tỷ rows quá chậm<br><br>GIẢI PHÁP 1 — Partition tốt hơn:<br><br>  Nếu đang partition theo năm → query tháng vẫn scan cả năm<br><br>  → Đổi sang partition theo tháng:<br><br>  PARTITION BY RANGE (transaction\_date)<br><br>  INTERVAL (NUMTOYMINTERVAL(1, 'MONTH'))<br><br>GIẢI PHÁP 2 — Aggregate table (thường hiệu quả nhất):<br><br>  \-- Tạo bảng tổng hợp theo ngày/chi nhánh/loại giao dịch<br><br>  CREATE TABLE agg\_transaction\_daily AS<br><br>  SELECT <br><br>      TRUNC(transaction\_date) dt,<br><br>      branch\_sk,<br><br>      transaction\_type\_sk,<br><br>      COUNT(\<em>) transaction\_count,<br><br>      SUM(amount) total\_amount,<br><br>      AVG(amount) avg\_amount<br><br>  FROM fact\_transaction<br><br>  GROUP BY TRUNC(transaction\_date), branch\_sk, transaction\_type\_sk;<br><br><br>  \-- Báo cáo tháng query từ agg table:<br><br>  SELECT branch\_sk, SUM(total\_amount)<br><br>  FROM agg\_transaction\_daily<br><br>  WHERE dt BETWEEN '2024-01-01' AND '2024-01-31'<br><br>  GROUP BY branch\_sk;<br><br>  \-- Từ 2 tỷ rows → vài triệu rows trong agg table → giây<br><br>GIẢI PHÁP 3 — Materialized View:<br><br>  CREATE MATERIALIZED VIEW mv\_monthly\_summary<br><br>  BUILD IMMEDIATE<br><br>  REFRESH COMPLETE ON DEMAND<br><br>  AS<br><br>  SELECT <br><br>      TRUNC(transaction\_date, 'MM') month\_dt,<br><br>      branch\_sk,<br><br>      SUM(amount) total\_amount,<br><br>      COUNT(\</em>) total\_count<br><br>  FROM fact\_transaction<br><br>  GROUP BY TRUNC(transaction\_date, 'MM'), branch\_sk;<br><br><br>  \-- ETL refresh MV sau mỗi batch<br><br>  EXEC DBMS\_MVIEW.REFRESH('mv\_monthly\_summary', 'C');<br><br><strong>Lưu ý:</strong> Bạn đã làm partition tuning trong NHNN DWH — đây là extension tự nhiên của công việc đó.<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q11 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q11. Khi thiết kế Staging schema, bạn quyết định như thế nào: ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Khi thiết kế Staging schema, bạn quyết định như thế nào: 1 bảng Staging cho mỗi source table, hay gộp nhiều source vào 1 bảng Staging?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br><strong>1 bảng Staging per source table (approach của bạn ở AML):</strong><br><br>STG\_IPCAS\_TRANSACTION   → tách riêng<br><br>STG\_SWIFT\_MESSAGE       → tách riêng<br><br>STG\_OSB\_EVENT          → tách riêng<br><br>Ưu điểm:<br><br><em> Debug dễ: lỗi ở đâu biết ngay là source nào<br><br></em> Rerun độc lập: chỉ rerun SWIFT, không ảnh hưởng IPCAS<br><br><em> Schema khác nhau giữa các source → không cần ép vào 1 bảng<br><br></em> Audit trail rõ ràng<br><br>Nhược điểm:<br><br><em> Nhiều bảng hơn → quản lý phức tạp hơn<br><br><strong>Gộp nhiều source vào 1 bảng Staging:</strong><br><br>STG\_ALL\_TRANSACTIONS (source\_system VARCHAR2, ...)<br><br>Ưu điểm:<br><br></em> Ít bảng hơn<br><br><em> Transform đơn giản nếu schema gần giống nhau<br><br>Nhược điểm:<br><br></em> Schema phải là union của tất cả source → nhiều NULL columns<br><br><em> Khó debug khi lỗi<br><br><strong>Kết luận:</strong> 1 bảng per source là best practice cho hệ thống enterprise phức tạp như AML với 5+ nguồn khác nhau. Bạn đã làm đúng.<br><br>•--<br><br></em>*</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn primary" onclick="showModule('g9', document.querySelectorAll('.nav-item')[3])">Tiếp theo: Nhóm 9 →</button>
+      </div>
+    </div>
+
+    <!-- G9: Behavioral & Situational -->
+    <div class="module" id="g9">
+      <div class="module-header">
+        <div class="module-tag">G9 · Soft Skills</div>
+        <div class="module-title">Nhóm 9: Behavioral & Situational</div>
+        <div class="module-subtitle">12 câu hỏi | Mức độ ưu tiên: 🟢 Bổ trợ</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Tiến độ ôn tập nhóm này:</span>
+          <span class="progress-count">0/12</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 1 — Xử lý áp lực & sự cố</div>
+
+      <!-- Q1 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q1. Kể về một lần hệ thống production bị sự cố nghiêm trọng t...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Kể về một lần hệ thống production bị sự cố nghiêm trọng trong ca trực của bạn. Bạn đã làm gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>SITUATION:<br><br>  DR Standby PostgreSQL mất đồng bộ 6 tiếng do network outage.<br><br>  Khi phục hồi, Standby không thể sync tiếp vì WAL đã bị xóa.<br><br>  Hệ thống MRO IT đang phục vụ 1.000+ kỹ thuật viên hàng không.<br><br>TASK:<br><br>  Phục hồi DR Standby mà không downtime Production<br><br>  và không mất dữ liệu.<br><br>ACTION:<br><br>  → Đầu tiên: xác nhận Primary vẫn healthy, Production không bị ảnh hưởng<br><br>  → Phân tích: WAL archive vẫn còn đủ 6 tiếng gap<br><br>  → Quyết định: dùng WAL archive thay vì rebuild từ pg\_basebackup<br><br>  → Cấu hình restore\_command trên Standby<br><br>  → Monitor từng bước replay, xác nhận catch-up hoàn toàn<br><br>  → Verify: replication lag về 0<br><br>RESULT:<br><br>  → Phục hồi trong \~40 phút thay vì 3-4 tiếng nếu rebuild<br><br>  → Zero data loss, zero downtime Production<br><br>  → Sau đó viết runbook cho case này để team xử lý nhanh hơn lần sau<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q2. Bạn đã bao giờ làm sai một thứ gì đó trên production và p...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn đã bao giờ làm sai một thứ gì đó trên production và phải xử lý hậu quả chưa? Kể lại."</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Đừng nói "chưa bao giờ sai" — không ai tin và nghe rất thiếu tự nhiên. Hãy kể một case thật, quan trọng là thể hiện bạn học được gì.<br><br>Ví dụ có thể kể:<br><br>SITUATION:<br><br>  Trong NHNN DWH, khi thực hiện tuning partition,<br><br>  tôi drop một partition tưởng là không còn dùng<br><br>  nhưng thực ra vẫn còn data đang được query<br><br>  bởi một báo cáo cuối tháng.<br><br>TASK:<br><br>  Phục hồi data và đảm bảo báo cáo chạy được đúng hạn.<br><br>ACTION:<br><br>  → Ngay lập tức thông báo cho team lead và stakeholder<br><br>  → Xác định data bị mất bằng cách query từ backup<br><br>  → Dùng Export/Import data pump restore lại partition đó<br><br>  → Test báo cáo chạy đúng kết quả<br><br>RESULT:<br><br>  → Phục hồi trong 2 tiếng, báo cáo vẫn kịp deadline<br><br>  → Học được: trước khi drop partition phải check<br><br>    dependency với team báo cáo, không chỉ check ETL<br><br>  → Từ đó tôi thêm bước sign-off với team báo cáo<br><br>    trước mọi DDL operation trên bảng production<br><br><strong>Điều quan trọng khi trả lời:</strong><br><br><em> Nhận trách nhiệm rõ ràng, không đổ lỗi<br><br></em> Tập trung vào action và lesson learned<br><br>* Thể hiện đã có biện pháp phòng ngừa sau đó<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q3. Kể về một tình huống bạn phải làm việc dưới áp lực deadli...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Kể về một tình huống bạn phải làm việc dưới áp lực deadline rất cao. Bạn xử lý như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>SITUATION:<br><br>  Dự án MRO IT VAECO có deadline Go-live cố định<br><br>  do hợp đồng với Vietnam Airlines. Một tuần trước<br><br>  Go-live phát hiện batch migrate dữ liệu từ AMASIS<br><br>  chạy 4 tiếng — vượt quá batch window cho phép.<br><br>TASK:<br><br>  Tối ưu batch từ 4 tiếng xuống còn dưới 1 tiếng<br><br>  trong vòng 3 ngày, không được delay Go-live.<br><br>ACTION:<br><br>  → Ngày 1: phân tích execution plan, xác định<br><br>    bottleneck là xử lý tuần tự theo từng giao dịch<br><br>  → Xác định data có thể chia theo khoảng thời gian<br><br>    mà không có dependency giữa các khoảng<br><br>  → Ngày 2: implement song song hóa 4 luồng,<br><br>    test trên môi trường có data tương đương production<br><br>  → Kết quả test: 4 tiếng → 28 phút<br><br>  → Ngày 3: review với team lead, sign-off, deploy<br><br>RESULT:<br><br>  → Go-live đúng hạn<br><br>  → Batch chạy 28 phút, thoải mái trong window<br><br>  → Case này trở thành template cho các migrate<br><br>    tương tự sau đó trong dự án<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 2 — Làm việc nhóm & giao tiếp</div>
+
+      <!-- Q4 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q4. Kể về một lần bạn phải thuyết phục team hoặc khách hàng c...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Kể về một lần bạn phải thuyết phục team hoặc khách hàng chấp nhận giải pháp kỹ thuật của bạn."</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>SITUATION:<br><br>  Backup PostgreSQL VAECO Production mất 3 tiếng 5 phút.<br><br>  Manager muốn tăng số parallel jobs (-j) của pg\_dump.<br><br>  Tôi phân tích và biết rằng vấn đề không phải ở số<br><br>  parallel jobs mà là TOAST table 81GB single-threaded.<br><br>TASK:<br><br>  Thuyết phục team chấp nhận dùng pg\_repack thay vì<br><br>  tăng \-j — một tool họ chưa từng dùng, cần downtime<br><br>  trên DR Acceptance để test.<br><br>ACTION:<br><br>  → Chuẩn bị demo: chạy pg\_dump với \-j 4, \-j 8, \-j 16<br><br>    → thời gian gần như không đổi → chứng minh bằng số liệu<br><br>  → Giải thích root cause bằng diagram đơn giản:<br><br>    pg\_dump parallel theo TABLE, nhưng 1 table đơn<br><br>    không thể chia → 81GB TOAST là bottleneck<br><br>  → Đề xuất: test pg\_repack trên DR Acceptance trước,<br><br>    không đụng Production cho đến khi verify<br><br>  → Trình bày risk: pg\_repack cần extra disk space,<br><br>    chạy online không lock Production<br><br>RESULT:<br><br>  → Team đồng ý test<br><br>  → DR Acceptance: TOAST 81GB → 4GB<br><br>  → Production: backup 3h05 → 15 phút (92%)<br><br>  → Manager sau đó reference case này trong báo cáo<br><br>    với Vietnam Airlines<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q5. Kể về một lần bạn không đồng ý với quyết định của tech le...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Kể về một lần bạn không đồng ý với quyết định của tech lead hoặc manager. Bạn xử lý thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>SITUATION:<br><br>  Trong dự án LPBank OFSAA, tech lead muốn dùng<br><br>  IKM mặc định (row-by-row) để đơn giản, dễ maintain.<br><br>  Tôi biết với 200 Program và data lớn, cách này<br><br>  sẽ không đảm bảo SLA batch window.<br><br>TASK:<br><br>  Đưa ra quan điểm khác mà không gây conflict,<br><br>  đồng thời có backup plan nếu không được chấp nhận.<br><br>ACTION:<br><br>  → Không phản đối ngay trong meeting<br><br>  → Tự làm benchmark trên môi trường dev:<br><br>    IKM row-by-row: 45 phút/Mapping<br><br>    IKM bulk insert: 8 phút/Mapping<br><br>  → Trình bày kết quả với tech lead riêng trước,<br><br>    không public để tránh làm họ mất mặt<br><br>  → Đề xuất: dùng bulk insert cho các Mapping lớn,<br><br>    row-by-row cho Mapping nhỏ ít quan trọng<br><br>  → Compromise: áp dụng cho top 20 Mapping<br><br>    chạy lâu nhất trước, xem kết quả<br><br>RESULT:<br><br>  → Tech lead đồng ý thử với top 20 Mapping<br><br>  → Kết quả tốt → áp dụng toàn bộ<br><br>  → Học được: dùng data và số liệu để thuyết phục,<br><br>    không dùng opinion; và chọn đúng thời điểm<br><br>    trình bày để đối phương không phòng thủ<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q6. Bạn làm việc trong team có developer, BA và DBA cùng lúc....</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn làm việc trong team có developer, BA và DBA cùng lúc. Kể về một lần có conflict và cách bạn giải quyết."</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>SITUATION:<br><br>  Dự án AML Agribank, BA yêu cầu thêm 3 trường<br><br>  mới vào Core table 1 tuần trước Go-live.<br><br>  Developer muốn thêm ngay. Tôi (DE) lo ngại<br><br>  về impact đến các stored procedure và ODI Mapping<br><br>  đã được test xong.<br><br>TASK:<br><br>  Tìm giải pháp dung hòa giữa yêu cầu business<br><br>  và rủi ro kỹ thuật, không để conflict leo thang.<br><br>ACTION:<br><br>  → Yêu cầu meeting 3 bên: BA, developer, DE<br><br>  → Tôi liệt kê cụ thể những gì phải thay đổi:<br><br>    X stored procedure, Y ODI Mapping, Z test case<br><br>  → Ước tính thời gian: 3 ngày dev \+ 2 ngày test<br><br>    → không kịp Go-live<br><br>  → Đề xuất phân chia:<br><br>    Phase 1 (Go-live): giữ nguyên schema hiện tại<br><br>    Phase 2 (2 tuần sau Go-live): thêm 3 trường mới,<br><br>    data được fill từ nguồn đã có sẵn<br><br>  → BA chấp nhận vì business không cần 3 trường đó<br><br>    ngay ngày Go-live<br><br>RESULT:<br><br>  → Go-live đúng hạn, không có rủi ro<br><br>  → Phase 2 được thực hiện có kế hoạch, test kỹ<br><br>  → Học được: conflict thường giải quyết được khi<br><br>    tất cả thấy trade-off rõ ràng bằng số liệu cụ thể<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 3 — Tự học & phát triển</div>
+
+      <!-- Q7 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q7. Kể về một lần bạn phải học một công nghệ hoàn toàn mới tr...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Kể về một lần bạn phải học một công nghệ hoàn toàn mới trong thời gian ngắn để giải quyết vấn đề."</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>SITUATION:<br><br>  VAECO yêu cầu xây dựng hệ thống WAL sync<br><br>  sang DR site. Tôi chưa từng làm WAL Archiving<br><br>  và script multi-threading Python trước đó.<br><br>TASK:<br><br>  Xây dựng hệ thống tự động sync WAL song song<br><br>  4 luồng trong vòng 2 tuần.<br><br>ACTION:<br><br>  → Ngày 1-3: đọc PostgreSQL documentation về<br><br>    WAL Archiving, archive\_command, restore\_command<br><br>  → Ngày 3-5: test trên môi trường dev với<br><br>    single-thread trước, verify correctness<br><br>  → Ngày 5-8: nghiên cứu Python threading,<br><br>    implement 4 luồng, thêm error handling<br><br>  → Ngày 8-12: test với data volume thật,<br><br>    monitor lag, fix edge cases<br><br>  → Ngày 12-14: code review với senior, deploy<br><br>    lên DR Acceptance, verify kết quả<br><br>RESULT:<br><br>  → Hệ thống hoạt động ổn định, replication lag<br><br>    giảm đáng kể so với single-thread<br><br>  → Học được cách tiếp cận: theory → small test<br><br>    → scale up → production, không nhảy thẳng vào<br><br>    implement phức tạp ngay từ đầu<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q8. DE là lĩnh vực thay đổi nhanh. Bạn tự học và cập nhật kiế...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"DE là lĩnh vực thay đổi nhanh. Bạn tự học và cập nhật kiến thức như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Đừng nói: <em>"Tôi đọc blog và xem YouTube."</em><br><br>Nên nói cụ thể hơn:<br><br>Cách tôi học có hệ thống:<br><br>1\. LEARN FROM PRODUCTION PROBLEMS:<br><br>   Mỗi incident tôi xử lý đều ghi lại root cause<br><br>   và solution. Case pg\_repack và DR recovery<br><br>   là những thứ tôi học được nhiều nhất — không<br><br>   sách giáo khoa nào dạy được chi tiết như vậy.<br><br>2\. OFFICIAL DOCUMENTATION:<br><br>   PostgreSQL docs và Oracle docs là nguồn<br><br>   chính xác nhất. Tôi đọc release notes<br><br>   khi có version mới để biết thay đổi gì.<br><br>3\. THỰC HÀNH TRÊN LAB:<br><br>   Tôi duy trì môi trường PostgreSQL local để<br><br>   test các case chưa gặp — ví dụ tôi đã tự<br><br>   simulate failover scenario nhiều lần trước<br><br>   khi làm trên production.<br><br>4\. HIỆN TẠI ĐANG TÌM HIỂU:<br><br>   \[Thật thà về những gì đang học thêm —<br><br>   ví dụ: Apache Airflow cho orchestration,<br><br>   hoặc dbt cho transformation layer\]<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q9. Điểm yếu của bạn là gì? Bạn đang làm gì để cải thiện?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Điểm yếu của bạn là gì? Bạn đang làm gì để cải thiện?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Tránh: <em>"Tôi làm việc quá chăm chỉ"</em> → cliché, không ai tin. Tránh: <em>"Tôi không có điểm yếu"</em> → thiếu self-awareness.<br><br>Câu trả lời tốt — điểm yếu thật nhưng không critical với role DE:<br><br>Điểm yếu tôi nhận ra: documentation.<br><br>Khi giải quyết vấn đề kỹ thuật, tôi thường<br><br>tập trung vào fix và tối ưu, nhưng sau đó<br><br>không document lại đầy đủ ngay lập tức.<br><br>Kết quả là đôi khi knowledge nằm trong<br><br>đầu tôi, không transfer được cho team.<br><br>Điều tôi đang làm để cải thiện:<br><br>• Sau mỗi incident: viết post-mortem ngắn<br><br>  trong vòng 24 tiếng<br><br>• Trước khi close một task: tự hỏi<br><br>  "Nếu người khác cần làm lại việc này,<br><br>  họ cần biết gì?"<br><br>• Tôi đã viết runbook cho case WAL recovery<br><br>  và pg\_repack sau khi xử lý ở VAECO —<br><br>  đây là thói quen tôi đang cố xây dựng<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 4 — Định hướng & phù hợp với công ty</div>
+
+      <!-- Q10 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L4</span>
+          <span>Q10. Tại sao bạn muốn chuyển sang công ty này? Bạn biết gì về ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Tại sao bạn muốn chuyển sang công ty này? Bạn biết gì về chúng tôi?"</em></p>
+          <div class="info-box tip">
+            💡 <strong>Gợi ý cách chuẩn bị — đây là câu hỏi cần research trước:</strong><br><br>TRƯỚC KHI PHỎNG VẤN — cần tìm hiểu:<br><br>  → Công ty làm gì? Domain: banking, fintech, retail...<br><br>  → Tech stack của họ: dùng cloud nào? Tool nào?<br><br>  → Culture: startup hay enterprise?<br><br>  → Vị trí DE này cần làm gì cụ thể?<br><br>FRAMEWORK TRẢ LỜI:<br><br>1\. Lý do cụ thể về công ty/vị trí:<br><br>   "Tôi thấy vị trí này làm việc với \[X technology\]<br><br>   mà tôi muốn phát triển thêm. Công ty đang<br><br>   \[Y project/direction\] phù hợp với background<br><br>   banking DE của tôi."<br><br>2\. Giá trị bạn mang lại:<br><br>   "Với kinh nghiệm ETL cho hệ thống AML và DWH<br><br>   banking, tôi có thể đóng góp ngay vào \[Z\]<br><br>   mà không cần thời gian ramp-up dài."<br><br>3\. Tránh:<br><br>   → "Vì muốn tăng lương" (dù là sự thật, đừng nói thẳng)<br><br>   → "Công ty cũ không tốt" (luôn nói tích cực về nơi cũ)<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q11 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L4</span>
+          <span>Q11. Bạn thấy mình 3-5 năm nữa sẽ ở đâu trong sự nghiệp DE?</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn thấy mình 3-5 năm nữa sẽ ở đâu trong sự nghiệp DE?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Ngắn hạn (1-2 năm):<br><br>  Củng cố và mở rộng nền tảng hiện tại:<br><br>  → Học thêm orchestration tool như Airflow<br><br>    để tự động hóa pipeline tốt hơn<br><br>  → Tiếp cận cloud data platform (AWS/GCP)<br><br>    vì đây là hướng thị trường đang đi<br><br>  → Đi sâu hơn vào data modeling cho<br><br>    banking domain mà tôi đang mạnh<br><br>Trung hạn (3-5 năm):<br><br>  → Muốn đảm nhận vai trò Senior DE hoặc<br><br>    Data Architect — thiết kế end-to-end<br><br>    data platform thay vì chỉ implement<br><br>  → Có thể mentor junior DE dựa trên<br><br>    kinh nghiệm thực tế đã tích lũy<br><br>  → Đóng góp vào các quyết định kiến trúc<br><br>    data ở cấp tổ chức<br><br>\[Quan trọng: kết nối với công ty đang apply\]<br><br>  "Tôi thấy công ty đang xây dựng \[X\] —<br><br>  đây là môi trường tốt để phát triển<br><br>  theo hướng đó."<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L4</span>
+          <span>Q12. Kể về thành tích bạn tự hào nhất trong sự nghiệp DE đến nay.</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Kể về thành tích bạn tự hào nhất trong sự nghiệp DE đến nay."</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Tôi tự hào nhất về case pg\_repack ở VAECO<br><br>vì nó thể hiện đầy đủ cách tôi tiếp cận vấn đề.<br><br>SITUATION:<br><br>  Backup PostgreSQL 328GB mất 3h05 mỗi ngày.<br><br>  Ai cũng nghĩ giải pháp là tăng parallel jobs.<br><br>GÌ TÔI LÀM KHÁC:<br><br>  Thay vì chấp nhận giải pháp obvious, tôi<br><br>  đặt câu hỏi: "Tại sao tăng \-j không giúp?"<br><br>  → Phân tích sâu hơn → phát hiện root cause<br><br>    thật sự là TOAST table 81GB single-threaded<br><br>  → Nghiên cứu pg\_repack — tool tôi chưa dùng<br><br>  → Test kỹ trên DR Acceptance trước<br><br>  → Deploy lên Production chỉ sau khi verify<br><br>KẾT QUẢ:<br><br>  → Backup 3h05 → 15 phút (giảm 92%)<br><br>  → 328GB → 18GB dung lượng<br><br>  → Không downtime, không data loss<br><br>ĐIỀU TÔI TỰ HÀO NHẤT:<br><br>  Không phải con số 92% — mà là mindset:<br><br>  không vội fix theo cách obvious, dành thời gian<br><br>  hiểu đúng vấn đề, test an toàn trước khi production.<br><br>  Đây là cách tôi muốn tiếp cận mọi vấn đề.<br><br>•--<br><br><em></em></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn primary" onclick="showModule('g10', document.querySelectorAll('.nav-item')[4])">Tiếp theo: Nhóm 10 →</button>
+      </div>
+    </div>
+
+    <!-- G10: Domain Knowledge -->
+    <div class="module" id="g10">
+      <div class="module-header">
+        <div class="module-tag">G10 · Banking/Aviation</div>
+        <div class="module-title">Nhóm 10: Domain Knowledge</div>
+        <div class="module-subtitle">12 câu hỏi | Mức độ ưu tiên: 🟢 Bổ trợ</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Tiến độ ôn tập nhóm này:</span>
+          <span class="progress-count">0/12</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 1 — Banking & Financial Data</div>
+
+      <!-- Q1 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q1. AML là gì? Tại sao hệ thống AML cần data pipeline ETL phứ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"AML là gì? Tại sao hệ thống AML cần data pipeline ETL phức tạp như vậy? Nếu data ETL bị sai, hậu quả với ngân hàng là gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>AML (Anti-Money Laundering) — Phòng chống rửa tiền:<br><br>Rửa tiền là quá trình tội phạm chuyển tiền bẩn<br><br>(từ ma túy, tham nhũng...) thành tiền hợp pháp<br><br>thông qua hệ thống tài chính.<br><br>Tại sao cần AML system:<br><br>  → Yêu cầu pháp lý BẮTBUỘC của NHNN Việt Nam<br><br>  → Thông tư 09/2023/TT-NHNN về phòng chống rửa tiền<br><br>  → Tiêu chuẩn quốc tế: FATF (Financial Action Task Force)<br><br>  → Nếu vi phạm: bị phạt nặng, thậm chí thu hồi<br><br>    giấy phép hoạt động<br><br>AML system hoạt động thế nào:<br><br>  1\. Thu thập data từ tất cả giao dịch<br><br>  2\. Phân tích pattern đáng ngờ:<br><br>     \- Giao dịch lớn bất thường (\>500 triệu VNĐ)<br><br>     \- Nhiều giao dịch nhỏ liên tiếp<br><br>       (structuring — chia nhỏ để tránh threshold)<br><br>     \- Giao dịch với quốc gia/cá nhân trong<br><br>       danh sách đen (sanctions list)<br><br>     \- Customer profile thay đổi đột ngột<br><br>  3\. Tạo alert cho compliance team review<br><br>  4\. Báo cáo STR (Suspicious Transaction Report)<br><br>     lên NHNN nếu xác nhận đáng ngờ<br><br>Tại sao ETL phức tạp:<br><br>  → Nhiều hệ thống nguồn: IPCAS (giao dịch nội địa),<br><br>    SWIFT (quốc tế), thẻ, chứng khoán...<br><br>  → Data cần realtime hoặc near-realtime<br><br>  → Chất lượng data phải 100% — không thể miss<br><br>    một giao dịch đáng ngờ<br><br>  → Lịch sử dài: AML cần data nhiều năm để<br><br>    phát hiện pattern dài hạn<br><br>Hậu quả khi data ETL sai:<br><br>  Technical: alert không chính xác — <br><br>    false positive (làm phiền khách tốt) hoặc<br><br>    false negative (bỏ sót giao dịch thật sự đáng ngờ)<br><br>  Legal: báo cáo STR sai → vi phạm pháp lý<br><br>  Financial: phạt tiền từ NHNN, mất uy tín<br><br>  Systemic: nếu ngân hàng lớn như Agribank bị<br><br>    compromise → ảnh hưởng toàn hệ thống tài chính<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q2. Core banking system là gì? Tại sao ETL từ core banking sa...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Core banking system là gì? Tại sao ETL từ core banking sang DWH/AML lại phức tạp hơn ETL thông thường?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Core Banking System (CBS):<br><br>  Hệ thống trung tâm xử lý mọi giao dịch ngân hàng:<br><br>  → IPCAS: Agribank dùng<br><br>  → T24 (Temenos): nhiều ngân hàng Việt Nam<br><br>  → Flexcube (Oracle): VCB, Sacombank...<br><br>  → SIBS: một số ngân hàng nhỏ<br><br>Đặc điểm của Core Banking data:<br><br>  → OLTP thuần túy: tối ưu cho transaction processing,<br><br>    không tối ưu cho analytics<br><br>  → Schema rất phức tạp và normalize cao:<br><br>    một "giao dịch" có thể span 10-20 bảng<br><br>  → Naming convention khó hiểu:<br><br>    tên cột viết tắt: ACCT\_NO, TXN\_DT, AMT\_CCY...<br><br>  → Không có documentation đầy đủ<br><br>    (vendor giữ bí mật schema)<br><br>  → Data volume cực lớn: Agribank hàng triệu<br><br>    giao dịch/ngày<br><br>  → Không thể query nặng trực tiếp lên CBS<br><br>    → sẽ ảnh hưởng performance production<br><br>Tại sao ETL từ CBS phức tạp hơn:<br><br>  1\. SCHEMA COMPLEXITY:<br><br>     Phải join nhiều bảng để có 1 "giao dịch hoàn chỉnh"<br><br>     Ví dụ: <br><br>     IPCAS\_TXN\_HDR (header) \+ IPCAS\_TXN\_DTL (detail)<br><br>     \+ IPCAS\_ACCT (account) \+ IPCAS\_CUST (customer)<br><br>     → Mới ra được record AML đầy đủ<br><br>  2\. DB LINK CONSTRAINT:<br><br>     Không thể JOIN trực tiếp nhiều bảng qua DB link<br><br>     (quá chậm, quá tải CBS)<br><br>     → Phải extract từng bảng vào Staging trước,<br><br>       sau đó JOIN trong Staging<br><br>  3\. CHANGE TRACKING KHÓ:<br><br>     CBS thường không có updated\_at timestamp chuẩn<br><br>     → Phải dùng sequence number hoặc WAL log<br><br>       để detect thay đổi<br><br>  4\. TIMING SENSITIVE:<br><br>     Giao dịch ngân hàng có T+0, T+1 settlement<br><br>     → ETL phải đúng ngày, không thể chậm<br><br>     → Cut-off time quan trọng<br><br>  5\. VENDOR LOCK-IN:<br><br>     Schema CBS thuộc sở hữu vendor<br><br>     → Khi vendor update version, schema có thể thay đổi<br><br>     → ETL mapping cần review lại<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q3. SWIFT là gì? Data từ SWIFT message có gì đặc biệt so với ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"SWIFT là gì? Data từ SWIFT message có gì đặc biệt so với data giao dịch nội địa?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>SWIFT (Society for Worldwide Interbank <br><br>       Financial Telecommunication):<br><br>  Mạng lưới trao đổi thông tin tài chính quốc tế.<br><br>  Kết nối 11.000+ tổ chức tài chính tại 200+ quốc gia.<br><br>SWIFT Message Types (MT):<br><br>  MT103: Chuyển tiền cá nhân/doanh nghiệp<br><br>  MT202: Chuyển tiền giữa ngân hàng<br><br>  MT700: Letter of Credit (Thư tín dụng)<br><br>  MT940: Sao kê tài khoản<br><br>Đặc điểm data SWIFT:<br><br>  → Định dạng chuẩn quốc tế, structured text:<br><br>    :20:REFERENCE123<br><br>    :23B:CRED<br><br>    :32A:240115USD50000,<br><br>    :50K:/123456789<br><br>    NGUYEN VAN A<br><br>    :59:/987654321<br><br>    JOHN DOE<br><br>    :70:PAYMENT FOR INVOICE 001<br><br>    :71A:OUR<br><br>  → Phức tạp hơn data nội địa vì:<br><br>    \- Nhiều field optional, có thể null<br><br>    \- Cần parse message format đặc biệt<br><br>    \- Currency conversion (nhiều loại tiền)<br><br>    \- Beneficiary bank information (BIC/SWIFT code)<br><br>    \- Sanctions screening: kiểm tra tên người gửi/nhận<br><br>      với danh sách OFAC, EU sanctions<br><br>  → AML đặc biệt quan tâm SWIFT vì:<br><br>    \- Rửa tiền xuyên quốc gia dùng SWIFT<br><br>    \- Kiểm tra BIC code của ngân hàng đối tác:<br><br>      có trong danh sách ngân hàng rủi ro cao không?<br><br>    \- Kiểm tra quốc gia: Iran, North Korea, Russia...<br><br>Khi ETL từ SWIFT vào AML Staging:<br><br>  → Parse message format → extract các field cần<br><br>  → Map SWIFT BIC code → dim\_bank<br><br>  → Map country code → dim\_country với risk level<br><br>  → Currency conversion sang VNĐ để so sánh threshold<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q4. DWH của Ngân hàng Nhà nước khác gì DWH của ngân hàng thươ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"DWH của Ngân hàng Nhà nước khác gì DWH của ngân hàng thương mại? Dữ liệu ở SG4 phục vụ mục đích gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Ngân hàng Nhà nước Việt Nam (NHNN):<br><br>  → Cơ quan quản lý nhà nước về tiền tệ và ngân hàng<br><br>  → Không kinh doanh với khách hàng thông thường<br><br>  → Điều tiết toàn bộ hệ thống tài chính Việt Nam<br><br>DWH NHNN (SG4) khác DWH ngân hàng thương mại:<br><br>  NGÂN HÀNG THƯƠNG MẠI (Agribank, LPBank...):<br><br>  → Data từ 1 ngân hàng<br><br>  → Phân tích: lợi nhuận, rủi ro tín dụng,<br><br>    hiệu quả chi nhánh<br><br>  → User: ban lãnh đạo, phòng kinh doanh<br><br>  NHNN (SG4):<br><br>  → Aggregate data từ TẤT CẢ ngân hàng thương mại<br><br>    (100+ tổ chức tín dụng)<br><br>  → Phân tích vĩ mô:<br><br>    \- Tổng dư nợ toàn hệ thống<br><br>    \- Thanh khoản hệ thống (LCR, NSFR)<br><br>    \- Tỷ lệ nợ xấu toàn ngành<br><br>    \- Luồng vốn vào/ra nền kinh tế<br><br>  → User: lãnh đạo NHNN, phòng thanh tra giám sát<br><br>Tại sao ETL phức tạp cho NHNN:<br><br>  → Data từ nhiều nguồn với schema KHÁC NHAU:<br><br>    mỗi ngân hàng dùng CBS khác nhau<br><br>  → Cần chuẩn hóa sang cùng 1 schema NHNN<br><br>  → Mã đơn vị/chi nhánh cần mapping cẩn thận<br><br>    → đây chính là project bạn làm ở SG4:<br><br>    mapping mã mới khi tái cơ cấu tổ chức<br><br>  → Confidentiality: data ngân hàng A không được<br><br>    lộ cho ngân hàng B<br><br>  → Timeliness: NHNN cần data T+1 để<br><br>    giám sát hệ thống hàng ngày<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-1">L1</span>
+          <span>Q5. OFSAA phục vụ mục đích gì trong ngân hàng? Tại sao LPBank...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"OFSAA phục vụ mục đích gì trong ngân hàng? Tại sao LPBank cần hệ thống phân tích lợi nhuận đa chiều?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>OFSAA — Oracle Financial Services Analytical Applications:<br><br>  Bộ sản phẩm phân tích tài chính của Oracle,<br><br>  thiết kế đặc biệt cho banking.<br><br>Tại sao ngân hàng cần OFSAA:<br><br>  VẤN ĐỀ: Ngân hàng có hàng triệu tài khoản,<br><br>  hàng chục nghìn nhân viên, hàng trăm chi nhánh.<br><br>  Câu hỏi management cần trả lời:<br><br><br>  → Chi nhánh nào đang lãi? Chi nhánh nào lỗ?<br><br>  → Sản phẩm nào (vay mua nhà, vay tiêu dùng...)<br><br>    mang lại lợi nhuận cao nhất?<br><br>  → Khách hàng nào đang profitable?<br><br>  → Chi phí vận hành đang ăn vào lợi nhuận<br><br>    ở đâu nhiều nhất?<br><br>  Mà Core Banking không trả lời được những câu này<br><br>  → OFSAA giải quyết bằng:<br><br>  FTP (Funds Transfer Pricing):<br><br>  → Tính "giá vốn nội bộ" cho từng khoản vay/tiền gửi<br><br>  → Ví dụ: chi nhánh A huy động 100 tỷ với lãi 6%,<br><br>    cho vay 80 tỷ với lãi 9%<br><br>  → FTP tính: margin thực sự của chi nhánh A là bao nhiêu<br><br>    sau khi trừ "chi phí vốn" nội bộ<br><br>  PFT (Profitability Management):<br><br>  → TOI (Thu nhập hoạt động thuần):<br><br>    \= Thu nhập lãi \+ Thu nhập phí \- Chi phí lãi<br><br>  → OPEX allocation: phân bổ chi phí IT, nhân sự,<br><br>    chi nhánh xuống từng sản phẩm/khách hàng<br><br>  → Kết quả: lãi/lỗ thực tế từng đơn vị kinh doanh<br><br>Tại sao ETL quan trọng với OFSAA:<br><br>  → Tính toán sai do data thiếu/sai → <br><br>    quyết định kinh doanh sai<br><br>  → Ví dụ: nếu thiếu 10% giao dịch của chi nhánh X<br><br>    → OFSAA nghĩ chi nhánh X lỗ trong khi thực tế lãi<br><br>    → Ban lãnh đạo quyết định đóng chi nhánh → sai<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 2 — Aviation & MRO Domain</div>
+
+      <!-- Q6 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q6. MRO IT là gì? Tại sao một công ty hàng không cần hệ thống...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"MRO IT là gì? Tại sao một công ty hàng không cần hệ thống quản lý bảo dưỡng phức tạp như AMOS?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>MRO (Maintenance, Repair & Overhaul):<br><br>  Bảo dưỡng, sửa chữa và đại tu tàu bay.<br><br>  VAECO (Vietnam Aircraft Engineering Company):<br><br>  → Công ty con của Vietnam Airlines<br><br>  → Chuyên bảo dưỡng toàn bộ đội tàu bay<br><br>    của Vietnam Airlines và các hãng khác<br><br>  → \~4.000 nhân viên kỹ thuật<br><br>AMOS (Aircraft Maintenance & Operations System):<br><br>  → ERP system chuyên biệt cho MRO hàng không<br><br>  → Của Swiss AviationSoftware (Swiss AS)<br><br>  → Được dùng bởi 200+ hãng hàng không toàn cầu<br><br>Tại sao MRO cần system phức tạp:<br><br>  1\. AN TOÀN LÀ TRÊN HẾT:<br><br>     → Mỗi linh kiện trên máy bay có vòng đời<br><br>       tính bằng giờ bay hoặc chu kỳ cất/hạ cánh<br><br>     → Ví dụ: Turbine blade phải thay sau <br><br>       3.000 flight cycles<br><br>     → Nếu không thay đúng hạn → nguy hiểm<br><br>     → AMOS track TỪNG linh kiện trên TỪNG máy bay<br><br>  2\. REGULATORY COMPLIANCE:<br><br>     → CAAV (Cục Hàng không Việt Nam)<br><br>     → EASA (European Union Aviation Safety Agency)<br><br>     → FAA (US Federal Aviation Administration)<br><br>     → Mỗi công việc bảo dưỡng phải có<br><br>       maintenance record đầy đủ<br><br>     → Audit có thể yêu cầu lịch sử 20+ năm<br><br>  3\. COMPLEX SCHEDULING:<br><br>     → Máy bay phải vừa bay vừa bảo dưỡng<br><br>     → Schedule bảo dưỡng phải không overlap<br><br>       với flight schedule<br><br>     → Cân bằng: hangar capacity, kỹ thuật viên,<br><br>       linh kiện inventory<br><br>Data trong AMOS:<br><br>  → Aircraft registration (VN-A321, VN-B787...)<br><br>  → Component tracking (Part number, serial number)<br><br>  → Work Order (lệnh bảo dưỡng)<br><br>  → Task Card (công việc cụ thể trong WO)<br><br>  → Technician certification (kỹ thuật viên nào<br><br>    được phép làm công việc gì)<br><br>  → Material consumption (linh kiện nào dùng)<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q7. Trong dự án VAECO, bạn migrate data từ AMASIS sang AMOS. ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Trong dự án VAECO, bạn migrate data từ AMASIS sang AMOS. AMASIS là gì và tại sao migration phức tạp?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>AMASIS (Aircraft Maintenance Advanced System<br><br>        for Integrated Solutions):<br><br>  → Hệ thống MRO cũ của VAECO<br><br>  → Chạy trên DB2 và SQL Server<br><br>  → Đã dùng nhiều năm → data history phong phú<br><br>    nhưng schema cũ và khó maintain<br><br>Tại sao migration phức tạp:<br><br>  1\. SCHEMA MISMATCH:<br><br>     AMASIS (DB2/SQL Server) → AMOS (Oracle)<br><br>     → Data type khác nhau:<br><br>       DB2 TIMESTAMP ≠ Oracle DATE<br><br>       SQL Server BIT ≠ Oracle NUMBER(1)<br><br>       Character encoding khác nhau<br><br>     → Tên bảng/cột khác hoàn toàn<br><br>       → cần mapping document dày hàng trăm trang<br><br>  2\. BUSINESS RULE TRANSFORMATION:<br><br>     → AMASIS lưu data theo cách riêng<br><br>     → AMOS có data model khác<br><br>     → Không thể copy 1:1 → cần transform logic phức tạp<br><br>     → Ví dụ: AMASIS 1 Work Order \= nhiều bảng<br><br>       → AMOS Work Order \= cấu trúc khác<br><br>  3\. DATA QUALITY LEGACY:<br><br>     → Data cũ nhiều năm có nhiều inconsistency<br><br>     → Giá trị NULL không chuẩn<br><br>     → Reference data (Part number, aircraft reg)<br><br>       không consistent giữa các bảng<br><br>     → Phải clean trước khi migrate<br><br>  4\. ZERO DOWNTIME REQUIREMENT:<br><br>     → VAECO không thể ngừng bảo dưỡng máy bay<br><br>     → Migration phải xảy ra song song với<br><br>       hoạt động bình thường<br><br>     → Cutover window: cuối tuần, đêm muộn<br><br>  5\. VALIDATION CRITICAL:<br><br>     → Một linh kiện bị thiếu trong lịch sử →<br><br>       có thể gây vấn đề pháp lý nghiêm trọng<br><br>     → Mọi record phải được verify 100%<br><br>     → Bạn đã migrate 300+ bảng với reconciliation<br><br>       check sau từng nhóm<br><br>  Đây là lý do 4h → 30 phút quan trọng:<br><br>  Migration data lịch sử cần chạy trong weekend<br><br>  window → không thể kéo dài 4 tiếng<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">L2</span>
+          <span>Q8. Tại sao hệ thống MRO của VAECO cần HA/DR 4 tầng? Downtime...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Tại sao hệ thống MRO của VAECO cần HA/DR 4 tầng? Downtime có ảnh hưởng gì đến hoạt động bảo dưỡng máy bay?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Impact của AMOS downtime theo thời gian:<br><br>  0-30 phút:<br><br>  → Kỹ thuật viên không in được Task Card<br><br>  → Không mở được Work Order mới<br><br>  → Nhưng kỹ thuật viên có thể tiếp tục<br><br>    công việc đang làm với giấy tờ thủ công<br><br>  30 phút \- 2 giờ:<br><br>  → Không thể release máy bay sau bảo dưỡng<br><br>    (AMOS phải sign off electronically)<br><br>  → Máy bay bị hold → delay chuyến bay<br><br>  → Vietnam Airlines phải thông báo hành khách<br><br>  → Chi phí: compensation, hotel, reputation damage<br><br>  2-4 giờ:<br><br>  → Tất cả Work Order bị freeze<br><br>  → Scheduling bị disrupted<br><br>  → Linh kiện không thể issue từ warehouse<br><br>    (AMOS quản lý inventory)<br><br>  → Chain effect: nhiều máy bay bị affected<br><br>  4+ giờ:<br><br>  → Emergency procedures phải activate<br><br>  → CAAV có thể audit<br><br>  → Contractual penalties với airlines khác<br><br>    (ngoài Vietnam Airlines, VAECO còn phục vụ<br><br>    Vietjet, Bamboo...)<br><br>Tại sao cần 4 tầng:<br><br>  Tier 1 — Primary DC:<br><br>  → Chạy production 24/7<br><br>  → 1.000+ users: kỹ thuật viên, supervisors,<br><br>    quality engineers, planners<br><br>  Tier 2 — Backup DC:<br><br>  → HA: failover trong vài phút nếu Primary fail<br><br>  → Cùng datacenter hoặc gần → lag thấp<br><br>  Tier 3 — Backup DR:<br><br>  → DR: bảo vệ khi toàn bộ datacenter chính fail<br><br>  → Site khác địa lý<br><br>  Tier 4 — DR Standby:<br><br>  → Bảo vệ khi cả DR site gặp vấn đề<br><br>  → Last resort, đảm bảo luôn có thể recover<br><br>  → Aviation safety culture: redundancy là bắt buộc<br><br>    Tương tự như máy bay có 2 động cơ,<br><br>    hệ thống IT hàng không cũng phải redundant<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ 3 — Regulatory & Compliance</div>
+
+      <!-- Q9 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q9. AML/CFT là gì? Khi làm ETL cho hệ thống AML, bạn phải tuâ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"AML/CFT là gì? Khi làm ETL cho hệ thống AML, bạn phải tuân thủ những quy định gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>AML/CFT:<br><br>  AML: Anti-Money Laundering — Phòng chống rửa tiền<br><br>  CFT: Combating Financing of Terrorism — <br><br>       Chống tài trợ khủng bố<br><br>Khung pháp lý:<br><br>  → Quốc tế: FATF 40 Recommendations<br><br>    (Financial Action Task Force)<br><br>  → Việt Nam: Luật Phòng chống rửa tiền 2022<br><br>  → NHNN: Thông tư 09/2023/TT-NHNN<br><br>Điều này ảnh hưởng đến ETL như thế nào:<br><br>  1\. DATA COMPLETENESS BẮT BUỘC:<br><br>     → Mọi giao dịch phải được capture<br><br>     → Không được phép "bỏ sót" vì lý do kỹ thuật<br><br>     → Nếu ETL fail → phải có recovery plan<br><br>       để không miss giao dịch nào<br><br>  2\. DATA RETENTION:<br><br>     → Theo luật: lưu tối thiểu 5-10 năm<br><br>     → ETL phải load vào archive layer<br><br>     → Không được delete data dù hết partition<br><br>  3\. AUDIT TRAIL:<br><br>     → Mọi thay đổi data phải có log:<br><br>       ai thay đổi, khi nào, từ gì sang gì<br><br>     → ETL audit log phải đầy đủ<br><br>     → Bạn đã làm: job log, proc log, error table<br><br>  4\. DATA ACCURACY:<br><br>     → STR (Suspicious Transaction Report) nộp NHNN<br><br>       phải dựa trên data chính xác<br><br>     → Báo cáo sai → vi phạm pháp lý<br><br>     → DQ checks không phải optional mà là requirement<br><br>  5\. TIMELINESS:<br><br>     → NHNN quy định ngân hàng phải báo cáo STR<br><br>       trong vòng 24 giờ kể từ khi phát hiện<br><br>     → ETL phải đảm bảo data real-time hoặc T+1<br><br>  6\. DATA SECURITY:<br><br>     → Data AML cực kỳ nhạy cảm<br><br>     → Chỉ authorized personnel được access<br><br>     → ETL accounts phải có least privilege<br><br>     → Logs không được chứa sensitive data<br><br>       (số tài khoản, CMND phải được mask)<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q10. Khi làm DWH cho NHNN, bạn xử lý data từ nhiều ngân hàng k...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Khi làm DWH cho NHNN, bạn xử lý data từ nhiều ngân hàng khác nhau. Có những thách thức gì về data governance?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Data governance challenges tại NHNN DWH:<br><br>  1\. DATA CONFIDENTIALITY:<br><br>     → Data của Agribank không được để lộ cho Vietcombank<br><br>     → Trong DWH, các bảng aggregate phải được<br><br>       access control chặt chẽ<br><br>     → ETL pipeline không được mix data của<br><br>       các ngân hàng theo cách expose individual bank info<br><br>     → Row-level security cho từng reporting unit<br><br>  2\. DATA STANDARDIZATION:<br><br>     → Mỗi ngân hàng dùng CBS khác nhau<br><br>     → Mã chi nhánh: Agribank dùng 4 số,<br><br>       Vietcombank dùng 3 chữ...<br><br>     → Chuẩn hóa về mã NHNN thống nhất<br><br>     → Đây chính là project mapping mã mới<br><br>       mà bạn đã làm trong SG4<br><br>  3\. TIMELINESS INCONSISTENCY:<br><br>     → Ngân hàng lớn (BIDV, Vietcombank):<br><br>       gửi data T+1 đúng giờ<br><br>     → Ngân hàng nhỏ, QTDND (Quỹ tín dụng):<br><br>       đôi khi delay hoặc data quality thấp<br><br>     → ETL phải handle late-arriving data:<br><br>       nhận data ngày D+2, 3... và backfill<br><br>  4\. SCHEMA EVOLUTION:<br><br>     → NHNN update quy định → ngân hàng phải<br><br>       báo cáo thêm trường mới<br><br>     → ETL và DWH schema phải thay đổi đồng bộ<br><br>     → Coordination với 100+ tổ chức tín dụng<br><br>       là thách thức lớn<br><br>  5\. DATA QUALITY VARIANCE:<br><br>     → Ngân hàng lớn: data quality cao<br><br>     → Ngân hàng nhỏ/QTDND: nhiều lỗi format,<br><br>       thiếu trường, giá trị không hợp lệ<br><br>     → DWH cần DQ rules riêng cho từng nhóm tổ chức<br><br>     → Báo cáo DQ feedback cho từng ngân hàng<br><br>  LESSON LEARNED từ SG4:<br><br>  Việc mapping mã mới không đơn giản là update bảng —<br><br>  phải coordinate với team từng đơn vị để confirm<br><br>  mapping đúng, vì sai 1 mã → report sai toàn bộ<br><br>  số liệu của đơn vị đó.<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q11 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q11. Trong dự án banking, bạn xử lý data nhạy cảm như số tài k...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Trong dự án banking, bạn xử lý data nhạy cảm như số tài khoản, CMND, số tiền. Bạn đảm bảo data security trong pipeline ETL như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Data security trong ETL banking:<br><br>  1\. DATA MASKING TRONG NON-PROD:<br><br>     → Production data không được copy nguyên vẹn<br><br>       xuống dev/test environment<br><br>     → Script mask trước khi sync:<br><br>     <br><br>     UPDATE stg\_customer<br><br>     SET id\_number \= REGEXP\_REPLACE(id\_number,<br><br>                     '.{6}$', '\#\#\#\#\#\#'),<br><br>         full\_name  \= 'CUSTOMER\_' || customer\_id,<br><br>         phone      \= '09' || LPAD(FLOOR(DBMS\_RANDOM.VALUE(1,99999999)), 8, '0');<br><br>  2\. ACCESS CONTROL:<br><br>     → ETL service account chỉ có quyền cần thiết:<br><br>       \- Read trên source tables<br><br>       \- Write trên staging tables<br><br>       \- Execute trên specific stored procedures<br><br>     → Không dùng DBA account để chạy ETL<br><br>     → Audit: log mọi access vào sensitive tables<br><br>  3\. ENCRYPTION IN TRANSIT:<br><br>     → DB link giữa systems phải dùng<br><br>       Oracle Advanced Security (TDE) hoặc SSL<br><br>     → SWIFT messages phải được encrypt khi transfer<br><br>  4\. LOGGING KHÔNG CHỨA SENSITIVE DATA:<br><br>     → Error log: không log giá trị sensitive<br><br>     → Đúng: "ERROR: account\_id 123456789 failed DQ"<br><br>     → Sai: "ERROR: CMND 012345678 of Nguyen Van A<br><br>              with balance 500,000,000 failed"<br><br>     → Mask trong log output<br><br>  5\. DATA LINEAGE:<br><br>     → Biết data đi qua đâu: ai access,<br><br>       ai transform, ai có thể đọc<br><br>     → Quan trọng cho GDPR-like compliance<br><br>  6\. TRONG DỰ ÁN THỰC TẾ CỦA BẠN:<br><br>     → VAECO: sync Production → Test phải mask<br><br>       aircraft serial numbers và technician info<br><br>       không cần thiết cho testing<br><br>     → AML: chỉ authorized compliance team<br><br>       được thấy full customer info trong report<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-3">L3</span>
+          <span>Q12. Bạn làm việc ở nhiều domain: banking (AML, DWH, OFSAA) và...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn làm việc ở nhiều domain: banking (AML, DWH, OFSAA) và aviation (MRO). Bạn thấy điểm giống và khác nhau về data engineering trong 2 domain này như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>ĐIỂM GIỐNG NHAU:<br><br>  1\. DATA QUALITY LÀ NON-NEGOTIABLE:<br><br>     → Banking: data sai → báo cáo AML sai → vi phạm pháp lý<br><br>     → Aviation: data bảo dưỡng sai → máy bay không airworthy<br><br>     → Cả hai: DQ checks không phải optional<br><br>     → Cả hai: audit trail bắt buộc, data retention dài<br><br>  2\. REAL-TIME PRESSURE:<br><br>     → Banking: giao dịch cần xử lý T+1 hoặc near real-time<br><br>     → Aviation: bảo dưỡng cần scheduling real-time<br><br>     → Cả hai: batch window chặt, downtime impact cao<br><br>  3\. REGULATORY COMPLIANCE DRIVEN:<br><br>     → Banking: NHNN, FATF, AML regulations<br><br>     → Aviation: CAAV, EASA, FAA<br><br>     → Cả hai: compliance audit có thể xảy ra bất kỳ lúc<br><br>     → Cả hai: documentation và traceability bắt buộc<br><br>  4\. LEGACY SYSTEM INTEGRATION:<br><br>     → Banking: Core banking (IPCAS, T24) schema phức tạp<br><br>     → Aviation: AMASIS (DB2) legacy data model<br><br>     → Cả hai: không có documentation đầy đủ,<br><br>       phải reverse engineer<br><br>ĐIỂM KHÁC NHAU:<br><br>  1\. DATA VOLUME & VELOCITY:<br><br>     → Banking: hàng triệu transactions/ngày,<br><br>       volume tăng theo số khách hàng<br><br>     → Aviation: ít records hơn (máy bay ít hơn khách hàng),<br><br>       nhưng mỗi record phức tạp hơn nhiều<br><br>     → Implication: Banking cần partition, bulk load tốt;<br><br>       Aviation cần data model phức tạp, component tracking<br><br>  2\. REAL-TIME VS BATCH:<br><br>     → Banking (AML): cần gần real-time, detect ngay<br><br>     → Aviation (MRO): batch là đủ, nhưng accuracy<br><br>       quan trọng hơn speed<br><br>  3\. NGƯỜI DÙNG DATA:<br><br>     → Banking: BI analyst, compliance officer, management<br><br>       → cần aggregated, dashboards<br><br>     → Aviation: kỹ thuật viên, quality engineers<br><br>       → cần operational data, specific aircraft records<br><br>  4\. CONSEQUENCE CỦA SAI:<br><br>     → Banking: financial loss, regulatory fine<br><br>     → Aviation: safety risk — hậu quả nghiêm trọng hơn<br><br>  5\. DATA SENSITIVITY:<br><br>     → Banking: financial data cực kỳ sensitive (PII, amount)<br><br>     → Aviation: kỹ thuật (serial number, maintenance history)<br><br>       sensitive hơn về safety, ít PII hơn<br><br>BÀI HỌC RÚT RA:<br><br>  Cả hai domain dạy tôi một điều quan trọng:<br><br>  DE không chỉ là người viết ETL —<br><br>  phải hiểu tại sao data tồn tại và<br><br>  hậu quả khi data sai.<br><br>  Điều đó thay đổi cách tôi thiết kế<br><br>  DQ checks và error handling:<br><br>  không phải "best effort" mà là "must be correct."<br><br>•--<br><br><em></em></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn primary" onclick="showModule('g11', document.querySelectorAll('.nav-item')[5])">Tiếp theo: Nhóm 11 →</button>
+      </div>
+    </div>
+
+    <!-- G11: Phần Mở Rộng -->
+    <div class="module" id="g11">
+      <div class="module-header">
+        <div class="module-tag">G11 · Modern Stack</div>
+        <div class="module-title">Nhóm 11: Phần Mở Rộng</div>
+        <div class="module-subtitle">14 câu hỏi | Mức độ ưu tiên: 🟢 Bổ trợ</div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Tiến độ ôn tập nhóm này:</span>
+          <span class="progress-count">0/14</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="level-header">CẤP ĐỘ A — Modern Data Stack & Cloud</div>
+
+      <!-- Q1 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LA</span>
+          <span>Q1. Apache Airflow là gì? Nó giải quyết vấn đề gì mà ODI/Tale...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Apache Airflow là gì? Nó giải quyết vấn đề gì mà ODI/Talend không làm được?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Airflow là platform orchestration pipeline,<br><br>dùng Python để define workflow dưới dạng DAG<br><br>(Directed Acyclic Graph).<br><br>Khác ODI/Talend ở chỗ:<br><br>  ODI/Talend:<br><br>  → GUI-based, kéo thả<br><br>  → Tốt cho enterprise ETL trong Oracle ecosystem<br><br>  → Scheduling built-in nhưng hạn chế<br><br>  → Khó version control (XML files)<br><br>  → Khó test tự động<br><br>  Airflow:<br><br>  → Code-based (Python) → Git version control dễ<br><br>  → Orchestration chuyên biệt:<br><br>    retry logic, dependencies, SLA monitoring<br><br>  → DAG: visual flow của pipeline<br><br>  → Có thể trigger bất kỳ thứ gì:<br><br>    Python function, Spark job, SQL, API call...<br><br>  → Web UI đẹp để monitor từng task<br><br>  → Cloud-native: Google Composer, AWS MWAA<br><br>Ví dụ DAG đơn giản:<br><br>  from airflow import DAG<br><br>  from airflow.operators.python import PythonOperator<br><br><br>  dag \= DAG('etl\_aml', schedule='0 22 \<em> \</em> \*')<br><br><br>  extract \= PythonOperator(task\_id='extract',<br><br>                           python\_callable=extract\_fn)<br><br>  transform \= PythonOperator(task\_id='transform',<br><br>                             python\_callable=transform\_fn)<br><br>  load \= PythonOperator(task\_id='load',<br><br>                        python\_callable=load\_fn)<br><br><br>  extract \>\> transform \>\> load  \# dependency<br><br>Khi nào dùng Airflow vs ODI:<br><br>  → ODI: Oracle ecosystem, GUI team, ETL heavy<br><br>  → Airflow: multi-tech pipeline, code team,<br><br>    cần flexible orchestration<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LA</span>
+          <span>Q2. dbt (data build tool) là gì? Nó thay đổi cách DE làm tran...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"dbt (data build tool) là gì? Nó thay đổi cách DE làm transformation như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>dbt là transformation layer — chỉ làm T trong ELT.<br><br>Cách làm cũ (ETL với stored procedure):<br><br>  → Viết SQL trong stored procedure Oracle/PG<br><br>  → Deploy bằng tay<br><br>  → Khó test, khó document<br><br>  → Version control thủ công<br><br>Cách làm với dbt:<br><br>  → Viết SQL SELECT thần (không cần INSERT/UPDATE)<br><br>  → dbt tự generate CREATE TABLE/VIEW từ SELECT đó<br><br>  → Built-in testing: not\_null, unique, accepted\_values<br><br>  → Auto-generate documentation từ schema.yml<br><br>  → Git-based: mọi thứ là code, review được<br><br>Ví dụ dbt model:<br><br>  \-- models/staging/stg\_transactions.sql<br><br>  WITH source AS (<br><br>      SELECT \<em> FROM {{ source('ipcas', 'transactions') }}<br><br>  ),<br><br>  cleaned AS (<br><br>      SELECT<br><br>          transaction\_id,<br><br>          account\_id,<br><br>          CAST(amount AS DECIMAL(18,2)) AS amount,<br><br>          UPPER(currency) AS currency,<br><br>          transaction\_date::DATE AS transaction\_date<br><br>      FROM source<br><br>      WHERE amount \> 0  \-- DQ filter<br><br>        AND transaction\_date IS NOT NULL<br><br>  )<br><br>  SELECT \</em> FROM cleaned<br><br>  \-- dbt run → tự tạo bảng stg\_transactions<br><br>  \-- dbt test → chạy DQ checks<br><br>  \-- dbt docs generate → web documentation<br><br>Tại sao DE ngày càng cần biết dbt:<br><br>  → Nhiều công ty fintech/startup dùng dbt<br><br>  → Kết hợp với Airflow: Airflow orchestrate,<br><br>    dbt làm transformation<br><br>  → Modern stack: Snowflake/BigQuery \+ dbt \+ Airflow<br><br>Với background của bạn:<br><br>  SQL strong \+ dbt \= tự nhiên<br><br>  dbt chỉ là cách viết SQL có cấu trúc hơn<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LA</span>
+          <span>Q3. Data Lake, Data Warehouse và Data Lakehouse khác nhau thế...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Data Lake, Data Warehouse và Data Lakehouse khác nhau thế nào? Công ty bạn nên dùng cái nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>DATA WAREHOUSE (bạn đã làm):<br><br>  → Structured data, schema-on-write<br><br>  → SQL-friendly, performance cao<br><br>  → Đắt khi scale<br><br>  → Ví dụ: Oracle DWH NHNN, OFSAA LPBank<br><br>  → Tốt cho: báo cáo định kỳ, BI, compliance<br><br>DATA LAKE:<br><br>  → Raw data mọi định dạng: JSON, CSV, images, logs<br><br>  → Schema-on-read: đọc đến đâu define schema đến đó<br><br>  → Rẻ (object storage: S3, GCS)<br><br>  → Dễ trở thành "data swamp" nếu không govern tốt<br><br>  → Ví dụ: AWS S3, Azure Data Lake<br><br>  → Tốt cho: ML/AI, exploratory analytics, raw logs<br><br>DATA LAKEHOUSE (hybrid mới nhất):<br><br>  → Kết hợp: lưu trữ rẻ như Lake,<br><br>    query performance như Warehouse<br><br>  → Open table format: Delta Lake, Apache Iceberg, Hudi<br><br>  → ACID transactions trên object storage<br><br>  → Ví dụ: Databricks, Apache Spark \+ Iceberg<br><br>  → Tốt cho: công ty cần cả BI lẫn ML/AI<br><br>Mapping vào thực tế:<br><br>  Ngân hàng truyền thống (Agribank, NHNN):<br><br>  → Data Warehouse: Oracle, structured, compliance-heavy<br><br>  → Khó thay đổi ngay<br><br><br>  Fintech mới (MoMo, VNPay):<br><br>  → Lakehouse: Spark \+ Iceberg trên cloud<br><br>  → Flexible, scale tốt, support ML<br><br><br>  Doanh nghiệp lớn chuyển đổi số:<br><br>  → Hybrid: DWH cho reporting \+ Lake cho raw/ML<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LA</span>
+          <span>Q4. Apache Spark là gì? Khi nào nên dùng Spark thay vì SQL th...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Apache Spark là gì? Khi nào nên dùng Spark thay vì SQL thuần?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Spark là distributed computing framework<br><br>xử lý data ở quy mô terabyte/petabyte.<br><br>Spark vs SQL thuần:<br><br>  SQL thuần (bạn đang dùng):<br><br>  → Single machine hoặc single DB cluster<br><br>  → Tốt cho: vài trăm GB đến vài TB<br><br>  → Oracle, PostgreSQL handle tốt với tuning<br><br>  → Ít overhead hơn<br><br>  Apache Spark:<br><br>  → Distributed: chia data ra nhiều nodes,<br><br>    xử lý song song thật sự<br><br>  → In-memory: nhanh hơn MapReduce 100x<br><br>  → Tốt cho: multi-TB đến petabyte<br><br>  → PySpark: Python API<br><br>  → Spark SQL: viết SQL chạy distributed<br><br>Khi nào cần Spark:<br><br>  → Data volume vượt quá single DB handle được<br><br>  → Cần xử lý unstructured data (JSON, logs, text)<br><br>  → ML pipeline: MLlib built-in<br><br>  → Real-time streaming: Spark Streaming/Structured Streaming<br><br>Ví dụ PySpark đơn giản:<br><br>  from pyspark.sql import SparkSession<br><br>  from pyspark.sql.functions import col, sum<br><br><br>  spark \= SparkSession.builder.appName("ETL").getOrCreate()<br><br><br>  df \= spark.read.parquet("s3://bucket/transactions/")<br><br><br>  result \= df.filter(col("amount") \> 1000000\) \\<br><br>             .groupBy("branch\_id") \\<br><br>             .agg(sum("amount").alias("total"))<br><br><br>  result.write.parquet("s3://bucket/output/")<br><br>Với background của bạn:<br><br>  → Bạn đã biết SQL tốt → PySpark SQL syntax quen ngay<br><br>  → Điểm khác: tư duy distributed, lazy evaluation,<br><br>    partition strategy trên cluster<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ B — Streaming & Real-time</div>
+
+      <!-- Q5 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LB</span>
+          <span>Q5. Apache Kafka là gì? Streaming data khác batch data như th...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Apache Kafka là gì? Streaming data khác batch data như thế nào? Khi nào banking cần streaming?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Kafka là distributed message streaming platform.<br><br>Kiến trúc cơ bản:<br><br>  Producer → \[Kafka Topic\] → Consumer<br><br><br>  Topic: như một queue có nhiều partitions<br><br>  Partition: đơn vị parallel processing<br><br>  Offset: vị trí trong topic, consumer track đã đọc đến đâu<br><br>Batch vs Streaming:<br><br>  BATCH (bạn đang làm):<br><br>  → Xử lý theo lô, định kỳ (hằng đêm, mỗi 4h)<br><br>  → Dữ liệu "stale" trong khoảng giữa 2 batch<br><br>  → Đơn giản hơn, easier to debug<br><br>  → Phù hợp: báo cáo T+1, DWH aggregate<br><br>  STREAMING (Kafka):<br><br>  → Xử lý từng event khi nó xảy ra<br><br>  → Near real-time: latency milliseconds đến giây<br><br>  → Phức tạp hơn: out-of-order events,<br><br>    exactly-once semantics, watermarks<br><br>  → Phù hợp: fraud detection, live dashboard<br><br>Khi banking CẦN streaming:<br><br>  → Real-time fraud detection:<br><br>    Giao dịch xảy ra → 200ms sau đã biết<br><br>    có đáng ngờ không → block nếu cần<br><br>    (Batch không làm được — giao dịch xong rồi)<br><br>  → Real-time account balance:<br><br>    Core banking update → Kafka event →<br><br>    mobile app hiển thị ngay<br><br>  → AML real-time alerting:<br><br>    Phát hiện pattern rửa tiền ngay trong ngày<br><br>    thay vì T+1<br><br>  → Thẻ tín dụng: phát hiện gian lận ngay lập tức<br><br>Với background bạn:<br><br>  → Dự án AML của bạn dùng batch (hằng đêm và 4h)<br><br>  → Nếu Agribank muốn real-time AML → cần Kafka<br><br>  → Đây là điểm bạn có thể nói: "Hiện tại pipeline<br><br>    của tôi là batch, tôi hiểu hạn chế của nó và<br><br>    muốn tìm hiểu thêm về streaming approach"<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LB</span>
+          <span>Q6. CDC (Change Data Capture) là gì? Tại sao CDC quan trọng h...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"CDC (Change Data Capture) là gì? Tại sao CDC quan trọng hơn timestamp-based incremental load trong một số trường hợp?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>CDC là kỹ thuật capture mọi thay đổi data<br><br>(INSERT, UPDATE, DELETE) từ source system<br><br>theo thời gian thực.<br><br>Cách hoạt động:<br><br>  Database write-ahead log (WAL/redo log)<br><br>  ghi lại mọi thay đổi trước khi apply.<br><br>  CDC tool đọc log này và stream ra ngoài.<br><br>  Ví dụ: Debezium (phổ biến nhất)<br><br>  PostgreSQL WAL → Debezium → Kafka topic<br><br>  Oracle Redo Log → Debezium → Kafka topic<br><br>CDC vs Timestamp-based incremental:<br><br>  TIMESTAMP-BASED (bạn đang có thể dùng):<br><br>  SELECT \* FROM transactions <br><br>  WHERE updated\_at \>= :last\_run\_time<br><br><br>  Vấn đề:<br><br>  → Không bắt được DELETE<br><br>    (row bị xóa → không còn updated\_at để query)<br><br>  → Cần column updated\_at — không phải bảng nào có<br><br>  → Clock skew giữa các servers gây miss records<br><br>  → Bulk update không update updated\_at → miss<br><br>  CDC:<br><br>  → Bắt được tất cả: INSERT, UPDATE, DELETE<br><br>  → Không cần column đặc biệt trong source<br><br>  → Không miss dù clock skew<br><br>  → Low latency: near real-time<br><br>Ví dụ CDC message từ Debezium:<br><br>  {<br><br>    "op": "u",              // u=update, c=create, d=delete<br><br>    "before": {<br><br>      "account\_id": "123",<br><br>      "balance": 1000000<br><br>    },<br><br>    "after": {<br><br>      "account\_id": "123", <br><br>      "balance": 1500000   // đã thay đổi<br><br>    },<br><br>    "ts\_ms": 1704067200000  // timestamp chính xác<br><br>  }<br><br>Trong AML context:<br><br>  → CDC quan trọng: customer risk level bị DELETE<br><br>    trong source → với timestamp-based sẽ miss<br><br>  → CDC bắt được DELETE → AML biết customer<br><br>    bị removed khỏi source vì lý do gì<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ C — Data Engineering Fundamentals</div>
+
+      <!-- Q7 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LC</span>
+          <span>Q7. Slowly Changing Dimension (SCD) loại nào phù hợp nhất cho...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Slowly Changing Dimension (SCD) loại nào phù hợp nhất cho từng trường hợp sau: địa chỉ khách hàng, tên sản phẩm, tỷ giá hối đoái hàng ngày?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>ĐỊA CHỈ KHÁCH HÀNG → SCD Type 2:<br><br>  → Cần lịch sử: giao dịch ngày 01/01/2023<br><br>    khi đó khách hàng ở địa chỉ nào?<br><br>  → Quan trọng cho: audit, báo cáo theo địa điểm,<br><br>    phân tích hành vi theo khu vực<br><br>  → AML: địa chỉ thay đổi bất thường → red flag<br><br>TÊN SẢN PHẨM → SCD Type 1 hoặc Type 2:<br><br>  → Nếu chỉ sửa lỗi chính tả: Type 1 (overwrite)<br><br>  → Nếu đổi tên sản phẩm có ý nghĩa business:<br><br>    Type 2 — báo cáo cũ vẫn hiện tên cũ<br><br>  → Ví dụ: "Vay mua nhà" đổi thành "Home Loan"<br><br>    → báo cáo Q1 vẫn hiện "Vay mua nhà"<br><br>TỶ GIÁ HỐI ĐOÁI → SCD Type 2 HOẶC bảng riêng:<br><br>  → Tỷ giá thay đổi hàng ngày → 365 records/năm<br><br>  → SCD Type 2 vẫn work nhưng thường dùng<br><br>    bảng dim\_exchange\_rate riêng:<br><br>    <br><br>    CREATE TABLE dim\_exchange\_rate (<br><br>        rate\_date    DATE,<br><br>        currency     VARCHAR2(3),<br><br>        rate\_to\_vnd  DECIMAL(18,6),<br><br>        PRIMARY KEY (rate\_date, currency)<br><br>    );<br><br>    <br><br>    → Join với fact table theo transaction\_date<br><br>      để lấy đúng tỷ giá ngày đó<br><br>BONUS CASES:<br><br>  → Risk level khách hàng: SCD Type 2<br><br>    (cần biết risk level tại thời điểm giao dịch)<br><br>  → Mã chi nhánh: SCD Type 2<br><br>    (lịch sử attribute của chi nhánh)<br><br>  → Giá cổ phiếu: bảng time-series riêng<br><br>    (quá nhiều thay đổi, không phải SCD)<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LC</span>
+          <span>Q8. Idempotency trong data pipeline là gì? Làm thế nào để đảm...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Idempotency trong data pipeline là gì? Làm thế nào để đảm bảo pipeline của bạn idempotent?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Idempotency: chạy cùng 1 operation nhiều lần<br><br>• kết quả giống như chạy 1 lần.<br><br>Tại sao quan trọng:<br><br>  → ETL fail giữa chừng → phải rerun<br><br>  → Nếu không idempotent: duplicate data sau khi rerun<br><br>  → Production incident tệ hơn khi rerun tạo ra thêm vấn đề<br><br>Kỹ thuật đảm bảo idempotency:<br><br>  1\. TRUNCATE \+ INSERT (đơn giản nhất):<br><br>     TRUNCATE TABLE stg\_transactions;<br><br>     INSERT INTO stg\_transactions SELECT ...;<br><br>     <br><br>     → Mỗi lần chạy: xóa hết và load lại<br><br>     → Idempotent nhưng chậm với data lớn<br><br>  2\. MERGE (upsert):<br><br>     MERGE INTO core\_transactions t<br><br>     USING stg\_transactions s ON (t.id \= s.id)<br><br>     WHEN MATCHED THEN UPDATE SET ...<br><br>     WHEN NOT MATCHED THEN INSERT ...;<br><br>     <br><br>     → Chạy lại: UPDATE thay vì tạo duplicate<br><br>     → Bạn đã dùng cho SCD-like tracking trong AML<br><br>  3\. BATCH\_ID \+ DELETE trước INSERT:<br><br>     \-- Xóa data của batch hiện tại (nếu có từ rerun)<br><br>     DELETE FROM core\_transactions <br><br>     WHERE batch\_id \= :current\_batch\_id;<br><br>     <br><br>     \-- Insert mới<br><br>     INSERT INTO core\_transactions ...;<br><br>     <br><br>     → Idempotent vì DELETE trước đảm bảo<br><br>       không có duplicate với cùng batch\_id<br><br>  4\. UNIQUE CONSTRAINT:<br><br>     → Database enforce không cho duplicate<br><br>     → ON CONFLICT DO UPDATE (PostgreSQL)<br><br>     → INSERT IGNORE / ON DUPLICATE KEY (MySQL)<br><br>  5\. CHECK TRƯỚC KHI INSERT:<br><br>     SELECT COUNT(\*) INTO v\_exists<br><br>     FROM etl\_job\_log<br><br>     WHERE batch\_date \= :run\_date<br><br>     AND status \= 'SUCCESS';<br><br>     <br><br>     IF v\_exists \> 0 THEN<br><br>         RAISE 'Batch already completed for this date';<br><br>     END IF;<br><br>Bạn đã implement:<br><br>  → batch\_id trong stored procedure AML<br><br>  → Đây là foundation của idempotency<br><br>  → Mỗi batch có ID duy nhất → trace và rerun được<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LC</span>
+          <span>Q9. Data Lineage là gì? Tại sao nó quan trọng với DE trong mô...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Data Lineage là gì? Tại sao nó quan trọng với DE trong môi trường banking?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Data Lineage là khả năng trace dữ liệu:<br><br>  → Từ đâu đến? (source)<br><br>  → Đi qua những bước nào? (transformation)<br><br>  → Ai có thể access? (governance)<br><br>  → Data hiện tại được tính từ đâu?<br><br>Ví dụ cụ thể:<br><br>  Báo cáo AML hiển thị: "Khách hàng X có<br><br>  tổng giao dịch đáng ngờ 500 triệu VNĐ"<br><br><br>  Lineage trace ngược:<br><br>  OFSAA Report → core\_suspicious\_amount<br><br>              ← MERGE từ stg\_transactions<br><br>              ← EXTRACT từ IPCAS\_TXN\_HDR<br><br>                 \+ IPCAS\_TXN\_DTL<br><br>                 \+ SWIFT\_MT103<br><br>  \+ Exchange rate từ dim\_exchange\_rate<br><br>  \+ Risk rules từ aml\_rule\_config table<br><br>Tại sao quan trọng trong banking:<br><br>  1\. AUDIT REQUIREMENT:<br><br>     NHNN/CAAV audit: "Con số này đến từ đâu?"<br><br>     → Không có lineage: không trả lời được<br><br>     → Có lineage: trace từng bước trong 30 giây<br><br>  2\. IMPACT ANALYSIS:<br><br>     Source schema thay đổi:<br><br>     "Nếu tôi sửa IPCAS\_TXN\_HDR.amount,<br><br>      bảng nào trong DWH bị ảnh hưởng?"<br><br>     → Lineage map cho biết ngay<br><br>  3\. DEBUG DATA QUALITY:<br><br>     "Tại sao tổng amount trong báo cáo<br><br>      thấp hơn 10% so với tuần trước?"<br><br>     → Trace lineage: tìm transform step bị lỗi<br><br>  4\. GDPR/DATA PRIVACY:<br><br>     "Dữ liệu khách hàng A đang ở đâu trong hệ thống?"<br><br>     → Lineage biết data đã đi qua staging nào,<br><br>       ai có thể access<br><br>Tools phổ biến:<br><br>  → Apache Atlas (open source)<br><br>  → DataHub (LinkedIn, open source)<br><br>  → Collibra (enterprise)<br><br>  → dbt tự động generate lineage từ model<br><br>Trong dự án của bạn:<br><br>  → Bạn chưa có formal lineage tool<br><br>  → Nhưng ETL audit log \+ mapping document<br><br>    là manual lineage<br><br>  → Đây là điểm có thể cải thiện<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LC</span>
+          <span>Q10. Schema evolution là gì? Làm thế nào để handle schema evol...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Schema evolution là gì? Làm thế nào để handle schema evolution trong pipeline ETL mà không break downstream?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Schema evolution: source/target schema thay đổi<br><br>theo thời gian — thêm cột, xóa cột, đổi kiểu.<br><br>BACKWARD COMPATIBLE changes (an toàn):<br><br>  → Thêm cột mới với DEFAULT NULL<br><br>  → Rename cột (thêm alias, giữ cột cũ)<br><br>  → Tăng độ dài VARCHAR<br><br><br>  → Pipeline cũ vẫn chạy được<br><br>  → Không cần update ngay<br><br>BREAKING changes (nguy hiểm):<br><br>  → Xóa cột đang dùng trong ETL<br><br>  → Đổi kiểu NUMBER → VARCHAR<br><br>  → Rename cột không có backward compat<br><br>  → Thay đổi semantic: amount đổi từ VNĐ sang USD<br><br><br>  → Pipeline sẽ fail hoặc worse: chạy nhưng cho kết quả sai<br><br>Cách handle:<br><br>  1\. SCHEMA REGISTRY (với Kafka/Avro):<br><br>     → Central place lưu schema version<br><br>     → Producer/Consumer negotiate version<br><br>     → Không break nếu thay đổi backward compat<br><br>     <br><br>     // Avro schema example<br><br>     {<br><br>       "type": "record",<br><br>       "name": "Transaction",<br><br>       "fields": \[<br><br>         {"name": "id", "type": "string"},<br><br>         {"name": "amount", "type": "double"},<br><br>         {"name": "currency", "type": "string",<br><br>          "default": "VND"}  // default → backward compat<br><br>       \]<br><br>     }<br><br>  2\. SCHEMA SNAPSHOT \+ DETECTION (bạn có thể implement):<br><br>     → Chụp schema mỗi ngày<br><br>     → Alert khi phát hiện thay đổi<br><br>     → Stop pipeline trước khi xử lý data bị lỗi<br><br>  3\. DEFENSIVE CODING trong ETL:<br><br>     \-- Thay vì SELECT \<em>:<br><br>     SELECT transaction\_id,<br><br>            account\_id,<br><br>            amount,<br><br>            currency<br><br>     FROM source\_table;<br><br>     \-- SELECT \</em> bắt hết thay đổi, khó trace<br><br>     \-- SELECT explicit: dễ biết cột nào đang dùng<br><br>  4\. VERSIONING LAYER trong Staging:<br><br>     \-- Thêm schema\_version column<br><br>     INSERT INTO stg\_transactions (<br><br>         ..., schema\_version<br><br>     ) VALUES (<br><br>         ..., 'v2.1'<br><br>     );<br><br>     \-- Transform logic có thể handle nhiều version<br><br>  5\. COMMUNICATION PROCESS:<br><br>     → Yêu cầu source team báo trước 2 tuần<br><br>       trước khi thay đổi schema<br><br>     → Change freeze trước Go-live<br><br>     → Đây là process bạn cần đề xuất trong team<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ D — System Design</div>
+
+      <!-- Q11 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LD</span>
+          <span>Q11. Nếu được thiết kế từ đầu một data platform cho ngân hàng ...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Nếu được thiết kế từ đầu một data platform cho ngân hàng quy mô vừa, bạn sẽ chọn kiến trúc nào? Tại sao?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>Tiêu chí đánh giá trước khi chọn:<br><br>  → Quy mô: bao nhiêu TB/năm? Bao nhiêu nguồn?<br><br>  → Team: bao nhiêu DE? Skill set gì?<br><br>  → Budget: on-premise hay cloud?<br><br>  → Latency requirement: batch T+1 hay near real-time?<br><br>  → Compliance: data phải ở Việt Nam không?<br><br>    (Theo quy định NHNN: data tài chính phải onshore)<br><br>Với ngân hàng quy mô vừa ở Việt Nam:<br><br>  INGESTION LAYER:<br><br>  → Oracle/PostgreSQL: dùng DB link \+ ODI (bạn đã biết)<br><br>    hoặc Debezium CDC nếu cần near real-time<br><br>  → File-based: SFTP → Python script → Staging<br><br>  STORAGE LAYER:<br><br>  → Staging: Oracle/PostgreSQL (on-premise)<br><br>    Lý do: compliance, team đã biết, enterprise support<br><br>  → DWH: Oracle (nếu budget) hoặc PostgreSQL (cost-effective)<br><br>  → Archive: object storage hoặc cheap disk<br><br>  TRANSFORMATION LAYER:<br><br>  → PL/SQL Stored Procedures: cho logic phức tạp,<br><br>    team đã quen<br><br>  → dbt on top: version control, testing, documentation<br><br>  → Airflow: orchestration thay thế ODI Scheduler<br><br>  SERVING LAYER:<br><br>  → Power BI / Tableau connect trực tiếp DWH<br><br>  → API layer cho real-time query<br><br>  MONITORING:<br><br>  → Prometheus \+ Grafana (bạn đã có kinh nghiệm)<br><br>  → Custom ETL monitoring dashboard<br><br>  ARCHITECTURE:<br><br>  Source Systems<br><br>      │<br><br>      ▼ (DB Link / CDC)<br><br>  \[Staging Layer — Oracle/PG\]<br><br>      │<br><br>      ▼ (dbt / Stored Procedures)<br><br>  \[Core DWH — Oracle/PG\]<br><br>      │<br><br>      ├──► \[Reporting Layer — BI Tool\]<br><br>      │<br><br>      └──► \[AML System — OFSAA/custom\]<br><br>      <br><br>  Orchestration: Airflow<br><br>  Monitoring: Prometheus \+ Grafana<br><br>  CI/CD: Git \+ dbt test<br><br>Tại sao không đề xuất cloud ngay:<br><br>  → NHNN regulation: data tài chính onshore<br><br>  → Cost predictability: on-premise dễ budget hơn<br><br>  → Nhưng có thể hybrid sau:<br><br>    Archive trên cloud, processing on-premise<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q12 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LD</span>
+          <span>Q12. Tại sao cần tách biệt storage và compute trong modern dat...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Tại sao cần tách biệt storage và compute trong modern data platform? Lambda Architecture và Kappa Architecture là gì?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>TÁCH STORAGE VÀ COMPUTE:<br><br>  Traditional (bạn đang có):<br><br>  → Oracle DB: storage và compute cùng 1 server<br><br>  → Scale up: mua server to hơn (expensive)<br><br>  → Idle: đêm không có batch → CPU waste<br><br>  Modern (cloud native):<br><br>  → Storage: S3/GCS (rẻ, unlimited)<br><br>  → Compute: Spark cluster (bật khi cần, tắt khi xong)<br><br>  → Scale independently: cần nhiều compute → <br><br>    spin up 100 nodes, xong → shut down, trả tiền<br><br>    theo giờ<br><br>  → Ví dụ: Snowflake, BigQuery, Databricks<br><br>Lợi ích:<br><br>  → Cost: không trả tiền compute khi không dùng<br><br>  → Flexibility: nhiều team dùng cùng storage,<br><br>    mỗi team có compute riêng<br><br>  → Scale: handle spike mà không mua thêm server<br><br>LAMBDA ARCHITECTURE:<br><br>  → Có 2 layer xử lý song song:<br><br>    Batch layer: xử lý historical data đầy đủ, chậm<br><br>    Speed layer: xử lý real-time data mới nhất, nhanh<br><br>    Serving layer: merge kết quả từ 2 layer trên<br><br>  → Vấn đề: phải maintain 2 codebase<br><br>    (batch và streaming) → phức tạp<br><br>KAPPA ARCHITECTURE:<br><br>  → Đơn giản hóa: chỉ 1 streaming layer<br><br>  → Treat everything as stream<br><br>  → Batch \= streaming với bounded data<br><br>  → Ví dụ: Kafka \+ Flink/Spark Streaming<br><br>  → Ưu điểm: 1 codebase duy nhất<br><br>  → Nhược điểm: streaming phức tạp hơn batch,<br><br>    reprocessing historical data khó hơn<br><br>Với banking Việt Nam hiện tại:<br><br>  → Hầu hết vẫn dùng Lambda-like:<br><br>    Batch ETL (overnight) \+ một số near real-time<br><br>  → Kappa: chưa phổ biến, cần mature streaming infra<br><br>  → Đây là lý do bạn nên học Kafka/Airflow<br><br>    để bridge từ batch sang hybrid approach<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+      <div class="level-header">CẤP ĐỘ E — Câu hỏi tư duy & problem-solving</div>
+
+      <!-- Q13 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LE</span>
+          <span>Q13. Bạn được giao thiết kế pipeline ETL mới cho một source sy...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Bạn được giao thiết kế pipeline ETL mới cho một source system hoàn toàn chưa có documentation. Bạn bắt đầu từ đâu?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>BƯỚC 1 — UNDERSTAND THE BUSINESS FIRST:<br><br>  → Hệ thống này làm gì trong business?<br><br>  → Data nào là quan trọng nhất?<br><br>  → Ai đang dùng data này và dùng như thế nào?<br><br>  → Downstream cần gì: báo cáo, ML, compliance?<br><br><br>  Lý do: hiểu business → biết data nào cần,<br><br>  không cần lấy hết mọi thứ<br><br>BƯỚC 2 — EXPLORE DATABASE SCHEMA:<br><br>  \-- Oracle: xem tất cả bảng<br><br>  SELECT table\_name, num\_rows<br><br>  FROM all\_tables<br><br>  WHERE owner \= 'SOURCE\_SCHEMA'<br><br>  ORDER BY num\_rows DESC;<br><br><br>  \-- Tìm bảng lớn nhất (thường là transactional)<br><br>  \-- Xem foreign key relationships<br><br>  SELECT a.table\_name, a.column\_name,<br><br>         c.r\_owner, c\_pk.table\_name r\_table<br><br>  FROM all\_cons\_columns a<br><br>  JOIN all\_constraints c ON a.owner \= c.owner<br><br>  JOIN all\_cons\_columns c\_pk ON ...<br><br>  WHERE c.constraint\_type \= 'R';<br><br>BƯỚC 3 — DATA PROFILING:<br><br>  \-- Mỗi bảng quan trọng:<br><br>  SELECT COUNT(\<em>) total\_rows,<br><br>         COUNT(DISTINCT key\_col) distinct\_keys,<br><br>         MIN(created\_date), MAX(created\_date),<br><br>         COUNT(\</em>) \- COUNT(amount) null\_amount\_count<br><br>  FROM source\_table;<br><br><br>  → Hiểu: volume, date range, null percentage,<br><br>    cardinality của các key columns<br><br>BƯỚC 4 — TRACE DATA FLOW:<br><br>  → Interview người dùng hệ thống:<br><br>    "Khi tôi tạo một giao dịch, nó đi vào bảng nào?"<br><br>  → Follow foreign keys để hiểu relationships<br><br>  → Tìm bảng nào update khi business event xảy ra<br><br>BƯỚC 5 — BUILD INCREMENTALLY:<br><br>  → Extract 1 ngày data trước, verify<br><br>  → Viết transform đơn giản nhất trước<br><br>  → Extend dần dần khi hiểu hơn<br><br>  → Đừng cố build full pipeline ngay lần đầu<br><br>BƯỚC 6 — DOCUMENT WHILE EXPLORING:<br><br>  → Ghi lại mọi thứ bạn phát hiện<br><br>  → Tạo data dictionary cho team<br><br>  → Đây là documentation chưa có — bạn tạo ra<br><br>•--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q14 -->
+      <div class="section q-container">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="check-box" onclick="toggleCheck(event, this)"></div>
+          <span class="q-badge q-lvl-2">LE</span>
+          <span>Q14. Nếu bạn phát hiện pipeline ETL đang hoạt động nhưng có th...</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><em>"Nếu bạn phát hiện pipeline ETL đang hoạt động nhưng có thể được cải thiện đáng kể về performance và maintainability, bạn tiếp cận việc refactor như thế nào?"</em></p>
+          <div class="info-box tip">
+            💡 <span><strong>Gợi ý trả lời:</strong><br><br>NGUYÊN TẮC: "If it ain't broke, don't fix it" —<br><br>nhưng technical debt sẽ giết bạn từ từ.<br><br>BƯỚC 1 — MEASURE TRƯỚC KHI OPTIMIZE:<br><br>  → Baseline hiện tại:<br><br>    \- Mỗi job mất bao lâu?<br><br>    \- Resource usage như thế nào?<br><br>    \- Bao nhiêu lần fail/tháng?<br><br>    \- Code complexity: số SP, độ dài, comment?<br><br>  → Không optimize thứ không phải bottleneck<br><br>BƯỚC 2 — PRIORITIZE:<br><br>  → Quick wins có impact cao nhất:<br><br>    \- Job chậm nhất (đo được) → optimize SQL/index<br><br>    \- Job fail nhiều nhất → thêm error handling<br><br>    \- Code dài nhất, ít comment nhất → refactor<br><br>  → Không refactor tất cả cùng lúc<br><br>BƯỚC 3 — REFACTOR AN TOÀN:<br><br>  → Không sửa Production trực tiếp<br><br>  → Tạo branch/version mới<br><br>  → Test kỹ trên dev với data tương đương production<br><br>  → A/B test: chạy cả version cũ và mới, so sánh kết quả<br><br>  → Deploy từng phần, không big bang<br><br>BƯỚC 4 — DOCUMENT CHANGES:<br><br>  → Comment tại sao refactor: "Đổi INSERT → MERGE<br><br>    để idempotent, tránh duplicate khi rerun"<br><br>  → Không chỉ ghi "refactored for performance"<br><br>BƯỚC 5 — MONITOR SAU DEPLOY:<br><br>  → So sánh duration trước/sau<br><br>  → Check không có regression: kết quả vẫn đúng?<br><br>  → Rollback plan nếu có vấn đề<br><br>Trong thực tế của bạn:<br><br>  → Bạn đã làm điều này ở NHNN DWH:<br><br>    tối ưu SP, tuning partition/index<br><br>  → Key learning: đo trước, fix có mục tiêu,<br><br>    không optimize vì "có thể nhanh hơn"<br><br>•--<br><br><em></em></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn primary" onclick="showModule('g6', document.querySelectorAll('.nav-item')[0])">Tiếp theo: Nhóm 6 →</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function showModule(moduleId, navElement) {
+    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+    document.getElementById(moduleId).classList.add('active');
+    
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (navElement) {
+      navElement.classList.add('active');
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function toggleSection(header) {
+    header.classList.toggle('open');
+    const content = header.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  }
+
+  function toggleCheck(event, element) {
+    event.stopPropagation();
+    element.classList.toggle('checked');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    document.querySelectorAll('.module').forEach(module => {
+      const total = module.querySelectorAll('.check-box').length;
+      if (total === 0) return;
+      const checked = module.querySelectorAll('.check-box.checked').length;
+      const percentage = (checked / total) * 100;
+      
+      const countEl = module.querySelector('.progress-count');
+      const barEl = module.querySelector('.progress-fill');
+      
+      if (countEl) countEl.textContent = `${checked}/${total}`;
+      if (barEl) barEl.style.width = `${percentage}%`;
+    });
+  }
+
+  // Initialize progress
+  document.addEventListener('DOMContentLoaded', updateProgress);
+</script>
+
+</body>
+</html>
