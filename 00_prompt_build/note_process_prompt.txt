@@ -1,0 +1,32 @@
+Quy trình:
+
+repo_notes_M03 -> prompt_build file cho claude code + prompt_review file cho antigravity
+
+1. Trên Claude web 
+Chụp ảnh màn hình toàn bộ cấu trúc thư mục của module + đính kèm file prompt_create_note_module1.txt
+=> copy output vào file prompt_create_note_moduleXX.txt
+
+dựa vào prompt_create_note_module1.txt hãy viết prompt prompt_create_note_module4.txt
+
+2. Vào claude code paste prompt_create_note_moduleXX.txt để tạo file repo_notes_M03.md
+
+3. Gửi file repo_notes_M03.md cho claude web để viết prompt_build file cho claude code ( đính file Module01_Docker_Terraform.txt + Module01_Docker_Terraform_bo_sung.txt)
+ + PROMPT_Review_Module_03.md file cho antigravity (đã có file PROMPT_Review_Generic.md, PROMPT_Patch_After_Review.md)
+
+Tham khảo prompt build file Module01_Docker_Terraform, Module01_Docker_Terraform_bo_sung áp dụng cho module 03 nhé:
+
+1. Từ file repo_notes_M04.md hãy viết prompt build cho module 04: prompt_build_Module0XXXX.txt (để claude code thực hiện) bao gồm 5 prompt :
+
+Prompt 1 → Khởi tạo file + S0 + S1
+
+Prompt 2 → Thêm S2 (đọc hiểu code repo)
+
+Prompt 3 → Thêm S3 (thực hành)
+
+Prompt 4 → Thêm S4 + S5 (production + nâng cao)
+
+Prompt 5 → Thêm S6 + S7 + S8 (lỗi + interview + checklist)
+
+2. hãy viết prompt PROMPT_Review_Module_04.md để review cho module 04 (để antigravity  thực hiện review code của claude)
+
+

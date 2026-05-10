@@ -1,0 +1,40 @@
+name: dbt_practice
+version: "1.0.0"
+config-version: 2
+
+profile: dbt_practice
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - target
+  - dbt_packages
+
+models:
+  dbt_practice:
+    staging:
+      +schema: staging
+      +materialized: view
+      +tags: ["staging"]
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+      +tags: ["intermediate"]
+    marts:
+      +schema: marts
+      +materialized: table
+      +tags: ["marts"]
+
+seeds:
+  dbt_practice:
+    +schema: seed
+
+snapshots:
+  dbt_practice:
+    +target_schema: snapshots
+

@@ -1,0 +1,19 @@
+id: sensor_waits_forever_broken
+namespace: de.zoomcamp.orchestration
+description: Broken example. A sensor-like task waits without timeout.
+
+inputs:
+  - id: run_date
+    type: STRING
+    defaults: "2026-05-01"
+
+tasks:
+  - id: wait_for_missing_dependency
+    type: io.kestra.plugin.scripts.shell.Commands
+    commands:
+      - |
+        while [ ! -f /app/data/state/upstream_ready_{{ inputs.run_date }}.marker ]; do
+          echo "waiting for upstream marker without timeout..."
+          sleep 10
+        done
+

@@ -1,0 +1,20 @@
+id: downstream_dependency_missing_broken
+namespace: de.zoomcamp.orchestration
+description: Broken example. Mart validation runs before mart build.
+
+inputs:
+  - id: run_date
+    type: STRING
+    defaults: "2026-05-01"
+
+tasks:
+  - id: extract_orders
+    type: io.kestra.plugin.scripts.python.Commands
+    commands:
+      - python /app/scripts/extract_orders.py --run-date {{ inputs.run_date }}
+
+  - id: validate_marts_too_early
+    type: io.kestra.plugin.scripts.python.Commands
+    commands:
+      - python /app/scripts/validate_marts.py --run-date {{ inputs.run_date }}
+

@@ -1,0 +1,23 @@
+services:
+  kestra:
+    image: kestra/kestra:latest
+    container_name: de_orchestration_kestra
+    command: server standalone --worker-thread=8
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./flows:/app/flows
+      - ./scripts:/app/scripts
+      - ./data:/app/data
+    environment:
+      KESTRA_CONFIGURATION: |
+        kestra:
+          repository:
+            type: memory
+          queue:
+            type: memory
+          storage:
+            type: local
+            local:
+              basePath: "/app/storage"
+

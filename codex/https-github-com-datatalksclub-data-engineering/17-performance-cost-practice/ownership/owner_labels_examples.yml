@@ -1,0 +1,28 @@
+examples:
+  bigquery_job:
+    labels:
+      owner: data-platform
+      domain: ecommerce
+      environment: prod
+      workload_type: dbt
+      criticality: high
+      cost_center: analytics
+
+  spark_job:
+    labels:
+      owner: data-platform
+      domain: ecommerce
+      environment: prod
+      workload_type: spark
+      criticality: medium
+      cost_center: analytics
+
+  kafka_topic:
+    labels:
+      owner: streaming-platform
+      domain: fraud
+      environment: prod
+      workload_type: kafka
+      criticality: high
+      cost_center: risk
+

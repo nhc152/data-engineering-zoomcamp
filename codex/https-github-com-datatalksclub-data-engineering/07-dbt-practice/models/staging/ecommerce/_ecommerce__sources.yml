@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+  - name: ecommerce
+    description: Raw ecommerce tables loaded into PostgreSQL for the dbt practice lab.
+    schema: raw
+    freshness:
+      warn_after: {count: 48, period: hour}
+      error_after: {count: 168, period: hour}
+    loaded_at_field: loaded_at
+    tables:
+      - name: customers
+        description: Raw customer profiles. Contains duplicate customer versions.
+      - name: products
+        description: Raw product catalog.
+      - name: orders
+        description: Raw orders. Contains duplicate order versions and inconsistent status casing.
+      - name: order_items
+        description: Raw order item lines.
+      - name: payments
+        description: Raw payment transactions.
+

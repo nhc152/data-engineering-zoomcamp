@@ -1,0 +1,9 @@
+# Example CODEOWNERS for a data repository.
+
+/dbt/models/marts/finance/ @finance-data-owner @data-platform
+/dbt/models/staging/ @analytics-engineering
+/orchestration/ @data-platform
+/infra/ @platform-team @security-team
+/quality/ @data-reliability
+/.github/workflows/ @platform-team
+

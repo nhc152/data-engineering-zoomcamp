@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: python_practice_postgres
+    environment:
+      POSTGRES_USER: de_user
+      POSTGRES_PASSWORD: de_password
+      POSTGRES_DB: python_practice
+    ports:
+      - "5433:5432"
+    volumes:
+      - python_practice_pgdata:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U de_user -d python_practice"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pipeline:
+    build: .
+    profiles: ["pipeline"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: python_practice
+      POSTGRES_USER: de_user
+      POSTGRES_PASSWORD: de_password
+      PIPELINE_DATA_DIR: data
+      PIPELINE_BATCH_SIZE: 100
+      PIPELINE_MAX_RETRIES: 3
+      PIPELINE_TIMEOUT_SECONDS: 5
+      PIPELINE_RETRY_BASE_SECONDS: 0.2
+      PIPELINE_RETRY_MAX_SECONDS: 2.0
+    command: ["python", "-m", "src.main", "--source", "api", "--api-pages-dir", "data/sample/api_pages", "--run-date", "2026-05-09"]
+
+volumes:
+  python_practice_pgdata:
+

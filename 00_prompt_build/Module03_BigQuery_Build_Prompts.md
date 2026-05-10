@@ -69,7 +69,6 @@ Lưu file. Báo cáo số dòng đã tạo.
 
 ```
 Đọc các file sau:
-- Module03_BigQuery_DataWarehouse.html (file đang build, đọc toàn bộ để hiểu structure)
 - data-engineering-zoomcamp/03-data-warehouse/ (đọc TOÀN BỘ từng file một)
   Cụ thể phải đọc:
   * 03-data-warehouse/big_query.sql
@@ -341,7 +340,6 @@ Lưu file. Báo cáo số dòng hiện tại.
 
 ```
 Đọc các file sau:
-- Module03_BigQuery_DataWarehouse.html (đọc toàn bộ)
 - master_de_roadmap.html (phần Incident Simulation, Interview Mapping, DoD, Final Checklist)
 
 Thêm nội dung S6, S7, S8 vào Module03_BigQuery_DataWarehouse.html.
@@ -470,7 +468,6 @@ Lưu file. Báo cáo số dòng cuối cùng và tóm tắt những gì đã bui
 
 ```
 Đọc các file sau trước khi làm:
-- Module03_BigQuery_DataWarehouse.html (đọc toàn bộ để hiểu structure hiện tại)
 - data-engineering-zoomcamp/03-data-warehouse/big_query_ml.sql
 - data-engineering-zoomcamp/03-data-warehouse/extras/web_to_gcs.py
 

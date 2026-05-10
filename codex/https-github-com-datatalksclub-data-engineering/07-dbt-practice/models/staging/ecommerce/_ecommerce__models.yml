@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: stg_ecommerce__customers
+    description: Cleaned and deduplicated customers. Grain is one row per current customer.
+    columns:
+      - name: customer_id
+        tests: [not_null, unique]
+      - name: customer_tier
+        tests:
+          - accepted_values:
+              values: ['bronze', 'silver', 'gold', 'platinum']
+
+  - name: stg_ecommerce__products
+    description: Cleaned product catalog. Grain is one row per product.
+    columns:
+      - name: product_id
+        tests: [not_null, unique]
+
+  - name: stg_ecommerce__orders
+    description: Cleaned and deduplicated orders. Grain is one row per latest order version.
+    columns:
+      - name: order_id
+        tests: [not_null, unique]
+      - name: customer_id
+        tests: [not_null]
+      - name: order_status
+        tests:
+          - accepted_values:
+              values: ['paid', 'shipped', 'completed', 'cancelled', 'refunded', 'unknown']
+
+  - name: stg_ecommerce__order_items
+    description: Cleaned order item lines. Grain is one row per order item.
+    columns:
+      - name: order_item_id
+        tests: [not_null, unique]
+      - name: order_id
+        tests: [not_null]
+      - name: product_id
+        tests:
+          - relationships:
+              to: ref('stg_ecommerce__products')
+              field: product_id
+
+  - name: stg_ecommerce__payments
+    description: Cleaned payment transactions. Grain is one row per payment.
+    columns:
+      - name: payment_id
+        tests: [not_null, unique]
+      - name: order_id
+        tests: [not_null]
+      - name: payment_status
+        tests:
+          - accepted_values:
+              values: ['captured', 'voided', 'refunded']
+

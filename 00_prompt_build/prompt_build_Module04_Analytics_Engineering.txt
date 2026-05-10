@@ -1,0 +1,466 @@
+## Prompt 1 — Khởi tạo file + S0 + S1
+
+Đọc các file sau trước khi làm bất cứ điều gì:
+- .claude/CLAUDE.md
+- .claude/OUTPUT_STANDARD.md
+- .claude/SOURCE_POLICY.md
+- master_de_roadmap.html (phần Module 04 và section 3-Level System)
+- module_template.html (lấy TOÀN BỘ CSS variables, font, component patterns)
+- data-engineering-zoomcamp/04-analytics-engineering/ (đọc README + liệt kê toàn bộ files)
+
+Tạo file mới: Module04_Analytics_Engineering.html
+
+File phải có:
+- Toàn bộ HTML boilerplate: <!DOCTYPE>, <head>, CSS inline, fonts Google
+- Copy NGUYÊN XI CSS variables và styles từ module_template.html
+- Hero banner: "Module 04 — Analytics Engineering & dbt", badges (Intermediate→Senior, ~10 ngày, Analytics Engineering)
+- Sidebar với 9 nav items: S0 đến S8 (S0 active mặc định)
+- JavaScript: showModule(), toggleSection(), answerQuiz(), toggleSolution(), switchTab(), toggleCheck(), updateProgress()
+- Phần main content chứa S0 và S1 đầy đủ, các section S2–S8 để placeholder <div id="sX" style="display:none"></div>
+
+NỘI DUNG S0 — Tổng quan & Mục tiêu:
+- Bảng 9 sections với tên + thời gian ước tính
+- Vấn đề thực tế Analytics Engineering giải quyết:
+  "SQL script rải rác không ai biết chạy theo thứ tự nào, không có test, không có docs"
+- Vấn đề thực tế dbt giải quyết:
+  "transformation ad-hoc, không reproducible, không version-controlled, không có lineage"
+- Trước dbt người ta làm gì? (stored procedures, notebook pipelines, manual SQL)
+- Data flow diagram ASCII:
+  Raw Source → [sources.yml] → Staging (view) → Intermediate (table) → Marts (table/incremental) → BI Tool
+- dbt DAG tổng quan:
+  raw.green_tripdata + raw.yellow_tripdata → stg → int_trips_unioned → int_trips → fct_trips → reporting
+- 2 learning paths rõ ràng:
+  Path A: BigQuery + dbt Cloud (cloud_setup.md)
+  Path B: DuckDB + dbt Core local (local_setup.md)
+- Exit criteria: "Bạn đã nắm module này khi..."
+
+NỘI DUNG S1 — Lý thuyết nền:
+
+Phần Analytics Engineering (3 levels):
+- Beginner: Analytics Engineer là gì, khác Data Engineer và Data Analyst thế nào
+- Beginner: ELT vs ETL — tại sao cloud DW thay đổi paradigm, analogy "bếp nhà hàng vs bếp tự nấu"
+- Beginner: Dimensional modeling — Fact table, Dimension table, Star schema — giải thích trực quan
+- Intermediate: Kimball vs Inmon vs Data Vault — trade-offs, khi nào dùng cái nào
+- Intermediate: dbt là gì — transformation workflow, Jinja compilation, materialization types
+- Senior: dbt trong modern data stack — vị trí trong pipeline ingestion→transform→serve
+- Mental model 1 câu: "dbt = git + CI/CD + docs + testing cho SQL transformation"
+- So sánh: dbt Core vs dbt Cloud vs SQLMesh — trade-offs thực tế 2025
+- Info boxes: tip/warn/note/danger đan xen
+- 6 câu quiz scenario-based với explanation đầy đủ
+
+Phần dbt Core Concepts (3 levels):
+- Beginner: Models, Sources, Seeds — mỗi cái là gì, dùng khi nào
+- Beginner: ref() vs source() — tại sao phân biệt quan trọng cho lineage
+- Intermediate: Materializations — view/table/incremental/ephemeral — khi nào chọn cái nào
+- Intermediate: Macros + Jinja — tránh lặp code, cross-database compatibility
+- Senior: Incremental models — unique_key, merge strategy, late-arriving data risk
+- Senior: dbt build vs dbt run — tại sao build là lệnh quan trọng nhất trong production
+- Mental model 1 câu: "dbt model = 1 SELECT query → dbt lo phần còn lại"
+- So sánh: dbt materialization strategies — bảng trade-offs rõ ràng
+- 6 câu quiz scenario-based với explanation đầy đủ
+
+Lưu file. Báo cáo số dòng đã tạo.
+
+
+---
+
+## Prompt 2 — Thêm S2 vào file
+
+Đọc các file sau:
+- data-engineering-zoomcamp/04-analytics-engineering/ (đọc TOÀN BỘ từng file một)
+  Cụ thể phải đọc:
+  * taxi_rides_ny/dbt_project.yml
+  * taxi_rides_ny/packages.yml
+  * taxi_rides_ny/package-lock.yml
+  * taxi_rides_ny/models/staging/sources.yml
+  * taxi_rides_ny/models/staging/stg_green_tripdata.sql
+  * taxi_rides_ny/models/staging/stg_yellow_tripdata.sql
+  * taxi_rides_ny/models/staging/schema.yml
+  * taxi_rides_ny/models/intermediate/int_trips_unioned.sql
+  * taxi_rides_ny/models/intermediate/int_trips.sql
+  * taxi_rides_ny/models/intermediate/schema.yml
+  * taxi_rides_ny/models/marts/dim_zones.sql
+  * taxi_rides_ny/models/marts/dim_vendors.sql
+  * taxi_rides_ny/models/marts/fct_trips.sql
+  * taxi_rides_ny/models/marts/schema.yml
+  * taxi_rides_ny/models/marts/reporting/fct_monthly_zone_revenue.sql
+  * taxi_rides_ny/models/marts/reporting/schema.yml
+  * taxi_rides_ny/macros/get_vendor_data.sql
+  * taxi_rides_ny/macros/get_trip_duration_minutes.sql
+  * taxi_rides_ny/macros/safe_cast.sql
+  * taxi_rides_ny/macros/macros_properties.yml
+  * taxi_rides_ny/seeds/payment_type_lookup.csv
+  * taxi_rides_ny/seeds/taxi_zone_lookup.csv
+  * taxi_rides_ny/seeds/seeds_properties.yml
+
+Thêm nội dung S2 vào Module04_Analytics_Engineering.html.
+Tìm placeholder <div id="s2" style="display:none"></div> và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S2 — Đọc hiểu code trong repo:
+
+Phần 1 — Cấu trúc thư mục:
+- Vẽ tree diagram toàn bộ 04-analytics-engineering/
+- Giải thích mục đích từng folder và file
+- Phân biệt rõ: class_notes/ (học lý thuyết) vs taxi_rides_ny/ (code thực hành)
+
+Phần 2 — dbt_project.yml (phân tích NGUYÊN VĂN từ repo):
+- Trích code thực tế, syntax highlight YAML
+- Giải thích TỪNG block: name/profile, model-paths, vars, models config
+- Tại sao staging dùng view, intermediate/marts dùng table?
+- vars dev_start_date/dev_end_date: mục đích là gì, dùng thế nào trong filter
+- require-dbt-version: tại sao cần pin version range?
+- Điểm yếu: staging models không dùng vars đã định nghĩa (hardcode filter thay vì dùng var())
+
+Phần 3 — sources.yml (phân tích NGUYÊN VĂN từ repo):
+- Trích code thực tế, syntax highlight YAML
+- Giải thích: source declaration, database/schema conditional cho BigQuery vs DuckDB
+- Freshness config: warn_after 24h, error_after 48h — ý nghĩa thực tế
+- env_var('GCP_PROJECT_ID') pattern: tại sao dùng, rủi ro fallback default là gì
+
+Phần 4 — Staging models (phân tích NGUYÊN VĂN từ repo):
+- Trích code stg_green_tripdata.sql và stg_yellow_tripdata.sql, syntax highlight SQL
+- Giải thích: rename/cast/filter pattern của staging layer
+- safe_cast macro: tại sao dùng thay vì CAST thẳng — cross-database compatibility
+- Điểm yếu: hardcode date filter '2019-01-01'/'2019-02-01' thay vì dùng var()
+
+Phần 5 — Intermediate models (phân tích NGUYÊN VĂN từ repo):
+- Trích code int_trips_unioned.sql và int_trips.sql, syntax highlight SQL
+- int_trips_unioned: UNION ALL pattern — tại sao align schema trước khi union
+- int_trips: surrogate key với dbt_utils.generate_surrogate_key — tại sao cần, format là gì
+- Điểm yếu: hardcode trip_type=1 cho yellow, ehail_fee=0 cho yellow
+
+Phần 6 — Marts models (phân tích NGUYÊN VĂN từ repo):
+- Trích code dim_zones.sql, dim_vendors.sql, fct_trips.sql, fct_monthly_zone_revenue.sql
+- fct_trips: INCREMENTAL materialization + merge strategy + unique_key=trip_id — giải thích từng phần
+- Incremental filter: max(pickup_datetime) pattern — tại sao dùng và late-arriving data risk
+- dim_vendors: ref('fct_trips') — tại sao dim phụ thuộc fact? (pattern không điển hình)
+- get_trip_duration_minutes macro: cross-database DATEDIFF compatibility
+- get_vendor_data macro: dictionary mapping trong Jinja — scalability concern
+
+Phần 7 — Macros và Seeds:
+- Trích code 3 macros: get_vendor_data.sql, safe_cast.sql, get_trip_duration_minutes.sql
+- Trích macros_properties.yml và seeds_properties.yml
+- Trích payment_type_lookup.csv (sample rows)
+- Seeds trong git: khi nào phù hợp, khi nào không
+
+Phần 8 — Packages:
+- packages.yml vs package-lock.yml: tương đương package.json vs package-lock.json trong Node
+- dbt_utils: những function hay dùng nhất (generate_surrogate_key, date_spine, pivoting)
+- codegen: dùng để làm gì trong development flow
+
+Phần 9 — DAG Lineage chi tiết:
+- Diagram ASCII đầy đủ: source → stg → int → marts → reporting
+- Annotate materialization type trên từng node
+- File nào ref file nào — lineage graph dạng text đầy đủ
+- Thứ tự chạy đúng: dbt seed → staging → intermediate → marts
+
+Tabs: SQL / YAML / Jinja — dùng switchTab() function
+
+Quiz: 6 câu về data flow và cấu trúc code, có explanation đầy đủ
+
+Lưu file. Báo cáo số dòng hiện tại.
+
+
+---
+
+## Prompt 3 — Thêm S3 vào file
+
+Đọc các file sau:
+  Cụ thể:
+  * setup/local_setup.md
+  * setup/cloud_setup.md
+  * setup/duckdb_troubleshooting.md
+  * class_notes/4_6_1_dbt_commands.md (để lấy commands thực tế)
+- master_de_roadmap.html (phần M04 — execution plan và Break/Debug examples nếu có)
+
+Thêm nội dung S3 vào Module04_Analytics_Engineering.html.
+Tìm placeholder <div id="s3" style="display:none"></div> và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S3 — Thực hành từng bước:
+
+Phần 1 — Setup môi trường (2 paths song song, dùng tab):
+
+Tab A — Local: DuckDB + dbt Core:
+- Cài dbt-duckdb: lệnh chính xác, verify bằng lệnh gì
+- Clone repo và vào đúng thư mục
+- Tạo profiles.yml tại ~/.dbt/: template đầy đủ với memory_limit và threads
+- Chạy ingest script để tạo DuckDB database
+- dbt debug: verify connection thành công
+- Verify thành công: "Bạn biết setup đúng khi thấy..."
+
+Tab B — Cloud: BigQuery + dbt Cloud:
+- Tạo service account + download key JSON — từng bước
+- Setup dbt Cloud project: connection, environment dev
+- Clone repo vào dbt Cloud IDE
+- dbt debug trong IDE
+- Verify thành công: "Bạn biết setup đúng khi thấy..."
+
+Phần 2 — Chạy dbt pipeline đầu tiên:
+- dbt deps: install packages, output mong đợi
+- dbt seed: load CSV seeds, verify table xuất hiện trong DB
+- dbt run --select staging: chỉ chạy staging trước, verify views
+- dbt run: chạy toàn bộ, đọc output thế nào
+- dbt test: chạy test, đọc kết quả pass/fail
+- dbt build: lệnh tổng hợp — tại sao dùng build thay vì run+test riêng
+- dbt docs generate && dbt docs serve: xem lineage graph
+
+Phần 3 — Làm việc với từng layer:
+
+Step-by-step thực hành:
+1. Mở stg_green_tripdata.sql, dbt compile để xem SQL compiled
+2. Chạy dbt run --select stg_green_tripdata --full-refresh
+3. Query trực tiếp vào DB verify data shape
+4. Mở fct_trips.sql, hiểu incremental config
+5. Chạy dbt run --select fct_trips+ để run fct_trips và tất cả downstream
+6. Chạy dbt build --select state:modified+ --state ./prod-artifacts (nếu có artifacts)
+
+Phần 4 — 3 bài tập thực hành (dùng .practice-task component):
+
+Task 1 (Beginner):
+Đề: Thêm column trip_duration_minutes vào stg_green_tripdata.sql
+Gợi ý: Dùng macro get_trip_duration_minutes đã có trong macros/
+Solution: SQL đầy đủ với macro call, thêm test not_null cho column mới
+
+Task 2 (Intermediate):
+Đề: Tạo model mới int_trips_with_zones.sql nối int_trips với dim_zones cho cả pickup và dropoff
+Gợi ý: ref() cả 3 models, LEFT JOIN 2 lần cho dim_zones, alias rõ ràng
+Solution: SQL đầy đủ với ref(), schema.yml entry, materialization phù hợp
+
+Task 3 (Advanced):
+Đề: Thêm snapshot cho dim_vendors để track vendor name changes theo thời gian (SCD Type 2)
+Gợi ý: Tạo file trong snapshots/, dbt snapshot command, updated_at strategy vs check strategy
+Solution: Snapshot YAML config + SQL đầy đủ, giải thích khi nào dùng từng strategy
+
+Phần 5 — "Cố tình phá" section:
+6 kịch bản với hướng dẫn debug từng bước:
+
+1. Xóa package-lock.yml rồi chạy dbt deps → output thay đổi thế nào, rủi ro gì
+2. Đổi materialization staging từ view sang table trong dbt_project.yml → tác động gì đến downstream?
+3. Sửa sai tên source trong sources.yml → lỗi gì, ở bước nào phát hiện
+4. Chạy dbt run --select fct_trips khi int_trips chưa tồn tại → lỗi gì, cách fix
+5. Chạy dbt run 2 lần liên tiếp với fct_trips incremental → data có bị duplicate không, tại sao
+6. Dùng source() thay vì ref() khi ref đến staging model → lỗi gì, tại sao không dùng source() cho inter-model ref
+
+
+---
+
+## Prompt 4 — Thêm S4 + S5 vào file
+
+Đọc các file sau:
+- Module04_Analytics_Engineering.html (đọc toàn bộ)
+- master_de_roadmap.html (phần M04 Senior Questions, Pro-tier patterns, Decisions)
+- data-engineering-zoomcamp/04-analytics-engineering/ (đọc lại code files nếu cần reference)
+
+Thêm nội dung S4 và S5 vào Module04_Analytics_Engineering.html.
+Tìm 2 placeholders và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S4 — Production Thinking:
+
+6 câu hỏi, mỗi câu có answer chi tiết + code example:
+
+1. FAILURE: dbt build chạy 2 tiếng, fail ở fct_trips lúc 4h sáng
+   - Log xem ở đâu? (dbt logs, target/run_results.json)
+   - fct_trips là incremental — data đang ở trạng thái gì? (partial merge)
+   - dbt retry hoạt động thế nào — khi nào đủ, khi nào không
+   - Fix thực tế: dbt build --select fct_trips+ --full-refresh hay tiếp tục?
+   - Bao giờ nên --full-refresh và tác động downstream
+
+2. SCALE: Từ 2 năm data (2019-2020) lên real-time streaming data mỗi ngày
+   - Incremental model hiện tại có đủ không? Bottleneck ở đâu?
+   - max(pickup_datetime) filter: late-arriving data problem — ví dụ cụ thể
+   - Fix: lookback window strategy (last N days reprocessing)
+   - Khi nào cần chuyển từ DuckDB sang BigQuery/Snowflake
+   - Code example: incremental với lookback window
+
+3. IDEMPOTENCY: Chạy dbt seed 2 lần → seeds có bị duplicate không
+   - dbt seed: --full-refresh mặc định hay không?
+   - Staging views: idempotent? Intermediate tables: idempotent?
+   - fct_trips incremental: idempotent với unique_key + merge?
+   - Thế nào là "truly idempotent" dbt pipeline
+   - Code example: test idempotency bằng row count check before/after
+
+4. DATA QUALITY: Làm sao biết data đúng sau khi pipeline chạy
+   - Generic tests trong schema.yml: unique, not_null, accepted_values — đủ chưa
+   - Những column quan trọng chưa có test (pickup_location_id, trip_distance, fare_amount)
+   - Source freshness: dbt source freshness — setup và interpret
+   - Custom singular test: viết test kiểm tra row count reasonable
+   - Code example: singular test file trong tests/
+
+5. COST & PERFORMANCE: BigQuery production — tránh query expensive
+   - Staging là view → mỗi downstream query phải scan lại source
+   - Khi nào đổi staging từ view sang table?
+   - fct_trips incremental: partition + cluster column nên chọn gì
+   - dbt build --select state:modified+ — tiết kiệm compute thế nào
+   - Code example: partition config trong fct_trips BigQuery
+
+6. SECURITY & GOVERNANCE: Những rủi ro trong setup hiện tại
+   - env_var('GCP_PROJECT_ID') default fallback 'please-add-your-gcp-project-id-here' → rủi ro runtime
+   - Service account key JSON trong cloud_setup.md → commit risk, key rotation policy
+   - Seeds trong git: data classification — có sensitive data không? (taxi_zone_lookup, payment_type_lookup)
+   - dbt Cloud: environment separation dev/prod — credential isolation
+   - Không có owner metadata trong schema.yml → ai chịu trách nhiệm model bị broken?
+   - Code example: meta.owner pattern trong schema.yml
+
+NỘI DUNG S5 — Kiến thức nâng cao:
+
+Phần 1 — dbt Pro patterns:
+- dbt build vs dbt run+test: tại sao build là gold standard, ordering đảm bảo gì
+- Slim CI: state:modified+ + defer to prod artifacts — workflow đầy đủ
+  * dbt build --select state:modified+ --state ./prod-artifacts
+  * Tại sao không build toàn bộ mỗi PR
+- dbt Mesh (giới thiệu): multi-project dependencies khi team lớn
+- Selector syntax nâng cao: tag:, path:, result:, +model+
+- Code example: CI/CD workflow YAML (GitHub Actions) cho dbt
+
+Phần 2 — Data Modeling Pro patterns:
+- SCD Type 2 với dbt snapshots: khi nào cần, config đầy đủ
+- Surrogate key best practices: composite key selection, stability over time
+- Incremental strategies: append vs merge vs delete+insert — trade-offs bảng rõ ràng
+- Fact table grain: fct_trips grain là gì, additive vs semi-additive metrics
+- Late-arriving dimension: dim_vendors ref fct_trips — tại sao antipattern, cách fix đúng
+
+Phần 3 — Testing Pro patterns:
+- Generic vs Singular vs Custom Generic tests — bảng khi nào dùng cái nào
+- Unit tests (dbt v1.8+): mock input, test transformation logic độc lập
+- dbt-expectations package: distribution tests, value range tests
+- Model contracts: enforced: true — fail build khi schema drift
+- Code example: unit test cho macro safe_cast
+
+Phần 4 — Bảng Trade-offs (khi DÙNG vs KHÔNG DÙNG):
+- View vs Table vs Incremental vs Ephemeral — matrix đầy đủ
+- Seeds vs External source tables vs dbt packages
+- dbt Core vs dbt Cloud (2025 context, Fusion engine)
+- DuckDB (local dev) vs BigQuery (production) — migration triggers
+
+Phần 5 — Khi nào outgrow setup hiện tại:
+- Dấu hiệu cần chuyển từ DuckDB sang production DW
+- Dấu hiệu cần chuyển từ dbt single-project sang dbt Mesh
+- Dấu hiệu cần thêm data quality framework ngoài dbt test
+- Dấu hiệu cần orchestrator (Airflow/Dagster) thay vì chạy dbt thủ công
+
+Lưu file. Báo cáo số dòng hiện tại.
+
+
+---
+
+## Prompt 5 — Thêm S6 + S7 + S8, hoàn thiện file
+
+Đọc các file sau:
+- Module04_Analytics_Engineering.html (đọc toàn bộ)
+- master_de_roadmap.html (phần Incident Simulation, Interview Mapping, DoD, Final Checklist)
+
+Thêm nội dung S6, S7, S8 vào Module04_Analytics_Engineering.html.
+Tìm 3 placeholders và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S6 — Lỗi thường gặp:
+
+Bảng 12 lỗi, dùng class="data-table":
+Cột: Lỗi (error message thực tế) | Nguyên nhân | Cách fix | Cách phòng tránh
+
+12 lỗi phải bao gồm:
+1. "Database Error: relation does not exist" — ref() đến model chưa chạy
+2. "Could not find relation" — source không tồn tại hoặc schema sai trong sources.yml
+3. "Compilation Error: Expected NodeType.Model" — source() dùng sai chỗ (ref inter-model)
+4. "Error: node was not found" — tên model trong --select bị typo
+5. "Duplicate rows in unique test" — fct_trips có duplicate trip_id sau incremental
+6. "Runtime Error: out of memory" — DuckDB OOM khi build full dataset
+7. "Error acquiring state lock" — 2 dbt processes chạy cùng lúc
+8. "Package not found" — dbt deps fail, registry unreachable hoặc version mismatch
+9. "env_var GCP_PROJECT_ID not set" — biến môi trường thiếu khi chạy BigQuery
+10. "full-refresh required" — schema change không compatible với incremental existing table
+11. "Source 'raw.green_tripdata' is not fresh" — source freshness check fail
+12. "compilation error in macro" — Jinja syntax error trong custom macro
+
+Sau bảng: Debugging checklist theo thứ tự ưu tiên (numbered list)
+Sau checklist: Nhắc learner mở Logbook ghi lại lỗi đã gặp
+
+NỘI DUNG S7 — Interview Prep:
+
+12 câu hỏi, dùng collapsible pattern:
+
+Junior (4 câu — badge xanh lam):
+1. dbt model là gì? Khác stored procedure thế nào?
+2. ref() và source() khác nhau thế nào, khi nào dùng cái nào?
+3. Tại sao staging layer nên dùng view thay vì table?
+4. dbt test chạy lúc nào trong pipeline, fail test có stop pipeline không?
+
+Mid (4 câu — badge vàng):
+5. Incremental model hoạt động thế nào? unique_key dùng để làm gì?
+6. Tại sao cần surrogate key thay vì dùng natural key từ source?
+7. dbt build khác dbt run thế nào? Khi nào dùng build?
+8. Làm sao đảm bảo dbt project chạy được ở cả DuckDB và BigQuery?
+
+Senior (4 câu — badge đỏ):
+9. Pipeline incremental fail lúc 3h sáng sau khi merge 80% data — xử lý thế nào mà không mất data?
+10. Team 10 AE cùng dbt project, CI/CD setup thế nào để tránh conflict và tốn kém compute?
+11. Thiết kế data model cho taxi trips support cả real-time dashboard lẫn monthly reporting — trade-offs?
+12. dbt project có 200 models, test coverage 30% — ưu tiên viết test theo thứ tự nào, tại sao?
+
+Mỗi câu: click expand → gợi ý trả lời chi tiết + "Red flag: đừng nói..."
+
+NỘI DUNG S8 — Checklist & Tổng kết:
+
+Progress bar (tự update khi tick):
+ID: checklist-progress-fill và checklist-progress-text
+
+Checklist 18 items chia 3 level:
+
+Beginner (6 items):
+- Giải thích được ELT vs ETL và tại sao dbt phù hợp với ELT
+- Setup được local DuckDB hoặc BigQuery + dbt Cloud không cần hỏi
+- Chạy được dbt deps, dbt seed, dbt run, dbt test không lỗi
+- Đọc hiểu được lineage graph trong dbt docs
+- Biết phân biệt ref() vs source() và dùng đúng trong model
+- Biết dbt_project.yml cấu hình materialization mặc định thế nào
+
+Intermediate (6 items):
+- Tự viết staging model từ đầu: rename, cast, filter, macro call
+- Tự viết schema.yml với tests: unique, not_null, accepted_values, relationships
+- Hiểu incremental model: unique_key, merge strategy, --full-refresh khi nào
+- Debug được lỗi ref() và source() không cần nhìn docs
+- Dùng được dbt build --select với selector syntax để chạy subset
+- Viết được macro đơn giản với Jinja và khai báo trong macros_properties.yml
+
+Senior (6 items):
+- Thiết kế được 3-layer architecture (staging/intermediate/marts) cho domain mới
+- Implement được incremental model với lookback window tránh late-arriving data
+- Viết được unit test cho macro và singular test cho business rule
+- Cấu hình được slim CI workflow (state:modified+ + defer to prod)
+- Giải thích được trade-offs materialization cho từng layer, justify cho người không biết dbt
+- Trả lời được 4 câu Senior interview không cần nhìn tài liệu
+
+Summary grid (5 điểm chốt):
+1. dbt = version control + CI/CD + docs + lineage cho SQL transformation
+2. 3-layer architecture (staging → intermediate → marts) = nguyên tắc nền tảng
+3. Incremental + unique_key = idempotency cho fact tables lớn
+4. dbt build + slim CI = gold standard cho production pipeline
+5. AWS/Snowflake mapping — kiến thức transfer được:
+   BigQuery → Redshift/Snowflake, DuckDB → SQLite/local dev,
+   dbt Core/Cloud concept giống nhau 100% bất kể warehouse
+
+Definition of Done (từ master_de_roadmap.html):
+5 checkboxes DoD — tick đủ mới được sang Module 05
+
+Preview Module 05:
+"Module tiếp theo: Batch Processing với Spark
+Cần chuẩn bị: hiểu được data model từ module này, làm quen với distributed computing concepts"
+Link: <a href="Module05_Batch_Processing.html">→ Module 05: Batch Processing</a>
+
+SAU KHI THÊM XONG 3 SECTIONS:
+Kiểm tra toàn bộ file:
+- Tất cả JavaScript functions hoạt động đúng không
+- Sidebar navigation showModule() đúng index chưa
+- Progress bar updateProgress() được gọi đúng chưa
+- Không còn placeholder nào chưa điền
+- File mở được trên browser không lỗi console
+- Tất cả code blocks có syntax highlight đúng ngôn ngữ (SQL, YAML, Jinja)
+
+Lưu file. Báo cáo số dòng cuối cùng và tóm tắt những gì đã build.
+
+
+---
+
+Cách chạy: Mở terminal → cd DE-Learning → claude → paste Prompt 1 → chờ xong → paste Prompt 2 → tiếp tục đến Prompt 5.
+
+Sau mỗi lần chạy nên mở file trên browser kiểm tra section vừa thêm trước khi chạy prompt tiếp theo.
+Với S2 đặc biệt: verify lineage diagram ASCII khớp với DAG thực tế trong repo.

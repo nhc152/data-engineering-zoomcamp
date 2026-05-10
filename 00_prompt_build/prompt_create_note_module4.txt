@@ -1,0 +1,178 @@
+Đọc TOÀN BỘ các file sau trong data-engineering-zoomcamp/04-analytics-engineering/:
+
+CLASS NOTES:
+- class_notes/4_1_1_analytics_engineering_basics.md
+- class_notes/4_1_2_what_is_dbt.md
+- class_notes/4_2_1_dbt_core_vs_dbt_cloud.md
+- class_notes/4_3_1_dbt_project_structure.md
+- class_notes/4_3_2_dbt_sources.md
+- class_notes/4_4_1_dbt_models.md
+- class_notes/4_4_2_dbt_seeds_and_macros.md
+- class_notes/4_5_1_documentation.md
+- class_notes/4_5_2_dbt_tests.md
+- class_notes/4_5_3_dbt_packages.md
+- class_notes/4_6_1_dbt_commands.md
+
+SETUP:
+- setup/cloud_setup.md
+- setup/local_setup.md
+- setup/duckdb_troubleshooting.md
+
+REFRESHERS:
+- refreshers/SQL.md
+
+DBT PROJECT - taxi_rides_ny:
+MACROS:
+- taxi_rides_ny/macros/get_vendor_data.sql
+- taxi_rides_ny/macros/get_trip_duration_minutes.sql
+- taxi_rides_ny/macros/safe_cast.sql
+- taxi_rides_ny/macros/macros_properties.yml
+
+MODELS - STAGING:
+- taxi_rides_ny/models/staging/stg_green_tripdata.sql
+- taxi_rides_ny/models/staging/stg_yellow_tripdata.sql
+- taxi_rides_ny/models/staging/sources.yml
+- taxi_rides_ny/models/staging/schema.yml
+
+MODELS - INTERMEDIATE:
+- taxi_rides_ny/models/intermediate/int_trips_unioned.sql
+- taxi_rides_ny/models/intermediate/int_trips.sql
+- taxi_rides_ny/models/intermediate/schema.yml
+
+MODELS - MARTS:
+- taxi_rides_ny/models/marts/dim_vendors.sql
+- taxi_rides_ny/models/marts/dim_zones.sql
+- taxi_rides_ny/models/marts/fct_trips.sql
+- taxi_rides_ny/models/marts/schema.yml
+- taxi_rides_ny/models/marts/reporting/fct_monthly_zone_revenue.sql
+- taxi_rides_ny/models/marts/reporting/schema.yml
+
+SEEDS:
+- taxi_rides_ny/seeds/payment_type_lookup.csv
+- taxi_rides_ny/seeds/taxi_zone_lookup.csv
+- taxi_rides_ny/seeds/seeds_properties.yml
+
+PROJECT CONFIG:
+- taxi_rides_ny/dbt_project.yml
+- taxi_rides_ny/packages.yml
+- taxi_rides_ny/package-lock.yml
+
+ROOT:
+- README.md
+
+Sau khi đọc xong TOÀN BỘ, tạo file repo_notes_M04.md:
+
+═══════════════════════════════
+1. CẤU TRÚC THƯ MỤC
+═══════════════════════════════
+Tree đầy đủ + mục đích từng folder và file
+
+═══════════════════════════════
+2. NỘI DUNG CÁC FILE .MD
+═══════════════════════════════
+Tóm tắt từng file .md theo format:
+[Tên file]
+- Dạy về: [topic]
+- Concepts chính: [list]
+- Commands được dùng: [list commands thực tế]
+- Lưu ý đặc biệt: [nếu có]
+
+═══════════════════════════════
+3. PHÂN TÍCH CODE FILES
+═══════════════════════════════
+Với mỗi file code, ghi rõ:
+
+[dbt_project.yml]
+- Project name, version, profile
+- Model configs: materialization mặc định theo layer
+- Vars được định nghĩa
+- Copy nguyên văn toàn bộ file
+
+[packages.yml / package-lock.yml]
+- Packages được dùng, version
+- Copy nguyên văn toàn bộ file
+
+[sources.yml]
+- Sources được khai báo: database, schema, tables
+- Freshness config nếu có
+- Copy nguyên văn toàn bộ file
+
+[schema.yml - từng layer]
+- Models được document: tên, description
+- Tests được định nghĩa: loại test, column target
+- Copy nguyên văn toàn bộ file (từng file riêng)
+
+[macros_properties.yml]
+- Macros được khai báo, arguments
+- Copy nguyên văn toàn bộ file
+
+[seeds_properties.yml]
+- Seeds được khai báo, column types
+- Copy nguyên văn toàn bộ file
+
+[Từng file .sql trong macros/]
+- Macro name, arguments nhận vào
+- Logic chính
+- Copy nguyên văn toàn bộ file
+
+[Từng file .sql trong models/staging/]
+- Source được ref đến
+- Transformations thực hiện
+- Materialization
+- Copy nguyên văn toàn bộ file
+
+[Từng file .sql trong models/intermediate/]
+- Models được ref đến (staging hay intermediate khác)
+- Transformations thực hiện
+- Materialization
+- Copy nguyên văn toàn bộ file
+
+[Từng file .sql trong models/marts/]
+- Models được ref đến
+- Business logic chính
+- Materialization
+- Copy nguyên văn toàn bộ file
+
+[Seeds .csv]
+- Columns và sample data
+- Mục đích dùng trong pipeline
+
+═══════════════════════════════
+4. DATA FLOW THỰC TẾ
+═══════════════════════════════
+- DAG đầy đủ: source → staging → intermediate → marts → reporting
+- File nào ref đến file nào (lineage graph dạng text)
+- Thứ tự chạy đúng theo dependency
+- Materialization strategy theo từng layer (view/table/incremental)
+
+═══════════════════════════════
+5. ĐIỂM YẾU & THIẾU SÓT
+═══════════════════════════════
+- Test coverage gaps (columns không có test, models không có schema.yml)
+- Hardcode issues (values, filter dates, project IDs...)
+- Incremental model issues nếu có
+- Macro design issues
+- Seeds dùng trong production: rủi ro gì
+- Documentation gaps
+- Những gì repo dạy nhưng không đủ cho Senior DE/Analytics Engineer
+
+═══════════════════════════════
+6. KIẾN THỨC NGOÀI REPO
+═══════════════════════════════
+Dựa trên những gì repo đang cover, liệt kê những concept
+Senior Analytics Engineer phải biết nhưng repo KHÔNG dạy:
+- dbt Core/Cloud: [list cụ thể]
+- Data Modeling: [list cụ thể]
+- Testing & Data Quality: [list cụ thể]
+- Performance & Optimization: [list cụ thể]
+- CI/CD cho dbt project: [list cụ thể]
+- Orchestration & Scheduling: [list cụ thể]
+
+Lưu file: repo_notes_M04.md
+
+QUAN TRỌNG:
+- Copy nguyên văn toàn bộ nội dung các file code và config
+- Không tóm tắt bỏ qua bất kỳ dòng code nào
+- Không bỏ qua file nào trong danh sách trên
+- Với các file schema.yml và sources.yml: copy từng file riêng biệt, ghi rõ path
+- Mục tiêu: đọc file notes này là hiểu hoàn toàn repo mà không cần mở repo

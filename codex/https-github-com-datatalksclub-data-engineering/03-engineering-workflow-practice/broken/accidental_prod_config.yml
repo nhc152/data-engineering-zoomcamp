@@ -1,0 +1,11 @@
+environment: prod
+database:
+  host: prod-db.internal
+  schema: marts
+pipeline:
+  write_mode: overwrite
+  backfill_start_date: 2024-01-01
+  backfill_end_date: 2026-05-01
+quality:
+  fail_on_error: false
+

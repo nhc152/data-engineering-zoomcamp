@@ -1,0 +1,35 @@
+id: fixed_dependency_flow
+namespace: de.zoomcamp.orchestration
+description: Fixed dependency ordering. Mart validation runs after mart build.
+
+inputs:
+  - id: run_date
+    type: STRING
+    defaults: "2026-05-01"
+
+tasks:
+  - id: extract_orders
+    type: io.kestra.plugin.scripts.python.Commands
+    commands:
+      - python /app/scripts/extract_orders.py --run-date {{ inputs.run_date }}
+
+  - id: load_raw_orders
+    type: io.kestra.plugin.scripts.python.Commands
+    commands:
+      - python /app/scripts/load_raw_orders.py --run-date {{ inputs.run_date }}
+
+  - id: validate_raw_orders
+    type: io.kestra.plugin.scripts.python.Commands
+    commands:
+      - python /app/scripts/validate_raw_orders.py --run-date {{ inputs.run_date }}
+
+  - id: build_marts
+    type: io.kestra.plugin.scripts.python.Commands
+    commands:
+      - python /app/scripts/build_marts.py --run-date {{ inputs.run_date }}
+
+  - id: validate_marts
+    type: io.kestra.plugin.scripts.python.Commands
+    commands:
+      - python /app/scripts/validate_marts.py --run-date {{ inputs.run_date }}
+

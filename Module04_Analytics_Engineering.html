@@ -1,0 +1,2495 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 04 — Analytics Engineering & dbt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+    --accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;
+    --text:#e6edf3;--text-muted:#8b949e;--code-bg:#0d1117;--highlight:#388bfd26;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter','Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+  .hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 40%,#1a2a1e 100%);border-bottom:2px solid var(--accent4);padding:40px 24px 30px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#6e40c922,transparent 70%);pointer-events:none}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--accent4);letter-spacing:-0.5px}
+  .hero p{color:var(--text-muted);margin-top:8px;font-size:.95rem}
+  .badge-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;border:1px solid}
+  .badge-blue{color:var(--accent);border-color:var(--accent);background:#1f6feb1a}
+  .badge-green{color:var(--accent2);border-color:var(--accent2);background:#2ea04326}
+  .badge-orange{color:var(--accent5);border-color:var(--accent5);background:#d2940026}
+  .badge-purple{color:var(--accent4);border-color:var(--accent4);background:#6e40c926}
+  .container{display:flex;min-height:calc(100vh - 160px)}
+  .sidebar{width:290px;min-width:290px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:0 16px 12px}
+  .level-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 16px 4px;color:var(--accent4)}
+  .nav-item{display:block;padding:7px 16px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-left:3px solid transparent;transition:all .15s}
+  .nav-item:hover{color:var(--text);background:var(--surface2)}
+  .nav-item.active{color:var(--accent4);border-left-color:var(--accent4);background:#6e40c915;font-weight:600}
+  .nav-number{display:inline-block;width:44px;font-size:.7rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .main{flex:1;padding:32px 40px;max-width:980px}
+  .module{display:none}
+  .module.active{display:block}
+  .module-header{border:1px solid var(--border);border-radius:12px;padding:24px 28px;background:var(--surface);margin-bottom:24px;position:relative;overflow:hidden}
+  .module-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent4)}
+  .module-tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent4);margin-bottom:8px}
+  .module-title{font-size:1.6rem;font-weight:800;margin-bottom:8px}
+  .module-subtitle{color:var(--text-muted);font-size:.9rem}
+  .section{margin-bottom:28px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .section-header{padding:14px 20px;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--surface2);border-bottom:1px solid var(--border);user-select:none}
+  .section-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .icon-purpose{background:#1f6feb33}
+  .icon-detail{background:#2ea04326}
+  .icon-quiz{background:#d2940026}
+  .icon-summary{background:#6e40c926}
+  .icon-practice{background:#f7816626}
+  .section-content{padding:20px;background:var(--surface)}
+  .section-toggle{margin-left:auto;color:var(--text-muted);font-size:12px}
+  h3{font-size:1rem;font-weight:700;color:var(--accent4);margin:18px 0 10px}
+  h3:first-child{margin-top:0}
+  h3.blue{color:var(--accent)}
+  h3.green{color:var(--accent2)}
+  h3.orange{color:var(--accent5)}
+  h3.red{color:var(--accent3)}
+  p{margin-bottom:12px;color:var(--text);font-size:.88rem}
+  ul,ol{padding-left:20px;margin-bottom:12px}
+  li{font-size:.88rem;margin-bottom:5px}
+  strong{color:var(--text)}
+  .cmd-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .cmd-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .cmd-body{padding:14px}
+  pre{font-family:'JetBrains Mono','Courier New','Consolas',monospace;font-size:.82rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--text)}
+  .kw{color:#ff7b72}.kw2{color:var(--accent)}.str{color:var(--accent5)}.fn{color:var(--accent4)}.num{color:#79c0ff}.comment{color:var(--text-muted)}
+  .db-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.68rem;font-weight:700;letter-spacing:.5px;margin-bottom:6px}
+  .db-pg{background:#4169e122;color:#4d9de0;border:1px solid #4169e155}
+  .db-oracle{background:#cc000022;color:#f97316;border:1px solid #cc000055}
+  code{font-family:'JetBrains Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:.82rem;color:var(--accent4)}
+  .quiz-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
+  .quiz-q{font-weight:600;font-size:.88rem;margin-bottom:10px}
+  .quiz-q::before{content:'Q';display:inline-block;width:22px;height:22px;background:var(--accent4);color:#000;border-radius:50%;font-size:.7rem;font-weight:800;text-align:center;line-height:22px;margin-right:8px}
+  .quiz-options{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .quiz-opt{padding:8px 12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.84rem;transition:all .15s;background:var(--bg)}
+  .quiz-opt:hover{border-color:var(--accent4);color:var(--accent4)}
+  .quiz-opt.correct{border-color:var(--accent2);color:var(--accent2);background:#2ea04310}
+  .quiz-opt.wrong{border-color:var(--accent3);color:var(--accent3);background:#f7816610}
+  .quiz-explain{font-size:.82rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px;margin-top:8px;display:none}
+  .quiz-explain.show{display:block}
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .summary-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:.82rem}
+  .summary-item strong{color:var(--accent4);display:block;margin-bottom:4px}
+  .practice-task{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
+  .practice-task-header{padding:12px 16px;background:#6e40c915;border-bottom:1px solid var(--border);font-weight:700;font-size:.85rem;color:var(--accent4)}
+  .practice-task-body{padding:16px}
+  .solution-toggle{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:.8rem;cursor:pointer;color:var(--accent2);margin-top:10px;transition:all .15s}
+  .solution-toggle:hover{background:var(--surface2)}
+  .solution-box{margin-top:10px;display:none;border-top:1px solid var(--border);padding-top:12px}
+  .solution-box.show{display:block}
+  .info-box{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:.84rem;border:1px solid;display:flex;gap:10px}
+  .info-box.tip{border-color:var(--accent2);background:#2ea04310;color:var(--accent2)}
+  .info-box.warn{border-color:var(--accent5);background:#d2940015;color:var(--accent5)}
+  .info-box.note{border-color:var(--accent4);background:#6e40c915;color:var(--accent4)}
+  .info-box.danger{border-color:var(--accent3);background:#f7816610;color:var(--accent3)}
+  .info-box span{color:var(--text)}
+  .progress-bar{background:var(--surface2);border-radius:4px;height:4px;margin:16px 0;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent4),var(--accent2));border-radius:4px;width:0;transition:width .2s}
+  .nav-buttons{display:flex;gap:12px;margin-top:32px;justify-content:space-between}
+  .nav-btn{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:6px}
+  .nav-btn:hover{border-color:var(--accent4);color:var(--accent4)}
+  .nav-btn.primary{background:var(--accent4);color:#000;border-color:var(--accent4)}
+  .nav-btn.primary:hover{background:#e2c0ff}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.83rem}
+  th{background:var(--surface2);padding:8px 12px;text-align:left;border:1px solid var(--border);color:var(--accent4)}
+  td{padding:8px 12px;border:1px solid var(--border)}
+  tr:nth-child(even) td{background:#ffffff05}
+  .checklist{list-style:none;padding:0}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:.88rem;border-bottom:1px solid var(--border)}
+  .checklist li:last-child{border-bottom:none}
+  .checklist li::before{content:'□';color:var(--accent4);font-size:1.1rem;flex-shrink:0;margin-top:-1px}
+  .test-question{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px}
+  .test-question.correct{border-color:var(--accent2);background:#2ea04312}
+  .test-question.wrong{border-color:var(--accent3);background:#f7816612}
+  .test-question.unanswered{border-color:var(--accent5);background:#d2940015}
+  .test-question-title{font-size:.86rem;font-weight:600;margin-bottom:8px}
+  .test-options{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+  .test-option{display:flex;align-items:center;gap:6px;font-size:.83rem;color:var(--text)}
+  .test-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .test-result{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)}
+  .score-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .score-chip{border:1px solid var(--border);border-radius:14px;padding:4px 10px;font-size:.78rem;color:var(--text);background:var(--bg)}
+  .score-chip.good{border-color:var(--accent2);color:var(--accent2)}
+  .score-chip.warn{border-color:var(--accent5);color:var(--accent5)}
+  .score-chip.bad{border-color:var(--accent3);color:var(--accent3)}
+  .mistake-list{margin-top:8px;padding-left:18px}
+  .tab-group{display:flex;gap:0;margin-bottom:0;border-bottom:1px solid var(--border)}
+  .tab{padding:8px 18px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab.active{color:var(--accent4);border-bottom-color:var(--accent4);font-weight:600}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  .schema-box{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin:14px 0;overflow-x:auto}
+  .schema-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+  .schema-table{border:1px solid var(--border);border-radius:8px;min-width:160px;overflow:hidden}
+  .schema-table-header{padding:8px 12px;font-size:.75rem;font-weight:700;text-align:center}
+  .schema-table-header.fact{background:#1f6feb33;color:var(--accent)}
+  .schema-table-header.dim{background:#6e40c926;color:var(--accent4)}
+  .schema-col{padding:5px 12px;font-size:.73rem;border-top:1px solid var(--border);display:flex;gap:6px}
+  .schema-col .pk{color:var(--accent5);font-weight:700;font-size:.65rem}
+  .schema-col .fk{color:var(--accent3);font-weight:700;font-size:.65rem}
+  .schema-col .col{color:var(--text-muted)}
+  .schema-arrow{align-self:center;color:var(--text-muted);font-size:1.4rem;padding:0 2px}
+  .mental-model{border-left:4px solid var(--accent);background:#1f6feb1a;padding:12px 14px;border-radius:6px;margin:12px 0;font-size:.88rem}
+  .checklist-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .check-box{width:16px;height:16px;border:1px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:.25rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  .check-box.checked{background:var(--accent2);border-color:var(--accent2)}
+  .check-box.checked::after{content:'✓';font-size:10px;color:#000;font-weight:600}
+  .progress-text{font-size:.8rem;color:var(--text-muted);margin-bottom:8px}
+  @media(max-width:768px){.sidebar{display:none}.main{padding:16px}.summary-grid{grid-template-columns:1fr}.test-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Module 04 — Analytics Engineering & dbt</h1>
+  <p>Biến SQL rời rạc thành transformation system có lineage, test, contract và vận hành production-ready.</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">Intermediate → Senior</span>
+    <span class="badge badge-green">~10 ngày</span>
+    <span class="badge badge-blue">Analytics Engineering</span>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="sidebar-title">Module Navigation</div>
+    <div class="level-label">MODULE 04 · DBT & ANALYTICS</div>
+    <div class="nav-item active" onclick="showModule(0,this)"><span class="nav-number">S0</span>Tổng quan & Mục tiêu</div>
+    <div class="nav-item" onclick="showModule(1,this)"><span class="nav-number">S1</span>Lý thuyết nền</div>
+    <div class="nav-item" onclick="showModule(2,this)"><span class="nav-number">S2</span>Đọc hiểu code repo</div>
+    <div class="nav-item" onclick="showModule(3,this)"><span class="nav-number">S3</span>Thực hành từng bước</div>
+    <div class="nav-item" onclick="showModule(4,this)"><span class="nav-number">S4</span>Production Readiness</div>
+    <div class="nav-item" onclick="showModule(5,this)"><span class="nav-number">S5</span>Kiến thức nâng cao</div>
+    <div class="nav-item" onclick="showModule(6,this)"><span class="nav-number">S6</span>Lỗi thường gặp</div>
+    <div class="nav-item" onclick="showModule(7,this)"><span class="nav-number">S7</span>Interview Prep</div>
+    <div class="nav-item" onclick="showModule(8,this)"><span class="nav-number">S8</span>Checklist & Tổng kết</div>
+  </nav>
+
+  <main class="main">
+
+    <div class="module active" id="s0">
+      <div class="module-header">
+        <div class="module-tag">S0 · Orientation</div>
+        <div class="module-title">Tổng quan & Mục tiêu Module 04</div>
+        <div class="module-subtitle">Từ SQL ad-hoc sang hệ thống transform có cấu trúc: reproducible, testable, documented, production-safe.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🧭</span>
+          Roadmap 9 sections của module
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Section</th><th>Tên section</th><th>Thời gian ước tính</th></tr></thead>
+            <tbody>
+              <tr><td>S0</td><td>Tổng quan & Mục tiêu</td><td>30–45 phút</td></tr>
+              <tr><td>S1</td><td>Lý thuyết nền</td><td>3–4 giờ</td></tr>
+              <tr><td>S2</td><td>Đọc hiểu code repo</td><td>2–3 giờ</td></tr>
+              <tr><td>S3</td><td>Thực hành từng bước</td><td>3–4 ngày</td></tr>
+              <tr><td>S4</td><td>Production Readiness</td><td>2–3 giờ</td></tr>
+              <tr><td>S5</td><td>Kiến thức nâng cao</td><td>2–3 giờ</td></tr>
+              <tr><td>S6</td><td>Lỗi thường gặp</td><td>2 giờ</td></tr>
+              <tr><td>S7</td><td>Interview Prep</td><td>2–3 giờ</td></tr>
+              <tr><td>S8</td><td>Checklist & Tổng kết</td><td>60 phút</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">🎯</span>
+          Analytics Engineering và dbt giải quyết vấn đề gì?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Vấn đề Analytics Engineering giải quyết</h3>
+          <p><strong>"SQL script rải rác không ai biết chạy theo thứ tự nào, không có test, không có docs".</strong></p>
+          <p>Khi team lớn dần, mỗi analyst/developer tạo một batch SQL riêng, chạy thủ công ở nhiều nơi. Kết quả là cùng một metric nhưng mỗi dashboard cho một con số khác nhau vì logic không được quản trị tập trung.</p>
+
+          <h3 class="green">Vấn đề dbt giải quyết</h3>
+          <p><strong>"transformation ad-hoc, không reproducible, không version-controlled, không có lineage".</strong></p>
+          <p>dbt đưa transformation vào cùng quy trình engineering: code review, dependency graph, testing, docs, CI/CD. Bạn không chỉ "chạy SQL", bạn xây data product có vòng đời rõ ràng.</p>
+
+          <div class="info-box danger">🔥 <span><strong>Nguy hiểm:</strong> nếu không có lineage và test, sai logic ở staging có thể âm thầm đi tới mart/reporting nhiều tuần trước khi business phát hiện.</span></div>
+
+          <h3 class="orange">Trước dbt, người ta làm gì?</h3>
+          <ul>
+            <li><strong>Stored procedures:</strong> gom logic trong warehouse nhưng khó review/version hóa theo chuẩn software.</li>
+            <li><strong>Notebook pipelines:</strong> nhanh để thử nghiệm nhưng dễ drift môi trường, khó tái lập tuyệt đối.</li>
+            <li><strong>Manual SQL:</strong> copy/paste query theo checklist hoặc cron script rời rạc, phụ thuộc con người.</li>
+          </ul>
+          <div class="info-box warn">⚠️ <span><strong>Cảnh báo:</strong> các cách cũ vẫn chạy được ở quy mô nhỏ, nhưng thường vỡ khi số model và số người cùng chạm vào data tăng nhanh.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🔁</span>
+          Data flow & dbt DAG tổng quan
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3>Data flow diagram (ASCII)</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>module04_flow.txt</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">Raw Source</span>
+    │
+    ▼
+<span class="kw2">[sources.yml]</span>
+    │
+    ▼
+<span class="kw2">Staging (view)</span>
+    │
+    ▼
+<span class="kw2">Intermediate (table)</span>
+    │
+    ▼
+<span class="kw2">Marts (table/incremental)</span>
+    │
+    ▼
+<span class="kw2">BI Tool</span></pre>
+            </div>
+          </div>
+
+          <h3>dbt DAG từ repo taxi_rides_ny</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>module04_dag.txt</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">raw.green_tripdata</span> + <span class="kw2">raw.yellow_tripdata</span>
+                    │
+                    ▼
+          <span class="kw2">stg_green_tripdata</span> + <span class="kw2">stg_yellow_tripdata</span>
+                    │
+                    ▼
+               <span class="kw2">int_trips_unioned</span>
+                    │
+                    ▼
+                   <span class="kw2">int_trips</span>
+                    │
+                    ▼
+                   <span class="kw2">fct_trips</span>
+                    │
+                    ▼
+      <span class="kw2">reporting.fct_monthly_zone_revenue</span></pre>
+            </div>
+          </div>
+          <div class="info-box note">📌 <span><strong>Lưu ý:</strong> cấu hình trong <code>dbt_project.yml</code> của repo đang phân tầng rõ: staging = <code>view</code>, intermediate = <code>table</code>, marts = <code>table</code>, riêng <code>fct_trips</code> chạy <code>incremental + merge</code>.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🛣️</span>
+          2 learning paths trong Module 04
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Path</th><th>Stack</th><th>Khi nào chọn</th><th>Reference</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Path A</strong></td>
+                <td>BigQuery + dbt Cloud</td>
+                <td>Bạn đã xong Module 03 và muốn mô phỏng environment collaboration/scheduler của cloud team.</td>
+                <td><code>04-analytics-engineering/setup/cloud_setup.md</code></td>
+              </tr>
+              <tr>
+                <td><strong>Path B</strong></td>
+                <td>DuckDB + dbt Core local</td>
+                <td>Bạn muốn free setup, iterate nhanh trên máy cá nhân, tập trung core dbt mechanics trước.</td>
+                <td><code>04-analytics-engineering/setup/local_setup.md</code></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="info-box tip">💡 <span><strong>Tip:</strong> học theo Path B trước để nắm model/test/ref/source thật chắc, rồi chuyển Path A để học thêm deploy/governance của team production.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">✅</span>
+          Exit criteria: "Bạn đã nắm module này khi..."
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li>Bạn giải thích được vì sao Analytics Engineering là lớp bắt buộc giữa ingest và BI.</li>
+            <li>Bạn mô tả được DAG chính của repo từ <code>sources.yml</code> đến reporting model cuối.</li>
+            <li>Bạn chọn được materialization hợp lý (view/table/incremental/ephemeral) theo use case thay vì theo thói quen.</li>
+            <li>Bạn viết được model có <code>ref()</code>, test cơ bản, và hiểu hậu quả lineage khi tham chiếu sai.</li>
+            <li>Bạn phân biệt rõ môi trường dbt Core local và dbt Cloud cho workflow team.</li>
+            <li>Bạn đọc lỗi <code>dbt build</code> và truy ngược được model gây fail cùng upstream dependency.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s1">
+      <div class="module-header">
+        <div class="module-tag">S1 · Foundation Theory</div>
+        <div class="module-title">Lý thuyết nền — Analytics Engineering & dbt (3-Level)</div>
+        <div class="module-subtitle">WHY trước HOW: hiểu vì sao hệ transform phải có chuẩn engineering thì mới scale được từ 5 model lên 500 model.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🏗️</span>
+          Analytics Engineering Fundamentals (Beginner → Senior)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Beginner — Analytics Engineer là gì? Khác gì DE và DA?</h3>
+          <table>
+            <thead><tr><th>Role</th><th>Primary focus</th><th>Output chính</th></tr></thead>
+            <tbody>
+              <tr><td>Data Engineer</td><td>Ingestion, orchestration, reliability hạ tầng dữ liệu</td><td>Raw/staging pipelines ổn định, scalable</td></tr>
+              <tr><td>Analytics Engineer</td><td>Transform data thành data model dùng được cho business</td><td>Staging/intermediate/marts có test + docs + lineage</td></tr>
+              <tr><td>Data Analyst</td><td>Phân tích insight, dashboard, ad-hoc business question</td><td>Report, insight, recommendation</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="green">Beginner — ELT vs ETL và vì sao cloud DW đổi paradigm</h3>
+          <p><strong>ETL cổ điển:</strong> transform nặng ở tầng compute trước khi load vào warehouse. <strong>ELT hiện đại:</strong> load raw trước, transform trong warehouse bằng SQL engine mạnh.</p>
+          <p>Analogy: <strong>"bếp nhà hàng vs bếp tự nấu"</strong>. ETL cũ giống tự nấu tất cả ở nhà rồi mới mang ra bán; ELT giống đưa nguyên liệu vào bếp nhà hàng công suất lớn (BigQuery/Snowflake), chế biến tại chỗ theo order.</p>
+
+          <h3 class="green">Beginner — Dimensional modeling trực quan</h3>
+          <ul>
+            <li><strong>Fact table:</strong> chứa sự kiện đo lường (trip, order, payment), nhiều dòng, cập nhật liên tục.</li>
+            <li><strong>Dimension table:</strong> chứa ngữ cảnh mô tả (zone, vendor, customer, product).</li>
+            <li><strong>Star schema:</strong> fact ở giữa, dimensions xung quanh để query BI dễ hiểu và ổn định.</li>
+          </ul>
+          <div class="schema-box">
+            <div class="schema-row">
+              <div class="schema-table">
+                <div class="schema-table-header fact">fct_trips</div>
+                <div class="schema-col"><span class="pk">PK</span><span class="col">trip_id</span></div>
+                <div class="schema-col"><span class="fk">FK</span><span class="col">pickup_locationid</span></div>
+                <div class="schema-col"><span class="fk">FK</span><span class="col">dropoff_locationid</span></div>
+                <div class="schema-col"><span class="col">fare_amount</span></div>
+              </div>
+              <div class="schema-arrow">↔</div>
+              <div class="schema-table">
+                <div class="schema-table-header dim">dim_zones</div>
+                <div class="schema-col"><span class="pk">PK</span><span class="col">locationid</span></div>
+                <div class="schema-col"><span class="col">zone</span></div>
+                <div class="schema-col"><span class="col">borough</span></div>
+                <div class="schema-col"><span class="col">service_zone</span></div>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="orange">Intermediate — Kimball vs Inmon vs Data Vault</h3>
+          <table>
+            <thead><tr><th>Approach</th><th>Strength</th><th>Trade-off</th><th>Khi nào dùng</th></tr></thead>
+            <tbody>
+              <tr><td>Kimball</td><td>Nhanh ra BI value, star schema trực quan</td><td>Dễ domain-silo nếu governance yếu</td><td>Team analytics cần delivery nhanh theo business process</td></tr>
+              <tr><td>Inmon</td><td>Tích hợp enterprise data chặt chẽ ở core</td><td>Time-to-value chậm, modeling upfront nặng</td><td>Tổ chức lớn yêu cầu chuẩn hóa enterprise-wide nghiêm</td></tr>
+              <tr><td>Data Vault</td><td>Auditability + historization tốt, chịu thay đổi source cao</td><td>Model phức tạp, learning curve cao cho BI users</td><td>Môi trường compliance/regulatory hoặc source thay đổi liên tục</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="orange">Intermediate — dbt là gì ở mức workflow</h3>
+          <ul>
+            <li><strong>Transformation workflow:</strong> SQL files + dependency graph + run order tự động.</li>
+            <li><strong>Jinja compilation:</strong> SQL được compile theo adapter, biến/macro/environment.</li>
+            <li><strong>Materialization:</strong> quyết định output model là view/table/incremental/ephemeral.</li>
+          </ul>
+
+          <h3 class="red">Senior — dbt trong modern data stack</h3>
+          <p>dbt nằm giữa ingestion và serving: raw data từ pipeline đi vào warehouse, dbt chuẩn hóa + mô hình hóa thành semantic layer để BI/ML/features dùng lại nhất quán. Đây là "control plane" cho quality + lineage của transformation layer.</p>
+          <div class="mental-model">💡 <strong>Mental model:</strong> dbt = git + CI/CD + docs + testing cho SQL transformation.</div>
+
+          <h3 class="red">So sánh thực tế 2025: dbt Core vs dbt Cloud vs SQLMesh</h3>
+          <table>
+            <thead><tr><th>Platform</th><th>Điểm mạnh</th><th>Điểm cần cân nhắc</th></tr></thead>
+            <tbody>
+              <tr><td>dbt Core</td><td>OSS, linh hoạt CI tự dựng, không lock UI vendor</td><td>Team phải tự vận hành scheduler, artifacts hosting, permissions</td></tr>
+              <tr><td>dbt Cloud</td><td>Managed IDE/job/orchestration/lineage UX tốt cho collaboration</td><td>Chi phí tăng theo team scale; governance phụ thuộc nền tảng cloud</td></tr>
+              <tr><td>SQLMesh</td><td>State-aware planning mạnh, hỗ trợ backfill/plan diff sâu</td><td>Ecosystem nhỏ hơn dbt, migration effort nếu team đã bám dbt lâu</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box tip">💡 <span><strong>Tip:</strong> nếu team mới học, bắt đầu dbt Core + CI cơ bản để hiểu mechanics; sau đó đánh giá dbt Cloud theo nhu cầu collaboration thật sự.</span></div>
+          <div class="info-box note">📌 <span><strong>Note:</strong> trong repo này, cấu trúc models/staging → intermediate → marts là ví dụ tốt cho mô hình layering giúp hạn chế spaghetti SQL.</span></div>
+          <div class="info-box warn">⚠️ <span><strong>Warn:</strong> chọn tool theo hype thay vì constraint thật (team size, SLA, budget, compliance) là lỗi kiến trúc phổ biến.</span></div>
+          <div class="info-box danger">🔥 <span><strong>Danger:</strong> bỏ qua tests ở transformation layer khiến BI xuất số sai ổn định — đây là loại lỗi nguy hiểm vì "trông có vẻ đúng".</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🧠</span>
+          Quiz tình huống — Analytics Engineering Fundamentals (6 câu)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item">
+            <div class="quiz-q">Team có 12 dashboard, mỗi dashboard join raw tables khác nhau và metric revenue lệch nhau giữa các phòng ban. Vai trò nào cần đứng ra giải quyết gốc rễ?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Data Analyst có thể phát hiện lệch số nhưng giải pháp gốc rễ là chuẩn hóa model transformation và governance metric.')">A. Data Analyst</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: Analytics Engineer chịu trách nhiệm chuẩn hóa business logic vào marts và kiểm soát lineage/test/documentation.')">B. Analytics Engineer</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'DE tập trung ingestion/reliability hạ tầng; vấn đề ở đây nằm ở lớp semantic transformation.')">C. Data Engineer</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'SRE không sở hữu business metric semantics trong warehouse.')">D. SRE</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Một startup dùng BigQuery serverless, query volume tăng mạnh. Vì sao ELT thường hợp lý hơn ETL trong bối cảnh này?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: ELT tận dụng compute của cloud warehouse để transform tại chỗ, giảm duplicated pipeline complexity.')">A. Vì warehouse đã tối ưu compute cho transform SQL lớn</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'ETL không luôn sai, nhưng không phải lý do chính trong cloud DW hiện đại.')">B. Vì ETL đã lỗi thời và không dùng nữa</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Storage rẻ hơn chỉ là một phần, không giải thích đầy đủ lợi thế kiến trúc.')">C. Vì lưu raw rẻ hơn nên logic nào cũng được</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'ELT không loại bỏ nhu cầu quality; ngược lại cần governance mạnh hơn.')">D. Vì ELT không cần test</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn cần output BI ổn định trong 2 tuần cho đội sales. Chọn modeling approach nào thường time-to-value nhanh nhất?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: Kimball với dimensional marts giúp BI consume nhanh và trực quan.')">A. Kimball dimensional modeling</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Inmon mạnh cho enterprise integration nhưng thường chậm hơn cho quick BI delivery.')">B. Inmon enterprise DW trước</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Data Vault hợp compliance/change-heavy, không tối ưu khi mục tiêu là BI nhanh trong 2 tuần.')">C. Data Vault full implementation</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Data lake raw-only thiếu semantic layer cho BI consumption.')">D. Chỉ data lake không model</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Công ty cần audit đầy đủ lịch sử thay đổi dữ liệu theo chuẩn compliance cao. Mô hình nào đáng cân nhắc nhất?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Kimball vẫn dùng được nhưng không phải hướng mạnh nhất cho historization/audit lineage chi tiết.')">A. Kimball thuần</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: Data Vault thiết kế để chịu thay đổi source và lưu lịch sử/audit tốt hơn.')">B. Data Vault</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Notebook không tạo governance model đủ mạnh cho compliance.')">C. Notebook pipeline</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Manual SQL thiếu traceability và controls.')">D. Manual SQL scripts</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Team đã có CI nội bộ mạnh, muốn tự kiểm soát hạ tầng và hạn chế chi phí platform theo seat. Chọn hướng nào hợp lý đầu tiên?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: dbt Core phù hợp khi team có năng lực tự vận hành CI/scheduler/doc hosting.')">A. dbt Core</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'dbt Cloud phù hợp collaboration nhanh, nhưng không đáp ứng mục tiêu tự kiểm soát tối đa.')">B. dbt Cloud ngay lập tức</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'SaaS BI không thay thế transformation framework.')">C. Chuyển toàn bộ sang BI tool</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Spark không trực tiếp giải quyết governance transformation SQL analytic layer.')">D. Spark-only pipeline</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Một model fail do source schema thay đổi, nhưng dashboard vẫn hiện số cũ vì table cũ chưa bị overwrite. Đây là rủi ro gì lớn nhất?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Pipeline fail không luôn gây outage ngay; rủi ro lớn hơn là dữ liệu stale/silent wrong.')">A. Outage tức thì luôn xảy ra</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: silent data quality issue nguy hiểm vì business vẫn ra quyết định trên số stale/invalid.')">B. Silent data quality drift</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Lỗi syntax chỉ là biểu hiện, không phải impact business lớn nhất.')">C. Chỉ là lỗi syntax SQL</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Không thể bỏ qua chỉ vì dashboard chưa đỏ; cần test/alerts/contract để chặn sớm.')">D. Không ảnh hưởng nếu dashboard chưa báo đỏ</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧩</span>
+          dbt Core Concepts (Beginner → Senior)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Beginner — Models, Sources, Seeds là gì?</h3>
+          <ul>
+            <li><strong>Models:</strong> file SQL trong <code>models/</code>, mỗi model ~ một SELECT thể hiện business logic.</li>
+            <li><strong>Sources:</strong> khai báo bảng raw bên ngoài dbt trong <code>sources.yml</code>, dùng để track freshness + lineage upstream.</li>
+            <li><strong>Seeds:</strong> CSV tĩnh version-controlled (ví dụ payment lookup), nạp vào warehouse để tránh hard-code CASE lặp lại.</li>
+          </ul>
+
+          <h3 class="green">Beginner — ref() vs source()</h3>
+          <table>
+            <thead><tr><th>Function</th><th>Trỏ tới</th><th>Ý nghĩa lineage</th></tr></thead>
+            <tbody>
+              <tr><td><code>source()</code></td><td>Raw table ngoài dbt</td><td>Đánh dấu boundary của hệ transform</td></tr>
+              <tr><td><code>ref()</code></td><td>Model do dbt quản lý</td><td>Tạo dependency nội bộ để dbt biết thứ tự build</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box note">📌 <span><strong>Note:</strong> phân biệt đúng <code>source()</code> và <code>ref()</code> là nền tảng để DAG và docs không bị sai quan hệ upstream/downstream.</span></div>
+
+          <h3 class="orange">Intermediate — Materializations: view/table/incremental/ephemeral</h3>
+          <table>
+            <thead><tr><th>Type</th><th>Ưu điểm</th><th>Hạn chế</th><th>Use case điển hình</th></tr></thead>
+            <tbody>
+              <tr><td>view</td><td>Fresh theo source, không tốn storage nhiều</td><td>Query downstream có thể chậm nếu logic nặng</td><td>Staging logic nhẹ, chuẩn hóa cột</td></tr>
+              <tr><td>table</td><td>Hiệu năng ổn định cho BI, tách compute build/query</td><td>Tốn storage, cần lịch rebuild</td><td>Intermediate/marts dùng nhiều</td></tr>
+              <tr><td>incremental</td><td>Giảm thời gian build trên bảng lớn</td><td>Phức tạp xử lý update/late data/schema change</td><td>Fact table lớn như <code>fct_trips</code></td></tr>
+              <tr><td>ephemeral</td><td>Không tạo object vật lý, giảm clutter schema</td><td>Debug khó hơn, query compile dài</td><td>Sub-logic tái dùng nhỏ, không cần persist</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="orange">Intermediate — Macros + Jinja</h3>
+          <p>Macros giúp tránh lặp SQL và chuẩn hóa logic cross-model. Jinja cho phép condition theo adapter/target/environment, ví dụ repo dùng macro tính trip duration và macro mapping vendor data.</p>
+          <div class="info-box tip">💡 <span><strong>Tip:</strong> chỉ macro hóa logic có tính lặp hoặc cần abstraction cross-database; macro hóa quá sớm sẽ làm model khó đọc.</span></div>
+
+          <h3 class="red">Senior — Incremental model pitfalls</h3>
+          <ul>
+            <li><strong>unique_key:</strong> bắt buộc để merge/upsert đúng record thay đổi.</li>
+            <li><strong>merge strategy:</strong> cần tương thích warehouse adapter và business semantics.</li>
+            <li><strong>late-arriving data:</strong> nếu filter incremental quá hẹp, record đến muộn sẽ bị bỏ sót.</li>
+            <li><strong>on_schema_change:</strong> phải định nghĩa rõ (append/ignore/fail) để tránh drift âm thầm.</li>
+          </ul>
+
+          <h3 class="red">Senior — dbt build vs dbt run</h3>
+          <p><code>dbt run</code> chỉ build models; <code>dbt build</code> chạy cả models + tests + snapshots + seeds theo graph. Trong production, <strong>dbt build</strong> là lệnh trọng tâm vì nó biến data quality thành gate thay vì hậu kiểm.</p>
+          <div class="mental-model">💡 <strong>Mental model:</strong> dbt model = 1 SELECT query → dbt lo phần còn lại.</div>
+
+          <div class="info-box warn">⚠️ <span><strong>Warn:</strong> chạy mỗi <code>dbt run</code> trong prod có thể đẩy dữ liệu sai vào downstream nếu tests không được kích hoạt đồng bộ.</span></div>
+          <div class="info-box danger">🔥 <span><strong>Danger:</strong> incremental sai key có thể nhân bản dữ liệu nhiều tháng trước khi ai đó phát hiện metric bị inflate.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🧪</span>
+          Quiz tình huống — dbt Core Concepts (6 câu)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn cần đưa bảng raw mới từ hệ payment vào DAG dbt để theo dõi freshness và lineage rõ ràng. Bước đúng đầu tiên là gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: khai báo trong sources.yml bằng source() để dbt hiểu đây là external upstream và có thể gắn freshness/tests.')">A. Khai báo source trong sources.yml</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'ref() dùng cho model nội bộ dbt, không dùng để trỏ thẳng raw table external.')">B. Dùng ref() trực tiếp tới raw table</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Seed chỉ phù hợp static lookup data, không phải raw transactional lớn.')">C. Nạp raw vào seeds</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Notebook không thay thế metadata lineage chính thức trong dbt.')">D. Viết notebook mô tả lineage</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Model staging chỉ cast kiểu dữ liệu và rename cột, downstream query không quá nặng. Materialization nào hợp lý nhất?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: view phù hợp cho staging nhẹ, giữ logic luôn fresh theo source.')">A. view</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'table có thể dùng nhưng thường chưa cần cho staging nhẹ và tăng storage.')">B. table</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'incremental tạo complexity không cần thiết cho model nhẹ.')">C. incremental</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'snapshot có mục tiêu khác (SCD/history), không phải transform staging thông thường.')">D. snapshot</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Bảng fact có 2 tỷ dòng, mỗi ngày append 5 triệu dòng mới và thỉnh thoảng có correction record. Bạn ưu tiên gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Rebuild full table tốn compute lớn và khó đáp ứng SLA hằng ngày.')">A. table full refresh hằng ngày</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: incremental + unique_key + merge giúp cập nhật delta và sửa record đổi mà không quét full.')">B. incremental với unique_key và merge</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'view sẽ đẩy chi phí nặng sang query time của downstream consumers.')">C. view để luôn realtime</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'ephemeral không phù hợp cho fact lớn cần persist.')">D. ephemeral</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Team copy-paste cùng đoạn CASE mapping payment_type trong 11 model khác nhau. Cách xử lý tốt nhất?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Copy thêm làm nợ kỹ thuật tăng nhanh và khó đảm bảo consistency.')">A. Tiếp tục copy vì nhanh</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: đưa logic vào macro hoặc seed lookup + join để tái sử dụng và kiểm soát thay đổi.')">B. Chuẩn hóa bằng macro/seed lookup</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Đẩy toàn bộ sang BI chỉ di chuyển vấn đề, không giải quyết semantic consistency tại data layer.')">C. Dời toàn bộ mapping lên BI</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Xóa mapping sẽ làm semantic business mơ hồ hơn.')">D. Bỏ mapping để đơn giản hóa</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Bạn cần chặn release khi test not_null/relationships fail thay vì chờ analyst phát hiện sau. Lệnh nào phù hợp cho job production?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'dbt run không tự đảm bảo tests chạy như gating step.')">A. dbt run</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: dbt build gom run + test + assets liên quan theo graph và phù hợp gate production.')">B. dbt build</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'dbt compile chỉ sinh SQL, không thực thi transformation/tests.')">C. dbt compile</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'dbt debug chỉ kiểm tra kết nối cấu hình.')">D. dbt debug</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Model incremental của bạn lọc <code>where updated_at &gt; max(updated_at)</code> và bỏ lỡ record đến muộn 3 ngày. Biện pháp nào đúng hơn?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Giảm threads không giải quyết logic late-arriving data.')">A. Giảm threads để query ổn định</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: thiết kế incremental window/lookback hoặc merge logic phù hợp để bắt được dữ liệu đến muộn.')">B. Thêm lookback window + merge strategy</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Bỏ unique_key sẽ làm dedup/upsert sai nghiêm trọng hơn.')">C. Bỏ unique_key để ingest nhanh</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Tăng warehouse size chỉ làm query nhanh hơn, không sửa logic missing data.')">D. Tăng compute warehouse</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s2" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S2 · Repository Code Reading</div>
+        <div class="module-title">Đọc hiểu code thực tế trong 04-analytics-engineering</div>
+        <div class="module-subtitle">Mục tiêu: đọc được DAG, hiểu từng layer, thấy rõ decision production và phát hiện điểm yếu cần refactor.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🗂️</span>
+          Phần 1 — Cấu trúc thư mục toàn bộ 04-analytics-engineering/
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Tree diagram đầy đủ</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>04-analytics-engineering/tree.txt</span></div>
+            <div class="cmd-body">
+<pre>04-analytics-engineering/
+├── README.md
+├── class_notes/
+│   ├── 4_1_1_analytics_engineering_basics.md
+│   ├── 4_1_2_what_is_dbt.md
+│   ├── 4_2_1_dbt_core_vs_dbt_cloud.md
+│   ├── 4_3_1_dbt_project_structure.md
+│   ├── 4_3_2_dbt_sources.md
+│   ├── 4_4_1_dbt_models.md
+│   ├── 4_4_2_dbt_seeds_and_macros.md
+│   ├── 4_5_1_documentation.md
+│   ├── 4_5_2_dbt_tests.md
+│   ├── 4_5_3_dbt_packages.md
+│   └── 4_6_1_dbt_commands.md
+├── refreshers/
+│   └── SQL.md
+├── setup/
+│   ├── cloud_setup.md
+│   ├── duckdb_troubleshooting.md
+│   └── local_setup.md
+└── taxi_rides_ny/
+    ├── .gitignore
+    ├── dbt_project.yml
+    ├── package-lock.yml
+    ├── packages.yml
+    ├── macros/
+    │   ├── get_trip_duration_minutes.sql
+    │   ├── get_vendor_data.sql
+    │   ├── macros_properties.yml
+    │   └── safe_cast.sql
+    ├── models/
+    │   ├── staging/
+    │   │   ├── schema.yml
+    │   │   ├── sources.yml
+    │   │   ├── stg_green_tripdata.sql
+    │   │   └── stg_yellow_tripdata.sql
+    │   ├── intermediate/
+    │   │   ├── int_trips.sql
+    │   │   ├── int_trips_unioned.sql
+    │   │   └── schema.yml
+    │   └── marts/
+    │       ├── dim_vendors.sql
+    │       ├── dim_zones.sql
+    │       ├── fct_trips.sql
+    │       ├── schema.yml
+    │       └── reporting/
+    │           ├── fct_monthly_zone_revenue.sql
+    │           └── schema.yml
+    ├── seeds/
+    │   ├── payment_type_lookup.csv
+    │   ├── seeds_properties.yml
+    │   └── taxi_zone_lookup.csv
+    ├── snapshots/
+    │   └── .gitkeep
+    └── tests/
+        └── .gitkeep</pre>
+            </div>
+          </div>
+
+          <h3 class="green">Phân biệt 2 vùng học quan trọng</h3>
+          <table>
+            <thead><tr><th>Folder</th><th>Vai trò</th><th>Dùng khi nào</th></tr></thead>
+            <tbody>
+              <tr><td><code>class_notes/</code></td><td>Tài liệu lý thuyết theo chapter</td><td>Đọc concept, vocabulary, mental model</td></tr>
+              <tr><td><code>taxi_rides_ny/</code></td><td>dbt project chạy được thật</td><td>Đọc code, chạy model, debug production pattern</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="orange">Mục đích từng nhóm file trong taxi_rides_ny/</h3>
+          <ul>
+            <li><code>dbt_project.yml</code>: cấu hình lõi project, materialization strategy, vars, version constraints.</li>
+            <li><code>packages.yml</code> + <code>package-lock.yml</code>: dependency range và dependency lock để reproducible build.</li>
+            <li><code>models/staging/*</code>: chuẩn hóa raw source (rename/cast/filter), định nghĩa tests cơ bản.</li>
+            <li><code>models/intermediate/*</code>: hợp nhất green/yellow, enrich lookup, tạo surrogate key, dedup.</li>
+            <li><code>models/marts/*</code>: dim/fact layer cho BI, incremental merge, contract và reporting grain.</li>
+            <li><code>macros/*</code>: tái sử dụng logic cross-database (safe cast, datediff, vendor mapping).</li>
+            <li><code>seeds/*</code>: static lookup data version-controlled trong git (payment type, taxi zones).</li>
+            <li><code>snapshots/</code>, <code>tests/</code>: placeholder cho SCD snapshot & custom tests (hiện chưa dùng).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">⚙️</span>
+          Phần 2 — dbt_project.yml (phân tích nguyên văn)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2tabs-config">
+            <div class="tab active" onclick="switchTab('s2tabs-config','s2-config-yaml')">YAML</div>
+            <div class="tab" onclick="switchTab('s2tabs-config','s2-config-sql')">SQL</div>
+            <div class="tab" onclick="switchTab('s2tabs-config','s2-config-jinja')">Jinja</div>
+          </div>
+
+          <div class="tab-content active" id="s2-config-yaml">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>taxi_rides_ny/dbt_project.yml</span></div>
+              <div class="cmd-body">
+<pre><span class="kw">name</span>: <span class="str">'taxi_rides_ny'</span>
+<span class="kw">version</span>: <span class="str">'1.0.0'</span>
+<span class="kw">config-version</span>: <span class="num">2</span>
+<span class="kw">require-dbt-version</span>: [<span class="str">">=1.7.0"</span>, <span class="str">"&lt;3.0.0"</span>]
+
+<span class="kw">profile</span>: <span class="str">'taxi_rides_ny'</span>
+
+<span class="kw">model-paths</span>: [<span class="str">"models"</span>]
+<span class="kw">seed-paths</span>: [<span class="str">"seeds"</span>]
+<span class="kw">macro-paths</span>: [<span class="str">"macros"</span>]
+
+<span class="kw">vars</span>:
+  <span class="kw">dev_start_date</span>: <span class="str">'2019-01-01'</span>
+  <span class="kw">dev_end_date</span>: <span class="str">'2019-02-01'</span>
+
+<span class="kw">models</span>:
+  <span class="kw">taxi_rides_ny</span>:
+    <span class="kw">staging</span>:
+      <span class="kw">+materialized</span>: <span class="str">view</span>
+    <span class="kw">intermediate</span>:
+      <span class="kw">+materialized</span>: <span class="str">table</span>
+    <span class="kw">marts</span>:
+      <span class="kw">+materialized</span>: <span class="str">table</span>
+
+<span class="kw">flags</span>:
+  <span class="kw">require_generic_test_arguments_property</span>: <span class="kw">true</span></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="s2-config-sql">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>materialization impact.sql</span></div>
+              <div class="cmd-body">
+<pre><span class="comment">-- staging là view: downstream query luôn đọc logic mới nhất</span>
+<span class="kw">select</span> * <span class="kw">from</span> <span class="fn">{{ ref('stg_green_tripdata') }}</span>
+
+<span class="comment">-- intermediate/marts là table: precompute để BI query nhanh và ổn định</span>
+<span class="kw">select</span> * <span class="kw">from</span> <span class="fn">{{ ref('int_trips') }}</span>
+<span class="kw">select</span> * <span class="kw">from</span> <span class="fn">{{ ref('fct_trips') }}</span></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="s2-config-jinja">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>expected var usage.jinja</span></div>
+              <div class="cmd-body">
+<pre><span class="comment">-- vars đã được khai báo trong dbt_project.yml</span>
+<span class="comment">-- production-friendly pattern nên dùng var() thay vì hardcode date</span>
+<span class="kw">where</span> pickup_datetime &gt;= <span class="str">'{{ var("dev_start_date") }}'</span>
+  <span class="kw">and</span> pickup_datetime &lt;  <span class="str">'{{ var("dev_end_date") }}'</span></pre>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="green">Giải thích từng block</h3>
+          <ul>
+            <li><strong>name/profile:</strong> định danh project và profile kết nối warehouse.</li>
+            <li><strong>model-paths/seed-paths/macro-paths:</strong> nói cho dbt biết vị trí code assets.</li>
+            <li><strong>vars:</strong> biến cấu hình dùng cho môi trường dev/sample run.</li>
+            <li><strong>models config:</strong> policy materialization theo layer để cân bằng freshness vs performance.</li>
+            <li><strong>require-dbt-version:</strong> pin version range để tránh break macro behavior khi nâng dbt.</li>
+          </ul>
+
+          <div class="info-box warn">⚠️ <span><strong>Điểm yếu hiện tại:</strong> project có <code>vars.dev_start_date/dev_end_date</code> nhưng staging models chưa dùng <code>var()</code>; vẫn hardcode date filter nên khó đổi window tập trung.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧱</span>
+          Phần 3 — sources.yml (source declaration, freshness, env vars)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>models/staging/sources.yml</span></div>
+            <div class="cmd-body">
+<pre><span class="kw">sources</span>:
+  - <span class="kw">name</span>: <span class="str">raw</span>
+    <span class="kw">database</span>: |
+      {%- <span class="kw">if</span> target.type == <span class="str">'bigquery'</span> -%}
+        {{ env_var(<span class="str">'GCP_PROJECT_ID'</span>, <span class="str">'please-add-your-gcp-project-id-here'</span>) }}
+      {%- <span class="kw">else</span> -%}
+        taxi_rides_ny
+      {%- <span class="kw">endif</span> -%}
+    <span class="kw">schema</span>: |
+      {%- <span class="kw">if</span> target.type == <span class="str">'bigquery'</span> -%}
+        nytaxi
+      {%- <span class="kw">else</span> -%}
+        prod
+      {%- <span class="kw">endif</span> -%}
+    <span class="kw">config</span>:
+      <span class="kw">freshness</span>:
+        <span class="kw">warn_after</span>: {<span class="kw">count</span>: <span class="num">24</span>, <span class="kw">period</span>: hour}
+        <span class="kw">error_after</span>: {<span class="kw">count</span>: <span class="num">48</span>, <span class="kw">period</span>: hour}
+    <span class="kw">tables</span>:
+      - <span class="kw">name</span>: green_tripdata
+        <span class="kw">config</span>:
+          <span class="kw">loaded_at_field</span>: lpep_pickup_datetime
+      - <span class="kw">name</span>: yellow_tripdata
+        <span class="kw">config</span>:
+          <span class="kw">loaded_at_field</span>: tpep_pickup_datetime</pre>
+            </div>
+          </div>
+
+          <h3 class="green">Ý nghĩa thực tế</h3>
+          <ul>
+            <li><strong>source declaration:</strong> biến raw table thành node có metadata trong DAG.</li>
+            <li><strong>database/schema conditional:</strong> cùng project chạy được trên BigQuery và local engine.</li>
+            <li><strong>freshness 24h/48h:</strong> sau 24 giờ thì cảnh báo stale; sau 48 giờ thì fail mức nghiêm trọng.</li>
+            <li><strong>env_var('GCP_PROJECT_ID'):</strong> tránh hardcode project id khi deploy nhiều môi trường.</li>
+          </ul>
+
+          <div class="info-box danger">🔥 <span><strong>Rủi ro fallback:</strong> default <code>please-add-your-gcp-project-id-here</code> giúp lộ lỗi sớm, nhưng nếu team bỏ qua log compile/runtime thì có thể mất thời gian debug kết nối sai project.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧪</span>
+          Phần 4 — Staging models (green/yellow)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2tabs-staging">
+            <div class="tab active" onclick="switchTab('s2tabs-staging','s2-staging-sql')">SQL</div>
+            <div class="tab" onclick="switchTab('s2tabs-staging','s2-staging-yaml')">YAML</div>
+            <div class="tab" onclick="switchTab('s2tabs-staging','s2-staging-jinja')">Jinja</div>
+          </div>
+
+          <div class="tab-content active" id="s2-staging-sql">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>stg_green_tripdata.sql + stg_yellow_tripdata.sql</span></div>
+              <div class="cmd-body">
+<pre><span class="comment">-- stg_green_tripdata.sql (trích)</span>
+{{ safe_cast(<span class="str">'ratecodeid'</span>, <span class="str">'integer'</span>) }} <span class="kw">as</span> rate_code_id,
+{{ safe_cast(<span class="str">'trip_type'</span>, <span class="str">'integer'</span>) }} <span class="kw">as</span> trip_type,
+{{ safe_cast(<span class="str">'payment_type'</span>, <span class="str">'integer'</span>) }} <span class="kw">as</span> payment_type
+...
+<span class="kw">where</span> vendorid <span class="kw">is not null</span>
+
+<span class="comment">-- stg_yellow_tripdata.sql (trích)</span>
+<span class="kw">cast</span>(tpep_pickup_datetime <span class="kw">as</span> timestamp) <span class="kw">as</span> pickup_datetime,
+...
+<span class="kw">cast</span>(payment_type <span class="kw">as</span> integer) <span class="kw">as</span> payment_type
+...
+<span class="kw">where</span> vendorid <span class="kw">is not null</span></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="s2-staging-yaml">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>models/staging/schema.yml</span></div>
+              <div class="cmd-body">
+<pre><span class="kw">models</span>:
+  - <span class="kw">name</span>: stg_green_tripdata
+    <span class="kw">columns</span>:
+      - <span class="kw">name</span>: vendor_id
+        <span class="kw">tests</span>: [<span class="str">not_null</span>]
+      - <span class="kw">name</span>: pickup_datetime
+        <span class="kw">tests</span>: [<span class="str">not_null</span>]
+
+  - <span class="kw">name</span>: stg_yellow_tripdata
+    <span class="kw">columns</span>:
+      - <span class="kw">name</span>: vendor_id
+        <span class="kw">tests</span>: [<span class="str">not_null</span>]
+      - <span class="kw">name</span>: pickup_datetime
+        <span class="kw">tests</span>: [<span class="str">not_null</span>]</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="s2-staging-jinja">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>staging dev filter + safe_cast macro</span></div>
+              <div class="cmd-body">
+<pre>{% <span class="kw">if</span> target.name == <span class="str">'dev'</span> %}
+<span class="kw">where</span> pickup_datetime &gt;= <span class="str">'2019-01-01'</span> <span class="kw">and</span> pickup_datetime &lt; <span class="str">'2019-02-01'</span>
+{% <span class="kw">endif</span> %}
+
+{% <span class="kw">if</span> target.type == <span class="str">'bigquery'</span> %}
+  safe_cast({{ column }} <span class="kw">as</span> {{ data_type }})
+{% <span class="kw">else</span> %}
+  <span class="kw">cast</span>({{ column }} <span class="kw">as</span> {{ data_type }})
+{% <span class="kw">endif</span> %}</pre>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="green">Pattern chính ở staging layer</h3>
+          <ul>
+            <li><strong>rename:</strong> chuẩn hóa cột raw về semantic names downstream dùng được ngay.</li>
+            <li><strong>cast:</strong> khóa schema types sớm để giảm lỗi lan xuống marts.</li>
+            <li><strong>filter:</strong> loại bản ghi không hợp lệ và giới hạn dev data window.</li>
+            <li><strong>safe_cast:</strong> BigQuery-safe cho dữ liệu bẩn, tăng cross-database compatibility.</li>
+          </ul>
+
+          <div class="info-box warn">⚠️ <span><strong>Điểm yếu:</strong> date filter đang hardcode <code>'2019-01-01'</code>/<code>'2019-02-01'</code> thay vì dùng <code>var()</code> từ project vars.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🔗</span>
+          Phần 5 — Intermediate models
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>int_trips_unioned.sql + int_trips.sql</span></div>
+            <div class="cmd-body">
+<pre><span class="comment">-- int_trips_unioned.sql (trích)</span>
+<span class="kw">cast</span>(trip_type <span class="kw">as</span> integer) <span class="kw">as</span> trip_type,
+<span class="str">'Green'</span> <span class="kw">as</span> service_type
+...
+<span class="kw">cast</span>(<span class="num">1</span> <span class="kw">as</span> integer) <span class="kw">as</span> trip_type,
+<span class="kw">cast</span>(<span class="num">0</span> <span class="kw">as</span> numeric) <span class="kw">as</span> ehail_fee,
+<span class="str">'Yellow'</span> <span class="kw">as</span> service_type
+...
+<span class="kw">select</span> * <span class="kw">from</span> green_trips
+<span class="kw">union all</span>
+<span class="kw">select</span> * <span class="kw">from</span> yellow_trips
+
+<span class="comment">-- int_trips.sql (trích)</span>
+{{ dbt_utils.generate_surrogate_key([
+  <span class="str">'u.vendor_id'</span>, <span class="str">'u.pickup_datetime'</span>, <span class="str">'u.pickup_location_id'</span>, <span class="str">'u.service_type'</span>
+]) }} <span class="kw">as</span> trip_id,
+...
+<span class="kw">left join</span> payment_types pt
+  <span class="kw">on</span> coalesce(u.payment_type, <span class="num">0</span>) = pt.payment_type
+...
+<span class="kw">qualify</span> row_number() <span class="kw">over</span>(
+  <span class="kw">partition by</span> vendor_id, pickup_datetime, pickup_location_id, service_type
+  <span class="kw">order by</span> dropoff_datetime
+) = <span class="num">1</span></pre>
+            </div>
+          </div>
+
+          <h3 class="green">Giải thích quyết định thiết kế</h3>
+          <ul>
+            <li><strong>UNION ALL:</strong> chỉ hợp lý khi schema đã align cột và kiểu dữ liệu trước đó.</li>
+            <li><strong>surrogate key trip_id:</strong> dùng <code>dbt_utils.generate_surrogate_key</code> để ghép các cột business key theo kiểu null-safe rồi băm <code>MD5 hash</code>, tạo id ổn định cho dedup/merge/join khi source không có primary key tin cậy.</li>
+            <li><strong>payment type enrichment:</strong> join seed lookup để semantic-friendly cho BI/user.</li>
+            <li><strong>dedup bằng qualify row_number:</strong> giảm duplicate trước khi vào fact layer.</li>
+          </ul>
+
+          <div class="info-box warn">⚠️ <span><strong>Điểm yếu:</strong> hardcode <code>trip_type=1</code> và <code>ehail_fee=0</code> cho yellow là assumption business; cần xác nhận định kỳ với data contract.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🏗️</span>
+          Phần 6 — Marts models (dim, fact, reporting)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>dim_zones.sql / dim_vendors.sql / fct_trips.sql / fct_monthly_zone_revenue.sql</span></div>
+            <div class="cmd-body">
+<pre><span class="comment">-- dim_zones.sql</span>
+<span class="kw">select</span> locationid <span class="kw">as</span> location_id, borough, zone, service_zone
+<span class="kw">from</span> {{ ref(<span class="str">'taxi_zone_lookup'</span>) }}
+
+<span class="comment">-- dim_vendors.sql</span>
+<span class="kw">with</span> trips <span class="kw">as</span> (
+  <span class="kw">select</span> * <span class="kw">from</span> {{ ref(<span class="str">'fct_trips'</span>) }}
+)
+<span class="kw">select distinct</span>
+  vendor_id,
+  {{ get_vendor_data(<span class="str">'vendor_id'</span>) }} <span class="kw">as</span> vendor_name
+<span class="kw">from</span> trips
+
+<span class="comment">-- fct_trips.sql (config trích)</span>
+{{ config(
+  materialized=<span class="str">'incremental'</span>,
+  unique_key=<span class="str">'trip_id'</span>,
+  incremental_strategy=<span class="str">'merge'</span>,
+  on_schema_change=<span class="str">'append_new_columns'</span>
+) }}
+
+{% if is_incremental() %}
+  <span class="kw">where</span> trips.pickup_datetime &gt; (
+    <span class="kw">select</span> <span class="kw">max</span>(pickup_datetime) <span class="kw">from</span> {{ this }}
+  )
+{% endif %}
+
+<span class="comment">-- reporting model grain trích</span>
+<span class="kw">group by</span> pickup_zone, revenue_month, service_type</pre>
+            </div>
+          </div>
+
+          <h3 class="green">Điểm cần hiểu sâu ở fact/reporting</h3>
+          <ul>
+            <li><strong>Incremental + merge + unique_key=trip_id:</strong> tránh rebuild toàn bảng, cho phép upsert delta.</li>
+            <li><strong>max(pickup_datetime) watermark:</strong> nhanh và đơn giản cho append stream.</li>
+            <li><strong>late-arriving risk:</strong> record đến muộn có thể bị bỏ sót nếu pickup_datetime cũ hơn watermark.</li>
+            <li><strong>dim_vendors ref fact:</strong> pattern hơi ngược chiều kim tự tháp dim-fact truyền thống, nhưng chấp nhận được khi vendor domain nhỏ và derive từ fact.</li>
+            <li><strong>get_trip_duration_minutes:</strong> dùng <code>dbt.datediff</code> macro để tương thích nhiều database dialect.</li>
+            <li><strong>get_vendor_data:</strong> dictionary mapping tiện cho scope nhỏ; scale lớn nên chuyển sang seed/dimension table để maintain tốt hơn.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🧩</span>
+          Phần 7 — Macros và Seeds
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2tabs-macroseed">
+            <div class="tab active" onclick="switchTab('s2tabs-macroseed','s2-ms-jinja')">Jinja</div>
+            <div class="tab" onclick="switchTab('s2tabs-macroseed','s2-ms-yaml')">YAML</div>
+            <div class="tab" onclick="switchTab('s2tabs-macroseed','s2-ms-sql')">SQL</div>
+          </div>
+
+          <div class="tab-content active" id="s2-ms-jinja">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>macros/get_vendor_data.sql + safe_cast.sql + get_trip_duration_minutes.sql</span></div>
+              <div class="cmd-body">
+<pre>{% set vendors = {
+  <span class="num">1</span>: <span class="str">'Creative Mobile Technologies'</span>,
+  <span class="num">2</span>: <span class="str">'VeriFone Inc.'</span>,
+  <span class="num">4</span>: <span class="str">'Unknown/Other'</span>
+} %}
+
+{% macro safe_cast(column, data_type) -%}
+  {% if target.type == <span class="str">'bigquery'</span> %}
+    safe_cast({{ column }} as {{ data_type }})
+  {% elif target.type == <span class="str">'oracle'</span> %}
+    cast({{ column }} as {{ data_type }}) <span class="comment">-- Oracle adapter branch</span>
+  {% else %}
+    cast({{ column }} as {{ data_type }})
+  {% endif %}
+{%- endmacro %}
+
+{% macro get_trip_duration_minutes(pickup_datetime, dropoff_datetime) -%}
+  {{ dbt.datediff(pickup_datetime, dropoff_datetime, <span class="str">'minute'</span>) }}
+{%- endmacro %}</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="s2-ms-yaml">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>macros_properties.yml + seeds_properties.yml</span></div>
+              <div class="cmd-body">
+<pre><span class="kw">macros</span>:
+  - <span class="kw">name</span>: get_vendor_data
+    <span class="kw">description</span>: <span class="str">Maps vendor IDs to vendor names using internal dictionary lookup.</span>
+  - <span class="kw">name</span>: safe_cast
+    <span class="kw">description</span>: <span class="str">Cross-database type cast with BigQuery safe_cast support.</span>
+  - <span class="kw">name</span>: get_trip_duration_minutes
+    <span class="kw">description</span>: <span class="str">Compute trip duration in minutes using cross-database dbt.datediff.</span>
+
+<span class="kw">seeds</span>:
+  - <span class="kw">name</span>: taxi_zone_lookup
+    <span class="kw">description</span>: <span class="str">Zone lookup data for taxi locations.</span>
+  - <span class="kw">name</span>: payment_type_lookup
+    <span class="kw">description</span>: <span class="str">Payment type code lookup table.</span></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="s2-ms-sql">
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>seeds/payment_type_lookup.csv (sample rows)</span></div>
+              <div class="cmd-body">
+<pre>payment_type,description
+0,Unknown
+1,Credit card
+2,Cash
+3,No charge
+4,Dispute
+5,Unknown
+6,Voided trip</pre>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="green">Khi nào dùng seeds trong git?</h3>
+          <ul>
+            <li><strong>Phù hợp:</strong> lookup nhỏ, thay đổi ít, cần version control cùng transformation code.</li>
+            <li><strong>Không phù hợp:</strong> dữ liệu lớn, cập nhật thường xuyên, hoặc có PII/sensitive data.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">📦</span>
+          Phần 8 — Packages: packages.yml vs package-lock.yml
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>packages.yml + package-lock.yml</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># packages.yml</span>
+- package: dbt-labs/dbt_utils
+  version: [<span class="str">">=1.3.0"</span>, <span class="str">"&lt;2.0.0"</span>]
+- package: dbt-labs/codegen
+  version: [<span class="str">">=0.14.0"</span>, <span class="str">"&lt;1.0.0"</span>]
+
+<span class="comment"># package-lock.yml</span>
+- name: dbt_utils
+  version: <span class="num">1.3.3</span>
+- name: codegen
+  version: <span class="num">0.14.0</span></pre>
+            </div>
+          </div>
+
+          <table>
+            <thead><tr><th>Khái niệm dbt</th><th>Tương đương Node</th><th>Ý nghĩa</th></tr></thead>
+            <tbody>
+              <tr><td><code>packages.yml</code></td><td><code>package.json</code></td><td>Khai báo dependency + version range</td></tr>
+              <tr><td><code>package-lock.yml</code></td><td><code>package-lock.json</code></td><td>Pin exact versions để reproducible</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="green">Hai package quan trọng trong repo này</h3>
+          <ul>
+            <li><strong>dbt_utils:</strong> hay dùng nhất gồm <code>generate_surrogate_key</code>, <code>date_spine</code>, pivot/unpivot helpers.</li>
+            <li><strong>codegen:</strong> hỗ trợ generate boilerplate (sources/schema YAML/model scaffolding) trong development flow.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🕸️</span>
+          Phần 9 — DAG lineage chi tiết + thứ tự chạy
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">ASCII lineage đầy đủ</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>module04_s2_lineage.txt</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">source('raw','green_tripdata')</span>  ──&gt; <span class="kw2">stg_green_tripdata</span> [view]
+<span class="kw2">source('raw','yellow_tripdata')</span> ──&gt; <span class="kw2">stg_yellow_tripdata</span> [view]
+
+<span class="kw2">stg_green_tripdata</span> + <span class="kw2">stg_yellow_tripdata</span>
+  └──&gt; <span class="kw2">int_trips_unioned</span> [table]
+         + <span class="kw2">payment_type_lookup</span> [seed]
+           └──&gt; <span class="kw2">int_trips</span> [table]
+
+<span class="kw2">taxi_zone_lookup</span> [seed] ──&gt; <span class="kw2">dim_zones</span> [table]
+<span class="kw2">int_trips</span> + <span class="kw2">dim_zones</span>(pickup/dropoff)
+  └──&gt; <span class="kw2">fct_trips</span> [incremental merge]
+         ├──&gt; <span class="kw2">dim_vendors</span> [table]
+         └──&gt; <span class="kw2">fct_monthly_zone_revenue</span> [table, reporting]</pre>
+            </div>
+          </div>
+
+          <h3 class="green">Ref graph dạng text</h3>
+          <ul>
+            <li><code>stg_green_tripdata</code> ref: <code>source('raw','green_tripdata')</code></li>
+            <li><code>stg_yellow_tripdata</code> ref: <code>source('raw','yellow_tripdata')</code></li>
+            <li><code>int_trips_unioned</code> ref: <code>stg_green_tripdata</code>, <code>stg_yellow_tripdata</code></li>
+            <li><code>int_trips</code> ref: <code>int_trips_unioned</code>, <code>payment_type_lookup</code></li>
+            <li><code>dim_zones</code> ref: <code>taxi_zone_lookup</code></li>
+            <li><code>fct_trips</code> ref: <code>int_trips</code>, <code>dim_zones</code> (2 alias: pickup/dropoff)</li>
+            <li><code>dim_vendors</code> ref: <code>fct_trips</code></li>
+            <li><code>fct_monthly_zone_revenue</code> ref: <code>fct_trips</code></li>
+          </ul>
+
+          <h3 class="orange">Thứ tự chạy đúng (production baseline)</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>run-order.txt</span></div>
+            <div class="cmd-body">
+<pre><span class="num">1</span>) dbt seed
+<span class="num">2</span>) dbt run --select staging
+<span class="num">3</span>) dbt run --select intermediate
+<span class="num">4</span>) dbt run --select marts
+<span class="num">5</span>) dbt test / dbt build (gate release)</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">🧠</span>
+          Quiz S2 — Data flow và cấu trúc code (6 câu)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item">
+            <div class="quiz-q">Vì sao <code>fct_trips</code> dùng <code>materialized='incremental'</code> + <code>incremental_strategy='merge'</code>?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'View sẽ dồn toàn bộ chi phí tính toán vào query-time và không phù hợp fact table lớn.')">A. Để luôn realtime như view</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: merge theo unique_key=trip_id giúp upsert delta, tránh full rebuild và vẫn cập nhật record thay đổi.')">B. Để upsert delta theo trip_id và giảm compute</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'ephemeral không persist data, không phù hợp fact phục vụ BI/reporting.')">C. Để không cần lưu bảng vật lý</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'snapshot dùng cho SCD/history tracking, không thay thế fact incremental thông thường.')">D. Vì snapshot nhanh hơn incremental</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Trong <code>sources.yml</code>, freshness <code>warn_after:24h</code> và <code>error_after:48h</code> có ý nghĩa gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: 24h là ngưỡng cảnh báo dữ liệu có dấu hiệu stale; 48h là mức fail nghiêm trọng để chặn pipeline/release.')">A. Cảnh báo stale sau 24h, fail nghiêm trọng sau 48h</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Đây không phải cấu hình retention; retention thuộc lifecycle policy của storage/warehouse.')">B. Chính sách giữ dữ liệu 24/48 giờ</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'freshness không phải giới hạn timeout query runtime.')">C. Timeout cho mỗi query</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'freshness áp cho source data timeliness, không phải số lần chạy dbt job.')">D. Số lần dbt được phép chạy mỗi ngày</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Tại sao nên ưu tiên <code>safe_cast</code> macro cho một số cột ở staging trên BigQuery?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: safe_cast tránh hard-fail khi gặp giá trị bẩn/không parse được, giúp pipeline robust hơn.')">A. Tránh fail cứng khi dữ liệu bẩn và tăng portability</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'safe_cast không làm query tự động nhanh hơn; mục tiêu chính là độ an toàn casting.')">B. Luôn nhanh hơn cast thường</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'safe_cast vẫn trả null nếu cast thất bại, không bảo toàn tuyệt đối giá trị gốc.')">C. Đảm bảo không bao giờ ra null</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'safe_cast không thay thế test chất lượng dữ liệu.')">D. Không cần test not_null nữa</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">`int_trips` tạo <code>trip_id</code> bằng <code>dbt_utils.generate_surrogate_key</code> từ nhiều cột để làm gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'UNION ALL nằm ở int_trips_unioned; surrogate key phục vụ định danh ổn định downstream.')">A. Để thay thế UNION ALL</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: tạo định danh ổn định cho dedup, merge và joins khi source key tự nhiên không tin cậy.')">B. Tạo unique business key ổn định cho pipeline</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Surrogate key không liên quan trực tiếp đến việc giảm số cột select.')">C. Giảm số lượng cột trong model</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Macro này không tự động thay đổi materialization thành incremental.')">D. Bắt buộc model chuyển sang incremental</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Điểm yếu của staging filter hiện tại là gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Giá trị hardcode không làm query realtime hơn; nó làm config kém linh hoạt.')">A. Hardcode giúp realtime tốt hơn var()</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: đang hardcode date thay vì dùng var(dev_start_date/dev_end_date), khó đổi phạm vi chạy tập trung.')">B. Hardcode date, chưa tận dụng vars trong dbt_project.yml</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Filter này không trực tiếp làm schema thay đổi tự động.')">C. Làm schema drift không kiểm soát</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Hardcode date không thay thế vai trò của source freshness checks.')">D. Không thể chạy source freshness</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+
+          <div class="quiz-item">
+            <div class="quiz-q">Thứ tự nào đúng nhất để chạy full DAG theo cấu trúc repo này?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Sai dependency: reporting/fact không thể chạy ổn trước khi seed/staging/intermediate sẵn sàng.')">A. marts → intermediate → staging → seed</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Seed nên chạy trước để lookup tables available cho int/marts.')">B. staging → seed → marts → reporting</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng: seed trước, rồi staging, intermediate, marts; sau đó test/build để gate quality.')">C. seed → staging → intermediate → marts → test/build</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Không thể bắt đầu từ reporting vì phụ thuộc trực tiếp fct_trips.')">D. reporting → fct_trips → dims → staging</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(1)">← S1: Lý thuyết nền</button>
+        <button class="nav-btn primary" onclick="showModule(3)">Tiếp theo: S3 Thực hành →</button>
+      </div>
+    </div>
+    <div class="module" id="s3" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S3 · Hands-on Execution</div>
+        <div class="module-title">Thực hành dbt từng bước: Setup → Run → Break → Debug</div>
+        <div class="module-subtitle">Bám sát setup docs của repo: local DuckDB path và cloud BigQuery + dbt Cloud path.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">🧰</span>
+          Phần 1 — Setup môi trường (2 paths song song)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s3tabs-setup">
+            <div class="tab active" onclick="switchTab('s3tabs-setup','s3-setup-local')">Tab A · Local</div>
+            <div class="tab" onclick="switchTab('s3tabs-setup','s3-setup-cloud')">Tab B · Cloud</div>
+          </div>
+
+          <div class="tab-content active" id="s3-setup-local">
+            <h3 class="blue">Local path: DuckDB + dbt Core</h3>
+            <ol>
+              <li><strong>Cài dbt-duckdb</strong>
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>install_local.sh</span></div>
+                  <div class="cmd-body"><pre>pip install dbt-duckdb
+
+dbt --version</pre></div>
+                </div>
+              </li>
+              <li><strong>Vào đúng thư mục project</strong>
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>project_path.sh</span></div>
+                  <div class="cmd-body"><pre>git clone https://github.com/DataTalksClub/data-engineering-zoomcamp.git
+cd data-engineering-zoomcamp/04-analytics-engineering/taxi_rides_ny</pre></div>
+                </div>
+                <p>Tất cả lệnh dbt phải chạy trong <code>taxi_rides_ny/</code>.</p>
+              </li>
+              <li><strong>Tạo <code>~/.dbt/profiles.yml</code> (đúng template từ setup/local_setup.md)</strong>
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>~/.dbt/profiles.yml</span></div>
+                  <div class="cmd-body"><pre>taxi_rides_ny:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: taxi_rides_ny.duckdb
+      schema: dev
+      threads: 1
+      extensions:
+        - parquet
+      settings:
+        memory_limit: '2GB'
+        preserve_insertion_order: false
+
+    prod:
+      type: duckdb
+      path: taxi_rides_ny.duckdb
+      schema: prod
+      threads: 1
+      extensions:
+        - parquet
+      settings:
+        memory_limit: '2GB'
+        preserve_insertion_order: false</pre></div>
+                </div>
+              </li>
+              <li><strong>Chạy ingest script để tạo DuckDB database và raw tables</strong></li>
+              <li><strong>Verify connection</strong>
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>verify_local.sh</span></div>
+                  <div class="cmd-body"><pre>dbt debug</pre></div>
+                </div>
+              </li>
+            </ol>
+
+            <div class="info-box tip">✅ <span><strong>Bạn biết setup local đúng khi thấy:</strong> <code>dbt debug</code> pass, file <code>taxi_rides_ny.duckdb</code> được tạo, schema <code>prod</code> có <code>yellow_tripdata</code> và <code>green_tripdata</code>.</span></div>
+            <div class="info-box warn">⚠️ <span>Máy RAM thấp dễ OOM: theo docs, 4GB thường fail, 8GB có thể fail, 16GB+ ổn định hơn.</span></div>
+          </div>
+
+          <div class="tab-content" id="s3-setup-cloud">
+            <h3 class="blue">Cloud path: BigQuery + dbt Cloud</h3>
+            <ol>
+              <li><strong>Tạo/kiểm tra Service Account và tải key JSON</strong>
+                <ul>
+                  <li>Vào GCP Console → IAM & Admin → Service Accounts.</li>
+                  <li>Role tối thiểu: <code>BigQuery Data Editor</code>, <code>BigQuery Job User</code>, <code>BigQuery User</code>.</li>
+                  <li>Tab KEYS → Add key → Create new key → JSON.</li>
+                </ul>
+              </li>
+              <li><strong>Nạp dữ liệu 2019–2020 vào dataset <code>nytaxi</code></strong>
+                <p>Phải có cả <code>green_tripdata</code> và <code>yellow_tripdata</code> (nguồn DataTalksClub release).</p>
+              </li>
+              <li><strong>Setup dbt Cloud project</strong>
+                <ul>
+                  <li>Project name: <code>taxi_rides_ny</code></li>
+                  <li>Connection type: BigQuery</li>
+                  <li>Dataset: <code>dbt_prod</code></li>
+                  <li>Location: phải trùng location của <code>nytaxi</code></li>
+                  <li>Timeout: <code>300</code> giây</li>
+                </ul>
+              </li>
+              <li><strong>Connect repo trong dbt Cloud IDE</strong> (managed repo hoặc GitHub đều được).</li>
+              <li><strong>Chạy dbt debug trong IDE terminal</strong>
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>dbt_cloud_terminal.sh</span></div>
+                  <div class="cmd-body"><pre>dbt debug</pre></div>
+                </div>
+              </li>
+            </ol>
+
+            <div class="info-box tip">✅ <span><strong>Bạn biết setup cloud đúng khi thấy:</strong> nút Test Connection trả về <code>Connection test succeeded</code>, environment Development xuất hiện trong Deploy → Environments, và <code>dbt debug</code> pass trong IDE.</span></div>
+            <div class="info-box danger">🔥 <span><strong>Bảo mật:</strong> tuyệt đối không commit file service-account JSON vào git.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">🚀</span>
+          Phần 2 — Chạy dbt pipeline đầu tiên
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>first_pipeline.sh</span></div>
+            <div class="cmd-body"><pre>dbt deps
+
+dbt seed
+
+dbt run --select staging
+
+dbt run
+
+dbt test
+
+dbt build
+
+dbt docs generate && dbt docs serve</pre></div>
+          </div>
+
+          <table>
+            <thead><tr><th>Lệnh</th><th>Mục tiêu</th><th>Verify thành công</th></tr></thead>
+            <tbody>
+              <tr><td><code>dbt deps</code></td><td>Cài package từ packages.yml</td><td>Thấy dbt_utils / codegen được resolve</td></tr>
+              <tr><td><code>dbt seed</code></td><td>Load CSV lookup vào DB</td><td>Xuất hiện bảng <code>payment_type_lookup</code>, <code>taxi_zone_lookup</code></td></tr>
+              <tr><td><code>dbt run --select staging</code></td><td>Chạy staging trước để validate source + cast/filter</td><td>stg models được materialize (view theo project config)</td></tr>
+              <tr><td><code>dbt run</code></td><td>Build toàn bộ models</td><td>Output hiển thị số model success/fail/skipped rõ ràng</td></tr>
+              <tr><td><code>dbt test</code></td><td>Chạy generic/singular/unit tests</td><td>Pass/Fail summary, biết model nào vi phạm contract</td></tr>
+              <tr><td><code>dbt build</code></td><td>Run + test + seed + snapshot, DAG-aware</td><td>Fail ở node nào thì downstream skip, tiết kiệm compute</td></tr>
+              <tr><td><code>dbt docs generate && dbt docs serve</code></td><td>Sinh docs và xem lineage graph</td><td>Mở docs local (dbt Core) để inspect DAG + metadata</td></tr>
+            </tbody>
+          </table>
+
+          <div class="info-box note">💡 <span><strong>Vì sao production ưu tiên <code>dbt build</code>:</strong> một lệnh duy nhất vừa build vừa test theo dependency graph, phù hợp làm quality gate cho CI/CD.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🧭</span>
+          Phần 3 — Làm việc với từng layer (step-by-step)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ol>
+            <li><strong>Mở <code>stg_green_tripdata.sql</code> và compile để xem SQL resolved:</strong>
+              <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>compile_staging.sh</span></div><div class="cmd-body"><pre>dbt compile --select stg_green_tripdata</pre></div></div>
+            </li>
+            <li><strong>Run riêng model staging:</strong>
+              <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>run_staging.sh</span></div><div class="cmd-body"><pre>dbt run --select stg_green_tripdata --full-refresh</pre></div></div>
+            </li>
+            <li><strong>Query trực tiếp DB để verify shape dữ liệu:</strong>
+              <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>verify_shape.sql</span></div><div class="cmd-body"><pre>select vendor_id, pickup_datetime, dropoff_datetime, trip_distance
+from stg_green_tripdata
+limit 20;</pre></div></div>
+            </li>
+            <li><strong>Mở <code>fct_trips.sql</code>, đọc incremental config:</strong> <code>materialized='incremental'</code>, <code>unique_key='trip_id'</code>, <code>incremental_strategy='merge'</code>.</li>
+            <li><strong>Chạy một phần graph từ fact:</strong>
+              <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>run_fact_graph.sh</span></div><div class="cmd-body"><pre>dbt run --select fct_trips+</pre></div></div>
+            </li>
+            <li><strong>Slim CI mode (khi có prod artifacts):</strong>
+              <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>slim_ci.sh</span></div><div class="cmd-body"><pre>dbt build --select state:modified+ --state ./prod-artifacts</pre></div></div>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">🛠️</span>
+          Phần 4 — 3 bài tập thực hành
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="practice-task">
+            <div class="practice-task-header">Task 1 (Beginner) — Thêm <code>trip_duration_minutes</code> vào stg_green_tripdata.sql</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Bổ sung column tính thời lượng chuyến đi ở staging green.</p>
+              <p><strong>Gợi ý:</strong> Dùng macro <code>get_trip_duration_minutes</code> đã có trong <code>macros/</code>.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">💡 Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>stg_green_tripdata.sql (snippet)</span></div>
+                  <div class="cmd-body"><pre>{{ get_trip_duration_minutes('pickup_datetime','dropoff_datetime') }} as trip_duration_minutes</pre></div>
+                </div>
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>models/staging/schema.yml (snippet)</span></div>
+                  <div class="cmd-body"><pre>- name: stg_green_tripdata
+  columns:
+    - name: trip_duration_minutes
+      tests:
+        - not_null</pre></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">Task 2 (Intermediate) — Tạo <code>int_trips_with_zones.sql</code></div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Join <code>int_trips</code> với <code>dim_zones</code> cho cả pickup và dropoff.</p>
+              <p><strong>Gợi ý:</strong> Dùng <code>ref()</code> cho 3 models, LEFT JOIN 2 lần với alias rõ ràng.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">💡 Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>models/intermediate/int_trips_with_zones.sql</span></div>
+                  <div class="cmd-body"><pre>{{ config(materialized='table') }}
+
+with trips as (
+  select * from {{ ref('int_trips') }}
+), zones as (
+  select * from {{ ref('dim_zones') }}
+)
+select
+  t.*,
+  pz.zone as pickup_zone,
+  pz.borough as pickup_borough,
+  dz.zone as dropoff_zone,
+  dz.borough as dropoff_borough
+from trips t
+left join zones pz on t.pickup_location_id = pz.location_id
+left join zones dz on t.dropoff_location_id = dz.location_id</pre></div>
+                </div>
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>models/intermediate/schema.yml (entry)</span></div>
+                  <div class="cmd-body"><pre>- name: int_trips_with_zones
+  description: Trips enriched with pickup/dropoff zone attributes.</pre></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">Task 3 (Advanced) — Snapshot <code>dim_vendors</code> để track lịch sử tên vendor (SCD Type 2)</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Tạo snapshot trong <code>snapshots/</code> để lưu lịch sử thay đổi theo thời gian.</p>
+              <p><strong>Gợi ý:</strong> So sánh <code>strategy='timestamp'</code> và <code>strategy='check'</code> để chọn đúng ngữ cảnh.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">💡 Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>snapshots/snap_dim_vendors.sql</span></div>
+                  <div class="cmd-body"><pre>{% snapshot snap_dim_vendors %}
+{{
+  config(
+    target_schema='snapshots',
+    unique_key='vendor_id',
+    strategy='check',
+    check_cols=['vendor_name']
+  )
+}}
+
+select
+  vendor_id,
+  vendor_name,
+  current_timestamp as snapshot_loaded_at
+from {{ ref('dim_vendors') }}
+
+{% endsnapshot %}</pre></div>
+                </div>
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>run_snapshot.sh</span></div>
+                  <div class="cmd-body"><pre>dbt snapshot --select snap_dim_vendors</pre></div>
+                </div>
+                <p><strong>Khi nào dùng strategy:</strong> <code>timestamp</code> khi nguồn có cột updated_at đáng tin cậy; <code>check</code> khi không có updated_at nhưng cần phát hiện thay đổi trên cột business.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">💥</span>
+          Phần 5 — Cố tình phá (6 kịch bản) và cách debug
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ol>
+            <li><strong>Xóa <code>package-lock.yml</code> rồi chạy <code>dbt deps</code></strong>
+              <ul>
+                <li><strong>Điều xảy ra:</strong> package vẫn cài được theo <code>packages.yml</code> nhưng version lock có thể drift.</li>
+                <li><strong>Rủi ro:</strong> môi trường dev/CI chạy khác version package → behavior không đồng nhất.</li>
+                <li><strong>Debug:</strong> regenerate lock, commit lock file để reproducible build.</li>
+              </ul>
+            </li>
+            <li><strong>Đổi staging materialization từ view sang table trong <code>dbt_project.yml</code></strong>
+              <ul>
+                <li><strong>Tác động:</strong> tăng storage, giảm repeated compute downstream, nhưng refresh staging chậm hơn.</li>
+                <li><strong>Debug:</strong> chạy lại staging + kiểm tra thời gian build và query cost.</li>
+              </ul>
+            </li>
+            <li><strong>Sửa sai tên source trong <code>sources.yml</code></strong>
+              <ul>
+                <li><strong>Lỗi:</strong> dbt compile/run báo source node không resolve hoặc table không tồn tại.</li>
+                <li><strong>Phát hiện:</strong> thường thấy ngay ở <code>dbt compile</code> hoặc bước run staging.</li>
+                <li><strong>Fix:</strong> đối chiếu tên source/table với BigQuery/DuckDB thực tế.</li>
+              </ul>
+            </li>
+            <li><strong>Chạy <code>dbt run --select fct_trips</code> khi <code>int_trips</code> chưa tồn tại</strong>
+              <ul>
+                <li><strong>Lỗi:</strong> dependency upstream missing.</li>
+                <li><strong>Fix:</strong> chạy theo graph: <code>dbt run --select +fct_trips</code> hoặc chạy staging/intermediate trước.</li>
+              </ul>
+            </li>
+            <li><strong>Chạy <code>dbt run</code> 2 lần liên tiếp với incremental <code>fct_trips</code></strong>
+              <ul>
+                <li><strong>Kỳ vọng:</strong> không duplicate nếu <code>unique_key='trip_id'</code> + <code>merge</code> hoạt động đúng.</li>
+                <li><strong>Debug verify:</strong> so sánh row count và sample key trước/sau lần chạy thứ 2.</li>
+              </ul>
+            </li>
+            <li><strong>Dùng <code>source()</code> thay vì <code>ref()</code> để tham chiếu model staging</strong>
+              <ul>
+                <li><strong>Lỗi khái niệm:</strong> <code>source()</code> chỉ dành cho external raw source; inter-model dependency phải dùng <code>ref()</code>.</li>
+                <li><strong>Hậu quả:</strong> mất lineage chuẩn và có thể trỏ sai object trong warehouse.</li>
+                <li><strong>Fix:</strong> đổi lại <code>{{ ref('stg_green_tripdata') }}</code> / <code>{{ ref('stg_yellow_tripdata') }}</code>.</li>
+              </ul>
+            </li>
+          </ol>
+
+          <div class="info-box note">🧠 <span><strong>Learning loop chuẩn senior:</strong> Read → Run → Break → Debug → Explain → Improve → Document. Mỗi lỗi debug xong nên ghi logbook nguyên nhân gốc và action phòng ngừa.</span></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(2)">← S2: Đọc code repo</button>
+        <button class="nav-btn primary" onclick="showModule(4)">Tiếp theo: S4 Production Thinking →</button>
+      </div>
+    </div>
+
+    <div class="module" id="s4" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S4 · Production Thinking</div>
+        <div class="module-title">Tư duy production cho dbt pipeline</div>
+        <div class="module-subtitle">6 câu hỏi thực chiến: failure, scale, idempotency, quality, cost, security & governance.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">1️⃣</span>
+          FAILURE — dbt build chạy 2 tiếng rồi fail ở fct_trips lúc 4h sáng
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li><strong>Log xem ở đâu:</strong> console output + artifacts trong <code>target/run_results.json</code>.</li>
+            <li><strong>Trạng thái incremental:</strong> các model trước đó có thể đã success; node fail chưa hoàn tất transaction tương ứng.</li>
+            <li><strong>Khi nào retry đủ:</strong> lỗi tạm thời hoặc fix nhỏ tại node fail → dùng <code>dbt retry</code>.</li>
+            <li><strong>Khi nào phải full-refresh:</strong> logic thay đổi lịch sử, duplicate lan rộng, hoặc cần rebuild sạch.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>failure_recovery.sh</span></div>
+            <div class="cmd-body"><pre>dbt build --target prod --fail-fast
+# fix lỗi xong
+
+dbt retry
+
+# chỉ khi cần rebuild sạch fact + downstream
+
+dbt build --select fct_trips+ --full-refresh</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">2️⃣</span>
+          SCALE — Từ data 2019–2020 sang data streaming mỗi ngày
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li><strong>Bottleneck hiện tại:</strong> filter incremental theo <code>max(pickup_datetime)</code> có thể bỏ lỡ late-arriving data.</li>
+            <li><strong>Fix production:</strong> dùng lookback window (reprocess N ngày gần đây) + merge by key.</li>
+            <li><strong>Khi chuyển DuckDB → BigQuery/Snowflake:</strong> local RAM/CPU không còn đáp ứng và workload cần concurrency cao.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>incremental_lookback.sql</span></div>
+            <div class="cmd-body"><pre>{% if is_incremental() %}
+where pickup_datetime >= (
+  select dateadd(day, -3, max(pickup_datetime)) from {{ this }}
+)
+{% endif %}</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">3️⃣</span>
+          IDEMPOTENCY — Chạy dbt seed/run nhiều lần có an toàn không?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li><strong>dbt seed:</strong> thiết kế để nạp deterministic cho bảng lookup (không phải append vô hạn).</li>
+            <li><strong>staging view:</strong> idempotent theo định nghĩa SQL view.</li>
+            <li><strong>intermediate/marts table:</strong> idempotent nếu build process deterministic và input không drift bất thường.</li>
+            <li><strong>fct_trips incremental:</strong> idempotent nhờ <code>unique_key='trip_id'</code> + <code>merge</code>.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>idempotency_check.sql</span></div>
+            <div class="cmd-body"><pre>-- before run
+select count(*) as before_cnt from fct_trips;
+
+-- run pipeline 2 lần liên tiếp
+-- dbt run --select fct_trips
+-- dbt run --select fct_trips
+
+-- after run
+select count(*) as after_cnt from fct_trips;
+-- kiểm tra sample duplicate keys
+select trip_id, count(*) c
+from fct_trips
+group by trip_id
+having count(*) > 1;</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">4️⃣</span>
+          DATA QUALITY — Làm sao biết data đúng sau pipeline?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li><strong>Generic tests</strong> (unique/not_null/accepted_values) là baseline, chưa đủ cho business anomalies.</li>
+            <li><strong>Bổ sung test cho cột quan trọng:</strong> <code>pickup_location_id</code>, <code>trip_distance</code>, <code>fare_amount</code>.</li>
+            <li><strong>Source freshness:</strong> dùng <code>dbt source freshness</code> để cảnh báo feed bị stale.</li>
+            <li><strong>Singular test:</strong> kiểm tra row-count và domain rules thực tế.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>tests/fct_trips_rowcount_reasonable.sql</span></div>
+            <div class="cmd-body"><pre>-- Fail nếu ngày gần nhất có số trip = 0 (pipeline có thể bị gãy)
+select 1
+where not exists (
+  select 1
+  from {{ ref('fct_trips') }}
+  where cast(pickup_datetime as date) = (
+    select max(cast(pickup_datetime as date)) from {{ ref('fct_trips') }}
+  )
+);</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">5️⃣</span>
+          COST & PERFORMANCE — BigQuery production tối ưu thế nào?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li><strong>Staging view trade-off:</strong> query linh hoạt nhưng downstream scan lặp lại.</li>
+            <li><strong>Khi đổi staging sang table:</strong> khi chi phí scan lặp quá cao hoặc DAG nhiều nhánh downstream.</li>
+            <li><strong>State-aware build:</strong> dùng <code>state:modified+</code> để chỉ build phần thay đổi trong CI.</li>
+            <li><strong>Partition/cluster fact:</strong> cân nhắc partition theo date, cluster theo key query phổ biến.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>fct_trips_bigquery_config.sql</span></div>
+            <div class="cmd-body"><pre>{{ config(
+  materialized='incremental',
+  unique_key='trip_id',
+  incremental_strategy='merge',
+  partition_by={"field": "pickup_datetime", "data_type": "timestamp", "granularity": "day"},
+  cluster_by=['pickup_location_id','dropoff_location_id']
+) }}</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">6️⃣</span>
+          SECURITY & GOVERNANCE — Rủi ro hiện tại và cách siết lại
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li><strong>env_var fallback:</strong> default project-id placeholder giúp fail sớm nhưng phải kiểm soát alert/log nghiêm túc.</li>
+            <li><strong>Service account key JSON:</strong> rủi ro commit nhầm; bắt buộc rotation policy khi nghi lộ key.</li>
+            <li><strong>Seeds trong git:</strong> phù hợp lookup không nhạy cảm; tuyệt đối tránh PII/secrets.</li>
+            <li><strong>Dev/prod isolation:</strong> tách credentials và schema để tránh ghi nhầm production.</li>
+            <li><strong>Ownership metadata:</strong> schema.yml nên có owner để biết ai chịu trách nhiệm khi model fail.</li>
+          </ul>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>schema_owner_meta.yml</span></div>
+            <div class="cmd-body"><pre>models:
+  - name: fct_trips
+    description: Fact table for taxi trips.
+    config:
+      contract:
+        enforced: true
+      meta:
+        owner: analytics_engineering_team
+        tier: gold
+        sla_hours: 24</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(3)">← S3: Thực hành</button>
+        <button class="nav-btn primary" onclick="showModule(5)">Tiếp theo: S5 Nâng cao →</button>
+      </div>
+    </div>
+
+    <div class="module" id="s5" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S5 · Advanced Knowledge</div>
+        <div class="module-title">Kiến thức nâng cao: Pro patterns, trade-offs và dấu hiệu outgrow</div>
+        <div class="module-subtitle">Tập trung vào cách đưa dbt project từ mức chạy được lên mức scale được.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🧠</span>
+          Phần 1 — dbt Pro patterns
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Vì sao <code>dbt build</code> là gold standard</h3>
+          <p><code>dbt build</code> chạy seed/run/test/snapshot theo DAG; fail ở đâu thì downstream skip ở đó. Đây là behavior phù hợp CI/CD production.</p>
+
+          <h3 class="green">Slim CI với state selector</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>slim_ci_build.sh</span></div>
+            <div class="cmd-body"><pre>dbt build --select state:modified+ --state ./prod-artifacts</pre></div>
+          </div>
+          <p>Không build toàn bộ mỗi PR vì tốn compute và kéo dài feedback loop. State-aware build chỉ chạy phần bị ảnh hưởng.</p>
+
+          <h3 class="orange">dbt Mesh (giới thiệu)</h3>
+          <p>Khi một project đơn lẻ trở nên quá lớn, multi-project boundaries + shared contracts giúp tránh spaghetti ownership.</p>
+
+          <h3>Selector syntax nâng cao (nhắc lại)</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>selectors.sh</span></div>
+            <div class="cmd-body"><pre>dbt run --select tag:nightly
+
+dbt run --select models/staging
+
+dbt build --select result:error+
+
+dbt run --select +fct_trips+</pre></div>
+          </div>
+
+          <h3>CI/CD workflow mẫu (GitHub Actions)</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>.github/workflows/dbt-ci.yml</span></div>
+            <div class="cmd-body"><pre>name: dbt-ci
+on: [pull_request]
+jobs:
+  dbt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install dbt-duckdb
+      - run: dbt deps
+      - run: dbt build --select state:modified+ --state ./prod-artifacts</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">📐</span>
+          Phần 2 — Data Modeling Pro patterns
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">SCD Type 2 với snapshots</h3>
+          <p>Dùng khi cần giữ lịch sử giá trị dimension theo thời gian thay vì overwrite.</p>
+
+          <h3 class="green">Surrogate key best practices</h3>
+          <ul>
+            <li>Chọn composite columns ổn định theo business grain.</li>
+            <li>Tránh đưa cột hay biến động không cần thiết vào key.</li>
+            <li>Giữ logic key generation nhất quán giữa các model.</li>
+          </ul>
+
+          <h3 class="orange">Incremental strategy trade-offs</h3>
+          <table>
+            <thead><tr><th>Strategy</th><th>Khi dùng</th><th>Ưu điểm</th><th>Rủi ro</th></tr></thead>
+            <tbody>
+              <tr><td><code>append</code></td><td>Data chỉ thêm mới, không update lịch sử</td><td>Đơn giản, nhanh</td><td>Dễ duplicate nếu upstream retry</td></tr>
+              <tr><td><code>merge</code></td><td>Có upsert theo unique_key</td><td>Idempotent tốt hơn</td><td>Query merge nặng hơn append</td></tr>
+              <tr><td><code>delete+insert</code></td><td>Warehouse không hỗ trợ merge tối ưu</td><td>Dễ hiểu</td><td>Chi phí cao hơn, latency cao hơn</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Fact grain & metric semantics</h3>
+          <p><code>fct_trips</code> có grain theo từng trip. Metric additive (vd. total_amount) khác với semi-additive theo time snapshots.</p>
+
+          <h3>Late-arriving dimension note</h3>
+          <p><code>dim_vendors</code> đang derive từ <code>fct_trips</code> là pattern không điển hình. Khi domain dimension có lifecycle độc lập, nên quản lý dim từ source chuyên biệt để tránh phụ thuộc fact.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🧪</span>
+          Phần 3 — Testing Pro patterns
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Loại test</th><th>Khi dùng</th><th>Ví dụ</th></tr></thead>
+            <tbody>
+              <tr><td>Generic test</td><td>Constraint phổ quát</td><td>unique, not_null, relationships</td></tr>
+              <tr><td>Singular test</td><td>Rule business tùy chỉnh</td><td>row count, anomaly guardrail</td></tr>
+              <tr><td>Custom generic test</td><td>Tái sử dụng rule nội bộ</td><td>quality policy theo team</td></tr>
+              <tr><td>Unit test (dbt v1.8+)</td><td>Test logic transform độc lập</td><td>mock input cho model/macro</td></tr>
+            </tbody>
+          </table>
+
+          <p><strong>dbt-expectations:</strong> phù hợp khi cần distribution/value-range checks nâng cao bên cạnh test core.</p>
+          <p><strong>Model contracts:</strong> <code>contract.enforced: true</code> giúp fail sớm khi schema drift.</p>
+
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>unit_test_safe_cast_example.yml</span></div>
+            <div class="cmd-body"><pre>unit_tests:
+  - name: test_safe_cast_numeric
+    model: stg_green_tripdata
+    given:
+      - input: source('raw', 'green_tripdata')
+        rows:
+          - {ratecodeid: '1'}
+          - {ratecodeid: 'abc'}
+    expect:
+      rows:
+        - {rate_code_id: 1}
+        - {rate_code_id: null}</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">⚖️</span>
+          Phần 4 — Trade-off matrix (Khi DÙNG vs KHÔNG DÙNG)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Chủ đề</th><th>Khi DÙNG</th><th>Khi KHÔNG DÙNG</th></tr></thead>
+            <tbody>
+              <tr><td>View</td><td>Staging nhẹ, logic cần luôn fresh</td><td>Downstream scan lặp quá đắt</td></tr>
+              <tr><td>Table</td><td>Model nặng cần precompute</td><td>Dữ liệu thay đổi liên tục, cần realtime view</td></tr>
+              <tr><td>Incremental</td><td>Fact lớn, dữ liệu tăng theo thời gian</td><td>Table nhỏ, logic thường xuyên rewrite toàn bộ</td></tr>
+              <tr><td>Ephemeral</td><td>Logic tạm, không cần materialize</td><td>Cần query trực tiếp/debug table vật lý</td></tr>
+              <tr><td>Seeds</td><td>Lookup nhỏ, ít đổi, không nhạy cảm</td><td>Dữ liệu lớn/PII/cập nhật liên tục</td></tr>
+              <tr><td>dbt Core</td><td>Muốn kiểm soát local/CLI, self-managed</td><td>Cần scheduler/collab managed sẵn</td></tr>
+              <tr><td>dbt Cloud</td><td>Team cần UI, jobs, env mgmt</td><td>Không muốn phụ thuộc dịch vụ managed</td></tr>
+              <tr><td>DuckDB local</td><td>Dev nhanh, prototyping, chi phí thấp</td><td>Concurrency cao, data volume vượt giới hạn RAM máy</td></tr>
+              <tr><td>BigQuery prod</td><td>Scale lớn, managed compute</td><td>Workload nhỏ nhưng query kém tối ưu gây cost spike</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">📈</span>
+          Phần 5 — Khi nào outgrow setup hiện tại?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li><strong>Outgrow DuckDB local:</strong> OOM lặp lại, build time tăng mạnh, nhiều người cần chạy song song.</li>
+            <li><strong>Outgrow single dbt project:</strong> hàng trăm models, ownership mờ, merge conflict DAG liên tục.</li>
+            <li><strong>Cần quality framework ngoài dbt tests:</strong> cần anomaly detection liên tục, distribution drift, SLA alerting đa tầng.</li>
+            <li><strong>Cần orchestrator chuyên dụng:</strong> dependency ngoài dbt tăng (API extract, ML jobs, multi-system backfills) nên cần Airflow/Dagster/Kestra quản lý end-to-end.</li>
+          </ul>
+
+          <div class="info-box note">🎯 <span><strong>Senior signal của Module 04:</strong> trả lời trôi chảy 3 câu hỏi roadmap (Fail, Cost, Scale) và áp dụng được Slim CI + Contracts + Tests + Docs trong quy trình thật.</span></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(4)">← S4: Production Thinking</button>
+        <button class="nav-btn primary" onclick="showModule(6)">Tiếp theo: S6 Lỗi thường gặp →</button>
+      </div>
+    </div>
+    <div class="module" id="s6" style="display:none">
+      <h1>S6 — Lỗi thường gặp (Troubleshooting Playbook)</h1>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🧯</span>
+          Phần 1 — 12 lỗi dbt thường gặp + nguyên nhân gốc
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Lỗi (error message thực tế)</th>
+                <th>Nguyên nhân</th>
+                <th>Cách fix</th>
+                <th>Cách phòng tránh</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>Database Error: relation does not exist</code></td>
+                <td><code>ref()</code> trỏ đến model chưa build hoặc model nằm ngoài selection hiện tại.</td>
+                <td>Chạy model upstream trước: <code>dbt run --select +model_name</code> hoặc <code>dbt build --select +model_name</code>.</td>
+                <td>Dùng CI để build graph theo dependency; tránh chạy rời từng model không có <code>+</code>.</td>
+              </tr>
+              <tr>
+                <td><code>Could not find relation</code></td>
+                <td><code>source()</code> trỏ sai schema/database hoặc source table chưa tồn tại.</td>
+                <td>Kiểm tra <code>sources.yml</code>, verify table thật trong warehouse, chạy lại ingestion upstream.</td>
+                <td>Bật <code>dbt source freshness</code> trong pipeline để fail sớm khi nguồn lệch.</td>
+              </tr>
+              <tr>
+                <td><code>Compilation Error: Expected NodeType.Model</code></td>
+                <td>Dùng <code>source()</code> thay cho <code>ref()</code> khi gọi model trung gian.</td>
+                <td>Đổi sang <code>ref('model_name')</code> cho inter-model dependency.</td>
+                <td>Quy ước rõ: raw ingestion dùng <code>source()</code>, transform layers dùng <code>ref()</code>.</td>
+              </tr>
+              <tr>
+                <td><code>Error: node was not found</code></td>
+                <td>Typo tên model trong <code>--select</code> hoặc model bị đổi tên.</td>
+                <td>Chạy <code>dbt ls --select ...</code> để xác thực selector trước khi run/build.</td>
+                <td>Dùng selector theo path/tag thay vì hardcode tên lẻ khi có thể.</td>
+              </tr>
+              <tr>
+                <td><code>Duplicate rows in unique test</code></td>
+                <td><code>fct_trips</code> bị duplicate <code>trip_id</code> sau incremental (late-arriving data hoặc merge key sai).</td>
+                <td>Deduplicate theo business key + timestamp, rồi <code>--full-refresh</code> nếu cần reset table.</td>
+                <td>Thiết kế <code>unique_key</code> chuẩn + lookback window cho incremental fact lớn.</td>
+              </tr>
+              <tr>
+                <td><code>Runtime Error: out of memory</code></td>
+                <td>DuckDB OOM khi build full dataset trên máy local RAM thấp.</td>
+                <td>Chạy subset theo date, giảm columns, hoặc chuyển workload nặng sang BigQuery.</td>
+                <td>Giữ local cho dev/prototype; production scale dùng warehouse managed.</td>
+              </tr>
+              <tr>
+                <td><code>Error acquiring state lock</code></td>
+                <td>Hai process dbt chạy đồng thời cùng state/artifacts.</td>
+                <td>Stop process trùng, xóa lock hợp lệ nếu job cũ đã chết, chạy lại tuần tự.</td>
+                <td>Thiết kế orchestrator tránh overlap schedule; mỗi env chỉ một writer tại một thời điểm.</td>
+              </tr>
+              <tr>
+                <td><code>Package not found</code></td>
+                <td><code>dbt deps</code> fail do registry unreachable hoặc version mismatch.</td>
+                <td>Kiểm tra mạng, pin version hợp lệ trong <code>packages.yml</code>, chạy lại <code>dbt deps</code>.</td>
+                <td>Pin package versions rõ ràng và cache dependency trong CI.</td>
+              </tr>
+              <tr>
+                <td><code>env_var GCP_PROJECT_ID not set</code></td>
+                <td>Thiếu biến môi trường khi chạy target BigQuery.</td>
+                <td>Set env var trong shell/CI secret rồi chạy lại profile target.</td>
+                <td>Document contract env vars bắt buộc cho từng environment.</td>
+              </tr>
+              <tr>
+                <td><code>full-refresh required</code></td>
+                <td>Schema/model logic đổi không tương thích với incremental table hiện có.</td>
+                <td>Chạy <code>dbt run --full-refresh --select model_name</code> trong window bảo trì.</td>
+                <td>Review schema-changing PR kỹ và lên kế hoạch backfill trước merge.</td>
+              </tr>
+              <tr>
+                <td><code>Source 'raw.green_tripdata' is not fresh</code></td>
+                <td>Source freshness fail vì ingestion upstream trễ hoặc chết job.</td>
+                <td>Khôi phục ingestion, backfill missing partitions rồi rerun downstream.</td>
+                <td>Đặt SLA freshness + alerting thay vì đợi analyst phát hiện muộn.</td>
+              </tr>
+              <tr>
+                <td><code>compilation error in macro</code></td>
+                <td>Jinja syntax lỗi trong macro custom (dấu ngoặc, filter, biến context).</td>
+                <td>Chạy <code>dbt compile</code>, sửa syntax và test macro với input nhỏ.</td>
+                <td>Review macro bằng PR checklist + unit test cho macro quan trọng.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🧭</span>
+          Phần 2 — Debugging checklist theo thứ tự ưu tiên
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ol>
+            <li><strong>Copy nguyên văn error message</strong> (không paraphrase) và xác định lỗi ở compile hay runtime.</li>
+            <li><strong>Thu hẹp phạm vi bằng selector</strong>: chạy model nhỏ nhất tái hiện lỗi với <code>dbt build --select ...</code>.</li>
+            <li><strong>Kiểm tra dependency graph</strong>: xác thực <code>ref()</code>, <code>source()</code>, và upstream readiness.</li>
+            <li><strong>So khớp environment</strong>: profile target, env vars, credentials, package versions.</li>
+            <li><strong>Inspect data reality</strong>: duplicate/null/schema drift trực tiếp trong warehouse.</li>
+            <li><strong>Apply fix nhỏ nhất có thể</strong>, rồi chạy lại theo thứ tự compile → run/build → test.</li>
+            <li><strong>Xác nhận chống tái phát</strong>: thêm test, contract, freshness check hoặc CI gate tương ứng.</li>
+          </ol>
+
+          <div class="info-box note">📝 <span><strong>Action bắt buộc:</strong> mở Logbook và ghi lại lỗi vừa gặp (symptom, root cause, fix, lesson learned) để build tư duy Senior qua từng incident.</span></div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(5)">← S5: Kiến thức nâng cao</button>
+        <button class="nav-btn primary" onclick="showModule(7)">Tiếp theo: S7 Interview Prep →</button>
+      </div>
+    </div>
+
+    <div class="module" id="s7" style="display:none">
+      <h1>S7 — Interview Prep (Junior → Mid → Senior)</h1>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🎯</span>
+          Cách dùng section này: click từng câu để mở gợi ý trả lời + red flag
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Mục tiêu không phải học thuộc lòng, mà là trả lời theo cấu trúc: <strong>Context → Decision → Trade-off → Failure mode</strong>.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔵</span>
+          <span class="badge badge-blue">Junior</span> 1) dbt model là gì? Khác stored procedure thế nào?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> dbt model là file SQL dạng SELECT declarative, dbt compile + materialize thành view/table/incremental trong warehouse. Stored procedure là code procedural chạy theo control-flow; khó review lineage hơn và thường gắn chặt engine-specific syntax.</p>
+          <p><strong>Red flag: đừng nói...</strong> “dbt chỉ là tool chạy SQL nên giống stored procedure.”</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔵</span>
+          <span class="badge badge-blue">Junior</span> 2) <code>ref()</code> và <code>source()</code> khác nhau thế nào, khi nào dùng?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> <code>source()</code> trỏ dữ liệu raw có sẵn (ngoài dbt ownership), còn <code>ref()</code> trỏ model do dbt build và tự tạo dependency graph. Rule thực hành: raw → staging dùng <code>source()</code>; staging/intermediate/marts gọi nhau bằng <code>ref()</code>.</p>
+          <p><strong>Red flag: đừng nói...</strong> “Dùng cái nào cũng được, miễn query chạy.”</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔵</span>
+          <span class="badge badge-blue">Junior</span> 3) Tại sao staging layer nên dùng view thay vì table?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> staging chủ yếu chuẩn hóa schema/typing nhẹ, nên view giảm storage duplication và luôn phản ánh raw mới nhất. Chỉ chuyển sang table khi view bị scan lặp gây cost/latency cao hoặc logic quá nặng.</p>
+          <p><strong>Red flag: đừng nói...</strong> “View luôn tốt hơn table trong mọi trường hợp.”</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔵</span>
+          <span class="badge badge-blue">Junior</span> 4) dbt test chạy lúc nào trong pipeline, fail test có stop pipeline không?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> khi dùng <code>dbt build</code>, test chạy sau khi model liên quan được materialize; test fail sẽ làm step/job fail để chặn downstream publish. Với <code>dbt run</code> đơn thuần thì không tự chạy test nếu không gọi thêm <code>dbt test</code>.</p>
+          <p><strong>Red flag: đừng nói...</strong> “Fail test vẫn ổn, chỉ là warning.”</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🟡</span>
+          <span class="badge badge-orange">Mid</span> 5) Incremental model hoạt động thế nào? <code>unique_key</code> dùng để làm gì?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> incremental chỉ xử lý phần data mới/thay đổi thay vì rebuild full table mỗi lần. <code>unique_key</code> định danh record để engine MERGE/UPSERT đúng hàng, giúp idempotency khi retry/backfill.</p>
+          <p><strong>Red flag: đừng nói...</strong> “Incremental nghĩa là insert thêm, không cần quan tâm duplicate/update.”</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🟡</span>
+          <span class="badge badge-orange">Mid</span> 6) Tại sao cần surrogate key thay vì natural key từ source?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> natural key từ source có thể null, đổi format, hoặc không globally unique giữa nhiều nguồn. Surrogate key chuẩn hóa join semantics, giảm coupling với upstream schema và ổn định cho marts/tests.</p>
+          <p><strong>Red flag: đừng nói...</strong> “Source có ID rồi thì luôn đủ dùng, không cần surrogate key.”</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🟡</span>
+          <span class="badge badge-orange">Mid</span> 7) <code>dbt build</code> khác <code>dbt run</code> thế nào? Khi nào dùng build?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> <code>dbt run</code> chỉ materialize models; <code>dbt build</code> chạy seeds/snapshots/models/tests theo DAG, nên phù hợp CI/CD vì có quality gate tích hợp. Build thường là default command cho production deploy.</p>
+          <p><strong>Red flag: đừng nói...</strong> “Run và build như nhau, chỉ khác tên lệnh.”</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🟡</span>
+          <span class="badge badge-orange">Mid</span> 8) Làm sao đảm bảo dbt project chạy được ở cả DuckDB và BigQuery?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> tách cấu hình theo target trong <code>profiles.yml</code>, gom logic đặc thù engine vào macros dispatch, hạn chế SQL vendor-specific trong models lõi. CI nên chạy ít nhất một subset test trên mỗi target quan trọng.</p>
+          <p><strong>Red flag: đừng nói...</strong> “Copy-paste hai codebase SQL riêng là nhanh nhất.”</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔴</span>
+          <span class="badge" style="color:#ff7b72;border-color:#ff7b72;background:#ff7b721f;">Senior</span> 9) Pipeline incremental fail lúc 3h sáng sau khi merge 80% data — xử lý thế nào mà không mất data?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> đóng băng downstream publish, xác định phạm vi commit dang dở bằng watermark/partition, rerun idempotent theo window affected. Nếu schema drift lớn, dùng snapshot backup + controlled full-refresh/backfill theo partition thay vì truncate toàn bộ.</p>
+          <p><strong>Red flag: đừng nói...</strong> “Drop table rồi chạy lại full luôn cho chắc.”</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔴</span>
+          <span class="badge" style="color:#ff7b72;border-color:#ff7b72;background:#ff7b721f;">Senior</span> 10) Team 10 AE cùng dbt project, CI/CD setup thế nào để tránh conflict và tốn kém compute?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> áp dụng Slim CI (<code>state:modified+</code> + defer to prod), bắt buộc PR checks (compile/build/test/docs), ownership theo folder/domain và policy merge window. Dùng ephemeral dev schemas theo user để tránh dẫm nhau.</p>
+          <p><strong>Red flag: đừng nói...</strong> “Mỗi PR chạy full 200 models trên prod warehouse cho an toàn.”</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔴</span>
+          <span class="badge" style="color:#ff7b72;border-color:#ff7b72;background:#ff7b721f;">Senior</span> 11) Thiết kế data model cho taxi trips support cả real-time dashboard lẫn monthly reporting — trade-offs?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> tách serving layer theo latency requirement: near-real-time aggregate table cho dashboard và curated marts ổn định cho reporting tháng. Trade-off chính là freshness vs consistency/cost; cần định nghĩa SLA khác nhau và reconciliation job để đồng bộ số liệu.</p>
+          <p><strong>Red flag: đừng nói...</strong> “Một bảng duy nhất giải quyết hết mọi use case BI.”</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🔴</span>
+          <span class="badge" style="color:#ff7b72;border-color:#ff7b72;background:#ff7b721f;">Senior</span> 12) dbt project có 200 models, test coverage 30% — ưu tiên viết test theo thứ tự nào, tại sao?
+          <span class="section-toggle">▶</span>
+        </div>
+        <div class="section-content" style="display:none">
+          <p><strong>Gợi ý trả lời:</strong> ưu tiên theo risk x blast radius: (1) marts/business-critical KPIs, (2) keys/relationships của fact-dim, (3) freshness/contract cho sources, rồi mới mở rộng xuống staging chi tiết. Mục tiêu là giảm xác suất incident nặng trước khi tăng coverage tuyệt đối.</p>
+          <p><strong>Red flag: đừng nói...</strong> “Viết random test cho đủ phần trăm coverage trước đã.”</p>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(6)">← S6: Lỗi thường gặp</button>
+        <button class="nav-btn primary" onclick="showModule(8)">Tiếp theo: S8 Checklist & Tổng kết →</button>
+      </div>
+    </div>
+
+    <div class="module" id="s8" style="display:none">
+      <h1>S8 — Checklist & Tổng kết Module 04</h1>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">✅</span>
+          Phần 1 — Progress checklist (18 mục, tự cập nhật)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;">
+            <div style="width:100%;height:12px;background:#0d1117;border:1px solid var(--border);border-radius:999px;overflow:hidden;">
+              <div id="checklist-progress-fill" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .25s ease;"></div>
+            </div>
+            <div id="checklist-progress-text" style="margin-top:8px;font-size:.86rem;color:var(--text2);">0/18 mục hoàn thành (0%)</div>
+          </div>
+
+          <h3 style="margin-bottom:8px;"><span class="badge badge-blue">Beginner</span></h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Giải thích được ELT vs ETL và tại sao dbt phù hợp với ELT.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Setup được local DuckDB hoặc BigQuery + dbt Cloud không cần hỏi.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Chạy được <code>dbt deps</code>, <code>dbt seed</code>, <code>dbt run</code>, <code>dbt test</code> không lỗi.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Đọc hiểu được lineage graph trong dbt docs.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Biết phân biệt <code>ref()</code> vs <code>source()</code> và dùng đúng trong model.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Biết <code>dbt_project.yml</code> cấu hình materialization mặc định thế nào.</span></div>
+
+          <h3 style="margin:18px 0 8px;"><span class="badge badge-orange">Intermediate</span></h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Tự viết staging model từ đầu: rename, cast, filter, macro call.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Tự viết <code>schema.yml</code> với tests: unique, not_null, accepted_values, relationships.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Hiểu incremental model: <code>unique_key</code>, merge strategy, <code>--full-refresh</code> khi nào.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Debug được lỗi <code>ref()</code> và <code>source()</code> không cần nhìn docs.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Dùng được <code>dbt build --select</code> với selector syntax để chạy subset.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Viết được macro đơn giản với Jinja và khai báo trong <code>macros_properties.yml</code>.</span></div>
+
+          <h3 style="margin:18px 0 8px;"><span class="badge" style="color:#ff7b72;border-color:#ff7b72;background:#ff7b721f;">Senior</span></h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Thiết kế được 3-layer architecture (staging/intermediate/marts) cho domain mới.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Implement được incremental model với lookback window tránh late-arriving data.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Viết được unit test cho macro và singular test cho business rule.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Cấu hình được slim CI workflow (<code>state:modified+</code> + defer to prod).</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Giải thích được trade-offs materialization cho từng layer, justify cho người không biết dbt.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Trả lời được 4 câu Senior interview không cần nhìn tài liệu.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🧠</span>
+          Phần 2 — Summary grid (5 điểm chốt)
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="summary-grid">
+            <div class="info-box note">1) <strong>dbt = version control + CI/CD + docs + lineage</strong> cho SQL transformation ở chuẩn team.</div>
+            <div class="info-box note">2) <strong>3-layer architecture</strong> (staging → intermediate → marts) là nguyên tắc nền tảng để scale project.</div>
+            <div class="info-box note">3) <strong>Incremental + unique_key</strong> là chìa khóa idempotency cho fact tables lớn.</div>
+            <div class="info-box note">4) <strong>dbt build + slim CI</strong> là gold standard production pipeline cho analytics engineering.</div>
+            <div class="info-box note">5) <strong>Kiến thức transfer được:</strong> BigQuery ↔ Redshift/Snowflake, DuckDB ↔ local dev, dbt Core/Cloud giữ nguyên concept.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">🏁</span>
+          Phần 3 — Definition of Done (DoD) trước khi sang Module 05
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Chạy được:</strong> toàn bộ dbt pipeline của module từ đầu đến cuối không vấp.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Hiểu được:</strong> vẽ lại kiến trúc Module 04 trên giấy trắng không nhìn tài liệu.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Phá được:</strong> tự tạo ít nhất 1 lỗi dbt thực tế và ghi đầy đủ vào Logbook.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Tối ưu được:</strong> tránh hardcode secrets, chọn materialization có lý do rõ ràng.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><strong>Trả lời được:</strong> xử lý trôi chảy các câu Senior interview ở S7.</span></div>
+
+          <div class="info-box warn">🚦 <span><strong>Rule:</strong> chỉ chuyển sang Module 05 khi bạn tự tin tick đủ 5 mục DoD này.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">📦</span>
+          Phần 4 — Preview Module 05
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Module tiếp theo: Batch Processing với Spark.</strong></p>
+          <p>Cần chuẩn bị: hiểu được data model từ module này, và làm quen với distributed computing concepts.</p>
+          <p><a href="Module05_Batch_Processing.html">→ Module 05: Batch Processing</a></p>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="nav-btn" onclick="showModule(7)">← S7: Interview Prep</button>
+        <button class="nav-btn primary" onclick="showModule(0)">Ôn lại từ S0</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const modules=document.querySelectorAll('.module');
+const navItems=document.querySelectorAll('.nav-item');
+
+function showModule(index,navItem){
+  modules.forEach(m=>{m.classList.remove('active');m.style.display='none'});
+  navItems.forEach(i=>i.classList.remove('active'));
+  const target=document.getElementById(`s${index}`);
+  if(target){target.classList.add('active');target.style.display='block'}
+  if(navItem)navItem.classList.add('active');
+  else if(navItems[index])navItems[index].classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toggleSection(header){
+  const content=header.nextElementSibling;
+  const toggle=header.querySelector('.section-toggle');
+  const isHidden=content.style.display==='none';
+  content.style.display=isHidden?'block':'none';
+  toggle.textContent=isHidden?'▼':'▶';
+}
+
+function answerQuiz(el,isCorrect,msg){
+  const item=el.closest('.quiz-item');
+  const opts=item.querySelectorAll('.quiz-opt');
+  const explain=item.querySelector('.quiz-explain');
+  opts.forEach(opt=>(opt.style.pointerEvents='none'));
+  el.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect){opts.forEach(opt=>{const o=opt.getAttribute('onclick');if(o&&o.includes('true'))opt.classList.add('correct')})}
+  explain.textContent=(isCorrect?'✓ Chính xác! ':'✗ Sai. ')+msg;
+  explain.classList.add('show');
+}
+
+function toggleSolution(btn){
+  const box=btn.nextElementSibling;
+  if(!box)return;
+  const show=box.classList.toggle('show');
+  btn.textContent=show?'🔼 Ẩn lời giải':'💡 Xem lời giải';
+}
+
+function switchTab(groupId,tabId){
+  const group=document.getElementById(groupId);
+  if(!group)return;
+  group.querySelectorAll('.tab').forEach(tab=>tab.classList.remove('active'));
+  const clicked=group.querySelector(`[onclick*="${tabId}"]`);
+  if(clicked)clicked.classList.add('active');
+  const container=group.parentElement;
+  container.querySelectorAll('.tab-content').forEach(content=>content.classList.remove('active'));
+  const target=document.getElementById(tabId);
+  if(target)target.classList.add('active');
+}
+
+function toggleCheck(box){
+  box.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress(){
+  const s8MainChecklist=document.querySelector('#s8 .section .section-content');
+  if(!s8MainChecklist)return;
+  const checks=s8MainChecklist.querySelectorAll('.check-box');
+  const checked=s8MainChecklist.querySelectorAll('.check-box.checked').length;
+  const total=checks.length;
+  const pct=total===0?0:Math.round((checked/total)*100);
+  const fill=document.getElementById('checklist-progress-fill');
+  const text=document.getElementById('checklist-progress-text');
+  if(fill)fill.style.width=`${pct}%`;
+  if(text)text.textContent=`${checked}/${total} mục hoàn thành (${pct}%)`;
+}
+
+showModule(0,navItems[0]);
+updateProgress();
+</script>
+</body>
+</html>

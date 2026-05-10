@@ -1,0 +1,59 @@
+name: data-ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  python-tests:
+    name: Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r 12-cicd-practice/requirements.txt
+
+      - name: Run pytest
+        run: |
+          cd 12-cicd-practice
+          pytest -q
+
+  dbt-build:
+    name: dbt local build
+    runs-on: ubuntu-latest
+    needs: python-tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dbt
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core dbt-duckdb duckdb
+
+      - name: dbt seed and build
+        run: |
+          cd 12-cicd-practice/dbt_sample
+          dbt deps
+          dbt seed --profiles-dir .
+          dbt build --profiles-dir .
+

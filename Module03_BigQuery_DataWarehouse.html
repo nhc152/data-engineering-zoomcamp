@@ -171,7 +171,7 @@
     <div class="nav-item" onclick="showModule(1,this)"><span class="nav-number">S1</span>Lý thuyết nền</div>
     <div class="nav-item" onclick="showModule(2,this)"><span class="nav-number">S2</span>Đọc hiểu code repo</div>
     <div class="nav-item" onclick="showModule(3,this)"><span class="nav-number">S3</span>Thực hành từng bước</div>
-    <div class="nav-item" onclick="showModule(4,this)"><span class="nav-number">S4</span>Production Thinking</div>
+    <div class="nav-item" onclick="showModule(4,this)"><span class="nav-number">S4</span>Production Readiness</div>
     <div class="nav-item" onclick="showModule(5,this)"><span class="nav-number">S5</span>Kiến thức nâng cao</div>
     <div class="nav-item" onclick="showModule(6,this)"><span class="nav-number">S6</span>Lỗi thường gặp</div>
     <div class="nav-item" onclick="showModule(7,this)"><span class="nav-number">S7</span>Interview Prep</div>
@@ -686,6 +686,9 @@
   uris = [<span class="str">'gs://nyc-tl-data/trip data/fhv_tripdata_2019-*.csv'</span>]
 );
 
+<span class="kw">CREATE OR REPLACE TABLE</span> `taxi-rides-ny.nytaxi.fhv_nonpartitioned_tripdata`
+<span class="kw">AS SELECT</span> * <span class="kw">FROM</span> `taxi-rides-ny.nytaxi.fhv_tripdata`;
+
 <span class="kw">CREATE OR REPLACE TABLE</span> `taxi-rides-ny.nytaxi.fhv_partitioned_tripdata`
 <span class="kw">PARTITION BY</span> DATE(dropoff_datetime)
 <span class="kw">CLUSTER BY</span> dispatching_base_num <span class="kw">AS</span> (
@@ -718,7 +721,11 @@
 <span class="kw">WHERE</span> fare_amount != 0;
 
 <span class="kw">CREATE OR REPLACE MODEL</span> `taxi-rides-ny.nytaxi.tip_model`
-<span class="kw">OPTIONS</span>(model_type=<span class="str">'linear_reg'</span>, input_label_cols=[<span class="str">'tip_amount'</span>]) <span class="kw">AS</span>
+<span class="kw">OPTIONS</span>(
+  model_type=<span class="str">'linear_reg'</span>,
+  input_label_cols=[<span class="str">'tip_amount'</span>],
+  DATA_SPLIT_METHOD=<span class="str">'AUTO_SPLIT'</span>
+) <span class="kw">AS</span>
 <span class="kw">SELECT</span> * <span class="kw">FROM</span> `taxi-rides-ny.nytaxi.yellow_tripdata_ml` <span class="kw">WHERE</span> tip_amount <span class="kw">IS NOT NULL</span>;
 
 <span class="kw">SELECT</span> * <span class="kw">FROM</span> ML.EVALUATE(MODEL `taxi-rides-ny.nytaxi.tip_model`, (...));
@@ -731,7 +738,9 @@
               <li><strong>Vì sao cast LocationID sang STRING:</strong> ID vị trí là categorical, không mang thứ tự tuyến tính; cast giúp BQML xử lý đúng kiểu category thay vì numeric scale.</li>
               <li><strong>`linear_reg` phù hợp khi:</strong> cần baseline regression dễ giải thích; không phù hợp quan hệ phi tuyến quá mạnh nếu không có feature engineering thêm.</li>
               <li><strong>`ML.EXPLAIN_PREDICT`:</strong> trả về độ đóng góp feature cho từng prediction, hữu ích để debug model behavior và giải thích cho stakeholder.</li>
-              <li><strong>Hyperparameter tuning:</strong> `num_trials` = số lần thử; `max_parallel_trials` = số trial chạy song song; `l1_reg`/`l2_reg` = regularization chống overfitting.</li>
+              <li><strong>Hyperparameter tuning:</strong> <code>num_trials=5</code> (số lần thử); <code>max_parallel_trials=2</code> (chạy song song); <code>l1_reg=hparam_range(0, 20)</code> và <code>l2_reg=hparam_candidates([0, 0.1, 1, 10])</code> dùng để regularization chống overfitting.</li>
+              <li><strong>Tại sao cast <code>PULocationID</code>/<code>DOLocationID</code> sang STRING:</strong> Location ID là identifier, không có linear ordering (ID 1 không "nhỏ hơn" ID 2 theo nghĩa thực). Nếu giữ numeric, model dễ coi như continuous variable và học feature sai; cast STRING giúp BQML xử lý dạng categorical (one-hot encoding) đúng ngữ nghĩa.</li>
+              <li><strong><code>ML.FEATURE_INFO</code> trả về gì:</strong> thống kê phân phối feature như mean, stddev, null_count, category_count; dùng để soi skewed features và missing values trước khi train.</li>
             </ul>
           </div>
 
@@ -740,9 +749,24 @@
             <div class="cmd-block">
               <div class="cmd-header"><span>● ● ●</span><span>web_to_gcs.py (excerpt)</span></div>
               <div class="cmd-body">
-<pre><span class="kw">request_url</span> = <span class="str">f"{init_url}{service}/{file_name}"</span>
+<pre><span class="kw">import</span> os, requests, pandas <span class="kw">as</span> pd
+<span class="kw">from</span> google.cloud <span class="kw">import</span> storage
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+<span class="kw">init_url</span> = <span class="str">"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/"</span>
+<span class="kw">request_url</span> = <span class="str">f"{init_url}{service}/{file_name}"</span>
 r = requests.get(request_url)
 open(file_name, <span class="str">"wb"</span>).write(r.content)
+
+dtypes = {
+    <span class="str">"VendorID"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"RatecodeID"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"PULocationID"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"DOLocationID"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"passenger_count"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"payment_type"</span>: <span class="str">"Int64"</span>,
+    <span class="str">"trip_type"</span>: <span class="str">"Int64"</span>,
+}
 
 df = pd.read_csv(file_name, dtype=dtypes, parse_dates=parse_dates, compression=<span class="str">"gzip"</span>)
 file_name = file_name.replace(<span class="str">".csv.gz"</span>, <span class="str">".parquet"</span>)
@@ -767,6 +791,14 @@ upload_to_gcs(BUCKET, f<span class="str">"{service}/{file_name}"</span>, file_na
               <li>Không có checksum hoặc data quality check sau convert/upload.</li>
               <li>Không có retry policy có chủ đích và thiếu structured logging.</li>
               <li>Năm/service đang hard-coded ở cuối script, chưa linh hoạt theo tham số runtime.</li>
+            </ul>
+
+            <h3 class="orange">Bổ sung production note — download local trước khi parse có ý nghĩa gì?</h3>
+            <ul>
+              <li><strong>Vì sao không parse trực tiếp từ URL vào pandas:</strong> file <code>.csv.gz</code> từ GitHub releases khá lớn (100MB+). Parse stream thẳng vào dataframe thường gây áp lực RAM và kém ổn định với dataset lớn.</li>
+              <li><strong>Pattern an toàn hơn:</strong> download về disk trước → đọc có kiểm soát (có thể chunk) → convert parquet → upload, giúp dễ retry/resume và dễ verify integrity từng bước.</li>
+              <li><strong>pyarrow vs fastparquet trong repo này:</strong> code thực tế gọi <code>df.to_parquet(file_name, engine="pyarrow")</code>, nên engine đang dùng là <strong>pyarrow</strong>, không phải fastparquet.</li>
+              <li><strong>Trade-off nhanh:</strong> pyarrow thường tương thích rộng và ổn định schema/type handling cho pipeline DE; fastparquet có thể nhẹ ở vài use case nhưng thường cần test kỹ hơn với typed columns phức tạp.</li>
             </ul>
           </div>
 
@@ -1232,6 +1264,14 @@ log_event(
             <li>Verify nhanh: <code>gcloud auth application-default print-access-token</code>.</li>
           </ul>
 
+          <h3 class="orange">7) Thay đổi schema file Parquet trên GCS rồi query External Table cũ</h3>
+          <ul>
+            <li><strong>Lỗi thường gặp:</strong> schema mismatch hoặc cột mới trả về <code>NULL</code> khi query.</li>
+            <li><strong>Tại sao:</strong> External Table giữ schema tại thời điểm <code>CREATE</code>, không tự auto-refresh schema mới từ source.</li>
+            <li><strong>Fix:</strong> <code>DROP</code> và <code>CREATE OR REPLACE EXTERNAL TABLE</code> để refresh schema metadata.</li>
+            <li><strong>Production lesson:</strong> schema evolution cần version control và migration plan rõ (không thay schema ad-hoc trên raw files).</li>
+          </ul>
+
           <div class="info-box danger">🔥 <span><strong>Debug order đề xuất:</strong> (1) đọc full error trong Job details/log, (2) kiểm tra credentials, (3) kiểm tra GCS path, (4) kiểm tra table metadata, (5) kiểm tra bytes scanned/pruning.</span></div>
         </div>
       </div>
@@ -1355,6 +1395,15 @@ run_job.result()</pre>
 }</pre>
             </div>
           </div>
+
+          <h3 class="orange">Security nâng cao — Column-level security & Authorized Views</h3>
+          <ul>
+            <li><strong>Column-level security trong BigQuery:</strong> dùng Policy Tags (Data Catalog) để mask cột nhạy cảm như PII/payment info.</li>
+            <li><strong>Hành vi runtime:</strong> user không đủ permission chỉ thấy NULL/masked value; không bypass được bằng <code>SELECT *</code>.</li>
+            <li><strong>Khi nào đặc biệt quan trọng:</strong> nhiều use case analytics cần chia sẻ dataset rộng, nhưng chỉ một số cột cần che chắn chặt.</li>
+            <li><strong>BigQuery Authorized Views:</strong> expose subset dữ liệu cho team khác mà không cấp full dataset access.</li>
+            <li><strong>Pattern:</strong> raw dataset team A → authorized view (aggregated/filtered) → team B chỉ thấy phần được phép.</li>
+          </ul>
 
           <h3 class="blue">5) DATA QUALITY — Làm sao biết dữ liệu load đúng?</h3>
           <p>Script hiện tại tập trung ingest, chưa có assertion sau load. Production cần checks tự động để phát hiện silent corruption hoặc schema drift sớm.</p>
@@ -1857,6 +1906,7 @@ run_job.result()</pre>
             <div class="summary-item"><strong>3) External → Native</strong>Flow chuẩn: External table để explore, Native table để tối ưu production và workload lặp lại.</div>
             <div class="summary-item"><strong>4) Idempotency</strong><code>CREATE OR REPLACE</code> là quick fix; production pattern là incremental partition load + watermark.</div>
             <div class="summary-item"><strong>5) Transferable mapping</strong>GCS → S3, BQ Dataset → Redshift Schema, BQML → SageMaker Autopilot, External Table → Redshift Spectrum/Athena.</div>
+            <div class="summary-item"><strong>6) BQML là entry point, không phải đích cuối</strong>Linear regression trong repo đủ để hiểu workflow, nhưng production ML cần Vertex AI Pipelines + Feature Store + Model Registry + Monitoring; biết khi nào “graduate” khỏi BQML là dấu hiệu Senior DE.</div>
           </div>
         </div>
       </div>

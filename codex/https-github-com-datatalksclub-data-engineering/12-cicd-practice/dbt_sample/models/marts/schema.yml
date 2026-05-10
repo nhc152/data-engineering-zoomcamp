@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: fct_orders
+    description: One row per order. Used as the core order fact.
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        tests:
+          - not_null
+      - name: order_date
+        tests:
+          - not_null
+      - name: recognized_revenue
+        tests:
+          - not_null
+
+  - name: mart_daily_revenue
+    description: One row per order_date with revenue metrics.
+    columns:
+      - name: order_date
+        tests:
+          - not_null
+          - unique
+      - name: recognized_revenue
+        tests:
+          - not_null
+

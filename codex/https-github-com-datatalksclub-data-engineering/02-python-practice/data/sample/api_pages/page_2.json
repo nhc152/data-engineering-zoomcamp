@@ -1,0 +1,15 @@
+{
+  "simulate": "timeout_once",
+  "data": [
+    {
+      "order_id": "O5003",
+      "customer_id": "C102",
+      "order_timestamp": "2026-05-09T00:10:00Z",
+      "status": "paid",
+      "amount": "30.00",
+      "updated_at": "2026-05-09T00:11:00Z"
+    }
+  ],
+  "next_page": "page_3.json"
+}
+

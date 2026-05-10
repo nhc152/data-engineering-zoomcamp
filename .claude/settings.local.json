@@ -25,7 +25,8 @@
       "Bash(grep *)",
       "Bash(rg *)",
       "Bash(wc *)",
-      "mcp__ide__executeCode"
+      "mcp__ide__executeCode",
+      "mcp__plugin_claude-mem_mcp-search__get_observations"
     ],
     "deny": [
       "Bash(del *)",
