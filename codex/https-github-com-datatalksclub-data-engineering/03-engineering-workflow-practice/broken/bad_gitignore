@@ -1,6 +1,0 @@
-# Bad .gitignore example.
-# This misses .env files and generated data.
-
-__pycache__/
-.pytest_cache/
-

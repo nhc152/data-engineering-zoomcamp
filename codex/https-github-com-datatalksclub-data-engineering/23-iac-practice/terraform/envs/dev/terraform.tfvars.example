@@ -1,6 +1,0 @@
-project_id  = "REPLACE_WITH_DEV_PROJECT_ID"
-location    = "US"
-name_prefix = "REPLACE_WITH_UNIQUE_PREFIX"
-owner       = "your_name"
-cost_center = "learning"
-

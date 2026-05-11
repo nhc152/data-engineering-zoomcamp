@@ -1,5 +1,0 @@
-{"event_id":"evt-101","order_id":"O2001","event_type":"order_paid","amount":50}
-{"event_id":"evt-102","order_id":"O2002","event_type":"order_paid","amount":70}
-{"event_id":"evt-101","order_id":"O2001","event_type":"order_paid","amount":50}
-{"event_id":"evt-103","order_id":"O2003","event_type":"order_paid","amount":90}
-

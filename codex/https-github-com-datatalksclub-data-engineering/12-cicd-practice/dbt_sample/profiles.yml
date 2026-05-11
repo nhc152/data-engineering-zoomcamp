@@ -1,8 +1,0 @@
-cicd_practice:
-  target: dev
-  outputs:
-    dev:
-      type: duckdb
-      path: target/cicd_practice.duckdb
-      threads: 4
-

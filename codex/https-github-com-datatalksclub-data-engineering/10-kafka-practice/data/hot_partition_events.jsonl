@@ -1,7 +1,0 @@
-{"event_id":"hot-0001","event_type":"OrderCreated","event_timestamp":"2026-05-05T00:00:01Z","schema_version":1,"producer":"kafka-practice","order_id":"HOT-ORDER","customer_id":"C999","amount":10.00,"order_status":"paid"}
-{"event_id":"hot-0002","event_type":"OrderCreated","event_timestamp":"2026-05-05T00:00:02Z","schema_version":1,"producer":"kafka-practice","order_id":"HOT-ORDER","customer_id":"C999","amount":11.00,"order_status":"paid"}
-{"event_id":"hot-0003","event_type":"OrderCreated","event_timestamp":"2026-05-05T00:00:03Z","schema_version":1,"producer":"kafka-practice","order_id":"HOT-ORDER","customer_id":"C999","amount":12.00,"order_status":"paid"}
-{"event_id":"hot-0004","event_type":"OrderCreated","event_timestamp":"2026-05-05T00:00:04Z","schema_version":1,"producer":"kafka-practice","order_id":"HOT-ORDER","customer_id":"C999","amount":13.00,"order_status":"paid"}
-{"event_id":"hot-0005","event_type":"OrderCreated","event_timestamp":"2026-05-05T00:00:05Z","schema_version":1,"producer":"kafka-practice","order_id":"HOT-ORDER","customer_id":"C999","amount":14.00,"order_status":"paid"}
-{"event_id":"hot-0006","event_type":"OrderCreated","event_timestamp":"2026-05-05T00:00:06Z","schema_version":1,"producer":"kafka-practice","order_id":"HOT-ORDER","customer_id":"C999","amount":15.00,"order_status":"paid"}
-

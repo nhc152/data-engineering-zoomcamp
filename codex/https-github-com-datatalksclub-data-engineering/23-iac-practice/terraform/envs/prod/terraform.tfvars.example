@@ -1,6 +1,0 @@
-project_id  = "REPLACE_WITH_PROD_PROJECT_ID"
-location    = "US"
-name_prefix = "REPLACE_WITH_UNIQUE_PREFIX"
-owner       = "data_platform"
-cost_center = "analytics"
-

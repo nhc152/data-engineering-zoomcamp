@@ -1,8 +1,0 @@
-{"event_id":"evt-0001","event_type":"OrderCreated","event_timestamp":"2026-05-01T01:15:00Z","schema_version":1,"producer":"kafka-practice","order_id":"O1001","customer_id":"C001","amount":200.00,"order_status":"paid"}
-{"event_id":"evt-0002","event_type":"OrderCreated","event_timestamp":"2026-05-01T05:00:00Z","schema_version":1,"producer":"kafka-practice","order_id":"O1002","customer_id":"C002","amount":75.00,"order_status":"paid"}
-{"event_id":"evt-0003","event_type":"OrderCreated","event_timestamp":"2026-05-02T09:00:00Z","schema_version":1,"producer":"kafka-practice","order_id":"O1003","customer_id":"C003","amount":95.00,"order_status":"paid"}
-{"event_id":"evt-0003","event_type":"OrderCreated","event_timestamp":"2026-05-02T09:00:00Z","schema_version":1,"producer":"kafka-practice","order_id":"O1003","customer_id":"C003","amount":95.00,"order_status":"paid"}
-{"event_id":"evt-0004","event_type":"OrderCancelled","event_timestamp":"2026-05-02T10:00:00Z","schema_version":1,"producer":"kafka-practice","order_id":"O1004","customer_id":"C004","amount":0.00,"order_status":"cancelled"}
-{"event_id":"evt-poison-0005","event_type":"OrderCreated","event_timestamp":"2026-05-03T01:30:00Z","schema_version":1,"producer":"kafka-practice","order_id":"O1005","customer_id":"C005","amount":"not-a-number","order_status":"paid"}
-{"event_id":"evt-0006","event_type":"OrderRefunded","event_timestamp":"2026-05-04T10:05:00Z","schema_version":1,"producer":"kafka-practice","order_id":"O1006","customer_id":"C001","amount":-40.00,"order_status":"refunded"}
-

@@ -1,2 +1,0 @@
-{"event_id":"evt-0005","schema_version":1,"payload":{"before":null,"after":{"order_id":"O1004","customer_id":"C004","order_status":"paid","order_amount":"144.00","updated_at":"2026-05-04T13:00:00Z"},"source":{"db":"shop","schema":"public","table":"orders","lsn":210,"txId":"tx-005","ts_ms":1777899600000,"snapshot":"false"},"op":"c","ts_ms":1777899600100}}
-

@@ -1,4 +1,0 @@
-{"event_id":"evt-001","order_id":"O1001","event_type":"order_paid","amount":200,"producer_attempt":1}
-{"event_id":"evt-002","order_id":"O1002","event_type":"order_paid","amount":75,"producer_attempt":1}
-{"event_id":"evt-001","order_id":"O1001","event_type":"order_paid","amount":200,"producer_attempt":2}
-

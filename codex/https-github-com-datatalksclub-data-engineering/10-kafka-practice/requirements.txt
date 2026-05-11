@@ -1,4 +1,0 @@
-confluent-kafka==2.6.1
-psycopg[binary]==3.2.3
-python-dotenv==1.0.1
-
