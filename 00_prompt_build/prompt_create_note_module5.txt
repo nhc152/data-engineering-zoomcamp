@@ -1,0 +1,99 @@
+Đọc TOÀN BỘ các file sau trong data-engineering-zoomcamp/05-data-platforms/:
+
+NOTES (DOCUMENTATION):
+- notes/README.md
+- notes/01-introduction.md
+- notes/02-getting-started.md
+- notes/03-nyc-taxi-pipeline.md
+- notes/04-bruin-mcp.md
+- notes/05-bruin-cloud.md
+- notes/06-core-01-projects.md
+- notes/06-core-02-pipelines.md
+- notes/06-core-03-assets.md
+- notes/06-core-04-variables.md
+- notes/06-core-05-commands.md
+
+Sau khi đọc xong TOÀN BỘ, tạo file repo_notes_M05.md:
+
+═══════════════════════════════
+1. CẤU TRÚC THƯ MỤC
+═══════════════════════════════
+Tree đầy đủ + mục đích từng folder và file
+
+═══════════════════════════════
+2. NỘI DUNG CÁC FILE .MD
+═══════════════════════════════
+Tóm tắt từng file .md theo format:
+[Tên file]
+- Dạy về: [topic]
+- Concepts chính: [list]
+- Commands được dùng: [list commands thực tế]
+- Lưu ý đặc biệt: [nếu có]
+
+═══════════════════════════════
+3. PHÂN TÍCH CODE FILES & CONFIGS
+═══════════════════════════════
+Với mỗi file config / code xuất hiện trong các .md hoặc trong repo, ghi rõ:
+
+[pipeline config files - ví dụ: pipeline.yml, *.yaml, *.json]
+- Assets được định nghĩa: tên, type, upstream/downstream dependencies
+- Connections: tên, type, credentials
+- Schedule / trigger settings
+- Copy nguyên văn toàn bộ file
+
+[asset files - ví dụ: *.sql, *.py dùng làm assets]
+- Asset type (sql, python, ingestr...)
+- Parameters / variables nhận vào
+- Logic chính từng bước
+- Upstream dependencies
+- Copy nguyên văn toàn bộ file
+
+[bruin CLI config - ví dụ: .bruin.yml, connections config]
+- Environments được định nghĩa
+- Connection types và fields
+- Copy nguyên văn toàn bộ file
+
+[pyproject.toml / requirements.txt / package.json nếu có]
+- Dependencies list
+- Copy nguyên văn toàn bộ file
+
+[Bất kỳ script shell / Makefile / helper script nào khác]
+- Làm gì, arguments, cách chạy
+- Copy nguyên văn toàn bộ file
+
+═══════════════════════════════
+4. DATA FLOW THỰC TẾ
+═══════════════════════════════
+- Flow đầy đủ từng bước: data đi từ đâu → qua đâu → đến đâu
+- Asset nào phụ thuộc asset nào (DAG dependency graph)
+- File nào trigger file nào
+- Thứ tự chạy đúng (materialization order)
+- Dependency giữa các pipelines / assets
+
+═══════════════════════════════
+5. ĐIỂM YẾU & THIẾU SÓT
+═══════════════════════════════
+- Security issues trong config thực tế (hardcode credentials, plain-text secrets...)
+- Idempotency issues của các assets
+- Production readiness gaps (error handling, retry, alerting...)
+- Observability / monitoring gaps
+- Những gì repo dạy nhưng không đủ cho Senior DE
+
+═══════════════════════════════
+6. KIẾN THỨC NGOÀI REPO
+═══════════════════════════════
+Dựa trên những gì repo đang cover, liệt kê những concept
+Senior DE phải biết nhưng repo KHÔNG dạy:
+- Bruin / Data Platform concepts: [list cụ thể]
+- Pipeline orchestration nâng cao: [list cụ thể]
+- Data quality & testing: [list cụ thể]
+- Cloud / infrastructure: [list cụ thể]
+- MCP & AI-assisted tooling: [list cụ thể]
+
+Lưu file: repo_notes_M05.md
+
+QUAN TRỌNG:
+- Copy nguyên văn toàn bộ nội dung các file code / config
+- Không tóm tắt bỏ qua bất kỳ dòng code nào
+- Không bỏ qua file nào trong danh sách trên
+- Mục tiêu: đọc file notes này là hiểu hoàn toàn repo mà không cần mở repo

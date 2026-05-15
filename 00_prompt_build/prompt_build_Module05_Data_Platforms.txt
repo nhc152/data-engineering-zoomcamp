@@ -1,0 +1,464 @@
+## Prompt 1 — Khởi tạo file + S0 + S1
+
+Đọc các file sau trước khi làm bất cứ điều gì:
+- .claude/CLAUDE.md
+- .claude/OUTPUT_STANDARD.md
+- .claude/SOURCE_POLICY.md
+- master_de_roadmap.html (phần Module 05 và section 3-Level System)
+- module_template.html (lấy TOÀN BỘ CSS variables, font, component patterns)
+- data-engineering-zoomcamp/05-data-platforms/ (đọc README + liệt kê toàn bộ files)
+
+Tạo file mới: Module05_Data_Platforms.html
+
+File phải có:
+- Toàn bộ HTML boilerplate: <!DOCTYPE>, <head>, CSS inline, fonts Google
+- Copy NGUYÊN XI CSS variables và styles từ module_template.html
+- Hero banner: "Module 05 — Data Platforms & Bruin", badges (Intermediate→Senior, ~8 ngày, Data Platforms)
+- Sidebar với 9 nav items: S0 đến S8 (S0 active mặc định)
+- JavaScript: showModule(), toggleSection(), answerQuiz(), toggleSolution(), switchTab(), toggleCheck(), updateProgress()
+- Phần main content chứa S0 và S1 đầy đủ, các section S2–S8 để placeholder <div id="sX" style="display:none"></div>
+
+NỘI DUNG S0 — Tổng quan & Mục tiêu:
+- Bảng 9 sections với tên + thời gian ước tính
+- Vấn đề thực tế Data Platforms giải quyết:
+  "Pipeline SQL rải rác không ai biết chạy theo thứ tự nào, không có lineage,
+  không có test, deploy bằng tay — khi có incident không biết bắt đầu debug từ đâu"
+- Vấn đề thực tế Bruin giải quyết:
+  "Orchestration ad-hoc, assets không có dependency graph rõ ràng,
+  không reproducible, không version-controlled, không có built-in quality checks"
+- Trước Bruin / data platform tools người ta làm gì?
+  (shell scripts chạy tuần tự, cron jobs, notebook pipelines, custom orchestrators)
+- Data flow diagram ASCII:
+  Raw Source (CSV/API/DB) → [connection config] → Ingestr Asset → SQL/Python Asset → Output Table → BI Tool
+- Bruin pipeline DAG tổng quan từ repo NYC Taxi:
+  raw.yellow_tripdata → ingest asset → stg_yellow_trips → fct_trips → reporting asset
+- 2 learning paths rõ ràng:
+  Path A: Bruin CLI local (DuckDB / SQLite)
+  Path B: Bruin Cloud (managed platform + MCP integration)
+- Exit criteria: "Bạn đã nắm module này khi..."
+
+NỘI DUNG S1 — Lý thuyết nền:
+
+Phần Data Platforms & Orchestration (3 levels):
+- Beginner: Data Platform là gì, khác Data Warehouse và Data Pipeline thế nào
+- Beginner: Asset-based thinking vs task-based thinking — tại sao asset là unit tốt hơn task
+- Beginner: Pipeline, Asset, Connection — 3 khái niệm cốt lõi của Bruin, mỗi cái là gì
+- Intermediate: Dependency graph (DAG) trong data platform — upstream/downstream, tại sao quan trọng
+- Intermediate: Materialization trong Bruin: table / view / incremental — so sánh với dbt patterns
+- Senior: Bruin trong modern data stack — vị trí trong pipeline ingestion → transform → serve
+- Mental model 1 câu: "Bruin = git-native data platform: define assets, declare dependencies, run anywhere"
+- So sánh: Bruin vs dbt vs Airflow vs Dagster — trade-offs thực tế 2025
+- Info boxes: tip/warn/note/danger đan xen
+- 6 câu quiz scenario-based với explanation đầy đủ
+
+Phần Bruin Core Concepts (3 levels):
+- Beginner: Projects, Pipelines, Assets — hierarchy và cách tổ chức
+- Beginner: Asset types: SQL asset, Python asset, Ingestr asset — mỗi loại dùng khi nào
+- Intermediate: Variables trong Bruin — built-in vars (start_date, end_date) vs custom vars
+- Intermediate: Connections — định nghĩa, types (BigQuery, DuckDB, Snowflake, Postgres), config location
+- Senior: Commands nâng cao: bruin run, bruin validate, bruin lineage, bruin render
+- Senior: Bruin MCP integration — AI-assisted pipeline authoring workflow
+- Mental model 1 câu: "Bruin asset = 1 file (SQL hoặc Python) + metadata YAML block → Bruin lo dependency và execution"
+- So sánh: Bruin asset config vs dbt model config — bảng trade-offs rõ ràng
+- 6 câu quiz scenario-based với explanation đầy đủ
+
+Lưu file. Báo cáo số dòng đã tạo.
+
+
+---
+
+## Prompt 2 — Thêm S2 vào file
+
+Đọc các file sau:
+- data-engineering-zoomcamp/05-data-platforms/ (đọc TOÀN BỘ từng file một)
+  Cụ thể phải đọc:
+  * notes/README.md
+  * notes/01-introduction.md
+  * notes/02-getting-started.md
+  * notes/03-nyc-taxi-pipeline.md
+  * notes/04-bruin-mcp.md
+  * notes/05-bruin-cloud.md
+  * notes/06-core-01-projects.md
+  * notes/06-core-02-pipelines.md
+  * notes/06-core-03-assets.md
+  * notes/06-core-04-variables.md
+  * notes/06-core-05-commands.md
+  * (Tìm và đọc toàn bộ pipeline config files, asset files, connection configs trong repo)
+
+Thêm nội dung S2 vào Module05_Data_Platforms.html.
+Tìm placeholder <div id="s2" style="display:none"></div> và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S2 — Đọc hiểu code trong repo:
+
+Phần 1 — Cấu trúc thư mục:
+- Vẽ tree diagram toàn bộ 05-data-platforms/
+- Giải thích mục đích từng folder và file
+- Phân biệt rõ: notes/ (tài liệu học) vs pipeline project files (code thực hành)
+
+Phần 2 — Project config (phân tích NGUYÊN VĂN từ repo):
+- Trích code config thực tế, syntax highlight YAML
+- Giải thích TỪNG block: project name, connections, default settings
+- Tại sao cần khai báo connections ở project level?
+- Environment separation: dev vs prod config thực tế thế nào
+
+Phần 3 — Pipeline config files (phân tích NGUYÊN VĂN từ repo):
+- Trích code pipeline YAML thực tế, syntax highlight
+- Giải thích: pipeline name, schedule, default_parameters
+- Schedule syntax: cron format, built-in schedules (daily, weekly...)
+- Điểm yếu nếu có (hardcode values, missing configs)
+
+Phần 4 — Ingestr Assets (phân tích NGUYÊN VĂN từ repo):
+- Trích code asset file thực tế, syntax highlight
+- Giải thích: asset type: ingestr, source connection, destination connection
+- Parameters: source_connection, source_table, destination_table
+- Tại sao dùng ingestr thay vì viết custom ingestion script?
+- Điểm yếu: incremental config, error handling
+
+Phần 5 — SQL Assets (phân tích NGUYÊN VĂN từ repo):
+- Trích code SQL asset files thực tế, syntax highlight SQL + YAML header
+- Giải thích: YAML metadata block trong SQL file — cách Bruin parse
+- depends: upstream asset declaration — so sánh với dbt ref()
+- materialization: table vs view — khi nào chọn cái nào
+- Variables trong SQL: {{ start_date }}, {{ end_date }} — built-in date range
+- Điểm yếu nếu có
+
+Phần 6 — Python Assets (phân tích NGUYÊN VĂN từ repo nếu có):
+- Trích code Python asset thực tế, syntax highlight
+- Bruin Python asset decorator / metadata block
+- Context object: pipeline, logger, connections
+- Khi nào dùng Python asset thay vì SQL asset?
+
+Phần 7 — Variables & Parameters:
+- Built-in variables: start_date, end_date, pipeline_name, run_id
+- Custom variables: định nghĩa và override khi chạy
+- Variables trong SQL vs variables trong Python assets — cách dùng khác nhau
+- Render command: bruin render — kiểm tra variables được resolve đúng không
+
+Phần 8 — Connections config:
+- Connection types trong repo: DuckDB, BigQuery, Postgres, v.v.
+- Config location: file nào chứa credentials
+- Security: credentials không commit vào git — pattern đúng là gì
+- Điểm yếu: nếu có credential hardcode trong repo
+
+Phần 9 — DAG Lineage chi tiết:
+- Diagram ASCII đầy đủ: source connection → ingestr asset → SQL asset → output asset
+- Annotate asset type trên từng node
+- File nào depends on file nào — lineage graph dạng text đầy đủ
+- Thứ tự chạy đúng: connections → ingest → transform → serve
+- bruin lineage command: cách đọc output
+
+Tabs: SQL / YAML / Python — dùng switchTab() function
+
+Quiz: 6 câu về data flow và cấu trúc code, có explanation đầy đủ
+
+Lưu file. Báo cáo số dòng hiện tại.
+
+
+---
+
+## Prompt 3 — Thêm S3 vào file
+
+Đọc các file sau:
+- Module05_Data_Platforms.html (đọc toàn bộ để biết context)
+- data-engineering-zoomcamp/05-data-platforms/notes/02-getting-started.md
+- data-engineering-zoomcamp/05-data-platforms/notes/03-nyc-taxi-pipeline.md
+- data-engineering-zoomcamp/05-data-platforms/notes/06-core-05-commands.md
+- master_de_roadmap.html (phần M05 — execution plan và Break/Debug examples nếu có)
+
+Thêm nội dung S3 vào Module05_Data_Platforms.html.
+Tìm placeholder <div id="s3" style="display:none"></div> và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S3 — Thực hành từng bước:
+
+Phần 1 — Setup môi trường (2 paths song song, dùng tab):
+
+Tab A — Local: Bruin CLI + DuckDB:
+- Cài Bruin CLI: lệnh chính xác cho từng OS (macOS/Linux/Windows), verify bằng lệnh gì
+- bruin version: output mong đợi
+- Init project mới hoặc clone repo demo
+- Config connection DuckDB local: file location, settings
+- bruin validate: kiểm tra project config đúng chưa
+- Verify thành công: "Bạn biết setup đúng khi thấy..."
+
+Tab B — Cloud: Bruin Cloud platform:
+- Tạo tài khoản Bruin Cloud
+- Connect repository (GitHub integration)
+- Setup connections trong Bruin Cloud UI: credentials, environments
+- Trigger run đầu tiên từ UI
+- Verify thành công: "Bạn biết setup đúng khi thấy..."
+
+Phần 2 — Chạy pipeline đầu tiên:
+- bruin validate: kiểm tra config trước khi chạy — output đọc thế nào
+- bruin run: chạy toàn bộ pipeline, đọc output thế nào
+- bruin run --asset <asset_name>: chạy 1 asset cụ thể
+- bruin run --downstream: chạy asset + tất cả downstream
+- bruin lineage: xem dependency graph
+- bruin render: preview SQL sau khi variables được resolve
+- Log đọc ở đâu, format thế nào
+
+Phần 3 — Làm việc với từng layer:
+
+Step-by-step thực hành:
+1. Mở ingestr asset, bruin render để xem config sau resolve
+2. Chạy bruin run --asset <ingestr_asset> —verify data xuất hiện trong DuckDB
+3. Query trực tiếp vào DuckDB verify data shape và row count
+4. Mở SQL asset, bruin render để xem SQL compiled với variables
+5. Chạy bruin run --asset <sql_asset> --downstream để run chain
+6. bruin lineage --asset <asset_name> để trace upstream dependencies
+
+Phần 4 — 3 bài tập thực hành (dùng .practice-task component):
+
+Task 1 (Beginner):
+Đề: Thêm một SQL asset mới tính trip_duration_minutes cho NYC Taxi data
+Gợi ý: Tạo file .sql mới với YAML header, khai báo depends upstream asset, dùng {{ start_date }} filter
+Solution: SQL đầy đủ với YAML metadata block, materialization phù hợp, bruin run command
+
+Task 2 (Intermediate):
+Đề: Tạo pipeline mới với 2 assets: 1 ingestr asset từ CSV file + 1 SQL transform asset
+Gợi ý: Khai báo connection mới, pipeline YAML, asset files với đúng depends chain
+Solution: Pipeline YAML + ingestr asset + SQL asset + bruin validate + bruin run commands
+
+Task 3 (Advanced):
+Đề: Setup incremental asset chỉ xử lý data trong date range {{ start_date }} → {{ end_date }},
+với logic idempotent: chạy lại cùng date range không tạo duplicate
+Gợi ý: materialization: incremental, unique_key, filter WHERE date BETWEEN {{ start_date }} AND {{ end_date }}
+Solution: Asset config đầy đủ + SQL idempotent + bruin run với date flags + verify no-duplicate test
+
+Phần 5 — "Cố tình phá" section:
+6 kịch bản với hướng dẫn debug từng bước:
+
+1. Khai báo depends sai tên asset → validation error gì, ở bước nào phát hiện
+2. Connection name trong asset không khớp với connection trong project config → lỗi gì
+3. Chạy bruin run khi upstream asset chưa tồn tại → lỗi gì, cách fix
+4. Variables {{ start_date }} không được set → SQL render thế nào, lỗi ở bước nào
+5. Chạy 2 bruin run song song cùng pipeline → conflict thế nào, cách phòng tránh
+6. Sửa sai YAML indentation trong asset header → parse error thế nào, debug flow
+
+Lưu file. Báo cáo số dòng hiện tại.
+
+
+---
+
+## Prompt 4 — Thêm S4 + S5 vào file
+
+Đọc các file sau:
+- Module05_Data_Platforms.html (đọc toàn bộ)
+- master_de_roadmap.html (phần M05 Senior Questions, Pro-tier patterns, Decisions)
+- data-engineering-zoomcamp/05-data-platforms/ (đọc lại notes files nếu cần reference)
+  Cụ thể: notes/04-bruin-mcp.md và notes/05-bruin-cloud.md
+
+Thêm nội dung S4 và S5 vào Module05_Data_Platforms.html.
+Tìm 2 placeholders và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S4 — Production Thinking:
+
+6 câu hỏi, mỗi câu có answer chi tiết + code example:
+
+1. FAILURE: Pipeline chạy 3 tiếng, fail ở transform asset lúc 2h sáng
+   - Log xem ở đâu? (Bruin CLI logs, Bruin Cloud UI logs)
+   - Asset đang ở trạng thái gì sau khi fail? (partial write, dirty state)
+   - bruin run --asset retry hoạt động thế nào — khi nào đủ, khi nào không
+   - Fix thực tế: rerun từ failed asset hay rerun toàn bộ pipeline?
+   - Bao giờ nên --full-refresh incremental asset và tác động downstream
+
+2. SCALE: Từ demo data (vài MB) lên production data (TB/ngày)
+   - Ingestr asset hiện tại có đủ không? Bottleneck ở đâu?
+   - Incremental ingestion: làm sao chỉ pull data mới thay vì full reload
+   - Date range variables: tại sao start_date/end_date là key cho scalability
+   - Khi nào cần chuyển từ DuckDB sang BigQuery/Snowflake production warehouse
+   - Code example: incremental ingestr asset config với date filter
+
+3. IDEMPOTENCY: Chạy pipeline 2 lần cùng date range → data có bị duplicate không
+   - Ingestr asset: idempotent mặc định hay không?
+   - SQL transform asset: view vs table — cái nào idempotent?
+   - Incremental asset với unique_key: idempotent với merge strategy
+   - Thế nào là "truly idempotent" Bruin pipeline
+   - Code example: verify idempotency bằng row count check trước/sau rerun
+
+4. DATA QUALITY: Làm sao biết data đúng sau khi pipeline chạy
+   - Bruin built-in quality checks: loại nào có sẵn, config thế nào
+   - Custom quality assertions: viết thế nào trong asset YAML block
+   - Source freshness: detect khi source data stale
+   - Row count anomaly detection: pipeline thành công nhưng data đột nhiên giảm 90%
+   - Code example: quality check config trong asset YAML
+
+5. COST & PERFORMANCE: Production pipeline — tránh reprocess không cần thiết
+   - Full reload vs incremental: khi nào chọn cái nào
+   - Date range parameterization: --start-date --end-date flags trong bruin run
+   - Parallel execution: bruin run concurrency config
+   - Asset caching: Bruin có cache intermediate results không
+   - Code example: bruin run với date range flags tối ưu cost
+
+6. SECURITY & GOVERNANCE: Những rủi ro trong setup hiện tại
+   - Credentials trong connection config: không commit vào git — đúng pattern là gì
+   - Environment separation: dev vs staging vs prod connection isolation
+   - Bruin Cloud: credential management và access control
+   - Bruin MCP: AI có access connection credentials không, rủi ro gì
+   - Code example: environment-based connection config pattern
+
+NỘI DUNG S5 — Kiến thức nâng cao:
+
+Phần 1 — Bruin Pro patterns:
+- bruin run với full selector syntax: --asset, --pipeline, --downstream, --upstream
+- Date range execution: --start-date, --end-date — workflow backfill toàn bộ lịch sử
+- bruin validate trước mọi deployment — integrate vào CI/CD thế nào
+- bruin lineage: đọc output để debug dependency chain
+- Code example: CI/CD workflow (GitHub Actions) cho Bruin pipeline
+
+Phần 2 — Bruin MCP Integration (từ notes/04-bruin-mcp.md):
+- MCP là gì trong context của Bruin — Model Context Protocol
+- Bruin MCP server: setup và config
+- AI-assisted pipeline authoring: workflow thực tế với Claude/Cursor
+- Những gì AI làm tốt (boilerplate, schema inference) vs không làm tốt (business logic)
+- Code example: MCP config file + example AI-generated asset review checklist
+
+Phần 3 — Bruin Cloud (từ notes/05-bruin-cloud.md):
+- Bruin Cloud vs Bruin CLI: features khác nhau
+- Managed execution: scheduling, retry, alerting built-in
+- Environment management: dev/staging/prod trên cloud
+- Team collaboration: access control, audit logs
+- Khi nào upgrade từ CLI lên Cloud — trigger conditions
+
+Phần 4 — Bảng Trade-offs (khi DÙNG vs KHÔNG DÙNG):
+- Ingestr asset vs custom Python ingestion script — matrix đầy đủ
+- SQL asset vs Python asset — khi nào chọn cái nào
+- DuckDB local vs BigQuery/Snowflake production — migration triggers
+- Bruin vs dbt vs Airflow — realistic comparison 2025
+- Bruin Cloud vs self-hosted orchestrator (Airflow/Dagster)
+
+Phần 5 — Khi nào outgrow setup hiện tại:
+- Dấu hiệu cần chuyển từ DuckDB local sang production DW
+- Dấu hiệu cần thêm alerting/monitoring ngoài Bruin logs
+- Dấu hiệu cần orchestrator thêm ngoài Bruin built-in scheduling
+- Dấu hiệu pipeline cần split thành multiple Bruin projects
+
+Lưu file. Báo cáo số dòng hiện tại.
+
+
+---
+
+## Prompt 5 — Thêm S6 + S7 + S8, hoàn thiện file
+
+Đọc các file sau:
+- Module05_Data_Platforms.html (đọc toàn bộ)
+- master_de_roadmap.html (phần Incident Simulation, Interview Mapping, DoD, Final Checklist)
+
+Thêm nội dung S6, S7, S8 vào Module05_Data_Platforms.html.
+Tìm 3 placeholders và thay bằng nội dung đầy đủ.
+
+NỘI DUNG S6 — Lỗi thường gặp:
+
+Bảng 12 lỗi, dùng class="data-table":
+Cột: Lỗi (error message thực tế) | Nguyên nhân | Cách fix | Cách phòng tránh
+
+12 lỗi phải bao gồm:
+1. "Asset not found: <asset_name>" — depends khai báo sai tên, typo trong asset name
+2. "Connection '<name>' not found in project config" — connection name không khớp
+3. "Cannot find upstream asset" — asset trong depends chưa được tạo hoặc đường dẫn sai
+4. "YAML parse error in asset header" — indentation sai, ký tự đặc biệt trong YAML
+5. "Variable 'start_date' is not defined" — chạy asset có variable nhưng không pass --start-date
+6. "Duplicate rows detected after incremental run" — thiếu unique_key hoặc merge logic sai
+7. "Connection refused: DuckDB file locked" — 2 processes cùng truy cập DuckDB file
+8. "Pipeline validation failed: circular dependency" — asset A depends B, B depends A
+9. "Ingestr source table not found" — source connection đúng nhưng table name sai
+10. "Insufficient permissions on destination" — connection credentials thiếu quyền write
+11. "bruin run timeout" — asset chạy quá lâu, không có timeout config
+12. "Schema mismatch: column '<col>' not found" — upstream asset thay đổi schema, downstream không update
+
+Sau bảng: Debugging checklist theo thứ tự ưu tiên (numbered list)
+Sau checklist: Nhắc learner mở Logbook ghi lại lỗi đã gặp
+
+NỘI DUNG S7 — Interview Prep:
+
+12 câu hỏi, dùng collapsible pattern:
+
+Junior (4 câu — badge xanh lam):
+1. Data Platform là gì? Khác Data Warehouse và Data Pipeline thế nào?
+2. Asset, Pipeline, Connection trong Bruin là gì? Quan hệ giữa chúng thế nào?
+3. Tại sao khai báo dependency (depends) trong asset quan trọng hơn là chạy script theo thứ tự thủ công?
+4. SQL asset khác Python asset thế nào, khi nào dùng cái nào?
+
+Mid (4 câu — badge vàng):
+5. Variables start_date và end_date trong Bruin giải quyết vấn đề gì trong production pipeline?
+6. Incremental asset hoạt động thế nào? Chạy 2 lần cùng date range có duplicate không?
+7. bruin validate vs bruin run — khi nào dùng cái nào, validate check những gì?
+8. Làm sao debug khi pipeline fail mà log không đủ thông tin để biết asset nào gây ra?
+
+Senior (4 câu — badge đỏ):
+9. Pipeline ingest 50GB/ngày fail lúc 3h sáng sau 4 tiếng chạy, incremental asset ở dirty state —
+   xử lý thế nào mà không mất data và không reprocess toàn bộ lịch sử?
+10. Team 5 DE cùng develop trên Bruin project, branching và deployment strategy thế nào
+    để tránh conflict và đảm bảo production không bị ảnh hưởng bởi dev changes?
+11. Thiết kế data platform cho e-commerce: 3 sources (DB, API, events), cần real-time dashboard
+    và daily batch reports — chọn asset types, connection strategy, và execution schedule thế nào?
+12. Bruin MCP integration: AI generate asset code — review checklist những gì trước khi merge vào production?
+
+Mỗi câu: click expand → gợi ý trả lời chi tiết + "Red flag: đừng nói..."
+
+NỘI DUNG S8 — Checklist & Tổng kết:
+
+Progress bar (tự update khi tick):
+ID: checklist-progress-fill và checklist-progress-text
+
+Checklist 18 items chia 3 level:
+
+Beginner (6 items):
+- Giải thích được Asset-based thinking khác Task-based thinking thế nào và tại sao quan trọng
+- Cài được Bruin CLI và chạy bruin --version thành công
+- Tạo được connection config đúng cho DuckDB hoặc BigQuery không cần hỏi
+- Chạy được bruin validate và đọc hiểu output báo lỗi gì
+- Chạy được bruin run pipeline đầu tiên và verify data xuất hiện trong destination
+- Đọc hiểu được lineage graph từ bruin lineage command
+
+Intermediate (6 items):
+- Tự viết SQL asset từ đầu: YAML header, depends, materialization, variables
+- Tự viết ingestr asset: source connection, destination, date range config
+- Hiểu incremental asset: unique_key, idempotency, khi nào cần --full-refresh
+- Debug được lỗi connection và dependency không cần nhìn docs
+- Dùng được bruin run với selector flags: --asset, --downstream, --start-date, --end-date
+- Tạo được pipeline YAML config với schedule và default parameters
+
+Senior (6 items):
+- Thiết kế được multi-asset pipeline cho domain mới với đúng dependency chain
+- Implement được incremental pipeline idempotent: chạy lại cùng date không duplicate
+- Setup được CI/CD workflow: bruin validate trong PR check, bruin run trong deploy
+- Giải thích được trade-offs Bruin vs dbt vs Airflow, justify cho team không biết Bruin
+- Cấu hình được Bruin MCP và demonstrate AI-assisted asset authoring workflow
+- Trả lời được 4 câu Senior interview không cần nhìn tài liệu
+
+Summary grid (5 điểm chốt):
+1. Bruin = git-native data platform: define assets, declare dependencies, run anywhere
+2. Asset-based DAG = nguyên tắc nền tảng: mỗi asset là 1 unit có dependency rõ ràng
+3. Variables start_date/end_date + incremental = idempotency cho production pipeline
+4. bruin validate + bruin lineage = bộ đôi kiểm tra trước mọi deployment
+5. Cloud/warehouse mapping — kiến thức transfer được:
+   DuckDB → BigQuery/Snowflake/Redshift, Bruin concept giống nhau bất kể warehouse,
+   Ingestr → Fivetran/Airbyte conceptually, SQL asset → dbt model conceptually
+
+Definition of Done (từ master_de_roadmap.html):
+5 checkboxes DoD — tick đủ mới được sang Module 06
+
+Preview Module 06:
+"Module tiếp theo: Batch Processing với Spark
+Cần chuẩn bị: hiểu data pipeline fundamentals từ module này, làm quen với distributed computing concepts"
+Link: <a href="Module06_Batch_Processing.html">→ Module 06: Batch Processing</a>
+
+SAU KHI THÊM XONG 3 SECTIONS:
+Kiểm tra toàn bộ file:
+- Tất cả JavaScript functions hoạt động đúng không
+- Sidebar navigation showModule() đúng index chưa
+- Progress bar updateProgress() được gọi đúng chưa
+- Không còn placeholder nào chưa điền
+- File mở được trên browser không lỗi console
+- Tất cả code blocks có syntax highlight đúng ngôn ngữ (SQL, YAML, Python)
+
+Lưu file. Báo cáo số dòng cuối cùng và tóm tắt những gì đã build.
+
+
+---
+
+Cách chạy: Mở terminal → cd DE-Learning → claude → paste Prompt 1 → chờ xong → paste Prompt 2 → tiếp tục đến Prompt 5.
+
+Sau mỗi lần chạy nên mở file trên browser kiểm tra section vừa thêm trước khi chạy prompt tiếp theo.
+Với S2 đặc biệt: verify lineage diagram ASCII khớp với actual pipeline structure trong repo.
+Với S3 đặc biệt: test tất cả bruin commands trong Tab A (local) trên máy thực trước khi viết vào file.
