@@ -10,7 +10,7 @@ dựa vào prompt_create_note_module1.txt hãy viết prompt prompt_create_note_
 
 2. Vào claude code paste prompt_create_note_moduleXX.txt để tạo file repo_notes_M03.md
 
-3. Gửi file repo_notes_M03.md cho claude web để viết prompt_build file cho claude code ( đính file Module01_Docker_Terraform.txt + Module01_Docker_Terraform_bo_sung.txt)
+3. Gửi file repo_notes_M03.md cho claude web để viết prompt_build file cho claude code ( đính file prompt_build_Module04_Analytics_Engineering.txt)
  + PROMPT_Review_Module_03.md file cho antigravity (đã có file PROMPT_Review_Generic.md, PROMPT_Patch_After_Review.md)
 
 Tham khảo prompt build file prompt_build_Module04_Analytics_Engineering.txt áp dụng cho module 05 nhé:

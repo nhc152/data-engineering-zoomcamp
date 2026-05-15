@@ -1,0 +1,405 @@
+MODULE 08 - COHORTS, PROJECTS & COURSE ASSETS
+
+Đọc TOÀN BỘ các file sau trong:
+- data-engineering-zoomcamp/cohorts/
+- data-engineering-zoomcamp/projects/
+- data-engineering-zoomcamp/images/
+
+PROJECTS:
+- projects/README.md
+- projects/datasets.md
+
+IMAGES - ROOT ASSETS:
+- images/bruin.svg
+- images/dlthub.png
+- images/kestra.svg
+- images/mage.svg
+- images/piperider.png
+- images/rising-wave.png
+
+IMAGES - ARCHITECTURE:
+- images/architecture/arch_v3_workshops.jpg
+- images/architecture/arch_v4_workshops.jpg
+- images/architecture/arch_v5_workshops.png
+- images/architecture/photo1700757552.jpeg
+
+IMAGES - AWS:
+- images/aws/iam.png
+
+2022 - ROOT:
+- cohorts/2022/README.md
+- cohorts/2022/project.md
+
+2022 - WEEK 1 BASICS & SETUP:
+- cohorts/2022/week_1_basics_n_setup/homework.md
+
+2022 - WEEK 2 DATA INGESTION:
+- cohorts/2022/week_2_data_ingestion/README.md
+- cohorts/2022/week_2_data_ingestion/homework/homework.md
+- cohorts/2022/week_2_data_ingestion/homework/solution.py
+- cohorts/2022/week_2_data_ingestion/transfer_service/README.md
+
+2022 - WEEK 2 AIRFLOW:
+- cohorts/2022/week_2_data_ingestion/airflow/1_setup_official.md
+- cohorts/2022/week_2_data_ingestion/airflow/2_setup_nofrills.md
+- cohorts/2022/week_2_data_ingestion/airflow/README.md
+- cohorts/2022/week_2_data_ingestion/airflow/.env_example
+- cohorts/2022/week_2_data_ingestion/airflow/Dockerfile
+- cohorts/2022/week_2_data_ingestion/airflow/docker-compose.yaml
+- cohorts/2022/week_2_data_ingestion/airflow/docker-compose-nofrills.yml
+- cohorts/2022/week_2_data_ingestion/airflow/docker-compose_2.3.4.yaml
+- cohorts/2022/week_2_data_ingestion/airflow/requirements.txt
+- cohorts/2022/week_2_data_ingestion/airflow/scripts/entrypoint.sh
+- cohorts/2022/week_2_data_ingestion/airflow/dags/data_ingestion_gcs_dag.py
+- cohorts/2022/week_2_data_ingestion/airflow/dags_local/data_ingestion_local.py
+- cohorts/2022/week_2_data_ingestion/airflow/dags_local/ingest_script.py
+- cohorts/2022/week_2_data_ingestion/airflow/extras/data_ingestion_gcs_dag_ex2.py
+- cohorts/2022/week_2_data_ingestion/airflow/extras/web_to_gcs.sh
+- cohorts/2022/week_2_data_ingestion/airflow/docs/1_concepts.md
+- cohorts/2022/week_2_data_ingestion/airflow/docs/arch-diag-airflow.png
+- cohorts/2022/week_2_data_ingestion/airflow/docs/gcs_ingestion_dag.png
+
+2022 - WEEK 3 DATA WAREHOUSE AIRFLOW:
+- cohorts/2022/week_3_data_warehouse/airflow/1_setup_official.md
+- cohorts/2022/week_3_data_warehouse/airflow/2_setup_nofrills.md
+- cohorts/2022/week_3_data_warehouse/airflow/README.md
+- cohorts/2022/week_3_data_warehouse/airflow/.env_example
+- cohorts/2022/week_3_data_warehouse/airflow/docker-compose.yaml
+- cohorts/2022/week_3_data_warehouse/airflow/docker-compose-nofrills.yml
+- cohorts/2022/week_3_data_warehouse/airflow/scripts/entrypoint.sh
+- cohorts/2022/week_3_data_warehouse/airflow/dags/gcs_to_bq_dag.py
+- cohorts/2022/week_3_data_warehouse/airflow/docs/gcs_2_bq_dag_graph_view.png
+- cohorts/2022/week_3_data_warehouse/airflow/docs/gcs_2_bq_dag_tree_view.png
+
+2022 - WEEK 5/6:
+- cohorts/2022/week_5_batch_processing/homework.md
+- cohorts/2022/week_6_stream_processing/homework.md
+
+2023 - ROOT:
+- cohorts/2023/README.md
+- cohorts/2023/project.md
+- cohorts/2023/leaderboard.md
+
+2023 - HOMEWORK BY WEEK:
+- cohorts/2023/week_1_docker_sql/homework.md
+- cohorts/2023/week_1_terraform/homework.md
+- cohorts/2023/week_2_workflow_orchestration/README.md
+- cohorts/2023/week_2_workflow_orchestration/homework.md
+- cohorts/2023/week_3_data_warehouse/homework.md
+- cohorts/2023/week_4_analytics_engineering/homework.md
+- cohorts/2023/week_5_batch_processing/homework.md
+
+2023 - WEEK 6 STREAM PROCESSING:
+- cohorts/2023/week_6_stream_processing/homework.md
+- cohorts/2023/week_6_stream_processing/client.properties
+- cohorts/2023/week_6_stream_processing/settings.py
+- cohorts/2023/week_6_stream_processing/producer_confluent.py
+- cohorts/2023/week_6_stream_processing/streaming_confluent.py
+- cohorts/2023/week_6_stream_processing/spark-submit.sh
+
+2023 - WORKSHOPS:
+- cohorts/2023/workshops/piperider.md
+
+2024 - ROOT:
+- cohorts/2024/README.md
+- cohorts/2024/project.md
+- cohorts/2024/leaderboard.md
+
+2024 - MODULE HOMEWORK:
+- cohorts/2024/01-docker-terraform/homework.md
+- cohorts/2024/01-docker-terraform/solutions.md
+- cohorts/2024/02-workflow-orchestration/README.md
+- cohorts/2024/02-workflow-orchestration/homework.md
+- cohorts/2024/03-data-warehouse/homework.md
+- cohorts/2024/04-analytics-engineering/homework.md
+- cohorts/2024/05-batch/homework.md
+- cohorts/2024/06-streaming/homework.md
+- cohorts/2024/06-streaming/docker-compose.yml
+
+2024 - WORKSHOPS:
+- cohorts/2024/workshops/dlt.md
+- cohorts/2024/workshops/rising-wave.md
+- cohorts/2024/workshops/dlt_resources/data_ingestion_workshop.md
+- cohorts/2024/workshops/dlt_resources/workshop.ipynb
+- cohorts/2024/workshops/dlt_resources/homework_starter.ipynb
+- cohorts/2024/workshops/dlt_resources/homework_solution.ipynb
+- cohorts/2024/workshops/dlt_resources/incremental_loading.png
+
+2025 - ROOT:
+- cohorts/2025/README.md
+- cohorts/2025/project.md
+
+2025 - MODULE HOMEWORK:
+- cohorts/2025/01-docker-terraform/homework.md
+- cohorts/2025/02-workflow-orchestration/README.md
+- cohorts/2025/02-workflow-orchestration/homework.md
+- cohorts/2025/03-data-warehouse/homework.md
+- cohorts/2025/03-data-warehouse/load_yellow_taxi_data.py
+- cohorts/2025/03-data-warehouse/DLT_upload_to_GCP.ipynb
+- cohorts/2025/04-analytics-engineering/homework.md
+- cohorts/2025/04-analytics-engineering/homework_q2.png
+- cohorts/2025/05-batch/homework.md
+- cohorts/2025/06-streaming/homework.md
+- cohorts/2025/06-streaming/homework/homework.ipynb
+
+2025 - WORKFLOW ORCHESTRATION FLOWS:
+- cohorts/2025/02-workflow-orchestration/flows/01_getting_started_data_pipeline.yaml
+- cohorts/2025/02-workflow-orchestration/flows/02_postgres_taxi.yaml
+- cohorts/2025/02-workflow-orchestration/flows/02_postgres_taxi_scheduled.yaml
+- cohorts/2025/02-workflow-orchestration/flows/03_postgres_dbt.yaml
+- cohorts/2025/02-workflow-orchestration/flows/04_gcp_kv.yaml
+- cohorts/2025/02-workflow-orchestration/flows/05_gcp_setup.yaml
+- cohorts/2025/02-workflow-orchestration/flows/06_gcp_taxi.yaml
+- cohorts/2025/02-workflow-orchestration/flows/06_gcp_taxi_scheduled.yaml
+- cohorts/2025/02-workflow-orchestration/flows/07_gcp_dbt.yaml
+- cohorts/2025/02-workflow-orchestration/images/homework.png
+
+2025 - WORKSHOPS:
+- cohorts/2025/workshops/dynamic_load_dlt.py
+- cohorts/2025/workshops/dlt/README.md
+- cohorts/2025/workshops/dlt/data_ingestion_workshop.md
+- cohorts/2025/workshops/dlt/dlt_homework.md
+- cohorts/2025/workshops/dlt/img/dlt.png
+- cohorts/2025/workshops/dlt/img/pipes.jpg
+- cohorts/2025/workshops/dlt/img/Rest_API.png
+
+2026 - ROOT:
+- cohorts/2026/README.md
+- cohorts/2026/project.md
+
+2026 - MODULE HOMEWORK:
+- cohorts/2026/01-docker-terraform/homework.md
+- cohorts/2026/02-workflow-orchestration/homework.md
+- cohorts/2026/03-data-warehouse/homework.md
+- cohorts/2026/03-data-warehouse/load_yellow_taxi_data.py
+- cohorts/2026/03-data-warehouse/DLT_upload_to_GCP.ipynb
+- cohorts/2026/04-analytics-engineering/homework.md
+- cohorts/2026/05-data-platforms/homework.md
+- cohorts/2026/06-batch/homework.md
+- cohorts/2026/07-streaming/homework.md
+
+2026 - WORKSHOPS:
+- cohorts/2026/workshops/dlt.md
+- cohorts/2026/workshops/dlt/README.md
+- cohorts/2026/workshops/dlt/dlt_homework.md
+- cohorts/2026/workshops/dlt/pyproject.toml
+- cohorts/2026/workshops/dlt/analysis.py
+- cohorts/2026/workshops/dlt/open_library_pipeline.py
+- cohorts/2026/workshops/dlt/dlt_Pipeline_Overview.ipynb
+- cohorts/2026/workshops/dlt/images/etl_diagram.png
+
+Sau khi đọc xong TOÀN BỘ, tạo file repo_notes_M08.md:
+
+===============================
+1. CẤU TRÚC THƯ MỤC
+===============================
+Tree đầy đủ + mục đích từng folder và file.
+
+Phải làm rõ cấu trúc chi tiết của cohorts:
+- 2022: cohort cũ theo week, có Airflow examples cho ingestion và warehouse.
+- 2023: cohort theo week, có homework, leaderboard, project, streaming Confluent/Spark example.
+- 2024: cohort theo module mới, có homework/solutions, workshop dlt, RisingWave, notebook.
+- 2025: cohort theo module mới, có Kestra YAML flows, DLT upload, workshop dlt, streaming notebook.
+- 2026: cohort mới nhất, có module 05 data platforms, dlt workshop cập nhật, notebook và scripts.
+
+Phải làm rõ cấu trúc chi tiết của projects:
+- projects/README.md: final project requirements, rubric, peer review, submission rules, tips, portfolio guidance.
+- projects/datasets.md: gợi ý dataset cho final project.
+
+Phải làm rõ cấu trúc chi tiết của images:
+- images/architecture: architecture/course overview/workshop architecture images.
+- images/aws: AWS IAM image used by older cohort docs.
+- root images: logos/assets for tools and workshops.
+
+Với mỗi năm, ghi:
+- Các module/week có trong năm đó.
+- File nào là README/project/leaderboard.
+- File nào là homework/solution.
+- File nào là code/config/notebook/image.
+- Những nội dung bị lặp giữa các năm và những nội dung thay đổi theo năm.
+
+Với projects/images, ghi:
+- File nào được README hoặc cohort docs tham chiếu.
+- Asset nào phục vụ course overview, workshop, hay project guidance.
+- File ảnh nào chỉ là static asset, không có logic/code.
+
+===============================
+2. NỘI DUNG CÁC FILE .MD
+===============================
+Tóm tắt từng file .md theo format:
+[Tên file đầy đủ theo path]
+- Vai trò: README / homework / solution / project / workshop / setup guide / concepts.
+- Dạy về: [topic]
+- Concepts chính: [list]
+- Commands được dùng: [list commands thực tế, nếu có]
+- Dataset/table/service liên quan: [nếu có]
+- Câu hỏi homework chính: [nếu là homework]
+- Đáp án/solution chính: [nếu là solution]
+- Lưu ý đặc biệt: [nếu có]
+
+Không gộp các file cùng tên ở các năm khác nhau. Ví dụ:
+- cohorts/2024/01-docker-terraform/homework.md
+- cohorts/2025/01-docker-terraform/homework.md
+- cohorts/2026/01-docker-terraform/homework.md
+phải được phân tích riêng.
+
+===============================
+3. PHÂN TÍCH CODE FILES & CONFIGS
+===============================
+Với mỗi file code/config, ghi rõ:
+
+[Python files .py]
+- Mục đích file.
+- Inputs/arguments/env vars.
+- Libraries dùng.
+- Data source và sink.
+- Logic chính từng bước.
+- File nào gọi/chạy file này.
+- Copy nguyên văn toàn bộ file.
+
+[YAML/YML files: docker-compose, Kestra flows, configs]
+- Mục đích file.
+- Services/flows/tasks.
+- Images/build, ports, volumes, env vars, networks, depends_on nếu là Docker Compose.
+- Namespace, tasks, triggers, inputs, outputs nếu là Kestra flow.
+- External dependencies: Postgres, GCS, BigQuery, dbt, Kafka/Redpanda, Spark...
+- Copy nguyên văn toàn bộ file.
+
+[Shell files .sh]
+- Mục đích file.
+- Commands chính.
+- Arguments/env vars.
+- Cách chạy.
+- Copy nguyên văn toàn bộ file.
+
+[Dockerfile / requirements.txt / pyproject.toml / client.properties / .env_example]
+- Dependencies/config quan trọng.
+- Version/package quan trọng.
+- Credentials/secrets/config nhạy cảm nếu có.
+- Copy nguyên văn toàn bộ file.
+
+[Notebook .ipynb]
+- Mục đích notebook.
+- Packages/imports.
+- Các cell chính và logic.
+- Dataset/source/sink.
+- Không cần copy toàn bộ JSON notebook nếu quá dài; nhưng phải tóm tắt từng cell quan trọng và copy các đoạn code cell chính.
+
+[Image/binary files .png/.jpg]
+- Không copy nội dung nhị phân.
+- Ghi rõ path, vai trò, hình minh họa gì, file .md/.ipynb nào tham chiếu nếu xác định được.
+
+===============================
+4. SO SÁNH COHORTS THEO NĂM
+===============================
+Lập bảng so sánh 2022, 2023, 2024, 2025, 2026:
+- Cấu trúc module/week.
+- Stack chính: Docker, Terraform, Airflow, Kestra, BigQuery, dbt, Spark, Kafka, Flink, dlt, Data Platforms.
+- Homework thay đổi như thế nào.
+- Workshop thay đổi như thế nào.
+- Module nào xuất hiện/mất đi/đổi tên qua từng năm.
+- Dataset hoặc cloud services được dùng qua từng năm.
+- Phần nào nên học từ cohort mới nhất, phần nào nên đọc từ cohort cũ vì còn giá trị.
+
+===============================
+5. FINAL PROJECT & DATASETS
+===============================
+Phân tích projects/README.md và projects/datasets.md:
+- Mục tiêu final project.
+- Những gì project bắt buộc phải có.
+- Rubric chấm điểm chi tiết.
+- Peer review process.
+- Quy định dataset: dataset nào không được dùng, dataset nào được gợi ý.
+- Tips để project đủ chất lượng portfolio.
+- Những lỗi thường gặp được docs cảnh báo.
+- Plagiarism/reuse policy.
+- Liên kết giữa projects/README.md và cohorts/<year>/project.md.
+- Project guidance thay đổi thế nào giữa cohorts/2022-2026 và projects/README.md chung.
+
+===============================
+6. COURSE ASSETS & IMAGE USAGE
+===============================
+Phân tích images/:
+- Với mỗi ảnh/logo, ghi path, loại file, vai trò.
+- File .md/.ipynb nào tham chiếu ảnh đó nếu xác định được.
+- Ảnh architecture nào được dùng làm overview chính trong README.md.
+- Ảnh nào phục vụ workshop tools: dlt, Kestra, Mage, Bruin, Piperider, RisingWave.
+- Ảnh nào phục vụ cloud setup: AWS IAM.
+- Không copy binary; chỉ mô tả vai trò và liên kết sử dụng.
+
+===============================
+7. DATA FLOW THỰC TẾ
+===============================
+Mô tả flow đầy đủ theo từng nhóm:
+
+2022 Airflow ingestion:
+- Source data -> GCS -> Airflow DAG -> local/GCS/BigQuery nếu có.
+- DAG nào chạy script nào.
+- Docker Compose/Airflow services phụ thuộc nhau thế nào.
+
+2022 Airflow warehouse:
+- GCS -> BigQuery.
+- DAG gcs_to_bq_dag.py làm gì.
+- Setup official vs no-frills khác nhau thế nào.
+
+2023 streaming:
+- producer_confluent.py -> Kafka/Confluent topic -> streaming_confluent.py/Spark.
+- client.properties/settings.py dùng thế nào.
+- spark-submit.sh chạy job ra sao.
+
+2025 Kestra workflow orchestration:
+- Các flow YAML từ getting started -> Postgres taxi -> dbt -> GCP setup -> GCP taxi -> dbt.
+- Flow nào phụ thuộc flow nào.
+- Data đi từ source -> Postgres/GCS/BigQuery/dbt như thế nào.
+
+2025/2026 DLT warehouse/workshop:
+- Source/API/open library -> dlt pipeline -> destination.
+- Notebook/script nào minh họa bước nào.
+
+Homework/project flow:
+- Homework theo module yêu cầu người học làm gì.
+- Project yêu cầu build pipeline end-to-end ra sao.
+- Projects folder đóng vai trò rubric/dataset guidance cho final project như thế nào.
+
+===============================
+8. ĐIỂM YẾU & THIẾU SÓT
+===============================
+Phân tích dựa trên code/config/thư mục thực tế:
+- Security issues: credentials, client.properties, env vars, hardcoded connection string.
+- Idempotency issues: rerun homework/pipeline có bị duplicate hoặc fail không.
+- Production readiness gaps: deployment, retries, rollback, scaling, partitioning.
+- Data quality gaps: validation, schema checks, null handling, tests.
+- Observability gaps: logs, metrics, alerts, lineage.
+- Testing gaps: unit/integration tests, workflow tests, DAG tests, notebook reproducibility.
+- Cost/performance gaps: BigQuery partitioning/clustering, Spark tuning, Kafka retention/partitioning.
+- Documentation gaps: phần nào chỉ là homework prompt, chưa đủ hướng dẫn production.
+- Project guidance gaps: rubric có yêu cầu gì nhưng chưa có template/reference implementation.
+- Asset gaps: ảnh nào thiếu context, ảnh nào được dùng nhưng không có mô tả đầy đủ.
+- Những gì cohorts dạy nhưng chưa đủ cho Senior Data Engineer.
+
+===============================
+9. KIẾN THỨC NGOÀI REPO
+===============================
+Dựa trên những gì cohorts đang cover, liệt kê những concept Senior Data Engineer phải biết nhưng repo KHÔNG dạy đủ:
+- Docker/Terraform production: remote state, modules, secrets, image scanning, CI/CD.
+- Orchestration: Airflow vs Kestra internals, backfills, retries, SLAs, event-driven orchestration.
+- Warehouse: BigQuery internals, partitioning/clustering strategy, cost governance, data modeling.
+- Analytics engineering: dbt testing, snapshots, exposures, contracts, semantic layer, CI.
+- Batch: Spark internals, shuffle, partitioning, file layout, lakehouse formats.
+- Streaming: Kafka internals, consumer groups, schema registry, exactly-once, Flink/Spark state.
+- Data quality: Great Expectations/Soda/dbt tests, anomaly detection, contracts.
+- Governance: IAM, PII, catalog, lineage, access control.
+- Platform engineering: multi-env, IaC, monitoring, incident response.
+- Project practice: requirements, architecture docs, SLAs, runbooks, evaluation criteria.
+- Portfolio/project delivery: README structure, reproducibility, demo data, CI, deployment docs, architecture diagrams.
+
+Lưu file: repo_notes_M08.md
+
+QUAN TRỌNG:
+- Copy nguyên văn toàn bộ nội dung các file code/config/text được liệt kê, trừ file nhị phân và notebook quá dài như quy định ở trên.
+- Không tóm tắt bỏ qua bất kỳ dòng code/config nào trong file code/config thông thường.
+- Không bỏ qua file nào trong danh sách trên, bao gồm cohorts, projects và images.
+- Không gộp các file cùng tên ở các năm khác nhau; phải phân tích theo đúng path.
+- Với notebook, phải đọc nội dung cell và trích/copy các đoạn code cell quan trọng.
+- Với ảnh, phải ghi path, vai trò, nơi được tham chiếu nếu có; không copy binary.
+- Mục tiêu: đọc file notes này là hiểu hoàn toàn Module 08 - Cohorts, Projects & Course Assets: lịch sử cohorts qua các năm, homework/project/workshop, final project rubric/datasets, course assets/images, và các pipeline/code liên quan mà không cần mở repo.

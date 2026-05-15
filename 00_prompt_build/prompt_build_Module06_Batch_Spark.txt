@@ -1,0 +1,1286 @@
+════════════════════════════════════════════════════════════════
+PROMPT BUILD — Module06_Batch_Spark.html
+Dùng cho: Claude Code thực hiện build file học tương tác
+Tham chiếu bắt buộc: repo_notes_M06.md
+Cấu trúc: 5 prompts, mỗi prompt build một nhóm sections
+════════════════════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROMPT 1 — KHỞI TẠO FILE + S0 + S1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Đọc TOÀN BỘ các file sau trước khi viết bất kỳ dòng code nào:
+1. module_template.html          ← CSS variables, component classes chuẩn
+2. master_de_roadmap.html        ← spec Module 06 và Definition of Done
+3. repo_notes_M06.md             ← toàn bộ source code, data flow, weaknesses
+
+KHÔNG bắt đầu viết code cho đến khi đã đọc xong cả 3 file.
+
+════════════════════════════════════════════════════════════════
+BƯỚC 1 — TẠO FILE SKELETON
+════════════════════════════════════════════════════════════════
+
+Tạo file Module06_Batch_Spark.html với:
+
+METADATA:
+- DOCTYPE html, charset UTF-8, viewport meta
+- Title: "Module 06 — Batch Processing với Apache Spark"
+- Google Fonts: Inter + JetBrains Mono
+- Toàn bộ CSS variables và component classes từ module_template.html — copy nguyên vẹn, không bỏ sót biến nào
+
+SIDEBAR (9 nav items):
+- S0: Tổng quan & Mục tiêu
+- S1: Lý thuyết nền
+- S2: Đọc hiểu code repo
+- S3: Thực hành từng bước
+- S4: Production Readiness
+- S5: Kiến thức nâng cao
+- S6: Lỗi thường gặp
+- S7: Interview Prep
+- S8: Checklist & Tổng kết
+
+JAVASCRIPT FUNCTIONS (tất cả phải tồn tại và hoạt động):
+- showModule(index)      → hiển thị section theo index, ẩn các section khác, cập nhật active nav
+- toggleSection(id)      → collapsible cho S7 interview answers
+- answerQuiz(qId, ans, correct) → xử lý quiz click: đúng/sai + hiện explanation
+- toggleSolution(taskId) → show/hide solution trong S3 practice tasks
+- switchTab(group, name) → tab switcher trong S2 code viewer
+- toggleCheck(itemId)    → tick checklist item S8
+- updateProgress()       → cập nhật progress bar S8 sau mỗi toggleCheck
+
+SECTION PLACEHOLDERS:
+Tạo 9 div id="s0" đến id="s8", tất cả style="display:none" trừ s0.
+Các section s1→s8 có nội dung placeholder: <p>Đang xây dựng...</p>
+S0 active mặc định.
+
+════════════════════════════════════════════════════════════════
+BƯỚC 2 — BUILD S0: TỔNG QUAN & MỤC TIÊU
+════════════════════════════════════════════════════════════════
+
+Thay thế placeholder S0 bằng nội dung đầy đủ:
+
+[Hero Banner]
+Title: "Module 06 — Batch Processing với Apache Spark"
+Subtitle: "Từ PySpark local đến Dataproc production trên GCP"
+Badges: Junior | Mid | Senior
+
+[Bảng 9 Sections]
+Bảng 3 cột: Section | Tên | Thời gian ước tính
+S0→S8, điền tên đầy đủ và thời gian học ước tính hợp lý.
+
+[Vấn đề Batch Processing là gì]
+Giải thích context: tại sao không dùng pandas thuần? Khi nào cần Spark?
+- Vấn đề scale: single-machine limit, RAM bottleneck
+- Trước Spark người ta làm gì: Hadoop MapReduce, Hive, sequential scripts
+- Spark giải quyết gì: in-memory distributed processing, lazy evaluation, DAG
+
+[Data Flow Diagram — ASCII]
+Vẽ 2 flow:
+
+Flow A — Local Batch:
+download_data.sh → data/raw/{type}/{year}/{month}/ (CSV.gz)
+    ↓ 05_taxi_schema.ipynb (define schema, repartition)
+data/pq/{type}/{year}/{month}/ (Parquet)
+    ↓ 06_spark_sql.ipynb / 06_spark_sql.py
+data/report-{year}/ (aggregated Parquet, coalesce 1)
+
+Flow B — Cloud (GCP):
+Parquet local → gsutil → gs://bucket/pq/
+    ↓ 09_spark_gcs.ipynb (GCS connector, service account)
+Spark reads gs:// directly
+    ↓ 06_spark_sql_big_query.py (BigQuery connector jar)
+trips_data_all.reports-{year} (BigQuery table)
+    ↓ gcloud dataproc jobs submit pyspark
+Dataproc cluster → GCS temp bucket → BigQuery
+
+[Exit Criteria]
+"Bạn đã nắm module này khi có thể:"
+- Giải thích Spark execution model: DAG → stages → tasks
+- Viết PySpark job từ đầu: đọc CSV với schema, transform, ghi Parquet
+- Biết khi nào dùng DataFrame API vs Spark SQL
+- Submit job lên Dataproc và kiểm tra kết quả trên BigQuery
+- Đọc Spark UI và hiểu stage/shuffle/task breakdown
+
+════════════════════════════════════════════════════════════════
+BƯỚC 3 — BUILD S1: LÝ THUYẾT NỀN
+════════════════════════════════════════════════════════════════
+
+S1 gồm 3 phần lớn, mỗi phần có quiz 6 câu:
+
+─────────────────────────────
+PHẦN A: Batch vs Stream & Spark Overview
+─────────────────────────────
+
+[Bảng so sánh: Batch vs Stream Processing]
+Chiều so sánh: latency, throughput, use case, complexity, cost, framework examples
+Tối thiểu 5 chiều so sánh.
+
+[Spark Architecture]
+Driver program → SparkContext → Cluster Manager → Executors
+Giải thích: driver là gì, executor là gì, task là đơn vị nhỏ nhất
+Local mode vs Standalone vs YARN vs Kubernetes
+
+[Lazy Evaluation]
+Transformations (lazy): map, filter, select, groupBy, join
+Actions (trigger execution): count, show, write, collect
+Tại sao lazy: Catalyst optimize toàn bộ DAG trước khi chạy
+
+[Mental model 1 câu]
+"Spark = distributed lazy computation engine — bạn define recipe, Spark optimize và cook khi cần"
+
+[Quiz 6 câu — Phần A]
+Format: answerQuiz() button, 4 đáp án, explanation hiện sau khi chọn.
+Câu mẫu:
+1. Khi gọi df.groupBy().count() thì Spark thực thi ngay hay chưa? → Chưa, đây là transformation
+2. Executor khác Driver ở điểm nào?
+3. Local[*] nghĩa là gì?
+4. Tại sao Spark nhanh hơn Hadoop MapReduce?
+5. Wide transformation khác narrow transformation ở điểm nào?
+6. Action nào trong list sau: select / filter / count / withColumn?
+
+─────────────────────────────
+PHẦN B: RDD, DataFrame, Dataset
+─────────────────────────────
+
+[Bảng so sánh: RDD vs DataFrame vs Dataset]
+Chiều so sánh: type-safety, optimization, API style, serialization, khi nào dùng
+Lưu ý: repo chỉ dùng DataFrame và RDD trong 08_rdds.ipynb.
+
+[Narrow vs Wide Dependencies]
+Narrow (no shuffle): map, filter, union — data cùng partition
+Wide (shuffle): groupBy, join, repartition — data phải di chuyển giữa partitions
+Kèm ASCII diagram minh họa.
+
+[Partitions & Shuffle]
+repartition(n) — full shuffle, đồng đều hơn
+coalesce(n) — narrow shuffle, nhanh hơn nhưng có thể uneven
+spark.sql.shuffle.partitions default 200
+Vấn đề: repo dùng repartition(4) và coalesce(1) hardcoded — tại sao đây là vấn đề production?
+
+[Senior box — Catalyst & Tungsten]
+Catalyst: Unresolved LP → Analyzed LP → Optimized LP → Physical Plan → RDD
+Tungsten: whole-stage codegen, off-heap memory, binary processing
+Cách đọc df.explain(True) để debug plan
+
+[Quiz 6 câu — Phần B]
+Câu mẫu:
+1. coalesce(1) khác repartition(1) ở điểm gì?
+2. groupBy gây wide transformation vì sao?
+3. DataFrame có lợi gì so với RDD thuần?
+4. Catalyst optimize ở layer nào trong pipeline?
+5. df.explain() show gì?
+6. Khi nào nên dùng RDD thay DataFrame?
+
+─────────────────────────────
+PHẦN C: File Formats & Storage
+─────────────────────────────
+
+[Bảng so sánh: CSV vs JSON vs Parquet vs ORC vs Avro]
+Chiều: encoding, schema, splittable, compression, read performance, write performance, khi nào dùng
+
+[Tại sao Parquet]
+Columnar storage — chỉ đọc columns cần thiết
+Row group statistics — predicate pushdown
+Built-in compression — Snappy/Gzip/Zstd
+Spark, BigQuery, Athena đều native support
+
+[Schema trong Spark]
+Infer schema — chậm vì cần scan file
+Define schema (StructType) — nhanh, safe, chính xác
+Từ repo: schema fhvhv, schema green, schema yellow — list đầy đủ columns/types từ repo_notes_M06.md
+
+[Quiz 6 câu — Phần C]
+Câu mẫu:
+1. Tại sao Parquet đọc nhanh hơn CSV cho query SELECT col1, col2?
+2. Schema inference có vấn đề gì trong production?
+3. Snappy vs Gzip: trade-off là gì?
+4. Splittable format quan trọng vì sao?
+5. repartition(4) trong 05_taxi_schema.ipynb tạo ra bao nhiêu file output?
+6. coalesce(1) có ý nghĩa gì và tại sao nguy hiểm production?
+
+Sau khi hoàn thành S0 và S1: lưu file, báo cáo số dòng hiện tại.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROMPT 2 — THÊM S2: ĐỌC HIỂU CODE REPO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Mở file Module06_Batch_Spark.html đã có.
+Đọc lại repo_notes_M06.md phần 3 (code files) trước khi viết.
+Thay thế placeholder S2 bằng nội dung đầy đủ.
+
+════════════════════════════════════════════════════════════════
+S2 — ĐỌC HIỂU CODE REPO
+════════════════════════════════════════════════════════════════
+
+[Tree diagram]
+Vẽ cây thư mục 06-batch/ đầy đủ với mục đích từng file
+(lấy từ phần 1 repo_notes_M06.md)
+
+─────────────────────────────
+TAB GROUP 1: download_data.sh
+─────────────────────────────
+
+Tab 1 — Code (nguyên văn):
+```bash
+set -e
+
+TAXI_TYPE=$1 # "yellow"
+YEAR=$2 # 2020
+
+URL_PREFIX="https://github.com/DataTalksClub/nyc-tlc-data/releases/download"
+
+for MONTH in {1..12}; do
+  FMONTH=`printf "%02d" ${MONTH}`
+  URL="${URL_PREFIX}/${TAXI_TYPE}/${TAXI_TYPE}_tripdata_${YEAR}-${FMONTH}.csv.gz"
+  LOCAL_PREFIX="data/raw/${TAXI_TYPE}/${YEAR}/${FMONTH}"
+  LOCAL_FILE="${TAXI_TYPE}_tripdata_${YEAR}_${FMONTH}.csv.gz"
+  LOCAL_PATH="${LOCAL_PREFIX}/${LOCAL_FILE}"
+  echo "downloading ${URL} to ${LOCAL_PATH}"
+  mkdir -p ${LOCAL_PREFIX}
+  wget ${URL} -O ${LOCAL_PATH}
+done
+```
+
+Tab 2 — Phân tích:
+- Arguments: $1=TAXI_TYPE, $2=YEAR
+- set -e: dừng ngay khi lệnh fail
+- printf "%02d": format month 2 chữ số (01..12)
+- Output path: data/raw/{type}/{year}/{month}/{type}_tripdata_{year}_{month}.csv.gz
+- Cách chạy: bash download_data.sh yellow 2020
+
+Tab 3 — Điểm yếu (warn box):
+- Không checksum: file download một nửa không phát hiện được
+- Không skip-if-exists: chạy lại sẽ download lại toàn bộ
+- Không retry/backoff: network lỗi → job fail ngay
+- Hardcode URL domain
+
+─────────────────────────────
+TAB GROUP 2: Config Files
+─────────────────────────────
+
+Tab 1 — spark.dockerfile (nguyên văn):
+```dockerfile
+FROM library/openjdk:11
+```
+Giải thích: chỉ có Java base, thiếu Python/pip/PySpark — dùng khi muốn tự cài runtime
+
+Tab 2 — core-site.xml (nguyên văn):
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+  <property>
+    <name>fs.AbstractFileSystem.gs.impl</name>
+    <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS</value>
+  </property>
+  <property>
+    <name>fs.gs.impl</name>
+    <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem</value>
+  </property>
+  <property>
+    <name>fs.gs.auth.service.account.json.keyfile</name>
+    <value>/home/alexey/.google/credentials/google_credentials.json</value>
+  </property>
+  <property>
+    <name>fs.gs.auth.service.account.enable</name>
+    <value>true</value>
+  </property>
+</configuration>
+```
+Giải thích từng property: fs.gs.impl là GCS filesystem provider, keyfile path là hardcoded (vấn đề!)
+
+Tab 3 — spark-defaults.conf (nguyên văn):
+```
+spark-master    yarn
+spark.hadoop.google.cloud.auth.service.account.enable        true
+spark.hadoop.google.cloud.auth.service.account.json.keyfile  /home/alexey
+```
+Cảnh báo: key "spark-master" không phải key chuẩn Spark (phải là spark.master); path keyfile thiếu tên file JSON
+
+─────────────────────────────
+TAB GROUP 3: Notebooks — Schema & Ingest
+─────────────────────────────
+
+Dùng tab switcher: 04_pyspark | 05_taxi_schema
+
+Tab 04_pyspark.ipynb:
+- Tóm tắt mục tiêu
+- Trích code cell quan trọng (nguyên văn từ repo_notes_M06.md):
+  * SparkSession builder local[*]
+  * Schema StructType đầy đủ cho FHVHV (7 fields: hvfhs_license_num, dispatching_base_num, pickup_datetime, dropoff_datetime, PULocationID, DOLocationID, SR_Flag)
+  * repartition(24) + write.parquet
+  * UDF crazy_stuff() và F.udf()
+  * withColumn + to_date + select chain
+- Giải thích tại sao repartition(24): phân phối đều cho 24 cores
+
+Tab 05_taxi_schema.ipynb:
+- Tóm tắt mục tiêu
+- Schema Green (20 fields) — nguyên văn từ repo
+- Schema Yellow (18 fields) — nguyên văn từ repo
+- Loop ingest green/yellow 2020/2021
+- Giải thích repartition(4) và write.parquet overwrite
+
+─────────────────────────────
+TAB GROUP 4: Notebooks — SQL & Transform
+─────────────────────────────
+
+Dùng tab switcher: 06_spark_sql | 06_spark_sql.py | 06_spark_sql_big_query.py
+
+Tab 06_spark_sql.ipynb:
+Trích code cell quan trọng nguyên văn:
+- Đọc Parquet: spark.read.parquet('data/pq/green/*/*')
+- Rename: withColumnRenamed lpep_pickup_datetime → pickup_datetime
+- Find common columns: loop so sánh green/yellow columns
+- Union: df_green_sel.unionAll(df_yellow_sel) với F.lit('green'/'yellow')
+- registerTempTable('trips_data')
+- Revenue SQL query đầy đủ (SUM fare/extra/mta/tip/tolls/improvement/total, AVG passenger/distance)
+- coalesce(1).write.parquet output
+
+Tab 06_spark_sql.py — nguyên văn toàn bộ file:
+(copy từ repo_notes_M06.md)
+Giải thích argparse arguments: --input_green, --input_yellow, --output
+Giải thích cách chạy: python, spark-submit --master local[*], spark-submit --master spark://...
+
+Tab 06_spark_sql_big_query.py — nguyên văn toàn bộ file:
+(copy từ repo_notes_M06.md)
+Điểm khác: .config("temporaryGcsBucket", ...) + df_result.write.format('bigquery').save(output)
+Hardcode temporaryGcsBucket — vấn đề production
+
+─────────────────────────────
+TAB GROUP 5: Notebooks — GroupBy, Join, RDD, GCS
+─────────────────────────────
+
+Dùng tab switcher: 07_groupby_join | 08_rdds | 09_spark_gcs
+
+Tab 07_groupby_join.ipynb:
+- GroupBy revenue: groupBy(revenue_zone, revenue_month, service_type).agg(SUM, AVG)
+- Join zones lookup: df LEFT JOIN df_zones ON PULocationID = LocationID
+- Join để enrich dữ liệu không phải filter
+- Giải thích shuffle behavior của join và groupBy
+- Giải thích tại sao không dùng broadcast(df_zones) trong repo → missed optimization
+
+Tab 08_rdds.ipynb:
+- Mục tiêu: hiểu RDD API vs DataFrame
+- Trích code: df.rdd để convert, map(), filter(), reduceByKey()
+- mapPartitions() — hiệu quả hơn map() khi cần init per-partition resource
+- toDF() để convert RDD back to DataFrame
+- Khi nào thực sự cần RDD: custom serialization, low-level control, Python interop
+
+Tab 09_spark_gcs.ipynb:
+- SparkConf GCS connector config
+- hadoopConf fs.gs.impl, AbstractFileSystem.gs.impl
+- Đọc trực tiếp từ gs://dtc_data_lake_de-zoomcamp-nytaxi/pq/green/*/*
+- Vấn đề: keyfile path hardcoded trong notebook
+
+─────────────────────────────
+TAB GROUP 6: Cloud Deployment (cloud.md)
+─────────────────────────────
+
+Dùng tab switcher: Local Cluster | spark-submit | Dataproc | BigQuery
+
+Tab Local Cluster:
+- Download GCS connector jar: gsutil cp gs://hadoop-lib/gcs/gcs-connector-hadoop3-2.2.5.jar ./lib/
+- Start master: ./sbin/start-master.sh
+- Start worker: ./sbin/start-worker.sh ${URL}
+- URL pattern: spark://hostname:7077
+
+Tab spark-submit:
+- nbconvert: jupyter nbconvert --to=script 06_spark_sql.ipynb
+- python local: python 06_spark_sql.py --input_green=... --input_yellow=... --output=...
+- submit standalone: spark-submit --master="${URL}" 06_spark_sql.py ...
+
+Tab Dataproc:
+- Upload script: gsutil -m cp -r 06_spark_sql.py gs://bucket/code/
+- Submit job: gcloud dataproc jobs submit pyspark --cluster=de-zoomcamp-cluster --region=europe-west6 gs://bucket/code/06_spark_sql.py -- --input_green=gs://... --output=gs://...
+
+Tab BigQuery:
+- Submit với jar: gcloud dataproc jobs submit pyspark --jars=gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar ...
+- Dataproc 2.1+ pre-install BigQuery connector — không cần --jars
+- Output: trips_data_all.reports-2020
+
+─────────────────────────────
+HOMEWORK SECTION (collapsible)
+─────────────────────────────
+
+File: homework.ipynb — FHVHV Feb 2021
+Q1: Spark version → spark.version
+Q2: Đọc CSV FHVHV Feb 2021, repartition 24, ghi Parquet — bao nhiêu file output?
+Q3: Bao nhiêu trips ngày 15/02/2021? → 367170
+Q4: Longest trip mỗi ngày — ngày nào có trip dài nhất?
+Q5: Most frequent dispatching_base_num
+Q6: Most common (PUZone / DOZone) pair — dùng JOIN với zones
+
+Cấu trúc: hiện đề bài, ẩn gợi ý code (toggle solution), ẩn đáp án.
+
+Sau khi hoàn thành S2: lưu file, báo cáo số dòng.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROMPT 3 — THÊM S3: THỰC HÀNH TỪNG BƯỚC
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Mở file Module06_Batch_Spark.html đã có.
+Đọc lại repo_notes_M06.md phần 4 (data flow) trước khi viết.
+Thay thế placeholder S3 bằng nội dung đầy đủ.
+
+════════════════════════════════════════════════════════════════
+S3 — THỰC HÀNH TỪNG BƯỚC
+════════════════════════════════════════════════════════════════
+
+[Setup Prerequisites box — note]
+Yêu cầu: Java 11/17 cài đúng, JAVA_HOME set, pip install pyspark
+Kiểm tra: java --version, python -c "import pyspark; print(pyspark.__version__)"
+
+─────────────────────────────
+TASK 1 — Hello PySpark (Junior)
+─────────────────────────────
+
+Mục tiêu: Tạo SparkSession đầu tiên, đọc CSV, in schema
+
+Bước 1: Tạo SparkSession
+```python
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .master("local[*]") \
+    .appName("hello_spark") \
+    .getOrCreate()
+
+print(spark.version)
+```
+Giải thích: local[*] dùng tất cả core trên máy
+
+Bước 2: Download data mẫu
+```bash
+wget https://github.com/DataTalksClub/nyc-tlc-data/releases/download/fhvhv/fhvhv_tripdata_2021-01.csv.gz
+gzip -dc fhvhv_tripdata_2021-01.csv.gz > fhvhv_tripdata_2021-01.csv
+```
+
+Bước 3: Đọc CSV và xem schema
+```python
+df = spark.read \
+    .option("header", "true") \
+    .csv("fhvhv_tripdata_2021-01.csv")
+
+df.printSchema()
+df.show(5)
+print(f"Row count: {df.count()}")
+```
+
+Bước 4: So sánh infer schema vs define schema
+```python
+from pyspark.sql import types
+
+schema = types.StructType([
+    types.StructField('hvfhs_license_num', types.StringType(), True),
+    types.StructField('dispatching_base_num', types.StringType(), True),
+    types.StructField('pickup_datetime', types.TimestampType(), True),
+    types.StructField('dropoff_datetime', types.TimestampType(), True),
+    types.StructField('PULocationID', types.IntegerType(), True),
+    types.StructField('DOLocationID', types.IntegerType(), True),
+    types.StructField('SR_Flag', types.StringType(), True)
+])
+
+df = spark.read \
+    .option("header", "true") \
+    .schema(schema) \
+    .csv("fhvhv_tripdata_2021-01.csv")
+
+df.printSchema()
+```
+
+[Expected output box]: schema hiện đúng types, không phải toàn StringType
+
+[toggleSolution] — Điểm hay cần chú ý:
+pickup_datetime/dropoff_datetime → TimestampType (không phải StringType)
+PULocationID/DOLocationID → IntegerType
+SR_Flag vẫn là String vì chỉ có giá trị "Y" hoặc null
+
+─────────────────────────────
+TASK 2 — Parquet Pipeline (Mid)
+─────────────────────────────
+
+Mục tiêu: Xây dựng pipeline CSV → Parquet, hiểu repartition và partition files
+
+Bước 1: Repartition và ghi Parquet
+```python
+df = df.repartition(24)
+df.write.parquet("data/pq/fhvhv/2021/01/")
+```
+Kiểm tra: ls -lh data/pq/fhvhv/2021/01/ → phải có 24 file part-*.parquet
+
+Bước 2: Đọc lại Parquet và compare
+```python
+df_parquet = spark.read.parquet("data/pq/fhvhv/2021/01/")
+df_parquet.printSchema()
+print(df_parquet.count())
+```
+
+Bước 3: Thử coalesce(1) — hiểu vấn đề
+```python
+df.coalesce(1).write.parquet("data/pq/fhvhv/2021/01_single/")
+```
+Kiểm tra: ls → chỉ 1 file part-*.parquet
+Câu hỏi: Tại sao đây là vấn đề khi data lớn?
+
+[toggleSolution] — Giải thích:
+coalesce(1) gom tất cả data về 1 executor → bottleneck
+Đọc lại: Spark chỉ dùng 1 task → không parallel
+Production: dùng coalesce(n) phù hợp với cluster size
+
+Bước 4: Wildcard read
+```python
+# Nếu đã có nhiều tháng:
+df_all = spark.read.parquet("data/pq/fhvhv/2021/*/")
+print(df_all.count())
+```
+
+─────────────────────────────
+TASK 3 — DataFrame Transformations (Mid)
+─────────────────────────────
+
+Mục tiêu: Column operations, filter, UDF — replica từ 04_pyspark.ipynb
+
+Bước 1: Select và filter
+```python
+from pyspark.sql import functions as F
+
+result = df \
+    .select('pickup_datetime', 'dropoff_datetime', 'PULocationID', 'DOLocationID') \
+    .filter(df.hvfhs_license_num == 'HV0003')
+
+result.show(5)
+```
+
+Bước 2: Tính duration
+```python
+df_with_duration = df \
+    .withColumn('duration_seconds',
+        df.dropoff_datetime.cast('long') - df.pickup_datetime.cast('long')) \
+    .withColumn('duration_minutes',
+        (df.dropoff_datetime.cast('long') - df.pickup_datetime.cast('long')) / 60) \
+    .withColumn('pickup_date', F.to_date(df.pickup_datetime))
+
+df_with_duration.select('pickup_date', 'duration_minutes').show(10)
+```
+
+Bước 3: Viết và dùng UDF
+```python
+def crazy_stuff(base_num):
+    num = int(base_num[1:])
+    if num % 7 == 0:
+        return f's/{num:03x}'
+    elif num % 3 == 0:
+        return f'a/{num:03x}'
+    else:
+        return f'e/{num:03x}'
+
+crazy_stuff_udf = F.udf(crazy_stuff, returnType=types.StringType())
+
+df \
+    .withColumn('pickup_date', F.to_date(df.pickup_datetime)) \
+    .withColumn('dropoff_date', F.to_date(df.dropoff_datetime)) \
+    .withColumn('base_id', crazy_stuff_udf(df.dispatching_base_num)) \
+    .select('base_id', 'pickup_date', 'dropoff_date', 'PULocationID', 'DOLocationID') \
+    .show()
+```
+
+[warn box — UDF Performance]
+UDF phá vỡ Catalyst optimization: mỗi row phải serialize Python → JVM → Python
+Ưu tiên dùng pyspark.sql.functions built-in trước khi viết UDF
+Nếu phải UDF: xem xét Pandas UDF (vectorized) cho throughput tốt hơn
+
+─────────────────────────────
+TASK 4 — Spark SQL + Union Green/Yellow (Mid)
+─────────────────────────────
+
+Mục tiêu: Replica 06_spark_sql.ipynb — union hai taxi types, revenue aggregation
+
+Bước 1: Đọc và rename
+```python
+df_green = spark.read.parquet("data/pq/green/*/*")
+df_green = df_green \
+    .withColumnRenamed('lpep_pickup_datetime', 'pickup_datetime') \
+    .withColumnRenamed('lpep_dropoff_datetime', 'dropoff_datetime')
+
+df_yellow = spark.read.parquet("data/pq/yellow/*/*")
+df_yellow = df_yellow \
+    .withColumnRenamed('tpep_pickup_datetime', 'pickup_datetime') \
+    .withColumnRenamed('tpep_dropoff_datetime', 'dropoff_datetime')
+```
+
+Bước 2: Tìm common columns và union
+```python
+common_colums = [col for col in df_green.columns if col in set(df_yellow.columns)]
+
+df_green_sel = df_green.select(common_colums).withColumn('service_type', F.lit('green'))
+df_yellow_sel = df_yellow.select(common_colums).withColumn('service_type', F.lit('yellow'))
+
+df_trips_data = df_green_sel.unionAll(df_yellow_sel)
+df_trips_data.groupBy('service_type').count().show()
+```
+
+Bước 3: Revenue aggregation bằng Spark SQL
+```python
+df_trips_data.registerTempTable('trips_data')
+
+df_result = spark.sql("""
+SELECT 
+    PULocationID AS revenue_zone,
+    date_trunc('month', pickup_datetime) AS revenue_month, 
+    service_type, 
+    SUM(fare_amount) AS revenue_monthly_fare,
+    SUM(extra) AS revenue_monthly_extra,
+    SUM(mta_tax) AS revenue_monthly_mta_tax,
+    SUM(tip_amount) AS revenue_monthly_tip_amount,
+    SUM(tolls_amount) AS revenue_monthly_tolls_amount,
+    SUM(improvement_surcharge) AS revenue_monthly_improvement_surcharge,
+    SUM(total_amount) AS revenue_monthly_total_amount,
+    AVG(passenger_count) AS avg_monthly_passenger_count,
+    AVG(trip_distance) AS avg_monthly_trip_distance
+FROM trips_data
+GROUP BY 1, 2, 3
+""")
+
+df_result.coalesce(1).write.parquet("data/report-2020", mode='overwrite')
+```
+
+─────────────────────────────
+TASK 5 — GroupBy, Join, RDD (Senior)
+─────────────────────────────
+
+Mục tiêu: Hiểu internals qua hands-on, optimize join
+
+Bước 1: Join zones lookup
+```python
+df_zones = spark.read.parquet("zones/")
+
+df_result_joined = df_trips_data \
+    .join(df_zones, df_trips_data.PULocationID == df_zones.LocationID, "left") \
+    .select('pickup_datetime', 'dropoff_datetime', 'service_type',
+            'Zone', 'fare_amount', 'total_amount')
+
+df_result_joined.show(5)
+```
+
+Bước 2: Broadcast join (optimization không có trong repo)
+```python
+from pyspark.sql.functions import broadcast
+
+df_result_broadcast = df_trips_data \
+    .join(broadcast(df_zones), df_trips_data.PULocationID == df_zones.LocationID, "left")
+
+# So sánh execution plan
+df_result_joined.explain()
+df_result_broadcast.explain()
+```
+
+Bước 3: RDD operations
+```python
+# Convert DataFrame to RDD
+rdd = df_trips_data.rdd
+
+# map/filter
+rdd_filtered = rdd.filter(lambda row: row.total_amount > 10)
+rdd_mapped = rdd_filtered.map(lambda row: (row.service_type, row.total_amount))
+
+# reduceByKey
+rdd_revenue = rdd_mapped.reduceByKey(lambda a, b: a + b)
+rdd_revenue.collect()
+
+# Convert back to DataFrame
+df_from_rdd = rdd_revenue.toDF(['service_type', 'total_revenue'])
+df_from_rdd.show()
+```
+
+[tip box — Khi nào dùng RDD]
+Khi cần: custom partitioning logic, binary/unstructured data, low-level fault tolerance
+Tránh dùng: khi DataFrame API đủ — Catalyst optimize tốt hơn Python RDD code
+
+─────────────────────────────
+TASK 6 — "CỐ TÌNH PHÁ" VÀ DEBUG (Senior)
+─────────────────────────────
+
+Kịch bản 1: Schema mismatch
+```python
+# Sai: dùng wrong column name
+df.select('pickup_time')  # column không tồn tại
+```
+Lỗi: AnalysisException: Column 'pickup_time' not found
+Debug: df.columns để xem đúng tên; df.printSchema() để xem types
+
+Kịch bản 2: OOM khi collect()
+```python
+df.collect()  # collect 11M rows về driver
+```
+Lỗi: OutOfMemoryError hoặc driver OOM
+Fix: df.take(100), df.limit(1000).collect(), hoặc write to disk thay vì collect
+
+Kịch bản 3: GCS auth fail
+Lỗi: com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem: ...AccessDeniedException
+Debug steps:
+1. Kiểm tra GOOGLE_APPLICATION_CREDENTIALS env var
+2. Kiểm tra service account có Storage Object Viewer role
+3. Kiểm tra fs.gs.auth.service.account.json.keyfile path đúng
+4. Kiểm tra GCS connector jar đã copy vào $SPARK_HOME/jars/
+
+Kịch bản 4: Task straggler (1 task chạy rất lâu)
+Nguyên nhân: data skew — 1 partition có quá nhiều data
+Debug: Spark UI → Stages → xem task duration distribution
+Fix: salt key để phân phối đều, hoặc dùng AQE (spark.sql.adaptive.enabled=true)
+
+Sau khi hoàn thành S3: lưu file, báo cáo số dòng.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROMPT 4 — THÊM S4 + S5: PRODUCTION READINESS + KIẾN THỨC NÂNG CAO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Mở file Module06_Batch_Spark.html đã có.
+Đọc lại repo_notes_M06.md phần 5 và 6 trước khi viết.
+Thay thế placeholder S4 và S5 bằng nội dung đầy đủ.
+
+════════════════════════════════════════════════════════════════
+S4 — PRODUCTION READINESS
+════════════════════════════════════════════════════════════════
+
+[danger box — Những gì repo không dạy nhưng production cần ngay]
+
+─────────────────────────────
+4.1 SECURITY ISSUES TRONG REPO
+─────────────────────────────
+
+[Bảng: Security Problems từ repo thực tế]
+| File | Vấn đề | Fix production |
+|------|--------|----------------|
+| core-site.xml | keyfile path hardcoded /home/alexey | Dùng Workload Identity trên GCP |
+| spark-defaults.conf | path thiếu tên file JSON | Secret Manager hoặc env var |
+| 06_spark_sql_big_query.py | temporaryGcsBucket hardcoded | Inject via --conf hoặc env |
+| 09_spark_gcs.ipynb | service account key trong notebook | Không để key trong notebook/git |
+
+[Code pattern an toàn hơn]
+```python
+import os
+
+# Lấy config từ env vars thay vì hardcode
+gcs_bucket = os.environ.get("GCS_BUCKET")
+project_id = os.environ.get("GCP_PROJECT")
+temp_bucket = os.environ.get("SPARK_TEMP_BUCKET")
+
+spark = SparkSession.builder \
+    .config("spark.hadoop.google.cloud.auth.service.account.enable", "true") \
+    .config("temporaryGcsBucket", temp_bucket) \
+    .getOrCreate()
+```
+
+─────────────────────────────
+4.2 IDEMPOTENCY & RELIABILITY
+─────────────────────────────
+
+[Vấn đề với download_data.sh]
+- Không có skip-if-exists → re-download lãng phí
+- Không có checksum → corrupt file không phát hiện
+- Không có retry → network timeout → job fail
+
+[Pattern cải thiện]
+```bash
+# Kiểm tra file tồn tại trước khi download
+if [ ! -f "${LOCAL_PATH}" ]; then
+    wget --retry-connrefused --waitretry=5 --tries=3 "${URL}" -O "${LOCAL_PATH}"
+    # Verify không rỗng
+    if [ ! -s "${LOCAL_PATH}" ]; then
+        rm -f "${LOCAL_PATH}"
+        echo "ERROR: Download failed for ${URL}"
+        exit 1
+    fi
+fi
+```
+
+[Idempotent Spark writes]
+```python
+# Luôn dùng mode overwrite với partition để idempotent
+df.write \
+    .mode("overwrite") \
+    .partitionBy("year", "month") \
+    .parquet(output_path)
+```
+
+─────────────────────────────
+4.3 PARTITION STRATEGY
+─────────────────────────────
+
+[Công thức chọn số partitions]
+Target partition size: 100–200 MB (uncompressed) hoặc 64–128 MB (Parquet compressed)
+Số partitions ≈ total_data_size / target_partition_size
+spark.sql.shuffle.partitions default 200 — chỉ phù hợp khi data ~20GB
+
+[Pattern thực tế]
+```python
+# Thay vì hardcode repartition(4):
+num_cores = spark.sparkContext.defaultParallelism
+target_partitions = max(num_cores, data_size_mb // 128)
+df.repartition(target_partitions).write.parquet(output_path)
+
+# Hoặc dùng AQE để Spark tự quyết:
+spark = SparkSession.builder \
+    .config("spark.sql.adaptive.enabled", "true") \
+    .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
+    .getOrCreate()
+```
+
+─────────────────────────────
+4.4 MONITORING & OBSERVABILITY
+─────────────────────────────
+
+[Spark UI — những gì cần xem]
+localhost:4040 khi Spark đang chạy
+- Jobs tab: tổng thời gian, số stages
+- Stages tab: shuffle read/write, task duration distribution → phát hiện skew
+- Storage tab: cached RDD/DataFrame size
+- SQL tab: physical plan, số rows, bytes read/written
+
+[Structured logging pattern]
+```python
+import logging
+import time
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+start = time.time()
+logger.info(f"Starting job: input_green={input_green}, output={output}")
+
+df = spark.read.parquet(input_green)
+row_count = df.count()
+logger.info(f"Read {row_count} rows from green taxi")
+
+df_result.write.parquet(output)
+logger.info(f"Job completed in {time.time()-start:.1f}s, output: {output}")
+```
+
+[tip box — Metrics nên track]
+- Input rows per source
+- Output rows per sink
+- Null rates trên key columns
+- Job duration per partition/month
+- Shuffle spill (nếu > 0 → cần tune memory)
+
+─────────────────────────────
+4.5 GCP DATAPROC PRODUCTION
+─────────────────────────────
+
+[Bảng: Dataproc Cluster Types]
+| Mode | Khi dùng | Trade-off |
+|------|----------|-----------|
+| Standard cluster | Job dài, tái sử dụng cluster | Chi phí khi idle |
+| Single-node | Dev/test | Không scale |
+| Serverless batches | Ad-hoc, sporadic | Cold start ~2 phút |
+
+[Best practices]
+- Dùng Preemptible workers cho worker nodes (tiết kiệm 60-80%)
+- Autoscaling policy cho workloads không đều
+- Component Gateway để truy cập Spark History Server mà không cần SSH
+- Labels cho cost attribution: --labels=env=prod,team=de,module=batch
+
+════════════════════════════════════════════════════════════════
+S5 — KIẾN THỨC NÂNG CAO
+════════════════════════════════════════════════════════════════
+
+[Note box: Phần này dành cho Senior DE — repo không dạy]
+
+─────────────────────────────
+5.1 SPARK INTERNALS (Senior)
+─────────────────────────────
+
+[Catalyst Optimizer — 4 phases]
+1. Analysis: resolve column names, types → Analyzed Logical Plan
+2. Logical Optimization: predicate pushdown, constant folding, column pruning
+3. Physical Planning: convert logical → physical operators, chọn join strategy
+4. Code Generation: Tungsten whole-stage codegen → bytecode
+
+[Đọc explain plan]
+```python
+df_result.explain(True)
+# Extended: Parsed LP → Analyzed LP → Optimized LP → Physical Plan
+# Tìm: FileScan (predicate pushdown), HashAggregate, Exchange (shuffle)
+```
+
+[Executor Memory Model]
+Executor JVM heap:
+- Execution memory: shuffle, join, sort (spark.executor.memory * 0.6 * 0.5)
+- Storage memory: cache/persist (spark.executor.memory * 0.6 * 0.5)
+- User memory: UDF, internal data structures
+- Overhead: off-heap (spark.executor.memoryOverhead, default max(384MB, 10%))
+
+─────────────────────────────
+5.2 JOIN STRATEGIES
+─────────────────────────────
+
+[Bảng: Join Types trong Spark]
+| Strategy | Khi dùng | Trigger |
+|----------|----------|---------|
+| Broadcast Hash Join | Small table < spark.sql.autoBroadcastJoinThreshold (10MB) | Automatic hoặc broadcast() hint |
+| Sort-Merge Join | Large tables, sorted partitions | Default cho large joins |
+| Shuffle Hash Join | Medium tables | spark.sql.join.preferSortMergeJoin=false |
+| Broadcast Nested Loop | Cross joins, non-equi joins | Tự động khi không có join key |
+
+[Skew Join Handling]
+```python
+# Phát hiện skew: xem Stages tab → task duration varies heavily
+
+# Fix 1: AQE skew join
+spark.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")
+
+# Fix 2: Salting thủ công
+from pyspark.sql import functions as F
+import random
+
+SALT_FACTOR = 10
+
+df_large = df_large.withColumn('salt', (F.rand() * SALT_FACTOR).cast('int'))
+df_small_salted = df_small.withColumn('salt', F.explode(F.array([F.lit(i) for i in range(SALT_FACTOR)])))
+
+df_large.join(df_small_salted,
+    (df_large.key == df_small_salted.key) & (df_large.salt == df_small_salted.salt))
+```
+
+─────────────────────────────
+5.3 INCREMENTAL BATCH DESIGN
+─────────────────────────────
+
+[Full load vs Incremental]
+```
+Full load:    đọc toàn bộ data mỗi lần → đơn giản, tốn kém
+Incremental:  chỉ đọc data mới/thay đổi → phức tạp hơn, hiệu quả
+```
+
+[Pattern: Partition-based incremental]
+```python
+# Xử lý theo partition date, chỉ chạy các partition chưa có
+import datetime
+
+def get_missing_partitions(output_path: str, start_date: str, end_date: str) -> list:
+    existing = spark.read.parquet(output_path).select('year', 'month').distinct()
+    # Compare với expected range, return missing ones
+    ...
+
+# Idempotent: overwrite partition cụ thể
+df_partition.write \
+    .mode("overwrite") \
+    .partitionBy("year", "month") \
+    .parquet(output_path)
+```
+
+─────────────────────────────
+5.4 BIGQUERY + SPARK INTEGRATION (Deep)
+─────────────────────────────
+
+[Direct vs Indirect write]
+Indirect (default): Spark → GCS temp → BigQuery load job → GCS temp cleanup
+Direct write: Spark → BigQuery Storage Write API (GA từ connector 0.27+)
+
+[Write Dispositions]
+```python
+df.write.format('bigquery') \
+    .option('table', 'project.dataset.table') \
+    .option('writeDispositionMode', 'WRITE_APPEND') \  # hoặc WRITE_TRUNCATE, WRITE_EMPTY
+    .save()
+```
+
+[BigQuery Storage Read API — nhanh hơn jdbc]
+```python
+df = spark.read.format('bigquery') \
+    .option('table', 'project.dataset.table') \
+    .option('filter', "date >= '2020-01-01'") \  # predicate pushdown
+    .load()
+```
+
+─────────────────────────────
+5.5 STRUCTURED STREAMING (giới thiệu)
+─────────────────────────────
+
+[Batch vs Streaming Spark]
+Batch: một lần đọc toàn bộ data, process, write, stop
+Streaming: đọc liên tục từ source (Kafka, GCS, socket), micro-batch mỗi X giây
+
+[Micro-batch example]
+```python
+df_stream = spark.readStream \
+    .schema(schema) \
+    .parquet("data/input/")
+
+query = df_stream.writeStream \
+    .outputMode("append") \
+    .format("parquet") \
+    .option("path", "data/output/") \
+    .option("checkpointLocation", "data/checkpoint/") \
+    .trigger(processingTime="1 minute") \
+    .start()
+
+query.awaitTermination()
+```
+
+[Watermarking — xử lý late data]
+```python
+df_with_watermark = df_stream \
+    .withWatermark("pickup_datetime", "2 hours") \
+    .groupBy(F.window("pickup_datetime", "1 hour"), "service_type") \
+    .agg(F.count("*"))
+```
+
+Sau khi hoàn thành S4 và S5: lưu file, báo cáo số dòng.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROMPT 5 — THÊM S6 + S7 + S8: LỖI + INTERVIEW + CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Mở file Module06_Batch_Spark.html đã có.
+Đọc lại repo_notes_M06.md phần 5 (điểm yếu) trước khi viết.
+Thay thế placeholder S6, S7, S8 bằng nội dung đầy đủ.
+Sau đó kiểm tra toàn bộ JS functions hoạt động đúng.
+
+════════════════════════════════════════════════════════════════
+S6 — LỖI THƯỜNG GẶP
+════════════════════════════════════════════════════════════════
+
+Mỗi lỗi theo format:
+- Triệu chứng (error message thực tế)
+- Nguyên nhân gốc rễ
+- Debug steps (thứ tự cụ thể)
+- Fix
+
+─────────────────────────────
+LỖI 1: Java Not Found / JAVA_HOME not set
+─────────────────────────────
+Triệu chứng: JAVA_HOME is not set; results may vary
+Debug:
+1. which java → có return path không?
+2. echo $JAVA_HOME → có set không?
+3. java --version
+Fix:
+```bash
+# Linux/WSL:
+export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+export PATH="${JAVA_HOME}/bin:${PATH}"
+# Thêm vào ~/.bashrc để persist
+
+# macOS:
+export JAVA_HOME=$(brew --prefix openjdk@17)
+```
+
+─────────────────────────────
+LỖI 2: AnalysisException — Column not found
+─────────────────────────────
+Triệu chứng: AnalysisException: Resolved attribute(s) pickup_time missing from schema
+Nguyên nhân: Tên column sai hoặc DataFrame đã transform làm mất column
+Debug:
+1. df.columns → liệt kê tất cả columns hiện tại
+2. df.printSchema() → xem types
+3. df.explain() → trace lại từ source
+Fix: Dùng đúng tên column; sau rename phải dùng tên mới
+
+─────────────────────────────
+LỖI 3: Path does not exist (Local)
+─────────────────────────────
+Triệu chứng: AnalysisException: Path does not exist: file:/path/to/data/raw/green/2021/08
+Nguyên nhân: download_data.sh chưa chạy đủ, hoặc path sai
+Debug:
+1. ls data/raw/green/2021/ → xem tháng nào có
+2. pwd → working directory đúng chưa
+3. Kiểm tra script đã chạy thành công chưa (exit code)
+Fix: Chạy lại download_data.sh cho đúng taxi_type và year
+
+─────────────────────────────
+LỖI 4: GCS Access Denied
+─────────────────────────────
+Triệu chứng: com.google.api.client.googleapis.json.GoogleJsonResponseException: 403 Forbidden
+Debug:
+1. Kiểm tra service account có Storage Object Viewer / Creator
+2. gcloud auth list → account nào đang active
+3. Kiểm tra path keyfile trong core-site.xml đúng và file tồn tại
+4. Kiểm tra bucket name đúng (không có trailing slash)
+Fix: Grant IAM role đúng; export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
+
+─────────────────────────────
+LỖI 5: OOM — OutOfMemoryError
+─────────────────────────────
+Triệu chứng: java.lang.OutOfMemoryError: Java heap space / GC overhead limit exceeded
+Nguyên nhân: collect() trả về quá nhiều data về driver; executor memory không đủ cho shuffle
+Debug:
+1. Spark UI → Stages → xem shuffle spill
+2. Spark UI → Executors → xem Memory Used
+3. Tìm .collect() trong code
+Fix:
+```python
+# Thay collect() bằng write + take(n) để preview
+df.write.parquet(output_path)
+df.take(10)  # Preview nhẹ
+
+# Tăng executor memory nếu shuffle spill:
+spark.conf.set("spark.executor.memory", "4g")
+spark.conf.set("spark.executor.memoryOverhead", "512m")
+```
+
+─────────────────────────────
+LỖI 6: BigQuery Connector Version Mismatch
+─────────────────────────────
+Triệu chứng: ClassNotFoundException / NoSuchMethodError liên quan đến BigQuery jar
+Nguyên nhân: spark-bigquery-latest_2.12.jar không compatible với Spark version
+Debug:
+1. spark.version → xem Spark version đang dùng
+2. Check connector compatibility matrix tại github.com/GoogleCloudDataproc/spark-bigquery-connector
+Fix: Dùng đúng jar cho Spark version; trên Dataproc 2.1+ không cần --jars
+
+─────────────────────────────
+LỖI 7: spark-defaults.conf key sai
+─────────────────────────────
+Triệu chứng: Spark không connect YARN dù đã config spark-defaults.conf
+Nguyên nhân: Key "spark-master yarn" không phải key chuẩn → phải là "spark.master yarn"
+Debug: cat $SPARK_HOME/conf/spark-defaults.conf, so sánh với Spark docs
+Fix:
+```
+# Sai (từ repo):
+spark-master    yarn
+
+# Đúng:
+spark.master    yarn
+```
+
+════════════════════════════════════════════════════════════════
+S7 — INTERVIEW PREP
+════════════════════════════════════════════════════════════════
+
+Format mỗi câu: câu hỏi hiển thị, click để expand câu trả lời (toggleSection)
+
+─────────────────────────────
+[Junior — badge xanh lam]
+─────────────────────────────
+
+Q1: Spark khác Hadoop MapReduce ở điểm gì?
+A: Spark xử lý trong memory, chỉ ghi disk khi cần (shuffle/spill); MapReduce ghi disk sau mỗi step. Spark nhanh hơn 10-100x với iterative algorithms. Spark có DataFrame/SQL/Streaming API; MR chỉ có map và reduce primitives.
+
+Q2: Transformation và Action trong Spark khác gì nhau? Cho ví dụ.
+A: Transformation (lazy): map, filter, select, groupBy, join — chỉ build DAG, chưa execute. Action (trigger execution): count(), show(), collect(), write(). Spark không chạy gì cho đến khi gặp action.
+
+Q3: Parquet tốt hơn CSV ở điểm nào cho batch processing?
+A: Columnar storage — chỉ đọc columns cần; row group statistics cho predicate pushdown; built-in compression (Snappy/Gzip); self-describing schema; splittable để đọc parallel.
+
+Q4: repartition và coalesce khác gì nhau? Khi nào dùng cái nào?
+A: repartition(n) — full shuffle, tạo n partitions đồng đều — dùng khi muốn tăng partitions hoặc phân phối lại đều. coalesce(n) — narrow operation, không shuffle, merge partitions — dùng khi giảm partitions (như trước write), nhanh hơn nhưng có thể uneven.
+
+─────────────────────────────
+[Mid — badge vàng]
+─────────────────────────────
+
+Q5: Khi nào nên dùng DataFrame API, khi nào Spark SQL?
+A: DataFrame API tốt hơn cho: chaining transformations phức tạp, type-checking lúc compile, programmatic column selection (ví dụ: dynamic column list). Spark SQL tốt hơn cho: aggregation phức tạp với nhiều GROUP BY, team quen SQL hơn Python, reuse query logic. Về performance, cả hai compile xuống cùng physical plan — không có winner tuyệt đối.
+
+Q6: Giải thích data flow từ CSV raw đến BigQuery trong module này.
+A: download_data.sh → raw CSV.gz trên local → 05_taxi_schema.ipynb (define schema, repartition 4, write Parquet) → data/pq/ → 06_spark_sql.py (union green/yellow, aggregate revenue, coalesce 1, write Parquet) → gsutil upload lên GCS → 06_spark_sql_big_query.py trên Dataproc (read GCS Parquet, write BigQuery qua connector) → BigQuery table trips_data_all.reports-YYYY
+
+Q7: Tại sao registerTempTable bị deprecated và nên dùng gì thay?
+A: registerTempTable bị deprecated từ Spark 2.0. Dùng createOrReplaceTempView('name') hoặc createGlobalTempView('name'). Global temp view tồn tại qua SparkSession, local temp view chỉ trong session.
+
+─────────────────────────────
+[Senior — badge đỏ]
+─────────────────────────────
+
+Q8: Giải thích tại sao UDF trong PySpark chậm. Có giải pháp nào?
+A: Python UDF phá vỡ Catalyst optimization (không pushdown), phải serialize mỗi row: JVM → Python via Py4J → process → Python → JVM. Giải pháp theo thứ tự ưu tiên: (1) dùng built-in pyspark.sql.functions thay UDF; (2) Pandas UDF (vectorized, Arrow-based) — nhanh hơn Python UDF ~10x; (3) Scala UDF nếu có thể; (4) Nếu bắt buộc Python UDF, batch nhiều operations trong 1 UDF.
+
+Q9: Bạn sẽ diagnose và fix data skew như thế nào?
+A: Detect: Spark UI → Stages → task duration — một số tasks chạy 10x lâu hơn median. Root cause: một số keys xuất hiện quá nhiều (ví dụ NULL, "unknown", hot users). Fix options: (1) Filter hoặc handle NULL riêng trước join/groupBy; (2) AQE (spark.sql.adaptive.skewJoin.enabled=true); (3) Salting: thêm random salt vào key để phân tán, replicate dimension table với salt; (4) Repartition by column khác. Trade-off: salting phức tạp hơn, cần join lại sau.
+
+Q10: Design một production batch pipeline xử lý taxi data monthly. Cần gì ngoài những gì repo dạy?
+A: Orchestration (Airflow/Prefect) với DAG per month; Idempotent partitioned writes (overwrite by month); Config/secrets management (Secret Manager, không hardcode); Schema evolution strategy (backward compatible); Data quality gates (row count, null rates, value ranges) trước khi promote to prod; Structured logging với run_id, input_partition, row_counts; Alerting khi job fail hoặc row count anomaly; Cost controls (spot workers, autoscaling, cluster auto-delete); CI/CD cho PySpark code; Data lineage tracking; SLA monitoring.
+
+════════════════════════════════════════════════════════════════
+S8 — CHECKLIST & TỔNG KẾT
+════════════════════════════════════════════════════════════════
+
+[Progress bar — tự cập nhật khi tick]
+"Hoàn thành: X / 20 items"
+
+─────────────────────────────
+CHECKLIST — 20 items (toggleCheck + updateProgress)
+─────────────────────────────
+
+SETUP (4 items):
+□ Cài Java 11/17 đúng, JAVA_HOME set, java --version không lỗi
+□ pip install pyspark, import pyspark trong Python không lỗi
+□ Tạo SparkSession local[*] thành công, spark.version hiện ra
+□ download_data.sh chạy được, có file CSV.gz trong data/raw/
+
+PARQUET PIPELINE (4 items):
+□ Đọc CSV với StructType schema (không infer), printSchema đúng types
+□ repartition(n) → write.parquet → ls cho thấy đúng n files part-*.parquet
+□ Đọc lại Parquet, count() khớp với CSV gốc
+□ Giải thích được trade-off repartition vs coalesce cho người khác
+
+SPARK SQL (4 items):
+□ Union green/yellow taxi qua common columns + F.lit service_type
+□ registerTempTable và chạy SQL query aggregate revenue thành công
+□ Hiểu khi nào DataFrame API vs Spark SQL — nêu được ít nhất 2 tiêu chí
+□ coalesce(1).write.parquet để output 1 file và giải thích được vấn đề production
+
+CLOUD (4 items):
+□ Đọc được Parquet từ gs:// bucket qua GCS connector
+□ Submit job lên Dataproc bằng gcloud dataproc jobs submit pyspark
+□ Ghi kết quả vào BigQuery table qua BigQuery connector
+□ Kiểm tra Spark History Server trên Dataproc Component Gateway
+
+PRODUCTION MINDSET (4 items):
+□ Phát hiện được 3 security issues trong repo (hardcoded keys, credentials)
+□ Đọc được Spark UI: xác định stage có shuffle, task với duration outlier
+□ Viết được df.explain(True) và giải thích ít nhất 2 operator trong physical plan
+□ Nêu được 4 thứ cần thêm nếu làm production: orchestration, quality checks, logging, alerts
+
+─────────────────────────────
+TỔNG KẾT MODULE
+─────────────────────────────
+
+[Bảng tóm tắt: Bạn đã học được]
+| Concept | Tool/API | Production gap |
+|---------|----------|----------------|
+| Batch pipeline | SparkSession, DataFrameReader | Orchestration, incremental |
+| Schema management | StructType | Schema evolution, registry |
+| Transformations | DataFrame API, Spark SQL | Catalyst optimization |
+| File format | Parquet, repartition | File sizing, bucketing |
+| Cloud execution | Dataproc, GCS, BigQuery | IAM, autoscaling, cost |
+| Debugging | Spark UI, explain() | APM, alerts, lineage |
+
+[Bảng: File nào → Học được gì]
+| File | Concept chính |
+|------|--------------|
+| download_data.sh | Bash scripting, idempotency (gap) |
+| 04_pyspark.ipynb | SparkSession, schema, repartition, UDF |
+| 05_taxi_schema.ipynb | StructType, multi-month ingest loop |
+| 06_spark_sql.ipynb | Union, Spark SQL, date_trunc, aggregation |
+| 06_spark_sql.py | argparse, spark-submit, script-ify notebook |
+| 06_spark_sql_big_query.py | BigQuery connector, temporaryGcsBucket |
+| 07_groupby_join.ipynb | GroupBy agg, join types, shuffle |
+| 08_rdds.ipynb | RDD API, reduceByKey, mapPartitions |
+| 09_spark_gcs.ipynb | GCS connector config, hadoopConf |
+| cloud.md | Standalone cluster, Dataproc, deployment flow |
+
+[Preview module tiếp theo]
+"Module tiếp theo: Streaming với Kafka và Spark Structured Streaming"
+Link: href="Module07_Streaming.html"
+
+════════════════════════════════════════════════════════════════
+FINAL CHECKS (Prompt 5 phải thực hiện trước khi xong)
+════════════════════════════════════════════════════════════════
+
+Sau khi build xong S6/S7/S8, kiểm tra toàn bộ:
+
+1. Tất cả 9 sections có nội dung (không còn placeholder "Đang xây dựng...")
+2. Tất cả JS functions tồn tại và hoạt động:
+   - showModule(0) → S0 hiện, S1-S8 ẩn
+   - answerQuiz() → click đáp án đúng → hiện "Đúng!" + explanation
+   - toggleSolution() → click → hiện/ẩn solution
+   - switchTab() → click tab → content chuyển đúng
+   - toggleCheck() + updateProgress() → tick → progress bar tăng
+   - toggleSection() → S7 interview expand/collapse
+3. Sidebar: click từng S0→S8 → đúng section hiện, nav item active
+4. Không có console error khi mở file trên browser
+5. Báo cáo: tổng số dòng file, tổng số quiz questions, tổng số practice tasks, tổng số checklist items
+
+Lưu file cuối: Module06_Batch_Spark.html

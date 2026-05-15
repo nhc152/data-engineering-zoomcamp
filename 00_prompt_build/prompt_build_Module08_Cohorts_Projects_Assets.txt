@@ -1,0 +1,655 @@
+# PROMPT BUILD - Module08_Cohorts_Projects_Assets.html
+
+Dùng cho: Claude Code thực hiện build file học tương tác.
+Tham chiếu bắt buộc: `repo_notes_M08.md`.
+Cấu trúc: 5 prompts, mỗi prompt build một nhóm sections.
+
+QUY TẮC CHUNG CHO TẤT CẢ PROMPT:
+- Không viết nội dung theo trí nhớ. Mọi claim về repo phải đối chiếu với `repo_notes_M08.md`.
+- Khi trích code/config/text từ repo, lấy nguyên văn từ appendix trong `repo_notes_M08.md`.
+- Với ảnh/binary assets: không copy binary, chỉ mô tả path, vai trò, nơi được tham chiếu.
+- Giữ nguyên component/CSS pattern từ `module_template.html`.
+- File đích duy nhất: `Module08_Cohorts_Projects_Assets.html`.
+- Sidebar luôn có 9 nav items: S0 đến S8.
+- Các function JS bắt buộc: `showModule()`, `toggleSection()`, `answerQuiz()`, `toggleSolution()`, `switchTab()`, `toggleCheck()`, `updateProgress()`.
+
+---
+
+## Prompt 1 - Khởi tạo file + S0 + S1
+
+Đọc TOÀN BỘ các file sau trước khi viết bất kỳ dòng code nào:
+1. `.claude/CLAUDE.md`
+2. `.claude/OUTPUT_STANDARD.md`
+3. `.claude/SOURCE_POLICY.md`
+4. `module_template.html` - lấy CSS variables, font, component classes, layout patterns.
+5. `master_de_roadmap.html` - đọc phần Module 08 nếu có; nếu chưa có, dùng Module 08 như meta module.
+6. `repo_notes_M08.md` - đọc phần 1, 2, 4, 5, 6 trước.
+
+KHÔNG bắt đầu viết code cho đến khi đã đọc xong các file trên.
+
+Tạo file mới: `Module08_Cohorts_Projects_Assets.html`.
+
+File phải có:
+- HTML boilerplate đầy đủ: `<!DOCTYPE html>`, `<head>`, charset UTF-8, viewport, title.
+- Title: `Module 08 - Cohorts, Projects & Course Assets`.
+- Google Fonts: Inter + JetBrains Mono.
+- Copy nguyên vẹn CSS variables và component classes từ `module_template.html`.
+- Hero banner: `Module 08 - Cohorts, Projects & Course Assets`.
+- Badges: `Meta Module`, `Course Archive`, `Final Project`, `Assets`, `Portfolio`.
+- Sidebar với 9 nav items:
+  - S0: Tổng quan & Mục tiêu
+  - S1: Bản đồ repo phụ trợ
+  - S2: Cohorts qua các năm
+  - S3: Homework & Workshops
+  - S4: Final Project
+  - S5: Course Assets
+  - S6: Cách học & Lộ trình
+  - S7: Review Checklist
+  - S8: Tổng kết & Portfolio
+- JavaScript đầy đủ:
+  - `showModule(index)`
+  - `toggleSection(id)`
+  - `answerQuiz(questionId, answer, correct)`
+  - `toggleSolution(taskId)`
+  - `switchTab(group, name)`
+  - `toggleCheck(itemId)`
+  - `updateProgress()`
+- Main content có S0 và S1 đầy đủ. S2-S8 để placeholder dạng:
+  `<div id="sX" class="section-content" style="display:none"><p>Đang xây dựng...</p></div>`
+
+### NỘI DUNG S0 - Tổng quan & Mục tiêu
+
+Phải có:
+
+1. Bảng 9 sections với tên + thời gian ước tính.
+
+2. Giải thích rõ Module 08 không phải module kỹ thuật lõi:
+   - `cohorts/` là lịch sử course, homework, workshop, project theo từng năm.
+   - `projects/` là final project guidance: rubric, datasets, peer review, portfolio advice.
+   - `images/` là static assets: architecture diagrams, tool logos, cloud screenshots.
+   - Module này dùng để hiểu toàn bộ "course wrapper" và cách biến kiến thức thành project/portfolio.
+
+3. Vấn đề thực tế Module 08 giải quyết:
+   - Người học dễ chỉ đọc module mới nhất và bỏ qua homework/workshop hữu ích ở cohort cũ.
+   - Final project thường fail vì thiếu rubric, dataset strategy, reproducibility, documentation.
+   - Assets/images bị dùng rải rác trong README/cohorts, cần biết ảnh nào phục vụ phần nào.
+
+4. Scope module:
+   - Cohorts 2022-2026.
+   - Final project docs trong `projects/`.
+   - Image assets trong `images/`.
+   - Không đi sâu lại toàn bộ module 01-07, chỉ map cohort/project/asset về module tương ứng.
+
+5. ASCII overview:
+
+```text
+README.md
+  -> current course modules 01-07
+  -> cohorts/2026/* homework + workshops
+  -> projects/ final project rubric + datasets
+  -> images/ architecture + tool logos
+
+cohorts/
+  2022 -> Airflow era + old homework/project
+  2023 -> Prefect/Confluent era + leaderboard
+  2024 -> Mage/dlt/RisingWave era
+  2025 -> Kestra + dlt + updated homework
+  2026 -> latest cohort + data platforms + updated dlt workshop
+```
+
+6. Exit criteria:
+   - Giải thích được vai trò từng folder `cohorts/`, `projects/`, `images/`.
+   - Biết nên học cohort nào cho từng chủ đề.
+   - Đọc được project rubric và tự đánh giá capstone project.
+   - Biết dataset nào không được dùng và cách chọn dataset thay thế.
+   - Biết ảnh/logo nào được dùng ở README/cohort/workshop nào.
+   - Biết chuyển course materials thành portfolio project có checklist rõ ràng.
+
+### NỘI DUNG S1 - Bản đồ repo phụ trợ
+
+S1 gồm 3 phần lớn, mỗi phần có bảng, callout, mini quiz.
+
+#### Phần A - `cohorts/` là gì?
+
+Nội dung bắt buộc:
+- Folder theo năm: 2022, 2023, 2024, 2025, 2026.
+- Cách tổ chức thay đổi:
+  - 2022/2023: week-based.
+  - 2024/2025/2026: module-based.
+- File phổ biến: `README.md`, `project.md`, `leaderboard.md`, `homework.md`, workshop docs.
+- Cohort cũ có giá trị vì chứa tool/approach cũ: Airflow 2022, streaming Confluent 2023, Mage 2024, Kestra 2025.
+- Cohort mới có giá trị vì phản ánh current course path.
+- 5 quiz scenario-based:
+  1. Muốn xem homework Docker mới nhất nên đọc folder nào?
+  2. Muốn đọc Airflow examples cũ nên đọc cohort nào?
+  3. Vì sao không gộp mọi `homework.md` lại với nhau?
+  4. Leaderboard dùng để làm gì?
+  5. Khi docs 2024 trỏ nhầm relative path, cần xử lý review thế nào?
+
+#### Phần B - `projects/` là gì?
+
+Nội dung bắt buộc:
+- `projects/README.md`: final project requirements, rubric, peer review, submission rules, project quality tips.
+- `projects/datasets.md`: dataset suggestions.
+- NYC taxi dataset dùng trong course không được dùng cho final project.
+- Project nên nằm ở repo riêng, có README tốt, reproducible setup, clear architecture.
+- Project là bridge từ learning repo sang portfolio.
+- 5 quiz:
+  1. Vì sao final project không nên dùng NYC taxi dataset?
+  2. Peer review yêu cầu gì?
+  3. Rubric khác checklist học tập thế nào?
+  4. Vì sao cần repo riêng cho project?
+  5. Dataset tốt cho project cần tiêu chí gì?
+
+#### Phần C - `images/` là gì?
+
+Nội dung bắt buộc:
+- Root images: tool logos/assets như Bruin, dlt, Kestra, Mage, Piperider, RisingWave.
+- `images/architecture`: overview/workshop architecture images.
+- `images/aws`: AWS IAM screenshot dùng trong cohort cũ.
+- Ảnh là static asset, không có logic học độc lập.
+- Phải kiểm tra ảnh được tham chiếu ở README/cohorts/workshops để tránh broken links.
+- 5 quiz:
+  1. Ảnh architecture chính của README là file nào?
+  2. Logo tool dùng để làm gì trong docs?
+  3. Có nên copy binary image vào notes không?
+  4. Khi ảnh không được tham chiếu ở đâu, ghi nhận thế nào?
+  5. Vì sao asset inventory quan trọng khi build HTML học?
+
+Sau khi hoàn thành Prompt 1:
+- Lưu file.
+- Báo cáo số dòng hiện tại.
+- Báo cáo số quiz đã tạo trong S1.
+
+---
+
+## Prompt 2 - Thêm S2: Cohorts qua các năm
+
+Mở file `Module08_Cohorts_Projects_Assets.html` đã có.
+
+Đọc lại:
+- `repo_notes_M08.md` phần 1, 2, 4.
+- Appendix/tóm tắt cho:
+  - `cohorts/2022/README.md`, `cohorts/2022/project.md`
+  - `cohorts/2023/README.md`, `cohorts/2023/project.md`, `cohorts/2023/leaderboard.md`
+  - `cohorts/2024/README.md`, `cohorts/2024/project.md`, `cohorts/2024/leaderboard.md`
+  - `cohorts/2025/README.md`, `cohorts/2025/project.md`
+  - `cohorts/2026/README.md`, `cohorts/2026/project.md`
+
+Thay placeholder S2 bằng nội dung đầy đủ.
+
+### NỘI DUNG S2 - Cohorts qua các năm
+
+Phải có:
+
+1. Tree diagram đầy đủ cấp cao của `cohorts/`.
+
+2. Bảng timeline 2022-2026:
+   - Year.
+   - Structure style: week-based/module-based.
+   - Main orchestration/tool era.
+   - Has project docs?
+   - Has leaderboard?
+   - Notable workshops/code.
+   - Nên đọc khi nào.
+
+3. Tab group `cohort-years` với 5 tabs:
+
+Tab 2022:
+- Structure: `week_1_basics_n_setup`, `week_2_data_ingestion`, `week_3_data_warehouse`, `week_5_batch_processing`, `week_6_stream_processing`.
+- Nhấn mạnh Airflow examples trong week 2/3.
+- Có `project.md`, `README.md`.
+- Giá trị: historical Airflow setup, old homework, GCS/BigQuery Airflow DAGs.
+
+Tab 2023:
+- Structure: week 1 Docker SQL, Terraform, workflow orchestration, warehouse, analytics engineering, batch, stream, workshops.
+- Có `leaderboard.md`, `project.md`, `README.md`.
+- Nhấn mạnh streaming Confluent/Spark files.
+- Giá trị: project gallery/leaderboard và Confluent streaming practice.
+
+Tab 2024:
+- Structure: `01-docker-terraform` đến `06-streaming`, workshops.
+- Có dlt workshop, RisingWave, leaderboard.
+- Có `solutions.md` cho Docker/Terraform.
+- Giá trị: transition sang module-based course, Mage/workshop context.
+
+Tab 2025:
+- Structure module-based.
+- Nhấn mạnh Kestra YAML flows trong `02-workflow-orchestration/flows`.
+- Có DLT upload notebook/script, dlt workshop, streaming notebook.
+- Giá trị: Kestra current-ish orchestration flow and updated homework.
+
+Tab 2026:
+- Latest cohort.
+- Có module `05-data-platforms`.
+- Có updated dlt workshop: README, homework, pyproject, scripts, notebook, ETL diagram.
+- Giá trị: current course path và current homework.
+
+4. So sánh chuyển đổi course:
+   - 2022/2023 week naming -> 2024+ module naming.
+   - Orchestration evolution: Airflow -> Prefect/Mage -> Kestra.
+   - Workshops evolution: Piperider, dlt, RisingWave, Data Platforms/Bruin.
+   - Streaming evolution: older Confluent/Spark vs newer course module 07.
+
+5. Decision guide:
+   - "Tôi đang học lần đầu" -> ưu tiên 2026 + module root.
+   - "Tôi muốn hiểu Airflow trong repo" -> 2022.
+   - "Tôi muốn xem project examples" -> 2023/2024 leaderboard + projects app links.
+   - "Tôi muốn luyện homework cũ" -> đọc theo năm, không gộp câu hỏi.
+   - "Tôi muốn build portfolio" -> projects/ + newest cohort project.md.
+
+6. Quiz 8 câu về cohort navigation.
+
+Yêu cầu UI:
+- Dùng `switchTab()` cho tab group.
+- Có warning boxes cho "không gộp homework cùng tên khác năm".
+- Có ít nhất 1 matrix/table so sánh 2022-2026.
+
+Lưu file. Báo cáo số dòng hiện tại.
+
+---
+
+## Prompt 3 - Thêm S3 + S4: Homework/Workshops + Final Project
+
+Mở `Module08_Cohorts_Projects_Assets.html`.
+
+Đọc lại:
+- `repo_notes_M08.md` phần 2, 3, 5, 7.
+- Appendix/tóm tắt cho toàn bộ `homework.md`, `solutions.md`, workshop `.md`, notebooks/scripts liên quan.
+- `projects/README.md`, `projects/datasets.md` trong `repo_notes_M08.md`.
+
+Thay placeholder S3 và S4 bằng nội dung đầy đủ.
+
+### NỘI DUNG S3 - Homework & Workshops
+
+Phải có:
+
+1. Bảng inventory homework theo năm/module:
+   - Path.
+   - Năm.
+   - Module/topic.
+   - Loại: homework/solution/workshop/code/notebook.
+   - Dataset/service/tool liên quan.
+   - Nên dùng để luyện gì.
+
+2. Nhóm homework theo chủ đề:
+   - Docker/Terraform.
+   - Workflow orchestration.
+   - Data warehouse.
+   - Analytics engineering.
+   - Batch.
+   - Streaming.
+   - Data platforms.
+
+3. Workshop map:
+   - 2023 Piperider.
+   - 2024 dlt.
+   - 2024 RisingWave.
+   - 2025 dlt.
+   - 2026 dlt.
+   - Với mỗi workshop: path, mục tiêu, tool, input/output, file assets/code liên quan.
+
+4. Code/config mini deep-dive:
+   - Airflow 2022 DAGs: role trong ingestion/warehouse.
+   - 2023 streaming Confluent/Spark files: producer, settings, streaming job.
+   - 2025 Kestra YAML flows: purpose từng flow.
+   - 2025/2026 DLT scripts/notebooks: source -> pipeline -> destination.
+
+5. Practice tasks với hint + solution toggle:
+   - Task 1: Chọn 3 homework theo thứ tự để ôn lại Docker -> Warehouse -> dbt.
+   - Task 2: So sánh homework Docker/Terraform 2024 vs 2026.
+   - Task 3: Map 2025 Kestra flows thành data pipeline diagram.
+   - Task 4: Dùng 2026 dlt workshop để tạo mini portfolio project.
+   - Task 5: Tạo bảng "homework gap" cho một module bạn yếu.
+
+6. Cố tình phá / lỗi học tập:
+   - Dùng homework năm cũ cho module mới mà không kiểm tra tool version.
+   - Copy solution mà không hiểu dataset/table.
+   - Nhầm `cohorts/<year>/project.md` với `projects/README.md`.
+   - Bỏ qua notebooks vì tưởng chỉ là binary.
+   - Không đọc images referenced trong homework.
+   - Lẫn Airflow/Prefect/Mage/Kestra do đọc nhiều cohort cùng lúc.
+
+### NỘI DUNG S4 - Final Project
+
+Phải có:
+
+1. Trích và phân tích `projects/README.md`:
+   - Goal của project.
+   - Những yêu cầu bắt buộc.
+   - Rubric chấm điểm.
+   - Peer review.
+   - Submission rules.
+   - Portfolio guidance.
+   - Tips và lỗi thường gặp.
+   - Plagiarism/reuse policy.
+
+2. Phân tích `projects/datasets.md`:
+   - Dataset suggestions.
+   - Vì sao NYC taxi dataset không được dùng.
+   - Tiêu chí chọn dataset tốt:
+     - public access.
+     - enough size.
+     - update cadence.
+     - clear schema.
+     - business question.
+     - legal/PII risk thấp.
+
+3. Project architecture template:
+
+```text
+Data source
+  -> ingestion script/API connector
+  -> data lake/object storage
+  -> warehouse/lakehouse
+  -> transformations/dbt/Spark
+  -> dashboard/report
+  -> README + reproducible commands + architecture diagram
+```
+
+4. Rubric self-check table:
+   - Problem description.
+   - Cloud/IaC.
+   - Workflow orchestration.
+   - Data warehouse.
+   - Transformations.
+   - Dashboard.
+   - Reproducibility.
+   - Documentation.
+
+5. Project design examples:
+   - Beginner: batch ELT public API -> BigQuery -> dbt -> dashboard.
+   - Intermediate: scheduled ingestion + partitioned warehouse + dbt tests.
+   - Advanced: streaming/CDC or dlt + orchestration + monitoring.
+
+6. Project anti-patterns:
+   - Hardcoded local paths/cloud project IDs.
+   - No `docker compose up` verification.
+   - Missing `dbt deps`.
+   - README only screenshots, no commands.
+   - No architecture diagram.
+   - Reusing prohibited course dataset.
+
+7. Quiz 10 câu về final project rubric/dataset/portfolio.
+
+Lưu file. Báo cáo số dòng hiện tại, số practice tasks và số project quiz.
+
+---
+
+## Prompt 4 - Thêm S5 + S6: Course Assets + Cách học
+
+Mở `Module08_Cohorts_Projects_Assets.html`.
+
+Đọc lại:
+- `repo_notes_M08.md` phần 1, 4, 6, 8, 9.
+- Asset inventory cho `images/`.
+- Các references trong README/cohorts đến `images/`, nếu có trong notes.
+
+Thay placeholder S5 và S6 bằng nội dung đầy đủ.
+
+### NỘI DUNG S5 - Course Assets
+
+Phải có:
+
+1. Asset inventory table:
+   - Path.
+   - Type.
+   - Role.
+   - Referenced by.
+   - Notes.
+
+2. Nhóm assets:
+   - Architecture images:
+     - `images/architecture/arch_v3_workshops.jpg`
+     - `images/architecture/arch_v4_workshops.jpg`
+     - `images/architecture/arch_v5_workshops.png`
+     - `images/architecture/photo1700757552.jpeg`
+   - Tool logos:
+     - `images/bruin.svg`
+     - `images/dlthub.png`
+     - `images/kestra.svg`
+     - `images/mage.svg`
+     - `images/piperider.png`
+     - `images/rising-wave.png`
+   - Cloud screenshots:
+     - `images/aws/iam.png`
+
+3. Image usage analysis:
+   - README overview image.
+   - Workshop/tool sections.
+   - Cohort docs references.
+   - Relative path risks.
+
+4. UI requirement:
+   - Có thumbnail/image preview nếu path local hoạt động trong HTML.
+   - Nếu không preview được, hiển thị path và mô tả, không tạo broken link.
+   - Không nhúng ảnh external nếu source không nằm trong repo.
+
+5. Asset quality checklist:
+   - Alt text.
+   - File size.
+   - Path stability.
+   - Referenced/not referenced.
+   - Relevance to section.
+
+### NỘI DUNG S6 - Cách học & Lộ trình
+
+Phải có:
+
+1. Learning strategy:
+   - Học module root 01-07 trước.
+   - Dùng `cohorts/2026` cho homework mới nhất.
+   - Dùng cohorts cũ để hiểu tool history hoặc luyện thêm.
+   - Dùng `projects/` ngay từ đầu để biết end goal.
+   - Dùng `images/architecture` để tự vẽ lại architecture cho project.
+
+2. 4 lộ trình:
+   - Beginner path: current course only.
+   - Deep repo path: current + cohorts old.
+   - Portfolio path: project-first.
+   - Senior review path: production gaps + project rubric.
+
+3. Study plan 14 ngày cho Module 08:
+   - Day 1-2: map cohorts.
+   - Day 3-5: homework inventory.
+   - Day 6-8: workshops.
+   - Day 9-11: final project design.
+   - Day 12: asset/diagram cleanup.
+   - Day 13: self-review with rubric.
+   - Day 14: portfolio README.
+
+4. Decision tree:
+
+```text
+Need latest homework?
+  -> cohorts/2026
+Need older Airflow?
+  -> cohorts/2022
+Need final project rubric?
+  -> projects/README.md
+Need dataset idea?
+  -> projects/datasets.md
+Need diagram/logo?
+  -> images/
+```
+
+5. Senior DE perspective:
+   - Module 08 không dạy thêm một engine mới, nhưng dạy cách đọc course repo như product/documentation system.
+   - Project rubric là contract giao hàng.
+   - Cohort history giúp nhận ra tool churn và khả năng migration.
+   - Assets giúp truyền đạt architecture rõ ràng.
+
+6. 8 scenario cards:
+   - "Tôi bị lạc giữa 2024 và 2026".
+   - "Tôi muốn chọn dataset project".
+   - "Tôi muốn làm project dùng dlt".
+   - "Tôi muốn dùng Airflow thay Kestra".
+   - "Tôi cần thêm project vào CV".
+   - "Tôi muốn review project của bạn học".
+   - "Tôi cần ảnh architecture cho README".
+   - "Tôi muốn tránh plagiarism".
+
+Lưu file. Báo cáo số dòng hiện tại.
+
+---
+
+## Prompt 5 - Thêm S7 + S8, hoàn thiện file
+
+Mở `Module08_Cohorts_Projects_Assets.html`.
+
+Đọc lại:
+- Toàn bộ `Module08_Cohorts_Projects_Assets.html`.
+- `repo_notes_M08.md` phần 6, 8, 9.
+- `projects/README.md` và `projects/datasets.md` trong notes.
+
+Thay placeholder S7 và S8 bằng nội dung đầy đủ.
+
+### NỘI DUNG S7 - Review Checklist
+
+Tạo checklist review cho final project và course navigation.
+
+Phần A - Cohort navigation review:
+- Có xác định đúng năm/module cần học không?
+- Có phân biệt current homework và historical homework không?
+- Có ghi rõ path cho mỗi file tham chiếu không?
+- Có kiểm tra tool version/context không?
+- Có tránh gộp sai homework cùng tên không?
+
+Phần B - Final project review:
+- Problem statement rõ ràng.
+- Dataset hợp lệ, không dùng NYC taxi course dataset.
+- Architecture diagram có source -> processing -> warehouse -> dashboard.
+- Reproducible commands.
+- Cloud/IaC nếu rubric yêu cầu.
+- Orchestration rõ ràng.
+- Transformations/test rõ ràng.
+- Dashboard hoặc output có giá trị.
+- README đủ để reviewer chạy/hiểu project.
+- Không hardcode secrets/local paths.
+
+Phần C - Asset review:
+- Ảnh có alt text.
+- Path không broken.
+- Ảnh architecture đúng với project.
+- Logo/tool image không dùng thay cho nội dung phân tích.
+
+Phần D - Interview/project defense questions:
+Tạo 15 câu hỏi collapsible, mỗi câu có:
+- Answer guide.
+- Evidence cần chỉ trong repo/project.
+- Red flag.
+
+Questions bắt buộc:
+1. Vì sao bạn chọn dataset này?
+2. Dataset có update cadence không?
+3. Pipeline có idempotent không?
+4. Nếu ingestion fail giữa chừng thì recover thế nào?
+5. Vì sao chọn warehouse/lakehouse này?
+6. Partitioning/clustering/file layout thế nào?
+7. Transformations được test ra sao?
+8. Dashboard trả lời business question gì?
+9. Project có reproducible từ máy khác không?
+10. Secrets được quản lý thế nào?
+11. Peer reviewer cần chạy command nào đầu tiên?
+12. Bạn dùng rubric để tự chấm ra sao?
+13. Phần nào lấy cảm hứng từ cohort cũ?
+14. Nếu đổi tool orchestration thì phần nào thay đổi?
+15. Điều gì làm project này đủ portfolio?
+
+### NỘI DUNG S8 - Tổng kết & Portfolio
+
+Progress bar:
+- Có `id="checklist-progress-fill"`.
+- Có `id="checklist-progress-text"`.
+- `toggleCheck()` cập nhật progress.
+
+Checklist 28 items chia 4 nhóm:
+
+Repo Understanding (7):
+- Giải thích được vai trò `cohorts/`.
+- Giải thích được vai trò `projects/`.
+- Giải thích được vai trò `images/`.
+- Biết cohort mới nhất là 2026.
+- Biết 2022 có Airflow examples.
+- Biết 2025 có Kestra flows.
+- Biết 2026 có module data platforms và dlt workshop mới.
+
+Homework/Workshop Mastery (7):
+- Map được homework theo module.
+- Không gộp sai homework cùng tên khác năm.
+- Biết dùng cohorts cũ để luyện thêm.
+- Biết đọc notebook cell chính.
+- Biết đọc YAML flows.
+- Biết phân biệt homework vs solution vs workshop.
+- Biết tạo practice plan từ homework inventory.
+
+Final Project Readiness (7):
+- Chọn được dataset hợp lệ.
+- Viết được problem statement.
+- Vẽ được architecture.
+- Thiết kế được reproducible setup.
+- Đối chiếu được rubric.
+- Chuẩn bị được peer review.
+- Tránh được plagiarism/reuse prohibited.
+
+Portfolio Quality (7):
+- README rõ ràng.
+- Commands chạy được.
+- No hardcoded secrets.
+- Dashboard/output có insight.
+- Có tests hoặc validation.
+- Có screenshots/diagrams đúng chỗ.
+- Có project defense answers.
+
+Summary grid 8 điểm chốt:
+1. `cohorts/` là archive + homework/workshop timeline.
+2. `projects/` là contract để hoàn thành capstone.
+3. `images/` là static asset layer, không phải module học riêng.
+4. Cohort mới nhất nên là default, cohort cũ dùng để hiểu history/luyện thêm.
+5. Homework cùng tên nhưng khác năm phải review riêng.
+6. Final project nên bắt đầu từ rubric, không bắt đầu từ tool.
+7. Dataset choice quyết định chất lượng project.
+8. Portfolio project cần reproducible, reviewable, defensible.
+
+File mapping:
+- `cohorts/2026/README.md` -> current cohort path.
+- `cohorts/2022/week_2_data_ingestion/airflow/*` -> historical Airflow examples.
+- `cohorts/2025/02-workflow-orchestration/flows/*` -> Kestra flow examples.
+- `cohorts/2026/workshops/dlt/*` -> current dlt workshop.
+- `projects/README.md` -> final project rubric.
+- `projects/datasets.md` -> dataset ideas.
+- `images/architecture/*` -> course/project diagram assets.
+
+Definition of Done:
+- Hiểu được 3 folder phụ trợ và mối quan hệ với module 01-07.
+- Tạo được learning plan dùng cohorts đúng cách.
+- Tự chấm được final project theo rubric.
+- Chọn được dataset hợp lệ cho project.
+- Chuẩn bị được portfolio README outline.
+
+Preview sau module:
+- Text: `Sau Module 08: dùng repo_notes_M01-M08 để build/review capstone project hoặc roadmap học cá nhân.`
+- Không dùng link hỏng.
+
+FINAL CHECKS bắt buộc trước khi kết thúc:
+1. Không còn placeholder `Đang xây dựng...`.
+2. Có đủ S0-S8.
+3. Sidebar click đúng từng section.
+4. Tất cả JS functions tồn tại.
+5. Progress bar S8 hoạt động.
+6. Tất cả code blocks đóng tag đúng.
+7. Không có console error.
+8. Không claim sai so với `repo_notes_M08.md`.
+9. Báo cáo tổng số dòng, số quiz, số practice tasks, số checklist items.
+
+Lưu file cuối: `Module08_Cohorts_Projects_Assets.html`.
+
+---
+
+Cách chạy:
+1. Mở terminal trong project learning site.
+2. Chạy Claude Code.
+3. Paste Prompt 1, chờ hoàn thành.
+4. Mở file HTML kiểm tra nhanh.
+5. Paste Prompt 2 -> Prompt 5 lần lượt.
+6. Sau Prompt 5, chạy prompt review bằng Antigravity.

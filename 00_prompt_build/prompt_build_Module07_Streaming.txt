@@ -1,0 +1,793 @@
+# PROMPT BUILD - Module07_Streaming.html
+
+Dùng cho: Claude Code thực hiện build file học tương tác.
+Tham chiếu bắt buộc: `repo_notes_M07.md`.
+Cấu trúc: 5 prompts, mỗi prompt build một nhóm sections.
+
+QUY TẮC CHUNG CHO TẤT CẢ PROMPT:
+- Không viết nội dung theo trí nhớ. Mọi claim về repo phải đối chiếu với `repo_notes_M07.md`.
+- Khi trích code/config từ repo, lấy nguyên văn từ appendix trong `repo_notes_M07.md`.
+- Giữ nguyên component/CSS pattern từ `module_template.html`.
+- File đích duy nhất: `Module07_Streaming.html`.
+- Sidebar luôn có 9 nav items: S0 đến S8.
+- Các function JS bắt buộc: `showModule()`, `toggleSection()`, `answerQuiz()`, `toggleSolution()`, `switchTab()`, `toggleCheck()`, `updateProgress()`.
+
+---
+
+## Prompt 1 - Khởi tạo file + S0 + S1
+
+Đọc TOÀN BỘ các file sau trước khi viết bất kỳ dòng code nào:
+1. `.claude/CLAUDE.md`
+2. `.claude/OUTPUT_STANDARD.md`
+3. `.claude/SOURCE_POLICY.md`
+4. `module_template.html` - lấy CSS variables, font, component classes, layout patterns.
+5. `master_de_roadmap.html` - đọc phần Module 07 và Definition of Done nếu có.
+6. `repo_notes_M07.md` - đọc phần 1, 2, 4, 5, 6 trước.
+
+KHÔNG bắt đầu viết code cho đến khi đã đọc xong các file trên.
+
+Tạo file mới: `Module07_Streaming.html`.
+
+File phải có:
+- HTML boilerplate đầy đủ: `<!DOCTYPE html>`, `<head>`, charset UTF-8, viewport, title.
+- Title: `Module 07 - Streaming với Kafka, Redpanda & Flink`.
+- Google Fonts: Inter + JetBrains Mono.
+- Copy nguyên vẹn CSS variables và component classes từ `module_template.html`.
+- Hero banner: `Module 07 - Streaming với Kafka, Redpanda & Flink`.
+- Badges: `Intermediate -> Senior`, `~10 ngày`, `Kafka`, `PyFlink`, `Real-time`.
+- Sidebar với 9 nav items:
+  - S0: Tổng quan & Mục tiêu
+  - S1: Lý thuyết nền
+  - S2: Đọc hiểu code repo
+  - S3: Thực hành từng bước
+  - S4: Production Readiness
+  - S5: Kiến thức nâng cao
+  - S6: Lỗi thường gặp
+  - S7: Interview Prep
+  - S8: Checklist & Tổng kết
+- JavaScript đầy đủ:
+  - `showModule(index)`
+  - `toggleSection(id)`
+  - `answerQuiz(questionId, answer, correct)`
+  - `toggleSolution(taskId)`
+  - `switchTab(group, name)`
+  - `toggleCheck(itemId)`
+  - `updateProgress()`
+- Main content có S0 và S1 đầy đủ. S2-S8 để placeholder dạng:
+  `<div id="sX" class="section-content" style="display:none"><p>Đang xây dựng...</p></div>`
+
+### NỘI DUNG S0 - Tổng quan & Mục tiêu
+
+Phải có:
+
+1. Bảng 9 sections với tên + thời gian ước tính.
+
+2. Vấn đề thực tế Streaming giải quyết:
+   - Batch/micro-batch không đủ khi cần phản ứng trong vài giây/phút.
+   - Fraud/security detection, surge pricing, monitoring, alert realtime.
+   - Streaming có operational cost cao vì job chạy 24/7.
+
+3. Trước streaming người ta làm gì:
+   - Cron job batch theo giờ/ngày.
+   - Polling database.
+   - Manual scripts.
+   - Micro-batch Spark/Airflow.
+
+4. Stack module 07 trong repo:
+   - Redpanda: Kafka-compatible broker.
+   - Python producer/consumer: ghi/đọc topic `rides`.
+   - PyFlink: stream processing, JDBC sink, window aggregation.
+   - PostgreSQL: sink cho processed/aggregated events.
+   - Extras: JSON/Avro examples, Faust, Spark Structured Streaming, ksqlDB.
+   - Theory Java: Kafka producer/consumer, Kafka Streams, Avro, topology tests.
+
+5. Data flow diagram ASCII, tối thiểu 4 flow:
+
+```text
+Workshop:
+Python producer.py
+  -> Redpanda topic rides (localhost:9092 / redpanda:29092)
+  -> PyFlink pass_through_job.py / aggregation_job.py
+  -> PostgreSQL processed_events / processed_events_aggregated
+
+Python consumer debug:
+Redpanda topic rides
+  -> consumer.py
+  -> console output
+
+Extras Avro:
+Avro producer
+  -> Kafka topic with key/value schema
+  -> Avro consumer
+
+Theory Java:
+JsonProducer / AvroProducer
+  -> Kafka topics
+  -> Kafka Streams topology
+  -> output topics / topology tests
+```
+
+6. Mental model:
+   - `Kafka/Redpanda = durable event log`.
+   - `Flink = stateful event-time processor`.
+   - `PostgreSQL sink = materialized result for querying`.
+
+7. Exit criteria:
+   - Giải thích được broker/topic/partition/consumer group/offset.
+   - Chạy được Redpanda, producer, consumer.
+   - Hiểu vì sao producer ngoài Docker dùng `localhost:9092`, Flink trong Docker dùng `redpanda:29092`.
+   - Đọc được PyFlink Kafka source + JDBC sink DDL.
+   - Giải thích watermark, tumbling window, late events, upsert sink.
+   - Nhận diện production gaps: checkpoint storage, DLQ, schema registry, monitoring lag.
+
+### NỘI DUNG S1 - Lý thuyết nền
+
+S1 gồm 3 phần lớn, mỗi phần có bảng/diagram, mental model, info boxes và 6 câu quiz scenario-based.
+
+#### Phần A - Streaming Fundamentals
+
+Nội dung bắt buộc:
+- Batch vs Micro-batch vs Streaming: latency, throughput, complexity, cost, use case.
+- Event, message, record, key, value, timestamp.
+- Topic, partition, offset, consumer group.
+- Broker vs cluster.
+- Producer ack/retry/idempotence ở mức khái niệm.
+- Consumer offset commit, `earliest` vs `latest`.
+- Log retention vs compaction.
+- Redpanda là Kafka-compatible broker: không JVM, không ZooKeeper, single binary, Raft.
+- Mental model: `Streaming = xử lý dòng event không kết thúc, không phải một file hữu hạn`.
+- 6 quiz:
+  1. Consumer group mới đọc topic cũ với `latest` sẽ thấy gì?
+  2. Vì sao cần key khi ghi Kafka?
+  3. Offset thuộc về broker hay consumer group?
+  4. Retention khác compaction thế nào?
+  5. Khi nào streaming đáng dùng hơn micro-batch?
+  6. Redpanda khác Kafka ở operational model nào?
+
+#### Phần B - Stream Processing & Flink
+
+Nội dung bắt buộc:
+- Stateless vs stateful processing.
+- Event time vs processing time.
+- Watermark là gì, vì sao cần cho window.
+- Tumbling, sliding, session windows.
+- Late events và allowed lateness.
+- Checkpoint, savepoint, state backend.
+- Exactly-once: điều kiện cần ở source + processor + sink.
+- Flink architecture: JobManager, TaskManager, task slot, parallelism.
+- PyFlink Table API vs DataStream API.
+- JDBC sink upsert với primary key `NOT ENFORCED`.
+- Mental model: `Window = bucket`, `Watermark = khi nào đóng bucket`, `Upsert = sửa kết quả khi event đến muộn`.
+- 6 quiz:
+  1. Watermark 5 giây nghĩa là gì?
+  2. Event đến sau watermark thì chuyện gì xảy ra?
+  3. Vì sao aggregation sink cần primary key?
+  4. Checkpoint khác savepoint thế nào?
+  5. JobManager khác TaskManager?
+  6. Khi nào dùng Table API thay vì DataStream API?
+
+#### Phần C - Serialization, Schema & Stream Applications
+
+Nội dung bắt buộc:
+- JSON vs Avro vs Protobuf vs raw bytes.
+- Schema Registry: subject, compatibility mode, evolution.
+- Kafka Streams: stream, table, joins, windows, state store.
+- Spark Structured Streaming: readStream/writeStream, trigger, checkpoint, output mode.
+- Faust/ksqlDB: high-level streaming abstractions.
+- Outbox pattern, CDC, event sourcing, stream-table duality.
+- Senior trade-off: operational cost của streaming vs business latency requirement.
+- 6 quiz:
+  1. Vì sao JSON dễ bắt đầu nhưng yếu trong production?
+  2. Thêm field nullable với default trong Avro có compatible không?
+  3. Kafka Streams state store dùng để làm gì?
+  4. Spark Structured Streaming micro-batch khác Flink continuous thế nào?
+  5. Khi nào dùng CDC thay vì producer app tự emit event?
+  6. Vì sao streaming job cần on-call?
+
+Sau khi hoàn thành Prompt 1:
+- Lưu file.
+- Báo cáo số dòng hiện tại.
+- Báo cáo số quiz đã tạo trong S1.
+
+---
+
+## Prompt 2 - Thêm S2: Đọc hiểu code repo
+
+Mở file `Module07_Streaming.html` đã có.
+
+Đọc lại:
+- `repo_notes_M07.md` phần 1, 3, 4, 7.
+- Các appendix cụ thể trong `repo_notes_M07.md`:
+  - `workshop/docker-compose.yml`
+  - `workshop/Dockerfile.flink`
+  - `workshop/flink-config.yaml`
+  - `workshop/src/models.py`
+  - `workshop/src/producers/producer.py`
+  - `workshop/src/producers/producer_realtime.py`
+  - `workshop/src/consumers/consumer.py`
+  - `workshop/src/consumers/consumer_postgres.py`
+  - `workshop/src/job/pass_through_job.py`
+  - `workshop/src/job/aggregation_job.py`
+  - `extras/python/json_example/*`
+  - `extras/python/avro_example/*`
+  - `extras/python/streams-example/faust/*`
+  - `extras/python/streams-example/pyspark/*`
+  - `extras/python/streams-example/redpanda/*`
+  - `theory/java/kafka_examples/src/main/java/org/example/*.java`
+  - `theory/java/kafka_examples/src/test/java/org/example/*.java`
+
+Thay placeholder S2 bằng nội dung đầy đủ.
+
+### NỘI DUNG S2 - Đọc hiểu code repo
+
+Phải có:
+
+1. Tree diagram đầy đủ của `07-streaming/`, lấy từ `repo_notes_M07.md`.
+   - Giải thích mục đích từng nhóm folder.
+   - Phân biệt rõ `workshop/`, `workshop/live/`, `extras/python/`, `extras/pyflink/`, `theory/java/kafka_examples/`.
+
+2. Tab group 1 - `workshop/docker-compose.yml`
+   - Tab Code: trích nguyên văn file.
+   - Tab Services: phân tích từng service:
+     - `redpanda`: image, command, ports 8082/9092/28082/29092, internal/external advertised listeners.
+     - `jobmanager`: build image `pyflink-workshop`, port 8081, mount volumes, env `FLINK_PROPERTIES`.
+     - `taskmanager`: depends_on jobmanager, task slots 15, parallelism 3.
+     - `postgres`: image `postgres:18`, credentials hardcoded.
+   - Tab Weaknesses: single broker, no TLS/SASL, plaintext DB password, no volume, no healthcheck.
+
+3. Tab group 2 - Flink image/config
+   - Trích `Dockerfile.flink`, `Dockerfile_ARM64.flink`, `flink-config.yaml`, `pyproject.flink.toml`.
+   - Giải thích:
+     - Base image Flink.
+     - Python/PyFlink install.
+     - Kafka/JDBC/Postgres connector jars.
+     - Memory/metaspace config.
+   - Điểm yếu: connector versions pinned/hardcoded, image build local, no SBOM/security scan.
+
+4. Tab group 3 - Python data model + producer/consumer
+   - Trích nguyên văn `workshop/src/models.py`.
+   - Trích nguyên văn `producer.py`, `producer_realtime.py`, `consumer.py`, `consumer_postgres.py`.
+   - Phân tích:
+     - `Ride` dataclass fields.
+     - `ride_from_row()`: parquet row -> epoch milliseconds.
+     - `ride_serializer()` và `ride_deserializer()`.
+     - Topic `rides`.
+     - `bootstrap_servers=['localhost:9092']`.
+     - Consumer group `rides-console` / `rides-to-postgres`.
+     - PostgreSQL insert vào `processed_events`.
+   - Điểm yếu: không key message, không idempotent producer, no retry/backoff, no DLQ, hardcoded credentials.
+
+5. Tab group 4 - PyFlink jobs
+   - Trích nguyên văn `pass_through_job.py`.
+   - Trích nguyên văn `aggregation_job.py`.
+   - Trích `aggregation_job_demo.py` nếu cần.
+   - Phân tích:
+     - Kafka source DDL: topic, `properties.bootstrap.servers=redpanda:29092`, startup mode.
+     - JSON format.
+     - Computed column `event_timestamp`.
+     - Watermark `event_timestamp - INTERVAL '5' SECOND`.
+     - JDBC sink DDL.
+     - `PRIMARY KEY (...) NOT ENFORCED`.
+     - `TUMBLE(TABLE events, DESCRIPTOR(event_timestamp), INTERVAL '1' HOUR)`.
+     - `env.enable_checkpointing(10 * 1000)` và `env.set_parallelism(3)`.
+   - Điểm yếu: checkpoint storage chưa durable, no restart strategy, no DLQ, DB credentials hardcoded.
+
+6. Tab group 5 - Extras Python
+   - JSON example: settings, ride model, producer, consumer.
+   - Avro example: key/value record, schema files, producer, consumer.
+   - Redpanda example: docker compose + producer/consumer.
+   - Faust examples: `branch_price.py`, `stream.py`, `stream_count_vendor_trips.py`, `windowing.py`.
+   - PySpark streaming: producer/consumer/streaming.py/spark-submit.sh.
+   - Redpanda Spark streaming: same flow with Redpanda.
+   - Với mỗi nhóm: source topic, transform, sink/output, serialization format.
+
+7. Tab group 6 - Java Kafka theory
+   - Trích/giải thích:
+     - `Topics.java`, `Secrets.java`.
+     - `JsonProducer.java`, `JsonProducerPickupLocation.java`.
+     - `JsonConsumer.java`.
+     - `JsonKStream.java`.
+     - `JsonKStreamJoins.java`.
+     - `JsonKStreamWindow.java`.
+     - `AvroProducer.java`.
+     - `CustomSerdes.java`.
+     - model classes `Ride`, `PickupLocation`, `VendorInfo`.
+     - tests `JsonKStreamTest.java`, `JsonKStreamJoinsTest.java`.
+   - Phân tích topology:
+     - Source stream/table.
+     - Transform/filter/map.
+     - Join.
+     - Window.
+     - Output topic.
+     - TopologyTestDriver.
+
+8. DAG / lineage diagram:
+
+```text
+producer.py
+  -> topic rides
+  -> consumer.py -> console
+  -> consumer_postgres.py -> processed_events
+  -> pass_through_job.py -> processed_events
+  -> aggregation_job.py -> processed_events_aggregated
+
+producer_realtime.py
+  -> topic rides with late events
+  -> aggregation_job.py
+  -> upsert processed_events_aggregated
+```
+
+9. Quiz 6 câu về repo code:
+   - Vì sao producer dùng `localhost:9092` còn Flink dùng `redpanda:29092`?
+   - Nếu đổi topic name trong producer mà không đổi Flink source thì lỗi gì?
+   - Vì sao `PRIMARY KEY NOT ENFORCED` quan trọng với JDBC upsert?
+   - Consumer group khác nhau có đọc cùng dữ liệu không?
+   - Watermark column lấy từ field nào?
+   - Java topology tests không cần broker thật vì sao?
+
+Yêu cầu UI:
+- Dùng `switchTab()` cho các tab groups.
+- Code blocks có syntax highlight class phù hợp: yaml, dockerfile, python, java, sql, json, bash.
+- Có warn/note boxes cho điểm yếu production.
+
+Lưu file. Báo cáo số dòng hiện tại.
+
+---
+
+## Prompt 3 - Thêm S3: Thực hành từng bước
+
+Mở `Module07_Streaming.html`.
+
+Đọc lại:
+- `repo_notes_M07.md` phần `workshop/README.md`.
+- `repo_notes_M07.md` appendix cho `workshop/*`, `workshop/src/*`, `extras/python/redpanda_example/*`.
+
+Thay placeholder S3 bằng nội dung đầy đủ.
+
+### NỘI DUNG S3 - Thực hành từng bước
+
+Phải có:
+
+#### Phần 1 - Setup môi trường
+
+Tab A - Workshop chính:
+- Prerequisites: Docker, Docker Compose, uv, SQL client.
+- Vào folder: `cd data-engineering-zoomcamp/07-streaming/workshop`.
+- `uv sync`.
+- Build/start Redpanda: `docker compose up redpanda -d`.
+- Verify:
+  - `docker compose ps`.
+  - Port `localhost:9092` available.
+  - Redpanda container running.
+
+Tab B - Full stack:
+- `docker compose up -d --build`.
+- Verify:
+  - Redpanda ports.
+  - Flink UI `http://localhost:8081`.
+  - PostgreSQL port `5432`.
+
+Tab C - Extras Redpanda:
+- Vào `extras/python/redpanda_example`.
+- `docker compose up -d`.
+- Run producer/consumer theo README.
+
+#### Phần 2 - Producer/Consumer cơ bản
+
+Step-by-step:
+1. Đọc `src/models.py`, giải thích `Ride`.
+2. Chạy `uv run python src/producers/producer.py`.
+3. Mở terminal khác chạy `uv run python src/consumers/consumer.py`.
+4. Verify nhận 10 messages.
+5. Giải thích:
+   - Topic auto-created.
+   - `auto_offset_reset='earliest'`.
+   - Consumer group.
+   - `producer.flush()`.
+
+#### Phần 3 - Ghi events vào PostgreSQL bằng Python consumer
+
+Step-by-step:
+1. Start postgres: `docker compose up postgres -d`.
+2. Connect:
+   - `uvx pgcli -h localhost -p 5432 -U postgres -d postgres`
+   - hoặc `docker compose exec postgres psql -U postgres -d postgres`.
+3. Tạo table `processed_events` đúng schema từ README.
+4. Chạy `uv run python src/consumers/consumer_postgres.py`.
+5. Query `SELECT count(*) FROM processed_events;`.
+6. Explain why Python consumer is okay for pass-through but weak for windows/state.
+
+#### Phần 4 - Submit PyFlink pass-through job
+
+Step-by-step:
+1. Start full stack.
+2. Build image nếu cần.
+3. Tạo table `processed_events`.
+4. Submit:
+
+```bash
+docker compose exec jobmanager ./bin/flink run \
+  -py /opt/src/job/pass_through_job.py \
+  --pyFiles /opt/src -d
+```
+
+5. Chạy producer.
+6. Kiểm tra Flink UI jobs.
+7. Query PostgreSQL.
+8. Explain:
+   - JobManager/TaskManager role.
+   - Kafka source.
+   - JDBC sink.
+   - Startup offset.
+
+#### Phần 5 - Submit aggregation job với tumbling window
+
+Step-by-step:
+1. Tạo table `processed_events_aggregated` đúng schema + primary key.
+2. Submit:
+
+```bash
+docker compose exec jobmanager ./bin/flink run \
+  -py /opt/src/job/aggregation_job.py \
+  --pyFiles /opt/src -d
+```
+
+3. Chạy `producer.py`.
+4. Query grouped output.
+5. Chạy `producer_realtime.py` để thấy late events.
+6. Watch query:
+
+```bash
+watch -n 1 'PGPASSWORD=postgres docker compose exec postgres psql -U postgres -d postgres -c "SELECT window_start, sum(num_trips) as trips, round(sum(total_revenue)::numeric, 2) as revenue FROM processed_events_aggregated GROUP BY window_start ORDER BY window_start;"'
+```
+
+7. Explain:
+   - Watermark.
+   - Late events.
+   - Upsert behavior.
+   - Why primary key matters.
+
+#### Phần 6 - Practice tasks
+
+Dùng `.practice-task` component, mỗi task có hint + solution toggle.
+
+Task 1 (Beginner):
+- Đề: Thêm `key_serializer` cho producer để key message theo `PULocationID`.
+- Gợi ý: Kafka partitioning dùng key để giữ cùng pickup location vào cùng partition.
+- Solution: code producer với `key_serializer=str.encode` hoặc bytes key, giải thích trade-off.
+
+Task 2 (Intermediate):
+- Đề: Tạo Flink job mới aggregate theo `DOLocationID` thay vì `PULocationID`.
+- Gợi ý: copy `aggregation_job.py`, đổi sink table và GROUP BY.
+- Solution: DDL sink + SQL insert đầy đủ.
+
+Task 3 (Intermediate):
+- Đề: Tăng watermark tolerance từ 5 giây lên 1 phút và giải thích effect.
+- Solution: sửa `WATERMARK for event_timestamp as event_timestamp - INTERVAL '1' MINUTE`, trade-off latency vs completeness.
+
+Task 4 (Advanced):
+- Đề: Thêm DLQ topic cho message lỗi JSON parse.
+- Gợi ý: workshop Table API JSON source không xử lý DLQ sẵn; đề xuất design bằng consumer preprocessing hoặc DataStream side output.
+- Solution: architecture + pseudo-code rõ ràng.
+
+Task 5 (Advanced):
+- Đề: Chuyển hardcoded Postgres credentials sang env vars.
+- Solution: docker compose env + Python/Flink DDL string construction pattern, cảnh báo không log secrets.
+
+#### Phần 7 - Cố tình phá
+
+Ít nhất 7 kịch bản, mỗi kịch bản có: triệu chứng, nguyên nhân, debug steps, fix.
+
+1. Producer chạy nhưng consumer không thấy message vì consumer group đã commit offset.
+2. Flink không connect được Kafka vì dùng `localhost:9092` trong container thay vì `redpanda:29092`.
+3. PostgreSQL sink fail vì chưa tạo table.
+4. `PRIMARY KEY` thiếu trong aggregation sink, upsert không hoạt động.
+5. Port 9092 hoặc 5432 đã bị process khác chiếm.
+6. Connector JAR Kafka/JDBC thiếu trong Flink image.
+7. `auto_offset_reset='latest'` làm job không đọc dữ liệu cũ.
+8. Event timestamp sai unit seconds vs milliseconds làm window sai.
+
+Lưu file. Báo cáo số dòng hiện tại, số practice tasks và số break scenarios.
+
+---
+
+## Prompt 4 - Thêm S4 + S5: Production + Nâng cao
+
+Mở `Module07_Streaming.html`.
+
+Đọc lại:
+- `repo_notes_M07.md` phần 5 và 6.
+- `repo_notes_M07.md` appendix cho docker compose, producer/consumer, Flink jobs, Java Kafka Streams.
+- `master_de_roadmap.html` phần senior/production nếu có.
+
+Thay placeholder S4 và S5 bằng nội dung đầy đủ.
+
+### NỘI DUNG S4 - Production Readiness
+
+Tạo 8 câu hỏi production. Mỗi câu phải có:
+- Context thực tế.
+- Risk.
+- Cách debug.
+- Cách fix.
+- Code/config example.
+
+1. SECURITY - Broker và database đang plaintext/hardcoded
+   - Hardcoded `postgres/postgres`, `localhost:9092`, `redpanda:29092`.
+   - No TLS/SASL.
+   - Fix: env vars, Docker secrets, SASL_SSL, least privilege DB user.
+   - Code example: compose env var + Python `os.environ`.
+
+2. DELIVERY SEMANTICS - At-least-once vs exactly-once
+   - Producer no idempotence.
+   - Flink checkpointing local/non-durable.
+   - JDBC sink upsert depends on primary key.
+   - Fix: idempotent producer, transactions where possible, durable checkpoint storage, deterministic keys.
+
+3. OFFSET & REPROCESSING
+   - `earliest-offset` good for replay, risky for production restart if job identity changes.
+   - Checkpoint vs new job submission.
+   - Fix: savepoint strategy, deployment policy, runbook.
+
+4. SCHEMA EVOLUTION
+   - Workshop main uses JSON with no schema registry.
+   - Avro extras show schema but not integrated into main flow.
+   - Fix: Schema Registry, compatibility mode, contract tests.
+   - Include example Avro compatibility decision.
+
+5. LATE EVENTS & WATERMARK POLICY
+   - Watermark 5 seconds is arbitrary.
+   - Business latency vs completeness.
+   - Fix: measure lateness distribution, configure allowed lateness/side output/upsert.
+
+6. BACKPRESSURE & SCALING
+   - Single Redpanda broker.
+   - Flink parallelism 3, task slots 15.
+   - Partition count not designed.
+   - Fix: partition key, broker replication, consumer parallelism, Flink UI backpressure diagnostics.
+
+7. OBSERVABILITY
+   - Missing Kafka lag monitoring, Flink metrics, DB sink metrics, structured logs.
+   - Fix: Prometheus/Grafana, Redpanda Console, Flink metrics reporter, alert thresholds.
+   - Include logging schema: run_id, topic, partition, offset, event_time, processing_time, sink_status.
+
+8. DATA QUALITY & DLQ
+   - JSON parse errors, bad timestamps, null IDs, negative amount.
+   - Fix: validation layer, DLQ topic, quarantine table, replay procedure.
+   - Include pseudo-code or Flink SQL/DataStream design.
+
+### NỘI DUNG S5 - Kiến thức nâng cao
+
+Phần 1 - Kafka/Redpanda internals:
+- Partition leadership, replication factor, ISR, controller/KRaft/Raft.
+- Log segment, retention, compaction.
+- Producer acks, retries, linger, batching, compression, idempotence.
+- Consumer group rebalance, cooperative rebalance, static membership.
+- Trade-off table: throughput vs latency vs durability.
+
+Phần 2 - Flink advanced:
+- Event time, processing time, ingestion time.
+- Watermark per partition.
+- Checkpoint barrier, checkpoint alignment.
+- Savepoint vs checkpoint.
+- State backend, TTL, RocksDB.
+- Restart strategy.
+- Exactly-once sinks.
+- Flink Kubernetes Operator / managed Flink.
+
+Phần 3 - Kafka Streams advanced:
+- KStream vs KTable vs GlobalKTable.
+- State stores + changelog topics.
+- Repartition topics.
+- Window stores.
+- Exactly-once v2.
+- Interactive queries.
+- Topology testing.
+
+Phần 4 - Spark Structured Streaming advanced:
+- Micro-batch trigger.
+- Output modes: append/update/complete.
+- Watermark state cleanup.
+- Checkpoint directory.
+- `foreachBatch`.
+- Khi dùng Spark streaming thay Flink.
+
+Phần 5 - Streaming architecture patterns:
+- Lambda vs Kappa.
+- CDC.
+- Outbox pattern.
+- Event sourcing.
+- CQRS.
+- Stream-table duality.
+- Backfill/replay.
+
+Phần 6 - Trade-off matrices:
+- Kafka consumer app vs Flink vs Kafka Streams vs Spark Structured Streaming vs ksqlDB.
+- JSON vs Avro vs Protobuf.
+- Redpanda self-hosted vs Kafka self-hosted vs Confluent Cloud.
+- Push streaming vs micro-batch.
+
+Phần 7 - Senior design scenario:
+- Thiết kế realtime taxi revenue dashboard:
+  - Producer contract.
+  - Topic partitioning.
+  - Schema registry.
+  - Flink aggregation.
+  - Upsert sink.
+  - Monitoring.
+  - Backfill.
+  - DLQ.
+  - On-call runbook.
+
+Yêu cầu:
+- Dùng bảng trade-off rõ ràng.
+- Có ít nhất 4 code/config snippets.
+- Có ít nhất 2 ASCII diagrams.
+- Không nói chung chung; phải map lại với files thật trong repo.
+
+Lưu file. Báo cáo số dòng hiện tại.
+
+---
+
+## Prompt 5 - Thêm S6 + S7 + S8, hoàn thiện file
+
+Mở `Module07_Streaming.html`.
+
+Đọc lại:
+- Toàn bộ `Module07_Streaming.html`.
+- `repo_notes_M07.md` phần 5, 6, 7.
+- `master_de_roadmap.html` phần Incident Simulation, Interview Mapping, DoD, Final Checklist nếu có.
+
+Thay placeholder S6, S7, S8 bằng nội dung đầy đủ.
+
+### NỘI DUNG S6 - Lỗi thường gặp
+
+Tạo bảng ít nhất 14 lỗi, dùng class `data-table`.
+
+Cột: `Lỗi / Triệu chứng` | `Nguyên nhân` | `Debug steps` | `Cách fix` | `Phòng tránh`.
+
+14 lỗi bắt buộc:
+1. `NoBrokersAvailable` khi producer connect `localhost:9092`.
+2. Consumer không nhận message vì `auto_offset_reset='latest'` hoặc group đã commit offset.
+3. Flink Kafka source không connect vì dùng sai listener `localhost:9092` trong container.
+4. `Table ... does not exist` khi JDBC sink ghi vào PostgreSQL.
+5. `ClassNotFoundException` Kafka/JDBC/Postgres connector trong Flink.
+6. `Could not execute SQL statement` do DDL Flink sai field/type.
+7. JSON parse/deserialization lỗi do schema event không khớp `Ride`.
+8. Timestamp unit sai: seconds vs milliseconds -> window năm 1970 hoặc tương lai.
+9. Aggregation không update vì sink thiếu primary key/upsert.
+10. Flink job restart rồi đọc lại từ đầu vì submit job mới không restore checkpoint/savepoint.
+11. Port conflict `9092`, `8081`, `5432`.
+12. Redpanda container up nhưng advertised listener sai làm client connect timeout.
+13. PostgreSQL duplicate rows khi Python consumer insert không idempotent.
+14. Late events không xuất hiện trong aggregation vì watermark/allowed lateness không phù hợp.
+
+Sau bảng:
+- Debugging checklist theo thứ tự ưu tiên:
+  1. Service có chạy không?
+  2. Đang ở trong Docker hay ngoài Docker?
+  3. Broker address đúng context chưa?
+  4. Topic có data không?
+  5. Consumer group offset ở đâu?
+  6. Schema message có khớp không?
+  7. Sink table tồn tại chưa?
+  8. Flink UI log nói gì?
+  9. Checkpoint/savepoint state ra sao?
+  10. Có DLQ/log raw event không?
+
+### NỘI DUNG S7 - Interview Prep
+
+Tạo 15 câu hỏi, dùng collapsible pattern `toggleSection()`.
+Mỗi câu có:
+- Gợi ý trả lời chi tiết.
+- `Red flag: đừng nói...`.
+- Level badge: Junior / Mid / Senior.
+
+Junior (5 câu):
+1. Kafka topic, partition, offset là gì?
+2. Producer và consumer khác nhau thế nào?
+3. Consumer group dùng để làm gì?
+4. `earliest` và `latest` khác nhau thế nào?
+5. Vì sao Redpanda chạy được với Kafka client?
+
+Mid (5 câu):
+6. Vì sao producer ngoài Docker dùng `localhost:9092`, Flink trong Docker dùng `redpanda:29092`?
+7. Watermark trong Flink giải quyết vấn đề gì?
+8. Tumbling window khác sliding window thế nào?
+9. Vì sao aggregation JDBC sink cần primary key?
+10. JSON vs Avro trong streaming production khác nhau thế nào?
+
+Senior (5 câu):
+11. Thiết kế pipeline realtime taxi revenue từ producer đến dashboard, yêu cầu late events và replay.
+12. Flink job fail 30 phút, restart thế nào để không mất/nhân đôi dữ liệu?
+13. Kafka lag tăng liên tục, bạn điều tra và scale ra sao?
+14. Schema producer đổi field breaking change, xử lý incident thế nào?
+15. Exactly-once end-to-end có thật sự đạt được với Kafka -> Flink -> PostgreSQL không? Điều kiện và trade-off?
+
+### NỘI DUNG S8 - Checklist & Tổng kết
+
+Progress bar:
+- Có `id="checklist-progress-fill"`.
+- Có `id="checklist-progress-text"`.
+- `toggleCheck()` cập nhật progress.
+
+Checklist 24 items chia 4 nhóm:
+
+Foundation (6):
+- Giải thích được topic/partition/offset/consumer group.
+- Phân biệt được batch, micro-batch, streaming.
+- Giải thích được Redpanda compatible Kafka nghĩa là gì.
+- Biết `earliest` vs `latest`.
+- Biết key ảnh hưởng partitioning.
+- Biết retention vs compaction.
+
+Workshop Hands-on (6):
+- Chạy được `docker compose up redpanda -d`.
+- Chạy được `producer.py` ghi topic `rides`.
+- Chạy được `consumer.py` đọc message.
+- Tạo được PostgreSQL table `processed_events`.
+- Submit được `pass_through_job.py`.
+- Submit được `aggregation_job.py` và query `processed_events_aggregated`.
+
+Flink/Streaming Processing (6):
+- Đọc hiểu được Kafka source DDL.
+- Đọc hiểu được JDBC sink DDL.
+- Giải thích được event time + watermark.
+- Giải thích được tumbling window.
+- Giải thích được late events + upsert.
+- Biết checkpoint/savepoint khác nhau.
+
+Production/Senior (6):
+- Nhận diện được hardcoded secrets/listeners trong repo.
+- Thiết kế được DLQ/quarantine flow.
+- Chọn được JSON vs Avro vs Protobuf theo context.
+- Đề xuất monitoring Kafka lag + Flink metrics.
+- Giải thích được replay/backfill strategy.
+- Trả lời được 5 câu Senior interview không cần tài liệu.
+
+Summary grid 6 điểm chốt:
+1. Kafka/Redpanda là event log bền vững, không chỉ là message queue.
+2. Offset thuộc consumer group, không thuộc từng consumer đơn lẻ.
+3. Flink xử lý stateful stream bằng event time, watermark và checkpoint.
+4. Upsert sink cần key rõ ràng để late events không tạo duplicate.
+5. JSON dễ học nhưng schema registry/Avro quan trọng cho production.
+6. Streaming chỉ đáng làm khi business cần latency thấp và team chịu được vận hành 24/7.
+
+File mapping:
+- `workshop/docker-compose.yml` -> infrastructure local.
+- `workshop/src/producers/producer.py` -> source events.
+- `workshop/src/consumers/consumer.py` -> debug consumer.
+- `workshop/src/job/pass_through_job.py` -> Kafka to JDBC pass-through.
+- `workshop/src/job/aggregation_job.py` -> windowed aggregation.
+- `extras/python/avro_example/*` -> schema/Avro.
+- `theory/java/kafka_examples/*` -> Kafka Streams/topology tests.
+
+Definition of Done:
+- 5 checkboxes DoD từ `master_de_roadmap.html` nếu có.
+- Nếu roadmap không có module-specific DoD, tự tạo DoD dựa trên exit criteria module 07.
+
+Preview module tiếp theo:
+- Text: `Module tiếp theo: Capstone / Final Project - tích hợp ingestion, batch, analytics và streaming`.
+- Link nếu có file tương ứng trong repo/site; nếu chưa có, dùng plain text không link hỏng.
+
+FINAL CHECKS bắt buộc trước khi kết thúc:
+1. Không còn placeholder `Đang xây dựng...`.
+2. Có đủ S0-S8.
+3. Sidebar click đúng từng section.
+4. Tất cả JS functions tồn tại.
+5. Progress bar S8 hoạt động.
+6. Tất cả code blocks đóng tag đúng.
+7. Không có console error.
+8. Không claim sai so với `repo_notes_M07.md`.
+9. Báo cáo tổng số dòng, số quiz, số practice tasks, số checklist items.
+
+Lưu file cuối: `Module07_Streaming.html`.
+
+---
+
+Cách chạy:
+1. Mở terminal trong project learning site.
+2. Chạy Claude Code.
+3. Paste Prompt 1, chờ hoàn thành.
+4. Mở file HTML kiểm tra nhanh.
+5. Paste Prompt 2 -> Prompt 5 lần lượt.
+6. Sau Prompt 5, chạy prompt review bằng Antigravity.

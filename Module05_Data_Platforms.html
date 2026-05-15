@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 05 — Data Platforms & Bruin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+    --accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;
+    --text:#e6edf3;--text-muted:#8b949e;--code-bg:#0d1117;--highlight:#388bfd26;
+    --color-primary:var(--accent4);--color-secondary:var(--accent);--color-accent:var(--accent2);
+    --color-bg:var(--bg);--color-surface:var(--surface);--color-border:var(--border);
+    --font-main:'Inter','Segoe UI',-apple-system,sans-serif;--font-mono:'JetBrains Mono','Courier New','Consolas',monospace;
+    --radius:8px;--shadow:0 12px 30px #00000033;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter','Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+  .hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 40%,#1a2a1e 100%);border-bottom:2px solid var(--accent4);padding:40px 24px 30px;text-align:center;position:relative;overflow:hidden}
+  .hero-banner{background:linear-gradient(135deg,#0d1117 0%,#161b22 40%,#1a2a1e 100%);border-bottom:2px solid var(--accent4);padding:40px 24px 30px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#6e40c922,transparent 70%);pointer-events:none}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--accent4);letter-spacing:-0.5px}
+  .hero p{color:var(--text-muted);margin-top:8px;font-size:.95rem}
+  .badge-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;border:1px solid}
+  .badge-blue{color:var(--accent);border-color:var(--accent);background:#1f6feb1a}
+  .badge-green{color:var(--accent2);border-color:var(--accent2);background:#2ea04326}
+  .badge-orange{color:var(--accent5);border-color:var(--accent5);background:#d2940026}
+  .badge-purple{color:var(--accent4);border-color:var(--accent4);background:#6e40c926}
+  .container{display:flex;min-height:calc(100vh - 160px)}
+  .sidebar{width:290px;min-width:290px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:0 16px 12px}
+  .level-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 16px 4px;color:var(--accent4)}
+  .nav-item{display:block;padding:7px 16px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-left:3px solid transparent;transition:all .15s}
+  .nav-item:hover{color:var(--text);background:var(--surface2)}
+  .nav-item.active{color:var(--accent4);border-left-color:var(--accent4);background:#6e40c915;font-weight:600}
+  .nav-number{display:inline-block;width:44px;font-size:.7rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .main{flex:1;padding:32px 40px;max-width:980px}
+  .module{display:none}
+  .module.active{display:block}
+  .module-header{border:1px solid var(--border);border-radius:12px;padding:24px 28px;background:var(--surface);margin-bottom:24px;position:relative;overflow:hidden}
+  .module-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent4)}
+  .module-tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent4);margin-bottom:8px}
+  .module-title{font-size:1.6rem;font-weight:800;margin-bottom:8px}
+  .module-subtitle{color:var(--text-muted);font-size:.9rem}
+  .section{margin-bottom:28px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .section-header{padding:14px 20px;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--surface2);border-bottom:1px solid var(--border);user-select:none}
+  .section-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .icon-purpose{background:#1f6feb33}
+  .icon-detail{background:#2ea04326}
+  .icon-quiz{background:#d2940026}
+  .icon-summary{background:#6e40c926}
+  .icon-practice{background:#f7816626}
+  .section-content{padding:20px;background:var(--surface)}
+  .section-toggle{margin-left:auto;color:var(--text-muted);font-size:12px}
+  h3{font-size:1rem;font-weight:700;color:var(--accent4);margin:18px 0 10px}
+  h3:first-child{margin-top:0}
+  h3.blue{color:var(--accent)}
+  h3.green{color:var(--accent2)}
+  h3.orange{color:var(--accent5)}
+  h3.red{color:var(--accent3)}
+  p{margin-bottom:12px;color:var(--text);font-size:.88rem}
+  ul,ol{padding-left:20px;margin-bottom:12px}
+  li{font-size:.88rem;margin-bottom:5px}
+  strong{color:var(--text)}
+  .cmd-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .cmd-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .cmd-body{padding:14px}
+  pre{font-family:'JetBrains Mono','Courier New','Consolas',monospace;font-size:.82rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--text)}
+  .kw{color:#ff7b72}.kw2{color:var(--accent)}.str{color:var(--accent5)}.fn{color:var(--accent4)}.num{color:#79c0ff}.comment{color:var(--text-muted)}
+  .db-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.68rem;font-weight:700;letter-spacing:.5px;margin-bottom:6px}
+  .db-pg{background:#4169e122;color:#4d9de0;border:1px solid #4169e155}
+  .db-oracle{background:#cc000022;color:#f97316;border:1px solid #cc000055}
+  code{font-family:'JetBrains Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:.82rem;color:var(--accent4)}
+  .quiz-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
+  .quiz-q{font-weight:600;font-size:.88rem;margin-bottom:10px}
+  .quiz-q::before{content:'Q';display:inline-block;width:22px;height:22px;background:var(--accent4);color:#000;border-radius:50%;font-size:.7rem;font-weight:800;text-align:center;line-height:22px;margin-right:8px}
+  .quiz-options{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .quiz-opt{padding:8px 12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.84rem;transition:all .15s;background:var(--bg)}
+  .quiz-opt:hover{border-color:var(--accent4);color:var(--accent4)}
+  .quiz-opt.correct{border-color:var(--accent2);color:var(--accent2);background:#2ea04310}
+  .quiz-opt.wrong{border-color:var(--accent3);color:var(--accent3);background:#f7816610}
+  .quiz-explain{font-size:.82rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px;margin-top:8px;display:none}
+  .quiz-explain.show{display:block}
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .summary-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:.82rem}
+  .summary-item strong{color:var(--accent4);display:block;margin-bottom:4px}
+  .practice-task{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
+  .practice-task-header{padding:12px 16px;background:#6e40c915;border-bottom:1px solid var(--border);font-weight:700;font-size:.85rem;color:var(--accent4)}
+  .practice-task-body{padding:16px}
+  .solution-toggle{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:.8rem;cursor:pointer;color:var(--accent2);margin-top:10px;transition:all .15s}
+  .solution-toggle:hover{background:var(--surface2)}
+  .solution-box{margin-top:10px;display:none;border-top:1px solid var(--border);padding-top:12px}
+  .solution-box.show{display:block}
+  .info-box{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:.84rem;border:1px solid;display:flex;gap:10px}
+  .info-box.tip{border-color:var(--accent2);background:#2ea04310;color:var(--accent2)}
+  .info-box.warn{border-color:var(--accent5);background:#d2940015;color:var(--accent5)}
+  .info-box.note{border-color:var(--accent4);background:#6e40c915;color:var(--accent4)}
+  .info-box.danger{border-color:var(--accent3);background:#f7816610;color:var(--accent3)}
+  .info-box span{color:var(--text)}
+  .progress-bar{background:var(--surface2);border-radius:4px;height:4px;margin:16px 0;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent4),var(--accent2));border-radius:4px;width:0;transition:width .2s}
+  .nav-buttons{display:flex;gap:12px;margin-top:32px;justify-content:space-between}
+  .nav-btn{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:6px}
+  .nav-btn:hover{border-color:var(--accent4);color:var(--accent4)}
+  .nav-btn.primary{background:var(--accent4);color:#000;border-color:var(--accent4)}
+  .nav-btn.primary:hover{background:#e2c0ff}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.83rem}
+  .data-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.82rem}
+  th{background:var(--surface2);padding:8px 12px;text-align:left;border:1px solid var(--border);color:var(--accent4)}
+  td{padding:8px 12px;border:1px solid var(--border)}
+  tr:nth-child(even) td{background:#ffffff05}
+  .checklist{list-style:none;padding:0}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:.88rem;border-bottom:1px solid var(--border)}
+  .checklist li:last-child{border-bottom:none}
+  .checklist li::before{content:'□';color:var(--accent4);font-size:1.1rem;flex-shrink:0;margin-top:-1px}
+  .test-question{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px}
+  .test-question.correct{border-color:var(--accent2);background:#2ea04312}
+  .test-question.wrong{border-color:var(--accent3);background:#f7816612}
+  .test-question.unanswered{border-color:var(--accent5);background:#d2940015}
+  .test-question-title{font-size:.86rem;font-weight:600;margin-bottom:8px}
+  .test-options{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+  .test-option{display:flex;align-items:center;gap:6px;font-size:.83rem;color:var(--text)}
+  .test-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .test-result{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)}
+  .score-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .score-chip{border:1px solid var(--border);border-radius:14px;padding:4px 10px;font-size:.78rem;color:var(--text);background:var(--bg)}
+  .score-chip.good{border-color:var(--accent2);color:var(--accent2)}
+  .score-chip.warn{border-color:var(--accent5);color:var(--accent5)}
+  .score-chip.bad{border-color:var(--accent3);color:var(--accent3)}
+  .mistake-list{margin-top:8px;padding-left:18px}
+  .tab-group{display:flex;gap:0;margin-bottom:0;border-bottom:1px solid var(--border)}
+  .tab-container{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .tab{padding:8px 18px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab.active{color:var(--accent4);border-bottom-color:var(--accent4);font-weight:600}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  .schema-box{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin:14px 0;overflow-x:auto}
+  .schema-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+  .schema-table{border:1px solid var(--border);border-radius:8px;min-width:160px;overflow:hidden}
+  .schema-table-header{padding:8px 12px;font-size:.75rem;font-weight:700;text-align:center}
+  .schema-table-header.fact{background:#1f6feb33;color:var(--accent)}
+  .schema-table-header.dim{background:#6e40c926;color:var(--accent4)}
+  .schema-col{padding:5px 12px;font-size:.73rem;border-top:1px solid var(--border);display:flex;gap:6px}
+  .schema-col .pk{color:var(--accent5);font-weight:700;font-size:.65rem}
+  .schema-col .fk{color:var(--accent3);font-weight:700;font-size:.65rem}
+  .schema-col .col{color:var(--text-muted)}
+  .schema-arrow{align-self:center;color:var(--text-muted);font-size:1.4rem;padding:0 2px}
+  .mental-model{border-left:4px solid var(--accent);background:#1f6feb1a;padding:12px 14px;border-radius:6px;margin:12px 0;font-size:.88rem}
+  .checklist-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .checklist-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .check-box{width:16px;height:16px;border:1px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:.25rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  .check-box.checked{background:var(--accent2);border-color:var(--accent2)}
+  .check-box.checked::after{content:'✓';font-size:10px;color:#000;font-weight:600}
+  .progress-text{font-size:.8rem;color:var(--text-muted);margin-bottom:8px}
+  .badge-red{color:var(--accent3);border-color:var(--accent3);background:#f7816626}
+  .interview-question{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden}
+  .interview-head{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;cursor:pointer}
+  .interview-head strong{font-size:.88rem;line-height:1.5}
+  .interview-answer{display:none;padding:0 14px 14px;border-top:1px solid var(--border)}
+  .interview-answer.show{display:block}
+  .red-flag{border-left:3px solid var(--accent3);background:#f7816610;padding:10px 12px;border-radius:4px;margin-top:10px;font-size:.84rem;color:var(--text)}
+  @media(max-width:768px){.sidebar{display:none}.main{padding:16px}.summary-grid{grid-template-columns:1fr}.test-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Module 05 — Data Platforms & Bruin</h1>
+  <p>Từ script rải rác sang asset graph có lineage, quality checks và deployment rõ ràng.</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">IntermediateSenior</span>
+    <span class="badge badge-green">~8 ngày</span>
+    <span class="badge badge-blue">Data Platforms</span>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="sidebar-title">Module Navigation</div>
+    <div class="level-label">MODULE 05 · DATA PLATFORMS</div>
+    <div class="nav-item active" onclick="showModule(0,this)"><span class="nav-number">S0</span>Tổng quan & Mục tiêu</div>
+    <div class="nav-item" onclick="showModule(1,this)"><span class="nav-number">S1</span>Lý thuyết nền</div>
+    <div class="nav-item" onclick="showModule(2,this)"><span class="nav-number">S2</span>Đọc hiểu code repo</div>
+    <div class="nav-item" onclick="showModule(3,this)"><span class="nav-number">S3</span>Thực hành từng bước</div>
+    <div class="nav-item" onclick="showModule(4,this)"><span class="nav-number">S4</span>Production Readiness</div>
+    <div class="nav-item" onclick="showModule(5,this)"><span class="nav-number">S5</span>Kiến thức nâng cao</div>
+    <div class="nav-item" onclick="showModule(6,this)"><span class="nav-number">S6</span>Lỗi thường gặp</div>
+    <div class="nav-item" onclick="showModule(7,this)"><span class="nav-number">S7</span>Interview Prep</div>
+    <div class="nav-item" onclick="showModule(8,this)"><span class="nav-number">S8</span>Checklist & Tổng kết</div>
+  </nav>
+
+  <main class="main">
+    <div class="module active" id="s0">
+      <div class="module-header">
+        <div class="module-tag">S0 · Orientation</div>
+        <div class="module-title">Tổng quan & Mục tiêu Module 05</div>
+        <div class="module-subtitle">Module này nâng cấp tư duy từ viết pipeline như script sang quản trị data assets như sản phẩm.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">M</span>
+          Roadmap 9 sections
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Section</th><th>Tên section</th><th>Thời gian ước tính</th></tr></thead>
+            <tbody>
+              <tr><td>S0</td><td>Tổng quan & Mục tiêu</td><td>45 phút</td></tr>
+              <tr><td>S1</td><td>Lý thuyết nền</td><td>1.5 ngày</td></tr>
+              <tr><td>S2</td><td>Đọc hiểu code repo</td><td>1 ngày</td></tr>
+              <tr><td>S3</td><td>Thực hành từng bước</td><td>2 ngày</td></tr>
+              <tr><td>S4</td><td>Production Thinking</td><td>1 ngày</td></tr>
+              <tr><td>S5</td><td>Kiến thức nâng cao</td><td>1 ngày</td></tr>
+              <tr><td>S6</td><td>Lỗi thường gặp</td><td>0.75 ngày</td></tr>
+              <tr><td>S7</td><td>Interview Prep</td><td>0.5 ngày</td></tr>
+              <tr><td>S8</td><td>Checklist & Tổng kết</td><td>0.25 ngày</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">!</span>
+          Vấn đề thực tế cần giải quyết
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Data Platforms giải quyết gì?</h3>
+          <p>Pipeline SQL rải rác không ai biết chạy theo thứ tự nào, không có lineage, không có test, deploy bằng tay — khi có incident không biết bắt đầu debug từ đâu.</p>
+          <div class="info-box warn"><span><strong>Cảnh báo:</strong> Khi pipeline chỉ là một đống script, vấn đề không nằm ở SQL khó hay Python khó. Vấn đề là không có contract vận hành: ai sở hữu output, input nào làm nó đổi, và chạy lại có an toàn không.</span></div>
+
+          <h3 class="green">Bruin giải quyết gì?</h3>
+          <p>Orchestration ad-hoc, assets không có dependency graph rõ ràng, không reproducible, không version-controlled, không có built-in quality checks.</p>
+          <div class="info-box note"><span><strong>Lưu ý:</strong> Bruin gom ingestion, transformation, orchestration, data quality, metadata và lineage vào cùng một project git-native.</span></div>
+
+          <h3 class="orange">Trước Bruin / data platform tools người ta làm gì?</h3>
+          <ul>
+            <li><strong>Shell scripts chạy tuần tự:</strong> dễ hiểu lúc nhỏ, nhưng khó retry từng bước và khó biết bước nào sinh ra bảng nào.</li>
+            <li><strong>Cron jobs:</strong> chạy được theo lịch, nhưng dependency graph thường nằm trong đầu người viết.</li>
+            <li><strong>Notebook pipelines:</strong> phù hợp exploration, nhưng dễ mất reproducibility nếu state trong notebook không sạch.</li>
+            <li><strong>Custom orchestrators:</strong> linh hoạt, nhưng team phải tự maintain scheduler, metadata, retry, lineage và quality checks.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">D</span>
+          Data flow diagram
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3>Generic data platform flow</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>data-platform-flow.txt</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">Raw Source (CSV/API/DB)</span>
+        |
+        v
+<span class="kw2">[connection config]</span>
+        |
+        v
+<span class="kw2">Ingestr Asset</span>
+        |
+        v
+<span class="kw2">SQL/Python Asset</span>
+        |
+        v
+<span class="kw2">Output Table</span>
+        |
+        v
+<span class="kw2">BI Tool</span></pre>
+            </div>
+          </div>
+
+          <h3>Bruin pipeline DAG từ repo NYC Taxi</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>nyc-taxi-dag.txt</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">raw.yellow_tripdata</span>
+        |
+        v
+<span class="kw2">ingest asset</span>  +  <span class="kw2">ingestion.payment_lookup</span>
+        |                         |
+        +------------+------------+
+                     v
+              <span class="kw2">stg_yellow_trips</span>
+                     |
+                     v
+                <span class="kw2">fct_trips</span>
+                     |
+                     v
+             <span class="kw2">reporting asset</span></pre>
+            </div>
+          </div>
+          <p>Trong repo notes, flow thực tế là <code>ingestion.trips</code> và <code>ingestion.payment_lookup</code> chạy trước, sau đó <code>staging.trips</code>, cuối cùng <code>reports.trips_report</code>.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">P</span>
+          2 learning paths
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="summary-grid">
+            <div class="summary-item"><strong>Path A: Bruin CLI local</strong>Dùng DuckDB / SQLite để hiểu project, pipeline, assets, variables, materialization và lineage ngay trên máy. Đây là path bắt buộc trước khi nghĩ tới production.</div>
+            <div class="summary-item"><strong>Path B: Bruin Cloud</strong>Dùng managed platform, GitHub integration, managed connections, monitoring, lineage UI và MCP integration để hiểu cách pipeline được deploy và vận hành.</div>
+          </div>
+          <div class="info-box tip"><span><strong>Tip:</strong> Nếu mới học, đi Path A trước. Nếu đã có pipeline chạy ổn và muốn hiểu vận hành, chuyển sang Path B.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">E</span>
+          Exit criteria
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3>Bạn đã nắm module này khi...</h3>
+          <ul>
+            <li>Giải thích được Data Platform khác Data Warehouse và Pipeline ở điểm nào.</li>
+            <li>Nhìn một asset Bruin và biết nó tạo bảng gì, phụ thuộc asset nào, materialize kiểu gì.</li>
+            <li>Chạy được <code>bruin validate</code>, <code>bruin run</code>, <code>bruin lineage</code> và dùng output để debug.</li>
+            <li>Vẽ lại được DAG NYC Taxi: ingestion + lookup → staging → reports.</li>
+            <li>Biết khi nào dùng local CLI, khi nào cần Bruin Cloud, và rủi ro nào phải kiểm soát trước production.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s1" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S1 · Foundation</div>
+        <div class="module-title">Lý thuyết nền</div>
+        <div class="module-subtitle">Hiểu Data Platforms theo 3 level: chạy được, thiết kế đúng, vận hành được.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">1</span>
+          Data Platforms & Orchestration
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Beginner: Data Platform là gì?</h3>
+          <p><strong>Data Platform</strong> là lớp công cụ giúp quản lý vòng đời dữ liệu từ ingest, transform, orchestration, quality checks, metadata đến lineage. Nó khác <strong>Data Warehouse</strong> vì warehouse là nơi lưu/truy vấn dữ liệu; khác <strong>Data Pipeline</strong> vì pipeline là một luồng xử lý cụ thể. Platform là hệ thống quản trị nhiều pipeline và nhiều assets.</p>
+          <div class="info-box note"><span><strong>Lưu ý:</strong> BigQuery/Snowflake là warehouse. Một pipeline NYC Taxi là flow xử lý. Bruin là platform/tooling giúp định nghĩa, chạy, kiểm tra và quan sát flow đó.</span></div>
+
+          <h3 class="blue">Beginner: Asset-based thinking vs task-based thinking</h3>
+          <p><strong>Task-based</strong> hỏi “bước nào chạy trước?”. <strong>Asset-based</strong> hỏi “bảng/view/file nào là output cần tin cậy, nó đến từ đâu?”. Asset là unit tốt hơn task vì người dùng data quan tâm output và contract của output, không chỉ quan tâm script đã chạy.</p>
+          <div class="info-box tip"><span><strong>Tip:</strong> Với production, hãy review theo asset: owner, upstream, freshness, schema, quality checks, rerun behavior.</span></div>
+
+          <h3 class="blue">Beginner: Pipeline, Asset, Connection</h3>
+          <ul>
+            <li><strong>Pipeline:</strong> nhóm assets theo schedule và config, ví dụ <code>nyc_taxi</code> chạy daily.</li>
+            <li><strong>Asset:</strong> một file SQL/Python/YAML tạo hoặc cập nhật một bảng/view, ví dụ <code>staging.trips</code>.</li>
+            <li><strong>Connection:</strong> cấu hình kết nối tới DuckDB, BigQuery, Snowflake, Postgres..., thường nằm trong <code>.bruin.yml</code> local hoặc Bruin Cloud.</li>
+          </ul>
+          <div class="info-box danger"><span><strong>Nguy hiểm:</strong> <code>.bruin.yml</code> có thể chứa credentials. Repo notes nhấn mạnh file này phải local và không push lên git.</span></div>
+
+          <h3 class="green">Intermediate: Dependency graph (DAG)</h3>
+          <p>DAG mô tả upstream/downstream của assets. Trong NYC Taxi, <code>staging.trips</code> phụ thuộc <code>ingestion.trips</code> và <code>ingestion.payment_lookup</code>; <code>reports.trips_report</code> phụ thuộc <code>staging.trips</code>. DAG quan trọng vì nó quyết định execution order, rerun scope và debug path khi incident xảy ra.</p>
+
+          <h3 class="green">Intermediate: Materialization trong Bruin</h3>
+          <table>
+            <thead><tr><th>Bruin pattern</th><th>Ý nghĩa</th><th>So với dbt</th></tr></thead>
+            <tbody>
+              <tr><td><code>table</code></td><td>Tạo bảng vật lý, phù hợp output cần query nhanh.</td><td>Gần <code>materialized='table'</code>.</td></tr>
+              <tr><td><code>view</code></td><td>Không lưu data, query lại khi đọc.</td><td>Gần <code>materialized='view'</code>.</td></tr>
+              <tr><td><code>incremental</code> / <code>time_interval</code></td><td>Chỉ xử lý một vùng dữ liệu, ví dụ theo <code>pickup_datetime</code>.</td><td>Gần dbt incremental, nhưng Bruin gắn trực tiếp với run interval và orchestration.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box warn"><span><strong>Cảnh báo:</strong> Raw asset trong repo dùng <code>append</code>; nếu rerun cùng interval có thể duplicate raw data. Staging có dedup, nhưng raw vẫn phình ra nếu không kiểm soát.</span></div>
+
+          <h3 class="red">Senior: Bruin trong modern data stack</h3>
+          <p>Bruin nằm ở lớp platform/orchestration quanh pipeline: ingest từ source, transform bằng SQL/Python, chạy quality checks, tạo metadata/lineage, rồi serve output cho reporting hoặc downstream applications. Nó không thay thế warehouse, nhưng làm pipeline reproducible và observable hơn.</p>
+
+          <div class="mental-model"><strong>Mental model:</strong> Bruin = git-native data platform: define assets, declare dependencies, run anywhere.</div>
+
+          <h3>Bruin vs dbt vs Airflow vs Dagster — trade-offs thực tế 2025</h3>
+          <table>
+            <thead><tr><th>Tool</th><th>Mạnh nhất khi</th><th>Trade-off</th></tr></thead>
+            <tbody>
+              <tr><td>Bruin</td><td>Muốn gom ingestion, SQL/Python assets, quality checks, lineage trong project gọn.</td><td>Hệ sinh thái nhỏ hơn Airflow/dbt; cần đánh giá connector và cloud maturity theo use case.</td></tr>
+              <tr><td>dbt</td><td>Transform SQL trong warehouse, model testing, docs, semantic modeling.</td><td>Không phải general-purpose orchestrator/ingestion platform.</td></tr>
+              <tr><td>Airflow</td><td>Orchestration linh hoạt, nhiều operators, legacy enterprise adoption mạnh.</td><td>Task-based, nhiều boilerplate, lineage/data quality thường phải tích hợp thêm.</td></tr>
+              <tr><td>Dagster</td><td>Asset-centric orchestration mạnh, software-defined assets, observability tốt.</td><td>Đòi hỏi Python/software engineering discipline cao hơn với team non-dev.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">Q</span>
+          Quiz: Data Platforms & Orchestration
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item"><div class="quiz-q">Team có 20 SQL scripts chạy bằng cron. Khi dashboard sai số, không ai biết script nào tạo bảng cuối. Chọn bước cải thiện đầu tiên?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Thêm cron chỉ giải quyết lịch chạy, không giải quyết lineage.')">A. Thêm nhiều cron job hơn</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Đưa output thành assets và khai báo upstream/downstream giúp debug theo graph.')">B. Chuyển sang asset graph có dependencies</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Warehouse nhanh hơn không tự tạo ownership và lineage.')">C. Đổi sang warehouse mạnh hơn</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Một bảng report cần rerun tháng 2022-01 mà không rebuild toàn bộ lịch sử. Materialization nào hợp lý nhất?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'View không lưu data và không xử lý overwrite interval.')">A. view</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Append dễ duplicate nếu rerun cùng interval.')">B. append</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. time_interval/delete+insert theo date range giúp rerun idempotent hơn.')">C. time_interval</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Trong incident, asset downstream fail vì thiếu cột từ upstream. Lệnh nào giúp nhìn dependency path?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. lineage cho biết upstream/downstream để khoanh vùng nơi schema đổi.')">A. bruin lineage</div><div class="quiz-opt" onclick="answerQuiz(this,false,'run có thể tái tạo lỗi, nhưng không phải bước tốt nhất để nhìn graph.')">B. bruin run --full-refresh</div><div class="quiz-opt" onclick="answerQuiz(this,false,'version chỉ kiểm tra CLI.')">C. bruin version</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Data Platform khác Data Warehouse ở điểm nào?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Warehouse là nơi lưu/truy vấn; platform quản lý lifecycle rộng hơn.')">A. Hai khái niệm giống nhau</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Platform bao quanh ingest, transform, orchestration, quality, lineage và metadata.')">B. Platform quản lý lifecycle, warehouse là storage/compute</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Pipeline là luồng xử lý cụ thể, không phải toàn bộ platform.')">C. Platform chỉ là một pipeline</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Khi nào dbt là lựa chọn rõ hơn Bruin?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Nếu bài toán chủ yếu là SQL transforms trong warehouse, dbt ecosystem rất mạnh.')">A. Team chỉ cần transform SQL trong warehouse và docs/tests model</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Ingestion đa nguồn và orchestration rộng không phải điểm mạnh cốt lõi của dbt.')">B. Team cần gom ingestion, Python assets và MCP workflow</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Cron không phải lý do để chọn dbt.')">C. Team muốn thay cron bằng cron khác</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Một asset là unit tốt hơn task vì sao?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Số dòng code không quyết định production reliability.')">A. Asset luôn ít code hơn task</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Asset gắn với output, contract, upstream/downstream và quality expectations.')">B. Asset đại diện cho output data có contract rõ</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Asset vẫn cần code để tạo hoặc cập nhật output.')">C. Asset không cần code</div></div><div class="quiz-explain"></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">2</span>
+          Bruin Core Concepts
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Beginner: Projects, Pipelines, Assets</h3>
+          <p><strong>Project</strong> là root directory đã init bằng <code>bruin init</code>, chứa config và pipelines. <strong>Pipeline</strong> gom assets theo schedule/config, có <code>pipeline.yml</code>. <strong>Asset</strong> là một file làm việc cụ thể: ingest, transform, seed, report.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>project-shape.txt</span></div><div class="cmd-body"><pre>project/
+  .bruin.yml
+  pipeline/
+    pipeline.yml
+    assets/
+      ingestion/trips.py
+      staging/trips.sql
+      reports/trips_report.sql</pre></div></div>
+
+          <h3 class="blue">Beginner: Asset types</h3>
+          <table>
+            <thead><tr><th>Asset type</th><th>Dùng khi nào</th><th>Ví dụ repo</th></tr></thead>
+            <tbody>
+              <tr><td>SQL asset</td><td>Transform, aggregate, build staging/report tables.</td><td><code>staging/trips.sql</code>, <code>reports/trips_report.sql</code></td></tr>
+              <tr><td>Python asset</td><td>Ingestion/API/file processing cần Python libraries.</td><td><code>ingestion/trips.py</code></td></tr>
+              <tr><td>Ingestr/YAML/Seed asset</td><td>Load source hoặc static lookup theo config.</td><td><code>payment_lookup.asset.yml</code></td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="green">Intermediate: Variables trong Bruin</h3>
+          <p>Built-in vars như <code>start_date</code>, <code>end_date</code> được tạo theo run interval. SQL dùng Jinja như <code>{{ start_date }}</code>; Python nhận qua environment variables như <code>BRUIN_START_DATE</code>, <code>BRUIN_END_DATE</code> hoặc custom vars qua JSON.</p>
+          <div class="info-box tip"><span><strong>Tip:</strong> Variables giúp cùng một asset chạy cho nhiều interval hoặc nhiều tenant mà không sửa code.</span></div>
+
+          <h3 class="green">Intermediate: Connections</h3>
+          <p>Connections định nghĩa cách Bruin nói chuyện với destination/source: BigQuery, DuckDB, Snowflake, Postgres, MotherDuck... Local config thường nằm trong <code>.bruin.yml</code>; Bruin Cloud lưu connection trong UI/cloud secrets nhưng tên connection phải khớp với pipeline.</p>
+
+          <h3 class="red">Senior: Commands nâng cao</h3>
+          <table>
+            <thead><tr><th>Command</th><th>Khi dùng</th><th>Production habit</th></tr></thead>
+            <tbody>
+              <tr><td><code>bruin validate</code></td><td>Trước khi chạy hoặc deploy.</td><td>Chặn broken references, circular dependencies, missing connections.</td></tr>
+              <tr><td><code>bruin run</code></td><td>Execute pipeline hoặc asset subset.</td><td>Dùng <code>--asset</code>, <code>--upstream</code>, <code>--downstream</code>, date range rõ.</td></tr>
+              <tr><td><code>bruin lineage</code></td><td>Debug dependency graph.</td><td>Bắt đầu incident từ asset fail rồi trace upstream.</td></tr>
+              <tr><td><code>bruin render</code></td><td>Xem SQL đã compile với variables.</td><td>Review query thật trước khi chạy production date range.</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="red">Senior: Bruin MCP integration</h3>
+          <p>Bruin MCP cho phép AI agent trong Cursor/VS Code/Claude giao tiếp với Bruin để scaffold assets, validate pipeline, query data và giải thích pipeline logic. Workflow tốt là dùng AI để draft asset/config, rồi engineer review metadata, dependency, materialization, quality checks và chạy validate.</p>
+          <div class="info-box danger"><span><strong>Nguy hiểm:</strong> AI-generated pipeline vẫn cần review như production code. Đặc biệt kiểm tra logic delete/insert, date boundaries, secrets và dependency graph.</span></div>
+
+          <div class="mental-model"><strong>Mental model:</strong> Bruin asset = 1 file (SQL hoặc Python) + metadata YAML block; Bruin lo dependency và execution.</div>
+
+          <h3>Bruin asset config vs dbt model config</h3>
+          <table>
+            <thead><tr><th>Khía cạnh</th><th>Bruin asset</th><th>dbt model</th></tr></thead>
+            <tbody>
+              <tr><td>Unit</td><td>SQL/Python/YAML asset file với metadata block.</td><td>SQL model + YAML properties/config.</td></tr>
+              <tr><td>Scope</td><td>Ingestion + transform + quality + orchestration.</td><td>Transform/modeling trong warehouse là trọng tâm.</td></tr>
+              <tr><td>Dependencies</td><td>Declare hoặc infer từ SQL/table reads; dùng cho run order.</td><td><code>ref()</code>/<code>source()</code> rõ ràng, docs lineage mạnh.</td></tr>
+              <tr><td>Materialization</td><td>table, view, append, time_interval, merge...</td><td>view, table, incremental, ephemeral, snapshots...</td></tr>
+              <tr><td>Team fit</td><td>Team muốn một platform gọn cho nhiều asset types.</td><td>Analytics engineering team SQL-heavy.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">Q</span>
+          Quiz: Bruin Core Concepts
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item"><div class="quiz-q">Bạn muốn load file lookup nhỏ <code>payment_lookup.csv</code> vào database kèm not_null/unique checks. Asset nào phù hợp?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Python làm được nhưng thừa cho static lookup.')">A. Python asset tự đọc CSV</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Seed/YAML asset đúng cho reference data tĩnh và khai báo checks.')">B. Seed/YAML asset</div><div class="quiz-opt" onclick="answerQuiz(this,false,'View không ingest file CSV.')">C. SQL view</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Bạn cần chạy <code>staging.trips</code> cùng toàn bộ upstream trước nó. Dùng command pattern nào?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. --asset chọn node, --upstream chạy dependencies cần thiết.')">A. bruin run ... --asset staging.trips --upstream</div><div class="quiz-opt" onclick="answerQuiz(this,false,'--downstream chạy các asset phụ thuộc vào staging, không chạy upstream.')">B. bruin run ... --asset staging.trips --downstream</div><div class="quiz-opt" onclick="answerQuiz(this,false,'query chỉ query dữ liệu, không chạy pipeline.')">C. bruin query ...</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Custom variable <code>taxi_types</code> là array. Trong Python nên xử lý thế nào?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Array thường được truyền qua env dưới dạng JSON string, không phải list Python sẵn.')">A. Dùng trực tiếp như list Python</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Repo notes dùng json.loads trên env vars để lấy taxi_types.')">B. Đọc env var rồi json.loads</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Hardcode làm mất parameterization.')">C. Hardcode yellow taxi trong script</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Vì sao pipeline nên có single schedule?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Assets cùng cadence nên nằm cùng pipeline để interval và dependencies rõ.')">A. Để grouping theo cadence và run interval rõ</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Một project có thể có nhiều pipelines.')">B. Vì Bruin chỉ cho phép một pipeline mỗi project</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Schedule không liên quan tới màu UI.')">C. Để lineage đẹp hơn trong UI</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Bạn chuẩn bị deploy lên Bruin Cloud. Connection local tên <code>duckdb-default</code>, pipeline reference cùng tên. Điều gì quan trọng?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Tên connection không nên đổi tùy tiện vì pipeline reference theo tên.')">A. Đổi tên connection trên Cloud cho dễ nhớ</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Connection trong cloud phải có tên/loại khớp với config pipeline hoặc deploy sẽ fail.')">B. Tạo connection cloud khớp tên pipeline đang dùng</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Push .bruin.yml có secrets là sai policy.')">C. Push .bruin.yml lên GitHub để Cloud đọc</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">AI agent qua MCP tạo xong pipeline. Senior review nên tập trung gì đầu tiên?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Style quan trọng nhưng không phải rủi ro production đầu tiên.')">A. Đổi tên biến cho đẹp</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Cần review asset metadata, dependencies, materialization, checks, secrets và date boundaries.')">B. Kiểm tra dependency, materialization, checks và destructive logic</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Tin tuyệt đối vào AI là rủi ro.')">C. Deploy ngay vì MCP đã generate</div></div><div class="quiz-explain"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s2" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S2 · Repo Reading</div>
+        <div class="module-title">Đọc hiểu code trong repo</div>
+        <div class="module-subtitle">Module 05 trong repo hiện chứa tài liệu và reference implementation; pipeline project thật được sinh bằng <code>bruin init zoomcamp my-taxi-pipeline</code>.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">T</span>
+          Phần 1 — Cấu trúc thư mục
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>05-data-platforms-tree.txt</span></div>
+            <div class="cmd-body">
+<pre>05-data-platforms/
+├── README.md
+├── repo_notes_M05.md
+└── notes/
+    ├── 01-introduction.md
+    ├── 02-getting-started.md
+    ├── 03-nyc-taxi-pipeline.md
+    ├── 04-bruin-mcp.md
+    ├── 05-bruin-cloud.md
+    ├── 06-core-01-projects.md
+    ├── 06-core-02-pipelines.md
+    ├── 06-core-03-assets.md
+    ├── 06-core-04-variables.md
+    └── 06-core-05-commands.md</pre>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Path</th><th>Mục đích</th><th>Ghi chú đọc code</th></tr></thead>
+            <tbody>
+              <tr><td><code>README.md</code></td><td>Entry point của module, link video, homework, resources.</td><td>Nói rõ tutorial dùng template ngoài: chạy <code>bruin init zoomcamp my-taxi-pipeline</code>.</td></tr>
+              <tr><td><code>repo_notes_M05.md</code></td><td>Bản phân tích đã gom snippets config/assets từ reference implementation.</td><td>Đây là nơi có các đoạn config/code “nguyên văn” để đọc trong repo hiện tại.</td></tr>
+              <tr><td><code>notes/</code></td><td>Tài liệu học theo từng video: intro, setup, NYC Taxi pipeline, MCP, Cloud, core concepts.</td><td>Không phải pipeline executable; là completed reference/tutorial notes.</td></tr>
+              <tr><td><code>notes/03-nyc-taxi-pipeline.md</code></td><td>Reference flow end-to-end NYC Taxi dùng DuckDB.</td><td>Chứa <code>.bruin.yml</code>, <code>pipeline.yml</code>, Python asset, seed asset, SQL assets.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box warn"><span><strong>Cảnh báo nguồn:</strong> Trong workspace này không có <code>05-data-platforms/notes/README.md</code> và không có file <code>.yml/.sql/.py</code> vật lý dưới <code>05-data-platforms/</code>. Pipeline files dưới đây là reference implementation được trích trong notes của module.</span></div>
+          <h3 class="green">notes/ vs pipeline project files</h3>
+          <ul>
+            <li><strong><code>notes/</code>:</strong> tài liệu học, đọc để hiểu Bruin concepts và reference code.</li>
+            <li><strong>Pipeline project files:</strong> chỉ xuất hiện sau khi learner chạy <code>bruin init zoomcamp my-taxi-pipeline</code>; gồm <code>.bruin.yml</code>, <code>pipeline/pipeline.yml</code>, <code>pipeline/assets/**</code>.</li>
+            <li><strong>Trong file này:</strong> mọi phân tích “code” dựa trên snippets nguyên văn trong <code>notes/03-nyc-taxi-pipeline.md</code>, <code>notes/02-getting-started.md</code> và <code>repo_notes_M05.md</code>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">C</span>
+          Phần 2 — Project config
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3>Config local từ NYC Taxi reference</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>.bruin.yml</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">default_environment</span>: <span class="str">default</span>
+
+<span class="kw2">environments</span>:
+  <span class="kw2">default</span>:
+    <span class="kw2">connections</span>:
+      <span class="kw2">duckdb</span>:
+        - <span class="kw2">name</span>: <span class="str">duckdb-default</span>
+          <span class="kw2">path</span>: <span class="str">duckdb.db</span></pre>
+            </div>
+          </div>
+          <ul>
+            <li><code>default_environment: default</code>: nếu không truyền <code>--environment</code>, Bruin dùng environment này.</li>
+            <li><code>environments.default</code>: môi trường local/dev tối thiểu cho tutorial.</li>
+            <li><code>connections.duckdb</code>: khai báo connection type là DuckDB.</li>
+            <li><code>name: duckdb-default</code>: tên logical connection mà pipeline/assets reference.</li>
+            <li><code>path: duckdb.db</code>: file database local, phù hợp học trên máy cá nhân.</li>
+          </ul>
+
+          <h3>Environment separation dev vs prod</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>.bruin.yml — expanded reference</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">default_environment</span>: <span class="str">default</span>
+
+<span class="kw2">environments</span>:
+  <span class="kw2">default</span>:
+    <span class="kw2">connections</span>:
+      <span class="kw2">duckdb</span>:
+        - <span class="kw2">name</span>: <span class="str">duckdb-default</span>
+          <span class="kw2">path</span>: <span class="str">duckdb.db</span>
+      <span class="kw2">motherduck</span>:
+        - <span class="kw2">name</span>: <span class="str">motherduck</span>
+          <span class="kw2">token</span>: <span class="str">&lt;your-token&gt;</span>
+
+  <span class="kw2">production</span>:
+    <span class="kw2">connections</span>:
+      <span class="kw2">bigquery</span>:
+        - <span class="kw2">name</span>: <span class="str">bq-prod</span>
+          <span class="kw2">project</span>: <span class="str">my-project</span>
+          <span class="kw2">dataset</span>: <span class="str">production</span></pre>
+            </div>
+          </div>
+          <p>Cần khai báo connections ở project level vì connection là shared infrastructure contract: nhiều pipelines/assets có thể dùng cùng logical connection name, còn credentials/path/project được đổi theo environment.</p>
+          <div class="info-box danger"><span><strong>Security:</strong> <code>.bruin.yml</code> có thể chứa token/service account. Pattern đúng là giữ local trong <code>.gitignore</code>, inject qua secret manager hoặc cấu hình trong Bruin Cloud; không commit plaintext credentials.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">Y</span>
+          Phần 3 — Pipeline config files
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>pipeline/pipeline.yml</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">name</span>: <span class="str">nyc_taxi</span>
+<span class="kw2">schedule</span>: <span class="str">daily</span>
+<span class="kw2">start_date</span>: <span class="str">"2022-01-01"</span>
+<span class="kw2">default_connections</span>:
+  <span class="kw2">duckdb</span>: <span class="str">duckdb-default</span>
+<span class="kw2">variables</span>:
+  <span class="kw2">taxi_types</span>:
+    <span class="kw2">type</span>: <span class="str">array</span>
+    <span class="kw2">items</span>:
+      <span class="kw2">type</span>: <span class="str">string</span>
+    <span class="kw2">default</span>: [<span class="str">"yellow"</span>]</pre>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Block</th><th>Ý nghĩa</th><th>Production note</th></tr></thead>
+            <tbody>
+              <tr><td><code>name</code></td><td>Pipeline identifier hiển thị trong CLI/UI.</td><td>Đặt ổn định, không đổi tùy hứng vì logs/monitoring dựa vào tên.</td></tr>
+              <tr><td><code>schedule</code></td><td>Cadence chạy pipeline; ở đây là <code>daily</code>.</td><td>Có thể dùng built-in <code>hourly</code>, <code>daily</code>, <code>weekly</code>, <code>monthly</code> hoặc cron expression.</td></tr>
+              <tr><td><code>start_date</code></td><td>Mốc bắt đầu khi full refresh/backfill.</td><td>Hardcode ngày lịch sử ổn cho tutorial, nhưng prod nên document nguồn business cutoff.</td></tr>
+              <tr><td><code>default_connections</code></td><td>Map connection type sang logical connection name.</td><td>Giúp pipeline chỉ khởi tạo connection nó cần.</td></tr>
+              <tr><td><code>variables</code></td><td>Custom params runtime, ở đây là <code>taxi_types</code>.</td><td>Cần validate values để tránh ingest nhầm source.</td></tr>
+            </tbody>
+          </table>
+          <h3>Schedule syntax</h3>
+          <p>Built-in schedules như <code>daily</code>, <code>weekly</code>, <code>monthly</code> đủ cho tutorial. Với production phức tạp, cron format kiểu <code>0 3 * * *</code> giúp mô tả “3 giờ sáng mỗi ngày”. Dù dùng format nào, điều quan trọng là assets trong cùng pipeline nên có cùng cadence.</p>
+          <div class="info-box warn"><span><strong>Điểm yếu:</strong> Reference config chưa có owner, alert policy, retry policy, SLA/freshness expectation. Đây là gap thường gặp khi chuyển từ tutorial sang production.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">I</span>
+          Phần 4 — Ingestr / Seed Assets
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Trong notes, ví dụ “YAML ingestor asset” được mô tả ở level concept. NYC Taxi reference dùng seed asset để load lookup CSV, không có file ingestr source/destination đầy đủ trong workspace.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>payment_lookup.asset.yml</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">name</span>: <span class="str">ingestion.payment_lookup</span>
+<span class="kw2">type</span>: <span class="str">duckdb.seed</span>
+<span class="kw2">parameters</span>:
+  <span class="kw2">path</span>: <span class="str">payment_lookup.csv</span>
+<span class="kw2">columns</span>:
+  - <span class="kw2">name</span>: <span class="str">payment_type_id</span>
+    <span class="kw2">type</span>: <span class="str">integer</span>
+    <span class="kw2">description</span>: <span class="str">"Numeric code for payment type"</span>
+    <span class="kw2">primary_key</span>: <span class="kw">true</span>
+    <span class="kw2">checks</span>:
+      - <span class="kw2">name</span>: <span class="str">not_null</span>
+      - <span class="kw2">name</span>: <span class="str">unique</span>
+  - <span class="kw2">name</span>: <span class="str">payment_type_name</span>
+    <span class="kw2">type</span>: <span class="str">string</span>
+    <span class="kw2">description</span>: <span class="str">"Human-readable payment type"</span>
+    <span class="kw2">checks</span>:
+      - <span class="kw2">name</span>: <span class="str">not_null</span></pre>
+            </div>
+          </div>
+          <ul>
+            <li><code>type: duckdb.seed</code>: asset load file tĩnh vào DuckDB, không phải custom Python.</li>
+            <li><code>parameters.path</code>: source file local <code>payment_lookup.csv</code>.</li>
+            <li><code>columns</code>: metadata + data quality checks chạy sau asset.</li>
+            <li><strong>Ingestr asset concept:</strong> nếu dùng ingestr thật, parameters thường thể hiện source connection, source table/stream và destination table; lợi ích là không phải tự viết extraction script cho connector phổ biến.</li>
+          </ul>
+          <div class="info-box tip"><span><strong>Khi dùng ingestr thay custom script:</strong> source là connector phổ biến, mapping đơn giản, không cần business logic phức tạp. Khi cần API pagination riêng, retry tùy biến hoặc enrich dữ liệu trong code, Python asset hợp lý hơn.</span></div>
+          <div class="info-box warn"><span><strong>Điểm yếu:</strong> Seed lookup nhỏ thì ổn, nhưng với ingestion lớn cần incremental cursor, error handling, retry, schema drift policy. Notes không có ingestr asset đầy đủ để đánh giá các config này.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">S</span>
+          Phần 5 — SQL Assets
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3>staging/trips.sql</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>pipeline/assets/staging/trips.sql</span></div>
+            <div class="cmd-body">
+<pre><span class="comment">/* @bruin
+name: staging.trips
+type: duckdb.sql
+
+depends:
+  - ingestion.trips
+  - ingestion.payment_lookup
+
+materialization:
+  type: table
+  strategy: time_interval
+  incremental_key: pickup_datetime
+  time_granularity: timestamp
+
+columns:
+  - name: pickup_datetime
+    type: timestamp
+    primary_key: true
+    checks:
+      - name: not_null
+
+custom_checks:
+  - name: row_count_greater_than_zero
+    query: |
+      SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+      FROM staging.trips
+    value: 1
+@bruin */</span>
+
+<span class="kw">SELECT</span>
+    t.pickup_datetime,
+    t.dropoff_datetime,
+    t.pickup_location_id,
+    t.dropoff_location_id,
+    t.fare_amount,
+    t.taxi_type,
+    p.payment_type_name
+<span class="kw">FROM</span> ingestion.trips t
+<span class="kw">LEFT JOIN</span> ingestion.payment_lookup p
+    <span class="kw">ON</span> t.payment_type = p.payment_type_id
+<span class="kw">WHERE</span> t.pickup_datetime &gt;= <span class="str">'{{ start_datetime }}'</span>
+  <span class="kw">AND</span> t.pickup_datetime &lt; <span class="str">'{{ end_datetime }}'</span>
+<span class="kw">QUALIFY</span> ROW_NUMBER() OVER (
+    PARTITION BY t.pickup_datetime, t.dropoff_datetime,
+                 t.pickup_location_id, t.dropoff_location_id, t.fare_amount
+    ORDER BY t.pickup_datetime
+) = 1</pre>
+            </div>
+          </div>
+          <h3>reports/trips_report.sql</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>pipeline/assets/reports/trips_report.sql</span></div>
+            <div class="cmd-body">
+<pre><span class="comment">/* @bruin
+name: reports.trips_report
+type: duckdb.sql
+
+depends:
+  - staging.trips
+
+materialization:
+  type: table
+  strategy: time_interval
+  incremental_key: trip_date
+  time_granularity: date
+
+columns:
+  - name: trip_date
+    type: date
+    primary_key: true
+  - name: taxi_type
+    type: string
+    primary_key: true
+  - name: payment_type
+    type: string
+    primary_key: true
+  - name: trip_count
+    type: bigint
+    checks:
+      - name: non_negative
+@bruin */</span>
+
+<span class="kw">SELECT</span>
+    CAST(pickup_datetime AS DATE) AS trip_date,
+    taxi_type,
+    payment_type_name AS payment_type,
+    COUNT(*) AS trip_count,
+    SUM(fare_amount) AS total_fare,
+    AVG(fare_amount) AS avg_fare
+<span class="kw">FROM</span> staging.trips
+<span class="kw">WHERE</span> pickup_datetime &gt;= <span class="str">'{{ start_datetime }}'</span>
+  <span class="kw">AND</span> pickup_datetime &lt; <span class="str">'{{ end_datetime }}'</span>
+<span class="kw">GROUP BY</span> 1, 2, 3</pre>
+            </div>
+          </div>
+          <ul>
+            <li><strong>YAML metadata block:</strong> nằm giữa <code>/* @bruin</code> và <code>@bruin */</code>; Bruin parse block này để biết asset name, type, dependencies, materialization, checks.</li>
+            <li><strong><code>depends</code>:</strong> khai báo upstream asset rõ ràng. So với dbt <code>ref()</code>, Bruin đặt dependency trong metadata; dbt thường đặt dependency ngay trong SQL expression qua <code>{{ ref('model') }}</code>.</li>
+            <li><strong><code>materialization.type: table</code>:</strong> chọn khi output cần query nhanh và lưu vật lý. <code>view</code> hợp khi logic nhẹ, không cần lưu data, và chấp nhận query cost/runtime ở lúc đọc.</li>
+            <li><strong>Variables:</strong> SQL dùng Jinja <code>{{ start_datetime }}</code>, <code>{{ end_datetime }}</code> để cắt đúng run interval.</li>
+          </ul>
+          <div class="info-box warn"><span><strong>Điểm yếu:</strong> SQL có checks cơ bản nhưng chưa có volume anomaly, accepted values cho <code>taxi_type</code>, freshness SLA, hoặc policy khi upstream schema thay đổi.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">P</span>
+          Phần 6 — Python Assets
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>pipeline/assets/ingestion/trips.py</span></div>
+            <div class="cmd-body">
+<pre><span class="str">"""@bruin
+name: ingestion.trips
+type: python
+image: python:3.11
+
+materialization:
+  type: table
+  strategy: append
+
+columns:
+  - name: pickup_datetime
+    type: timestamp
+    description: "When the meter was engaged"
+  - name: dropoff_datetime
+    type: timestamp
+    description: "When the meter was disengaged"
+@bruin"""</span>
+
+<span class="kw">import</span> os
+<span class="kw">import</span> json
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="kw">def</span> <span class="fn">materialize</span>():
+    start_date = os.environ[<span class="str">"BRUIN_START_DATE"</span>]
+    end_date = os.environ[<span class="str">"BRUIN_END_DATE"</span>]
+    taxi_types = json.loads(os.environ[<span class="str">"BRUIN_VARS"</span>]).get(<span class="str">"taxi_types"</span>, [<span class="str">"yellow"</span>])
+
+    <span class="comment"># Generate list of months between start and end dates</span>
+    <span class="comment"># Fetch parquet files from:</span>
+    <span class="comment"># https://d37ci6vzurychx.cloudfront.net/trip-data/{taxi_type}_tripdata_{year}-{month}.parquet</span>
+
+    <span class="kw">return</span> final_dataframe</pre>
+            </div>
+          </div>
+          <p>Bruin Python asset trong reference dùng metadata block dạng docstring thay vì decorator. Function <code>materialize()</code> trả về DataFrame; Bruin chịu trách nhiệm ghi DataFrame vào table theo materialization config.</p>
+          <ul>
+            <li><strong>Metadata block:</strong> <code>name</code>, <code>type</code>, <code>image</code>, <code>materialization</code>, <code>columns</code>.</li>
+            <li><strong>Context/runtime:</strong> notes không có object <code>context</code>; runtime values được truyền qua environment variables như <code>BRUIN_START_DATE</code>, <code>BRUIN_END_DATE</code>, <code>BRUIN_VARS</code>.</li>
+            <li><strong>Khi dùng Python:</strong> ingest API/file, parse JSON, gọi SDK, xử lý logic không tiện viết SQL, hoặc cần Pandas/ML libraries.</li>
+          </ul>
+          <div class="info-box danger"><span><strong>Điểm yếu:</strong> <code>strategy: append</code> không idempotent nếu rerun cùng interval; code snippet cũng chưa thể hiện retry, timeout, HTTP status handling, package pinning hoặc logging chi tiết.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">V</span>
+          Phần 7 — Variables & Parameters
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Variable</th><th>Loại</th><th>Cách dùng</th></tr></thead>
+            <tbody>
+              <tr><td><code>start_date</code> / <code>start_datetime</code></td><td>Built-in run interval</td><td>SQL Jinja hoặc Python env var để lấy đầu khoảng xử lý.</td></tr>
+              <tr><td><code>end_date</code> / <code>end_datetime</code></td><td>Built-in run interval</td><td>Cắt data theo exclusive/inclusive boundary tùy command/runtime.</td></tr>
+              <tr><td><code>pipeline_name</code></td><td>Built-in metadata</td><td>Dùng trong logs/metadata nếu runtime expose; notes không có usage cụ thể.</td></tr>
+              <tr><td><code>run_id</code></td><td>Built-in metadata</td><td>Dùng trace logs/run; notes không có usage cụ thể.</td></tr>
+              <tr><td><code>taxi_types</code></td><td>Custom variable</td><td>Định nghĩa trong <code>pipeline.yml</code>, override bằng <code>--var taxi_types=["green","fhv"]</code>.</td></tr>
+            </tbody>
+          </table>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>variables-commands.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># Override date range</span>
+<span class="kw2">bruin</span> run ./pipeline.yml --start-date 2020-01-01 --end-date 2020-01-31
+
+<span class="comment"># Override custom variable</span>
+<span class="kw2">bruin</span> run ./pipeline.yml --var taxi_types=[<span class="str">"green"</span>,<span class="str">"fhv"</span>]
+
+<span class="comment"># Render before running to verify variables resolve correctly</span>
+<span class="kw2">bruin</span> render ./pipeline.yml --asset staging.trips</pre>
+            </div>
+          </div>
+          <h3>SQL vs Python</h3>
+          <ul>
+            <li><strong>SQL:</strong> dùng Jinja trong query: <code>WHERE pickup_datetime &gt;= '{{ start_datetime }}'</code>.</li>
+            <li><strong>Python:</strong> đọc từ environment variables: <code>os.environ["BRUIN_START_DATE"]</code>, <code>os.environ["BRUIN_VARS"]</code>, rồi parse JSON nếu là array/object.</li>
+          </ul>
+          <div class="info-box tip"><span><strong>Tip:</strong> Dùng <code>bruin render</code> trước khi chạy backfill lớn để kiểm tra date range, table name và custom variables đã compile đúng.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">K</span>
+          Phần 8 — Connections config
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Connection type</th><th>Xuất hiện trong repo notes</th><th>Config location</th></tr></thead>
+            <tbody>
+              <tr><td>DuckDB</td><td>NYC Taxi local tutorial, <code>duckdb-default</code>.</td><td><code>.bruin.yml</code> local.</td></tr>
+              <tr><td>MotherDuck</td><td>Core projects example có <code>token: &lt;your-token&gt;</code>.</td><td><code>.bruin.yml</code> local hoặc Bruin Cloud connection.</td></tr>
+              <tr><td>BigQuery</td><td>Production example <code>bq-prod</code>.</td><td>Bruin Cloud hoặc local env-specific config.</td></tr>
+              <tr><td>Postgres/MySQL/Snowflake/Redshift</td><td>Được nêu là built-in connection types.</td><td>Project config hoặc managed connections tùy môi trường.</td></tr>
+            </tbody>
+          </table>
+          <p>File chứa credentials trong local Bruin project là <code>.bruin.yml</code>. Khi deploy Cloud, cùng logical connection name được cấu hình trong UI/Cloud secrets, không cần push credentials lên GitHub.</p>
+          <div class="info-box danger"><span><strong>Security review:</strong> Trong repo module hiện tại không có credentials thật được commit. Reference snippet có placeholder <code>&lt;your-token&gt;</code>; nếu thay bằng token thật trong git thì đó là lỗi nghiêm trọng.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">G</span>
+          Phần 9 — DAG Lineage chi tiết
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>nyc-taxi-lineage.txt</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">DuckDB connection: duckdb-default</span>
+        |
+        +-- <span class="kw2">ingestion.trips</span> [python asset, append table]
+        |       source: NYC Taxi parquet files
+        |       file: pipeline/assets/ingestion/trips.py
+        |
+        +-- <span class="kw2">ingestion.payment_lookup</span> [duckdb.seed asset]
+                source: payment_lookup.csv
+                file: pipeline/assets/ingestion/payment_lookup.asset.yml
+
+<span class="kw2">ingestion.trips</span> + <span class="kw2">ingestion.payment_lookup</span>
+        |
+        v
+<span class="kw2">staging.trips</span> [duckdb.sql asset, table + time_interval]
+        file: pipeline/assets/staging/trips.sql
+        depends: ingestion.trips, ingestion.payment_lookup
+        |
+        v
+<span class="kw2">reports.trips_report</span> [duckdb.sql asset, table + time_interval]
+        file: pipeline/assets/reports/trips_report.sql
+        depends: staging.trips
+        |
+        v
+<span class="kw2">BI / reporting consumers</span></pre>
+            </div>
+          </div>
+          <h3>Thứ tự chạy đúng</h3>
+          <ol>
+            <li><strong>Connections:</strong> Bruin resolve <code>duckdb-default</code> từ project environment.</li>
+            <li><strong>Ingest:</strong> <code>ingestion.trips</code> và <code>ingestion.payment_lookup</code> chạy trước; hai asset này không phụ thuộc nhau.</li>
+            <li><strong>Transform:</strong> <code>staging.trips</code> đợi cả hai ingestion assets, join lookup, filter interval, dedup.</li>
+            <li><strong>Serve:</strong> <code>reports.trips_report</code> aggregate metrics theo ngày, taxi type, payment type.</li>
+          </ol>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>lineage-debug.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># View entire pipeline lineage</span>
+<span class="kw2">bruin</span> lineage ./pipeline/pipeline.yml
+
+<span class="comment"># Debug one asset and its neighbors</span>
+<span class="kw2">bruin</span> lineage ./pipeline.yml --asset staging.trips</pre>
+            </div>
+          </div>
+          <p>Cách đọc output lineage: bắt đầu từ asset fail, nhìn upstream để tìm input/schema/check nào sai; nhìn downstream để biết impact radius, tức dashboard/table nào bị ảnh hưởng nếu asset đó stale hoặc fail.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">X</span>
+          Tabs: SQL / YAML / Python
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div>
+            <div class="tab-group" id="s2-code-tabs">
+              <div class="tab active" onclick="switchTab('s2-code-tabs','s2-tab-sql')">SQL</div>
+              <div class="tab" onclick="switchTab('s2-code-tabs','s2-tab-yaml')">YAML</div>
+              <div class="tab" onclick="switchTab('s2-code-tabs','s2-tab-python')">Python</div>
+            </div>
+            <div class="tab-content active" id="s2-tab-sql">
+              <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>SQL asset pattern</span></div><div class="cmd-body"><pre><span class="comment">/* @bruin
+name: reports.trips_report
+type: duckdb.sql
+depends:
+  - staging.trips
+@bruin */</span>
+
+<span class="kw">SELECT</span> CAST(pickup_datetime AS DATE) AS trip_date, COUNT(*) AS trip_count
+<span class="kw">FROM</span> staging.trips
+<span class="kw">WHERE</span> pickup_datetime &gt;= <span class="str">'{{ start_datetime }}'</span>
+  <span class="kw">AND</span> pickup_datetime &lt; <span class="str">'{{ end_datetime }}'</span>
+<span class="kw">GROUP BY</span> 1</pre></div></div>
+            </div>
+            <div class="tab-content" id="s2-tab-yaml">
+              <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>YAML config pattern</span></div><div class="cmd-body"><pre><span class="kw2">name</span>: <span class="str">nyc_taxi</span>
+<span class="kw2">schedule</span>: <span class="str">daily</span>
+<span class="kw2">default_connections</span>:
+  <span class="kw2">duckdb</span>: <span class="str">duckdb-default</span>
+<span class="kw2">variables</span>:
+  <span class="kw2">taxi_types</span>:
+    <span class="kw2">type</span>: <span class="str">array</span>
+    <span class="kw2">default</span>: [<span class="str">"yellow"</span>]</pre></div></div>
+            </div>
+            <div class="tab-content" id="s2-tab-python">
+              <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>Python asset pattern</span></div><div class="cmd-body"><pre><span class="kw">import</span> os
+<span class="kw">import</span> json
+
+<span class="kw">def</span> <span class="fn">materialize</span>():
+    start_date = os.environ[<span class="str">"BRUIN_START_DATE"</span>]
+    end_date = os.environ[<span class="str">"BRUIN_END_DATE"</span>]
+    taxi_types = json.loads(os.environ[<span class="str">"BRUIN_VARS"</span>]).get(<span class="str">"taxi_types"</span>, [<span class="str">"yellow"</span>])
+    <span class="kw">return</span> final_dataframe</pre></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">Q</span>
+          Quiz: Data flow & cấu trúc code
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item"><div class="quiz-q">Trong workspace hiện tại, pipeline executable thật nằm ở đâu?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Không có thư mục pipeline executable dưới 05-data-platforms; chỉ có notes và repo_notes.')">A. 05-data-platforms/pipeline/</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Repo hiện chứa notes/reference; pipeline thật được sinh bằng bruin init zoomcamp.')">B. Không có sẵn; được sinh từ Bruin template</div><div class="quiz-opt" onclick="answerQuiz(this,false,'notes là tài liệu, không phải project chạy trực tiếp.')">C. 05-data-platforms/notes/</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Asset nào phải chạy trước <code>staging.trips</code>?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Metadata depends của staging.trips khai báo hai upstream này.')">A. ingestion.trips và ingestion.payment_lookup</div><div class="quiz-opt" onclick="answerQuiz(this,false,'reports.trips_report là downstream, chạy sau staging.')">B. reports.trips_report</div><div class="quiz-opt" onclick="answerQuiz(this,false,'pipeline.yml là config, không phải data asset upstream trực tiếp.')">C. pipeline.yml</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Vì sao <code>.bruin.yml</code> không nên commit?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'YAML vẫn nên version nếu không chứa secrets; vấn đề ở đây là credentials.')">A. Vì YAML không đọc được trong git</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. File này có thể chứa database paths, tokens, service credentials.')">B. Vì có thể chứa credentials/connections</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không liên quan tới tốc độ pipeline.')">C. Vì làm pipeline chạy chậm</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Trong SQL asset Bruin, block nào được Bruin parse để biết dependencies và materialization?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'SELECT là logic transform, nhưng metadata nằm ở block @bruin.')">A. SELECT statement</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Block giữa /* @bruin và @bruin */ chứa name/type/depends/materialization.')">B. YAML metadata block @bruin</div><div class="quiz-opt" onclick="answerQuiz(this,false,'README không điều khiển execution.')">C. README.md</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Rerun raw ingestion cùng date interval có rủi ro gì trong reference Python asset?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. strategy append chỉ insert thêm; rerun cùng interval có thể duplicate raw rows.')">A. Duplicate raw data do append</div><div class="quiz-opt" onclick="answerQuiz(this,false,'append không tự drop bảng.')">B. Luôn drop toàn bộ database</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không có bằng chứng asset tự đổi connection.')">C. Tự động đổi sang BigQuery</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Muốn kiểm tra Jinja variables trong SQL đã resolve đúng trước khi chạy backfill lớn, dùng gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'lineage đọc graph, không render query compiled.')">A. bruin lineage</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. bruin render/Bruin Render panel giúp xem SQL sau khi inject variables.')">B. bruin render</div><div class="quiz-opt" onclick="answerQuiz(this,false,'version chỉ xem phiên bản CLI.')">C. bruin version</div></div><div class="quiz-explain"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s3" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S3 · Hands-on</div>
+        <div class="module-title">Thực hành từng bước</div>
+        <div class="module-subtitle">Mục tiêu của S3 là chạy được pipeline, hiểu từng layer, rồi cố tình phá để học debug thật.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">1</span>
+          Phần 1 — Setup môi trường
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s3-setup-tabs">
+            <div class="tab active" onclick="switchTab('s3-setup-tabs','s3-tab-local')">Local: CLI + DuckDB</div>
+            <div class="tab" onclick="switchTab('s3-setup-tabs','s3-tab-cloud')">Cloud: Bruin Cloud</div>
+          </div>
+
+          <div class="tab-content active" id="s3-tab-local">
+            <h3 class="blue">Local path — Bruin CLI + DuckDB</h3>
+            <p>Path này là baseline bắt buộc: bạn build và debug pipeline trên máy trước khi deploy lên cloud. Theo tài liệu Bruin hiện tại, macOS, Linux và Windows đều dùng cùng installer; Windows cần chạy trong Git Bash hoặc WSL.</p>
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>install-bruin-local.sh</span></div>
+              <div class="cmd-body">
+<pre><span class="comment"># macOS / Linux</span>
+<span class="kw2">curl</span> -LsSf https://getbruin.com/install/cli | sh
+
+<span class="comment"># macOS / Linux alternative</span>
+<span class="kw2">wget</span> -qO- https://getbruin.com/install/cli | sh
+
+<span class="comment"># Windows: run inside Git Bash or WSL, not plain PowerShell</span>
+<span class="kw2">curl</span> -LsSf https://getbruin.com/install/cli | sh
+
+<span class="comment"># Verify</span>
+<span class="kw2">bruin</span> version</pre>
+              </div>
+            </div>
+            <p><strong>Output mong đợi:</strong> <code>bruin version</code> in ra version CLI, ví dụ dạng <code>bruin version x.y.z</code> hoặc một version string tương đương. Nếu terminal báo command not found, kiểm tra lại PATH hoặc mở terminal mới.</p>
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>init-zoomcamp-project.sh</span></div>
+              <div class="cmd-body">
+<pre><span class="comment"># Init project từ template Zoomcamp</span>
+<span class="kw2">bruin</span> init zoomcamp my-taxi-pipeline
+<span class="kw2">cd</span> my-taxi-pipeline
+
+<span class="comment"># Kiểm tra cấu trúc project</span>
+<span class="kw2">bruin</span> validate ./pipeline/pipeline.yml</pre>
+              </div>
+            </div>
+            <h3 class="green">Config DuckDB local</h3>
+            <div class="cmd-block">
+              <div class="cmd-header"><span>● ● ●</span><span>.bruin.yml</span></div>
+              <div class="cmd-body">
+<pre><span class="kw2">default_environment</span>: <span class="str">default</span>
+
+<span class="kw2">environments</span>:
+  <span class="kw2">default</span>:
+    <span class="kw2">connections</span>:
+      <span class="kw2">duckdb</span>:
+        - <span class="kw2">name</span>: <span class="str">duckdb-default</span>
+          <span class="kw2">path</span>: <span class="str">duckdb.db</span></pre>
+              </div>
+            </div>
+            <ul>
+              <li><code>.bruin.yml</code> nằm ở project root, cùng level với <code>pipeline/</code>.</li>
+              <li><code>path: duckdb.db</code> tạo file DuckDB local trong project.</li>
+              <li><code>duckdb-default</code> phải khớp với <code>default_connections.duckdb</code> trong <code>pipeline.yml</code>.</li>
+            </ul>
+            <div class="info-box tip"><span><strong>Bạn biết setup đúng khi thấy:</strong> <code>bruin version</code> chạy được, <code>bruin validate ./pipeline/pipeline.yml</code> không báo broken asset/connection, và file <code>.bruin.yml</code> có connection <code>duckdb-default</code>.</span></div>
+          </div>
+
+          <div class="tab-content" id="s3-tab-cloud">
+            <h3 class="blue">Cloud path — Bruin Cloud platform</h3>
+            <ol>
+              <li>Tạo tài khoản Bruin Cloud, verify email, tạo organization hoặc join team có sẵn.</li>
+              <li>Connect repository qua GitHub integration. Direct GitHub connection là path gọn nhất; Personal Access Token chỉ dùng khi org policy bắt buộc.</li>
+              <li>Setup connections trong Bruin Cloud UI: chọn connection type như DuckDB/MotherDuck/BigQuery/Redshift, đặt connection name trùng với pipeline config, nhập credentials theo environment.</li>
+              <li>Mở trang Pipelines, đợi Bruin validate repository/assets/connections.</li>
+              <li>Enable pipeline hoặc trigger run đầu tiên từ UI.</li>
+            </ol>
+            <table>
+              <thead><tr><th>Cloud step</th><th>Verify</th><th>Lỗi hay gặp</th></tr></thead>
+              <tbody>
+                <tr><td>GitHub connected</td><td>Repo xuất hiện trong Bruin Cloud.</td><td>Thiếu quyền repo hoặc branch không chứa pipeline.</td></tr>
+                <tr><td>Connection created</td><td>Connection test pass trong UI.</td><td>Tên connection không khớp <code>pipeline.yml</code>.</td></tr>
+                <tr><td>Pipeline enabled</td><td>Run đầu tiên được tạo cho interval gần nhất.</td><td>Missing secrets hoặc asset validation fail.</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box tip"><span><strong>Bạn biết setup đúng khi thấy:</strong> pipeline xuất hiện trong Cloud, connection validation pass, run đầu tiên có asset status success/failure rõ ràng, lineage graph hiển thị các assets.</span></div>
+            <div class="info-box warn"><span><strong>Cloud habit:</strong> không push <code>.bruin.yml</code> chứa secrets. Cloud giữ credentials trong connection management; repo chỉ nên chứa pipeline/assets/config không bí mật.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">2</span>
+          Phần 2 — Chạy pipeline đầu tiên
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Validate trước khi run</h3>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>validate-and-run.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># Check syntax, dependencies, connections</span>
+<span class="kw2">bruin</span> validate ./pipeline/pipeline.yml
+
+<span class="comment"># Run toàn bộ pipeline với date range nhỏ</span>
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --start-date 2022-01-01 --end-date 2022-02-01
+
+<span class="comment"># Run một asset cụ thể</span>
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset ingestion.trips
+
+<span class="comment"># Run asset + downstream dependents</span>
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset ingestion.trips --downstream
+
+<span class="comment"># Xem dependency graph</span>
+<span class="kw2">bruin</span> lineage ./pipeline/pipeline.yml
+
+<span class="comment"># Preview SQL sau khi variables được resolve</span>
+<span class="kw2">bruin</span> render ./pipeline/pipeline.yml --asset staging.trips</pre>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Command</th><th>Đọc output thế nào</th><th>Khi nào dùng</th></tr></thead>
+            <tbody>
+              <tr><td><code>bruin validate</code></td><td>Tìm dòng lỗi asset definition, circular dependency, missing connection, broken reference.</td><td>Luôn chạy trước <code>run</code> và trước commit/deploy.</td></tr>
+              <tr><td><code>bruin run</code></td><td>Đọc asset nào bắt đầu, asset nào pass/fail, thời gian chạy, check nào fail.</td><td>Chạy full pipeline hoặc backfill một interval.</td></tr>
+              <tr><td><code>--asset</code></td><td>Output chỉ xoay quanh asset được chọn.</td><td>Debug từng node thay vì chạy cả DAG.</td></tr>
+              <tr><td><code>--downstream</code></td><td>Kiểm tra asset đang sửa có làm hỏng downstream không.</td><td>Sau khi sửa raw/staging asset.</td></tr>
+              <tr><td><code>lineage</code></td><td>Nhìn upstream/downstream để trace impact.</td><td>Khi không biết lỗi bắt đầu từ đâu.</td></tr>
+              <tr><td><code>render</code></td><td>Kiểm tra SQL/config sau Jinja/date variables.</td><td>Trước khi chạy date range lớn.</td></tr>
+            </tbody>
+          </table>
+          <h3 class="green">Log đọc ở đâu?</h3>
+          <p>Local CLI log nằm ngay trong terminal output của <code>bruin run</code>: asset name, trạng thái, lỗi parse/SQL/runtime, quality check result. Với Bruin Cloud, đọc trong run detail page: từng asset có status, duration, logs, checks và lineage context.</p>
+          <div class="info-box note"><span><strong>Format log nên ghi vào Logbook:</strong> command executed, expected outcome, actual error, suspected root cause, fix attempted, final resolution.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">3</span>
+          Phần 3 — Làm việc với từng layer
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ol>
+            <li><strong>Mở ingestion asset:</strong> với NYC Taxi là <code>pipeline/assets/ingestion/trips.py</code> hoặc seed <code>payment_lookup.asset.yml</code>. Chạy render nếu asset có templating/config cần resolve.</li>
+            <li><strong>Run ingestion asset:</strong> <code>bruin run ./pipeline/pipeline.yml --asset ingestion.trips --start-date 2022-01-01 --end-date 2022-02-01</code>.</li>
+            <li><strong>Verify data trong DuckDB:</strong> query row count và sample records bằng <code>bruin query</code> hoặc DuckDB CLI.</li>
+            <li><strong>Mở SQL asset:</strong> <code>pipeline/assets/staging/trips.sql</code>, đọc metadata block <code>depends</code>, <code>materialization</code>, <code>custom_checks</code>.</li>
+            <li><strong>Render SQL compiled:</strong> <code>bruin render ./pipeline/pipeline.yml --asset staging.trips --start-date 2022-01-01 --end-date 2022-02-01</code>.</li>
+            <li><strong>Run transform chain:</strong> <code>bruin run ./pipeline/pipeline.yml --asset staging.trips --downstream --start-date 2022-01-01 --end-date 2022-02-01</code>.</li>
+            <li><strong>Trace upstream:</strong> <code>bruin lineage ./pipeline/pipeline.yml --asset staging.trips</code> để xác nhận nó phụ thuộc <code>ingestion.trips</code> và <code>ingestion.payment_lookup</code>.</li>
+          </ol>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>verify-duckdb.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># Verify raw layer</span>
+<span class="kw2">bruin</span> query --connection duckdb-default --query <span class="str">"SELECT COUNT(*) FROM ingestion.trips"</span>
+
+<span class="comment"># Verify staging shape</span>
+<span class="kw2">bruin</span> query --connection duckdb-default --query <span class="str">"SELECT * FROM staging.trips LIMIT 10"</span>
+
+<span class="comment"># Verify report metrics</span>
+<span class="kw2">bruin</span> query --connection duckdb-default --query <span class="str">"SELECT trip_date, SUM(trip_count) FROM reports.trips_report GROUP BY 1 ORDER BY 1"</span></pre>
+            </div>
+          </div>
+          <div class="info-box tip"><span><strong>Rule thực hành:</strong> sau mỗi asset run, query output table ngay. Đừng đợi full pipeline xong mới phát hiện schema sai từ layer đầu.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">4</span>
+          Phần 4 — 3 bài tập thực hành
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="practice-task">
+            <div class="practice-task-header">Task 1 — Beginner: Thêm SQL asset tính trip_duration_minutes</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Thêm một SQL asset mới tính <code>trip_duration_minutes</code> cho NYC Taxi data.</p>
+              <p><strong>Gợi ý:</strong> Tạo file <code>pipeline/assets/staging/trip_durations.sql</code>, thêm YAML header, khai báo <code>depends: staging.trips</code>, dùng filter theo <code>{{ start_datetime }}</code> và <code>{{ end_datetime }}</code>.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>pipeline/assets/staging/trip_durations.sql</span></div>
+                  <div class="cmd-body">
+<pre><span class="comment">/* @bruin
+name: staging.trip_durations
+type: duckdb.sql
+
+depends:
+  - staging.trips
+
+materialization:
+  type: table
+  strategy: time_interval
+  incremental_key: pickup_datetime
+  time_granularity: timestamp
+
+columns:
+  - name: pickup_datetime
+    type: timestamp
+    checks:
+      - name: not_null
+  - name: trip_duration_minutes
+    type: double
+    checks:
+      - name: non_negative
+@bruin */</span>
+
+<span class="kw">SELECT</span>
+    pickup_datetime,
+    dropoff_datetime,
+    taxi_type,
+    fare_amount,
+    date_diff(<span class="str">'minute'</span>, pickup_datetime, dropoff_datetime) AS trip_duration_minutes
+<span class="kw">FROM</span> staging.trips
+<span class="kw">WHERE</span> pickup_datetime &gt;= <span class="str">'{{ start_datetime }}'</span>
+  <span class="kw">AND</span> pickup_datetime &lt; <span class="str">'{{ end_datetime }}'</span></pre>
+                  </div>
+                </div>
+                <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>run-task-1.sh</span></div><div class="cmd-body"><pre><span class="kw2">bruin</span> validate ./pipeline/pipeline.yml
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset staging.trip_durations --upstream --start-date 2022-01-01 --end-date 2022-02-01</pre></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">Task 2 — Intermediate: Pipeline mới với CSV ingest + SQL transform</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Tạo pipeline mới với 2 assets: một asset load CSV file và một SQL transform asset.</p>
+              <p><strong>Gợi ý:</strong> Khai báo connection DuckDB, pipeline YAML, asset seed/ingestr-like YAML và SQL asset có <code>depends</code> đúng chain.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>pipelines/payment_lookup/pipeline.yml</span></div>
+                  <div class="cmd-body">
+<pre><span class="kw2">name</span>: <span class="str">payment_lookup_pipeline</span>
+<span class="kw2">schedule</span>: <span class="str">daily</span>
+<span class="kw2">start_date</span>: <span class="str">"2022-01-01"</span>
+<span class="kw2">default_connections</span>:
+  <span class="kw2">duckdb</span>: <span class="str">duckdb-default</span></pre>
+                  </div>
+                </div>
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>assets/raw/payment_lookup.asset.yml</span></div>
+                  <div class="cmd-body">
+<pre><span class="kw2">name</span>: <span class="str">raw.payment_lookup</span>
+<span class="kw2">type</span>: <span class="str">duckdb.seed</span>
+<span class="kw2">parameters</span>:
+  <span class="kw2">path</span>: <span class="str">payment_lookup.csv</span>
+<span class="kw2">columns</span>:
+  - <span class="kw2">name</span>: <span class="str">payment_type_id</span>
+    <span class="kw2">type</span>: <span class="str">integer</span>
+    <span class="kw2">primary_key</span>: <span class="kw">true</span>
+    <span class="kw2">checks</span>:
+      - <span class="kw2">name</span>: <span class="str">not_null</span>
+      - <span class="kw2">name</span>: <span class="str">unique</span></pre>
+                  </div>
+                </div>
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>assets/staging/payment_lookup_clean.sql</span></div>
+                  <div class="cmd-body">
+<pre><span class="comment">/* @bruin
+name: staging.payment_lookup_clean
+type: duckdb.sql
+depends:
+  - raw.payment_lookup
+materialization:
+  type: view
+@bruin */</span>
+
+<span class="kw">SELECT</span>
+    payment_type_id,
+    lower(trim(payment_type_name)) AS payment_type_name
+<span class="kw">FROM</span> raw.payment_lookup
+<span class="kw">WHERE</span> payment_type_name IS NOT NULL</pre>
+                  </div>
+                </div>
+                <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>run-task-2.sh</span></div><div class="cmd-body"><pre><span class="kw2">bruin</span> validate ./pipelines/payment_lookup/pipeline.yml
+<span class="kw2">bruin</span> run ./pipelines/payment_lookup/pipeline.yml
+<span class="kw2">bruin</span> lineage ./pipelines/payment_lookup/pipeline.yml</pre></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">Task 3 — Advanced: Incremental asset idempotent theo date range</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Setup incremental asset chỉ xử lý data trong date range <code>{{ start_datetime }}</code> đến <code>{{ end_datetime }}</code>, và chạy lại cùng date range không tạo duplicate.</p>
+              <p><strong>Gợi ý:</strong> Dùng materialization interval/incremental, key ổn định, filter date range trong SQL, rồi chạy cùng range hai lần để test duplicate.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block">
+                  <div class="cmd-header"><span>● ● ●</span><span>assets/reports/daily_trip_metrics.sql</span></div>
+                  <div class="cmd-body">
+<pre><span class="comment">/* @bruin
+name: reports.daily_trip_metrics
+type: duckdb.sql
+depends:
+  - staging.trips
+
+materialization:
+  type: table
+  strategy: time_interval
+  incremental_key: trip_date
+  time_granularity: date
+
+columns:
+  - name: trip_date
+    type: date
+    primary_key: true
+  - name: taxi_type
+    type: string
+    primary_key: true
+  - name: trip_count
+    type: bigint
+    checks:
+      - name: non_negative
+@bruin */</span>
+
+<span class="kw">SELECT</span>
+    CAST(pickup_datetime AS DATE) AS trip_date,
+    taxi_type,
+    COUNT(*) AS trip_count,
+    SUM(fare_amount) AS total_fare
+<span class="kw">FROM</span> staging.trips
+<span class="kw">WHERE</span> pickup_datetime &gt;= <span class="str">'{{ start_datetime }}'</span>
+  <span class="kw">AND</span> pickup_datetime &lt; <span class="str">'{{ end_datetime }}'</span>
+<span class="kw">GROUP BY</span> 1, 2</pre>
+                  </div>
+                </div>
+                <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>run-task-3.sh</span></div><div class="cmd-body"><pre><span class="comment"># Run twice with same date range</span>
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset reports.daily_trip_metrics --upstream --start-date 2022-01-01 --end-date 2022-02-01
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset reports.daily_trip_metrics --upstream --start-date 2022-01-01 --end-date 2022-02-01
+
+<span class="comment"># Verify no duplicate primary grain</span>
+<span class="kw2">bruin</span> query --connection duckdb-default --query <span class="str">"SELECT trip_date, taxi_type, COUNT(*) c FROM reports.daily_trip_metrics GROUP BY 1,2 HAVING COUNT(*) &gt; 1"</span></pre></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">5</span>
+          Phần 5 — Cố tình phá
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Roadmap yêu cầu không qua module mới nếu chưa tự debug ít nhất vài lỗi. Với Bruin, hãy phá ở metadata, connection, variables và concurrency vì đó là nơi incident production thường bắt đầu.</p>
+          <table>
+            <thead><tr><th>Kịch bản</th><th>Triệu chứng / lỗi dự kiến</th><th>Debug flow</th><th>Cách fix</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>1. Khai báo <code>depends</code> sai tên asset</td>
+                <td><code>bruin validate</code> báo broken dependency / asset not found trước khi run.</td>
+                <td>Đọc asset name trong YAML header, chạy <code>bruin lineage</code>, so sánh tên thật với <code>depends</code>.</td>
+                <td>Sửa <code>depends</code> thành đúng name, không dùng file path thay asset name.</td>
+              </tr>
+              <tr>
+                <td>2. Connection name không khớp project config</td>
+                <td>Validate/run báo missing connection hoặc cannot resolve connection <code>duckdb-default</code>.</td>
+                <td>Mở <code>.bruin.yml</code> và <code>pipeline.yml</code>, kiểm tra <code>default_connections</code> trỏ tới name nào.</td>
+                <td>Đổi tên connection trong project config hoặc pipeline để khớp 1-1.</td>
+              </tr>
+              <tr>
+                <td>3. Run khi upstream asset chưa tồn tại</td>
+                <td>Asset downstream fail vì table/view upstream không tồn tại, hoặc validation báo missing upstream asset.</td>
+                <td>Chạy <code>bruin lineage --asset &lt;asset&gt;</code>, rồi chạy lại với <code>--upstream</code>.</td>
+                <td>Tạo upstream asset, sửa dependency, hoặc run <code>--asset staging.trips --upstream</code>.</td>
+              </tr>
+              <tr>
+                <td>4. Variables <code>{{ start_date }}</code> không resolve</td>
+                <td><code>bruin render</code> vẫn còn literal Jinja hoặc SQL run lỗi vì date string không hợp lệ.</td>
+                <td>Render asset trước, kiểm tra tên variable đúng là <code>start_datetime</code>/<code>end_datetime</code> hay <code>start_date</code>/<code>end_date</code>.</td>
+                <td>Dùng đúng variable name theo asset/runtime, truyền <code>--start-date</code> và <code>--end-date</code>.</td>
+              </tr>
+              <tr>
+                <td>5. Chạy 2 <code>bruin run</code> song song cùng pipeline</td>
+                <td>Table lock, race condition, duplicate append raw hoặc report bị ghi đè cùng interval.</td>
+                <td>Kiểm tra run logs, thời gian start/end, query duplicate grain, xem materialization strategy.</td>
+                <td>Tránh parallel run cùng interval, dùng lock/concurrency policy trong runner/cloud, ưu tiên idempotent materialization.</td>
+              </tr>
+              <tr>
+                <td>6. Sai YAML indentation trong asset header</td>
+                <td>Parse error ở <code>bruin validate</code>, thường chỉ ra dòng/field gần lỗi.</td>
+                <td>Copy block metadata ra editor có YAML lint, kiểm tra list indentation dưới <code>depends</code>, <code>columns</code>, <code>checks</code>.</td>
+                <td>Sửa indentation 2 spaces nhất quán, chạy lại <code>bruin validate</code> trước khi run.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>debug-routine.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># 1. Validate fast before executing anything</span>
+<span class="kw2">bruin</span> validate ./pipeline/pipeline.yml
+
+<span class="comment"># 2. Render suspicious asset</span>
+<span class="kw2">bruin</span> render ./pipeline/pipeline.yml --asset staging.trips --start-date 2022-01-01 --end-date 2022-02-01
+
+<span class="comment"># 3. Trace graph around failing asset</span>
+<span class="kw2">bruin</span> lineage ./pipeline/pipeline.yml --asset staging.trips
+
+<span class="comment"># 4. Run smallest reproducible scope</span>
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset staging.trips --upstream --start-date 2022-01-01 --end-date 2022-02-01</pre>
+            </div>
+          </div>
+          <div class="info-box note"><span><strong>Logbook tối thiểu:</strong> ghi lại lỗi bạn cố tình tạo, command gây lỗi, exact error, root cause, command fix, và cách phòng tránh lần sau.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s4" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S4 · Production Readiness</div>
+        <div class="module-title">Production Readiness: vận hành Bruin pipeline khi có incident thật</div>
+        <div class="module-subtitle">Mục tiêu của phần này là trả lời được câu hỏi senior: khi pipeline fail, scale, rerun, cost tăng hoặc credential rò rỉ thì xử lý thế nào.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">F</span>
+          1. FAILURE: Pipeline chạy 3 tiếng, fail ở transform asset lúc 2h sáng
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Log xem ở đâu?</strong> Nếu chạy local, xem terminal output của <code>bruin run</code>, rerun với scope hẹp hơn, và dùng <code>bruin lineage</code> để xác định upstream/downstream của asset fail. Nếu deploy Bruin Cloud, xem run detail trong UI: asset status, execution logs, quality check results và dependency graph.</p>
+          <p><strong>Asset đang ở trạng thái gì sau khi fail?</strong> Asset fail không nên được xem là output sạch. Với table append hoặc incremental không atomic, có thể đã có partial write. Với transform table/time_interval, state có thể là dirty state nếu bước delete/insert/merge chạy một phần trước khi lỗi xảy ra.</p>
+          <p><strong><code>bruin run --asset</code> retry hoạt động thế nào?</strong> Retry bằng cách chạy lại đúng asset fail. Cách này đủ khi upstream đã sạch, lỗi là transient như network, timeout, warehouse slot tạm thiếu, hoặc bug SQL đã fix và asset có materialization idempotent. Cách này không đủ khi upstream cũng bị sai, raw table đã duplicate, schema nguồn đổi, hoặc asset fail đã để lại partial write cần cleanup/full refresh.</p>
+          <p><strong>Fix thực tế:</strong> bắt đầu từ failed asset nếu upstream đã pass và data contract không đổi. Rerun toàn pipeline khi lỗi có thể lan từ ingestion, biến date range sai, connection sai environment, hoặc nhiều downstream phụ thuộc vào một output đã bẩn.</p>
+          <p><strong>Khi nào dùng <code>--full-refresh</code>?</strong> Dùng cho incremental asset khi logic tính toán thay đổi, unique key sai trước đó, historical rows đã bị duplicate, hoặc cần rebuild lại partition/table từ source of truth. Tác động downstream là tất cả asset đọc từ table đó nên được rerun, thường dùng thêm <code>--downstream</code>.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>failure-recovery.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># 1. Inspect graph around failed asset</span>
+<span class="kw2">bruin</span> lineage ./pipeline/pipeline.yml --asset staging.trips
+
+<span class="comment"># 2. Retry only failed transform when upstream is trusted</span>
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset staging.trips \
+  --start-date 2022-01-01 --end-date 2022-02-01
+
+<span class="comment"># 3. If staging was partially written, rebuild it and its consumers</span>
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset staging.trips \
+  --full-refresh --downstream \
+  --start-date 2022-01-01 --end-date 2022-02-01</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">S</span>
+          2. SCALE: Từ demo data vài MB lên TB/ngày
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Ingestr/YAML ingestion asset hiện tại có đủ không?</strong> Notes module có nhắc YAML ingestor ở level concept, còn NYC Taxi reference dùng Python asset <code>ingestion.trips</code> và seed asset <code>ingestion.payment_lookup</code>. Với production, chỉ dùng ingestr khi connector/source được Bruin docs hỗ trợ rõ và đã verify field syntax theo version CLI đang chạy.</p>
+          <p><strong>Incremental ingestion:</strong> production không nên full reload hằng ngày nếu source có timestamp, cursor, primary key hoặc partition. Asset cần chỉ pull khoảng <code>start_date</code>/<code>end_date</code>, ghi vào partition/table đích bằng strategy có khả năng overwrite/merge đúng interval.</p>
+          <p><strong>Date range variables là chìa khóa scale:</strong> cùng một asset có thể chạy daily, hourly, backfill một tháng, hoặc rerun một ngày lỗi mà không đổi code. Không có date boundary thì mọi retry dễ thành full scan/full reload.</p>
+          <p><strong>Khi nào chuyển từ DuckDB sang BigQuery/Snowflake?</strong> Khi data vượt RAM/local disk, nhiều người cần query đồng thời, cần IAM/audit, cần partition/cluster/compute scale, hoặc pipeline trở thành SLA production. DuckDB rất tốt cho local development và dữ liệu nhỏ-trung bình, không phải production warehouse cho TB/ngày và nhiều consumer.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>conceptual-ingestr-pattern.asset.yml</span></div>
+            <div class="cmd-body">
+<p class="comment">Conceptual pattern only: repo notes không có actual ingestr asset để copy nguyên văn; verify field names với Bruin docs/CLI trước khi dùng production.</p>
+<pre><span class="kw2">name</span>: <span class="str">raw.orders</span>
+<span class="kw2">type</span>: <span class="str">ingestr</span>
+
+<span class="kw2">source</span>:
+  <span class="kw2">connection</span>: <span class="str">postgres-prod</span>
+  <span class="kw2">table</span>: <span class="str">public.orders</span>
+  <span class="kw2">incremental_key</span>: <span class="str">updated_at</span>
+  <span class="kw2">where</span>: <span class="str">"updated_at &gt;= '{{ start_datetime }}' AND updated_at &lt; '{{ end_datetime }}'"</span>
+
+<span class="kw2">destination</span>:
+  <span class="kw2">connection</span>: <span class="str">bigquery-prod</span>
+  <span class="kw2">table</span>: <span class="str">raw.orders</span>
+
+<span class="kw2">materialization</span>:
+  <span class="kw2">type</span>: <span class="str">table</span>
+  <span class="kw2">strategy</span>: <span class="str">incremental</span>
+  <span class="kw2">unique_key</span>: <span class="str">order_id</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">I</span>
+          3. IDEMPOTENCY: Chạy pipeline 2 lần cùng date range có duplicate không?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Ingestr asset idempotent mặc định không?</strong> Không nên giả định. Nếu asset append thẳng vào raw table, rerun cùng interval có thể duplicate. Idempotency phụ thuộc vào connector, destination strategy, unique key và cách xử lý interval.</p>
+          <p><strong>SQL transform: view vs table.</strong> View thường idempotent vì chỉ lưu query definition. Table rebuild cũng idempotent nếu mỗi run replace toàn bộ output hoặc overwrite đúng interval. Table append không idempotent nếu không có delete/merge trước khi insert.</p>
+          <p><strong>Incremental asset với unique key:</strong> idempotent khi merge/upsert dựa trên key ổn định, hoặc time_interval delete-and-insert đúng cùng date window. Key phải đại diện cho business identity, không phải timestamp dễ thay đổi.</p>
+          <p><strong>Truly idempotent Bruin pipeline:</strong> chạy lại cùng code, cùng input, cùng date range sẽ tạo cùng output; không tăng row count bất thường, không đổi aggregate ngoài kỳ vọng, quality checks vẫn pass, downstream không bị nhân đôi.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>idempotency-check.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># Count before rerun</span>
+<span class="kw2">bruin</span> query --connection duckdb-default \
+  --query <span class="str">"SELECT COUNT(*) AS n FROM staging.trips WHERE pickup_datetime &gt;= '2022-01-01' AND pickup_datetime &lt; '2022-02-01'"</span>
+
+<span class="comment"># Rerun the same date range</span>
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset staging.trips \
+  --start-date 2022-01-01 --end-date 2022-02-01
+
+<span class="comment"># Count after rerun; n should be unchanged for idempotent output</span>
+<span class="kw2">bruin</span> query --connection duckdb-default \
+  --query <span class="str">"SELECT COUNT(*) AS n FROM staging.trips WHERE pickup_datetime &gt;= '2022-01-01' AND pickup_datetime &lt; '2022-02-01'"</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">Q</span>
+          4. DATA QUALITY: Làm sao biết data đúng sau khi pipeline chạy?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Built-in checks:</strong> notes module dùng các checks như <code>not_null</code>, <code>unique</code>, <code>non_negative</code> trong block <code>columns</code>. Các check này chạy sau khi asset materialize xong và giúp bắt lỗi null key, duplicate primary key, metric âm.</p>
+          <p><strong>Custom assertions:</strong> dùng <code>custom_checks</code> khi rule là business logic, ví dụ row count phải lớn hơn 0, tổng doanh thu không âm, hoặc một phân vùng phải có đủ ngày.</p>
+          <p><strong>Source freshness:</strong> với production, thêm check so sánh <code>MAX(updated_at)</code> hoặc <code>MAX(event_time)</code> với run date. Pipeline thành công nhưng source stale vẫn là incident dữ liệu.</p>
+          <p><strong>Row count anomaly:</strong> row count giảm 90% thường không làm SQL fail, nên cần check tương đối so với historical baseline hoặc ít nhất threshold tối thiểu theo ngày.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>quality-checks.sql</span></div>
+            <div class="cmd-body">
+<pre><span class="comment">/* @bruin
+name: staging.trips
+type: duckdb.sql
+depends:
+  - ingestion.trips
+materialization:
+  type: table
+  strategy: time_interval
+  incremental_key: pickup_datetime
+  time_granularity: timestamp
+columns:
+  - name: pickup_datetime
+    type: timestamp
+    primary_key: true
+    checks:
+      - name: not_null
+  - name: fare_amount
+    type: double
+    checks:
+      - name: non_negative
+custom_checks:
+  - name: row_count_greater_than_zero
+    query: |
+      SELECT CASE WHEN COUNT(*) &gt; 0 THEN 1 ELSE 0 END
+      FROM staging.trips
+      WHERE pickup_datetime &gt;= '{{ start_datetime }}'
+        AND pickup_datetime &lt; '{{ end_datetime }}'
+    value: 1
+  - name: source_fresh_enough
+    query: |
+      SELECT CASE WHEN MAX(pickup_datetime) &gt;= '{{ start_datetime }}' THEN 1 ELSE 0 END
+      FROM staging.trips
+    value: 1
+@bruin */</span>
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> ingestion.trips
+<span class="kw">WHERE</span> pickup_datetime &gt;= <span class="str">'{{ start_datetime }}'</span>
+  <span class="kw">AND</span> pickup_datetime &lt; <span class="str">'{{ end_datetime }}'</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">C</span>
+          5. COST & PERFORMANCE: Tránh reprocess không cần thiết
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Full reload vs incremental:</strong> full reload phù hợp dimension nhỏ, reference data, hoặc khi logic lịch sử thay đổi. Incremental phù hợp fact table lớn, event/order/log data, và pipeline chạy thường xuyên.</p>
+          <p><strong>Date range parameterization:</strong> <code>--start-date</code> và <code>--end-date</code> giới hạn scan, write và downstream recompute. Đây là cách giảm cost rõ nhất khi warehouse tính tiền theo data scanned/compute time.</p>
+          <p><strong>Parallel execution:</strong> Bruin chạy theo asset graph; các asset độc lập có thể chạy song song tùy cấu hình/runtime. Khi tăng concurrency, kiểm tra giới hạn source API, warehouse slots và lock table để tránh tự tạo bottleneck.</p>
+          <p><strong>Asset caching:</strong> Không nên thiết kế dựa trên giả định Bruin cache intermediate results như build cache. Production cost control nên dựa vào materialization đúng, partition/date filter, incremental merge và warehouse tuning.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>cost-aware-run.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="comment"># Backfill one month, not the entire table history</span>
+<span class="kw2">bruin</span> validate ./pipeline/pipeline.yml
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml \
+  --start-date 2022-01-01 \
+  --end-date 2022-02-01 \
+  --environment production
+
+<span class="comment"># Recompute only affected branch after fixing raw.orders</span>
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml \
+  --asset raw.orders \
+  --downstream \
+  --start-date 2022-01-15 \
+  --end-date 2022-01-16</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">G</span>
+          6. SECURITY & GOVERNANCE: Rủi ro trong setup hiện tại
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Credentials:</strong> <code>.bruin.yml</code> có thể chứa database path, token, service account hoặc custom secrets nên phải nằm trong <code>.gitignore</code>. Commit connection name và pipeline logic; không commit secret value.</p>
+          <p><strong>Environment separation:</strong> dev/staging/prod cần connection isolation. Default environment nên là dev để tránh chạy nhầm production; production phải yêu cầu flag rõ ràng hoặc chạy qua CI/Cloud.</p>
+          <p><strong>Bruin Cloud:</strong> Cloud quản lý credentials trong connection UI, validate connection, chạy schedule, lưu logs và hỗ trợ access control theo team. Git repo chỉ chứa project code.</p>
+          <p><strong>Bruin MCP:</strong> MCP cho AI agent gọi Bruin commands và đọc context pipeline. AI không nên được đưa raw credentials trong prompt; rủi ro chính là agent có thể chạy query/command qua connection mà user đã cấp quyền. Giới hạn quyền connection, dùng read-only khi review, và tách môi trường.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>.bruin.yml pattern</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">default_environment</span>: <span class="str">dev</span>
+
+<span class="kw2">environments</span>:
+  <span class="kw2">dev</span>:
+    <span class="kw2">connections</span>:
+      <span class="kw2">duckdb</span>:
+        - <span class="kw2">name</span>: <span class="str">duckdb-default</span>
+          <span class="kw2">path</span>: <span class="str">duckdb.db</span>
+
+  <span class="kw2">staging</span>:
+    <span class="kw2">connections</span>:
+      <span class="kw2">bigquery</span>:
+        - <span class="kw2">name</span>: <span class="str">bq-staging</span>
+          <span class="kw2">project</span>: <span class="str">analytics-staging</span>
+          <span class="kw2">dataset</span>: <span class="str">staging</span>
+
+  <span class="kw2">production</span>:
+    <span class="kw2">connections</span>:
+      <span class="kw2">bigquery</span>:
+        - <span class="kw2">name</span>: <span class="str">bq-prod</span>
+          <span class="kw2">project</span>: <span class="str">analytics-prod</span>
+          <span class="kw2">dataset</span>: <span class="str">warehouse</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s5" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S5 · Kiến thức nâng cao</div>
+        <div class="module-title">Bruin pro patterns, MCP, Cloud và trade-offs thực tế</div>
+        <div class="module-subtitle">Phần này nối từ Bruin CLI local sang workflow production: CI/CD, AI-assisted authoring, Cloud deployment và quyết định khi nào đổi kiến trúc.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">P</span>
+          Phần 1 — Bruin Pro patterns
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Full selector syntax:</strong> dùng <code>--asset</code> để chạy một asset, <code>--downstream</code> để chạy các consumer bị ảnh hưởng, <code>--upstream</code> để build đủ dependencies trước một asset. Chạy toàn pipeline bằng đường dẫn <code>pipeline.yml</code>; trong repo nhiều pipeline, chọn đúng file pipeline thay vì chạy nhầm project root.</p>
+          <p><strong>Date range execution:</strong> backfill lịch sử nên chia theo tháng/ngày để dễ retry và kiểm soát cost. Workflow tốt là validate, chạy một interval nhỏ, kiểm tra row count/quality, rồi lặp qua các interval lớn hơn.</p>
+          <p><strong><code>bruin validate</code> trước deployment:</strong> đưa vào CI/CD để bắt syntax lỗi, dependency lỗi, connection name thiếu và circular lineage trước khi merge/deploy.</p>
+          <p><strong><code>bruin lineage</code> để debug:</strong> đọc upstream để tìm input gây lỗi; đọc downstream để biết dashboard/table nào cần rerun hoặc cảnh báo consumer.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>github-actions-bruin.yml</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">name</span>: <span class="str">bruin-ci</span>
+
+<span class="kw2">on</span>:
+  <span class="kw2">pull_request</span>:
+  <span class="kw2">push</span>:
+    <span class="kw2">branches</span>: [<span class="str">main</span>]
+
+<span class="kw2">jobs</span>:
+  <span class="kw2">validate</span>:
+    <span class="kw2">runs-on</span>: <span class="str">ubuntu-latest</span>
+    <span class="kw2">steps</span>:
+      - <span class="kw2">uses</span>: <span class="str">actions/checkout@v4</span>
+      - <span class="kw2">name</span>: <span class="str">Install Bruin</span>
+        <span class="kw2">run</span>: <span class="str">curl -LsSf https://getbruin.com/install.sh | sh</span>
+      - <span class="kw2">name</span>: <span class="str">Validate pipeline</span>
+        <span class="kw2">run</span>: <span class="str">bruin validate ./pipeline/pipeline.yml</span>
+      - <span class="kw2">name</span>: <span class="str">Print lineage for review</span>
+        <span class="kw2">run</span>: <span class="str">bruin lineage ./pipeline/pipeline.yml</span></pre>
+            </div>
+          </div>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>selector-patterns.sh</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset raw.trips
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset raw.trips --downstream
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --asset reports.trips_report --upstream
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --start-date 2020-01-01 --end-date 2020-02-01
+<span class="kw2">bruin</span> run ./pipeline/pipeline.yml --full-refresh --asset staging.trips --downstream</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">M</span>
+          Phần 2 — Bruin MCP Integration
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>MCP là gì?</strong> MCP là Model Context Protocol. Trong context Bruin, MCP cho AI agent trong Cursor, VS Code, Claude Code... giao tiếp với Bruin để đọc project, chạy commands, truy vấn data, troubleshoot và sinh asset/config.</p>
+          <p><strong>Setup:</strong> Bruin MCP server chạy bằng command <code>bruin mcp</code>. Cursor dùng mục Tools & MCP, VS Code dùng <code>.vscode/mcp.json</code>, Claude Code có thể add server bằng CLI.</p>
+          <p><strong>Workflow thực tế:</strong> không giao toàn bộ business logic cho AI một lần. Làm asset-by-asset: ingestion trước, staging sau, reports sau; sau mỗi bước yêu cầu AI chạy <code>bruin validate</code>, render SQL, query sample và giải thích lineage.</p>
+          <p><strong>AI làm tốt:</strong> boilerplate asset, schema inference, docs/metadata, viết custom checks, generate query kiểm chứng. <strong>AI không làm tốt:</strong> quyết định business definition, grain của fact table, dữ liệu nhạy cảm, SLA/cost trade-off, hoặc logic domain chưa được mô tả rõ.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>.vscode/mcp.json</span></div>
+            <div class="cmd-body">
+<pre>{
+  <span class="str">"servers"</span>: {
+    <span class="str">"bruin"</span>: {
+      <span class="str">"command"</span>: <span class="str">"bruin"</span>,
+      <span class="str">"args"</span>: [<span class="str">"mcp"</span>]
+    }
+  }
+}</pre>
+            </div>
+          </div>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>ai-generated-asset-review.md</span></div>
+            <div class="cmd-body">
+<pre><span class="comment">AI-generated asset review checklist</span>
+- Asset name follows schema.table convention.
+- Grain is explicit: one row per order, trip, customer-day, etc.
+- depends list matches every upstream table read by SQL.
+- Date filter uses {{ start_datetime }} and {{ end_datetime }}.
+- Materialization is idempotent for reruns.
+- Primary key or unique_key represents business identity.
+- Quality checks cover null keys, duplicate keys and negative metrics.
+- No credential, token or secret appears in generated code.
+- bruin validate passes before merge.</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">C</span>
+          Phần 3 — Bruin Cloud
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><strong>Bruin Cloud vs CLI:</strong> CLI phù hợp local development, validation, ad-hoc run và learning. Cloud dùng cùng project code nhưng thêm managed execution, UI logs, scheduling, retry, alerting, managed connections, lineage/metadata và collaboration.</p>
+          <p><strong>Managed execution:</strong> thay vì cron/self-hosted runner, Cloud enable pipeline theo schedule, tạo run cho interval, lưu trạng thái từng asset và hiển thị quality check results.</p>
+          <p><strong>Environment management:</strong> connection names trong code giữ ổn định; credential thật nằm trong Cloud connection UI. Dev/staging/prod tách bằng environment và quyền truy cập.</p>
+          <p><strong>Team collaboration:</strong> Cloud phù hợp khi nhiều người cần xem run, lineage, logs, audit trail, access control và cùng review pipeline state mà không SSH vào server.</p>
+          <p><strong>Khi nào upgrade:</strong> khi pipeline có SLA, cần schedule reliable, cần alert khi fail/stale, cần quản lý credentials tập trung, hoặc team không còn chấp nhận vận hành bằng terminal local.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">T</span>
+          Phần 4 — Bảng trade-offs: khi dùng vs không dùng
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Decision</th><th>Dùng khi</th><th>Không dùng khi</th></tr></thead>
+            <tbody>
+              <tr><td>Ingestr asset</td><td>Nguồn phổ biến, cần connector nhanh, schema đơn giản, incremental/date filter rõ.</td><td>API custom phức tạp, auth đặc thù, retry/rate-limit rất riêng, cần parsing business logic sâu.</td></tr>
+              <tr><td>Custom Python ingestion</td><td>Cần SDK riêng, nhiều endpoint, pagination phức tạp, file parsing hoặc enrichment trước khi load.</td><td>Nguồn đã có connector ổn; team muốn giảm code vận hành.</td></tr>
+              <tr><td>SQL asset</td><td>Transform set-based, join/aggregate/filter, logic chạy tốt trong warehouse.</td><td>Logic cần API call, ML library, loop phức tạp, hoặc xử lý file ngoài SQL.</td></tr>
+              <tr><td>Python asset</td><td>Ingestion, pandas/SDK, data science, validation tùy biến.</td><td>Transform lớn đáng lẽ pushdown vào warehouse; Python local sẽ thành bottleneck.</td></tr>
+              <tr><td>DuckDB local</td><td>Learning, local dev, test nhỏ, single-user analytics, file-based workflow.</td><td>TB/ngày, multi-user, IAM/audit, high concurrency, production SLA.</td></tr>
+              <tr><td>BigQuery/Snowflake</td><td>Data lớn, concurrency, governance, partition/cluster, compute scale.</td><td>Demo nhỏ hoặc cost/ops chưa cần production warehouse.</td></tr>
+              <tr><td>Bruin</td><td>Muốn git-native assets, ingestion + transform + checks + lineage trong một tool.</td><td>Team đã chuẩn hóa sâu trên dbt/Airflow/Dagster và không cần unified workflow.</td></tr>
+              <tr><td>dbt</td><td>Analytics engineering SQL-first, semantic docs, model testing trong warehouse.</td><td>Cần ingestion/orchestration end-to-end trong cùng tool.</td></tr>
+              <tr><td>Airflow</td><td>Complex orchestration, many external systems, custom operators, enterprise scheduler.</td><td>Team nhỏ chỉ cần data asset graph và không muốn maintain scheduler.</td></tr>
+              <tr><td>Bruin Cloud</td><td>Cần managed schedule/retry/alerting/logs/credential management.</td><td>Đã có platform team self-host Airflow/Dagster ổn và compliance yêu cầu tự quản.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">O</span>
+          Phần 5 — Khi nào outgrow setup hiện tại
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Chuyển từ DuckDB local sang production DW</h3>
+          <ul>
+            <li>Data không còn vừa RAM/local disk, hoặc query scan mất quá lâu.</li>
+            <li>Nhiều consumer cần query cùng lúc.</li>
+            <li>Cần IAM, audit logs, backup, retention, partitioning và warehouse-level monitoring.</li>
+          </ul>
+          <h3 class="green">Thêm alerting/monitoring ngoài Bruin logs</h3>
+          <ul>
+            <li>Pipeline có SLA và fail lúc 2h sáng phải có người biết.</li>
+            <li>Data stale/row count anomaly quan trọng hơn trạng thái command success.</li>
+            <li>Cần dashboard vận hành theo latency, freshness, cost và quality trend.</li>
+          </ul>
+          <h3 class="orange">Cần orchestrator ngoài Bruin built-in scheduling</h3>
+          <ul>
+            <li>Workflow phụ thuộc nhiều hệ thống ngoài data warehouse: API jobs, ML training, file transfer, business approvals.</li>
+            <li>Cần sensor/event-driven orchestration hoặc fan-out/fan-in phức tạp.</li>
+            <li>Đã có enterprise orchestrator và Bruin chỉ nên là asset execution layer.</li>
+          </ul>
+          <h3 class="red">Split thành multiple Bruin projects</h3>
+          <ul>
+            <li>Ownership khác nhau: finance, growth, product analytics có release cycle riêng.</li>
+            <li>Pipeline graph quá lớn, validate/run/review chậm và khó phân quyền.</li>
+            <li>Connection/security boundary khác nhau giữa domain hoặc environment.</li>
+          </ul>
+          <div class="info-box note"><span><strong>Rule of thumb:</strong> đừng split chỉ vì folder dài. Split khi ownership, deployment boundary, security boundary hoặc SLA thật sự khác nhau.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s6" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S6 · Common Errors</div>
+        <div class="module-title">Lỗi thường gặp khi làm Bruin pipeline</div>
+        <div class="module-subtitle">Bảng này dùng như runbook nhanh: đọc error pattern, khoanh vùng nguyên nhân, fix đúng chỗ và ghi lại vào logbook. Exact wording có thể khác theo Bruin CLI version.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">E</span>
+          12 lỗi thường gặp
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table class="data-table">
+            <thead>
+              <tr><th>Lỗi / error pattern</th><th>Nguyên nhân</th><th>Cách fix</th><th>Cách phòng tránh</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>Asset not found: &lt;asset_name&gt;</code></td><td><code>depends</code> khai báo sai tên asset hoặc typo giữa file path và metadata name.</td><td>Chạy <code>bruin lineage</code>, mở asset upstream, copy đúng <code>name</code> vào <code>depends</code>.</td><td>Dùng convention <code>schema.table</code>, review dependency trong PR, validate trước khi run.</td></tr>
+              <tr><td><code>Connection '&lt;name&gt;' not found in project config</code></td><td>Connection name trong asset/pipeline không khớp với <code>.bruin.yml</code> hoặc Cloud connection.</td><td>Sửa <code>default_connections</code> hoặc asset connection cho đúng logical name.</td><td>Chuẩn hóa tên như <code>duckdb-default</code>, <code>bq-prod</code>; không rename connection tùy tiện.</td></tr>
+              <tr><td><code>Cannot find upstream asset</code></td><td>Asset trong <code>depends</code> chưa được tạo, bị move sai folder, hoặc Bruin không parse được header.</td><td>Tạo asset thiếu, sửa path/header, chạy lại <code>bruin validate ./pipeline.yml</code>.</td><td>Thêm asset theo thứ tự upstream trước downstream; validate trong CI.</td></tr>
+              <tr><td><code>YAML parse error in asset header</code></td><td>Indentation sai, thiếu dấu <code>:</code>, quote lỗi, hoặc ký tự đặc biệt trong YAML block.</td><td>Render/validate asset, sửa indentation bằng spaces, quote string có ký tự đặc biệt.</td><td>Giữ YAML header ngắn, dùng formatter, copy pattern từ asset đã pass.</td></tr>
+              <tr><td><code>Variable 'start_date' is not defined</code></td><td>Asset dùng date variable nhưng run không có interval hoặc tên variable sai giữa <code>start_date</code>/<code>start_datetime</code>.</td><td>Chạy với <code>--start-date</code> và <code>--end-date</code>, hoặc sửa template variable đúng runtime.</td><td>Mọi asset incremental phải có command example và test render date range.</td></tr>
+              <tr><td><code>Duplicate rows detected after incremental run</code></td><td>Thiếu <code>unique_key</code>, merge logic sai, hoặc append cùng date range nhiều lần.</td><td>Dedup raw/staging, thêm unique key hoặc strategy time_interval/merge, rerun affected interval.</td><td>Thiết kế idempotency từ đầu; verify row count trước/sau rerun cùng interval.</td></tr>
+              <tr><td><code>Connection refused: DuckDB file locked</code></td><td>Hai process cùng ghi vào một DuckDB file, hoặc notebook/IDE còn giữ connection.</td><td>Đóng process đang giữ lock, tách dev run, hoặc chuyển workload production sang warehouse serverless.</td><td>Không chạy song song write-heavy jobs trên cùng DuckDB file; dùng environment riêng.</td></tr>
+              <tr><td><code>Pipeline validation failed: circular dependency</code></td><td>Asset A depends B và B depends A, hoặc dependency chain vòng qua nhiều asset.</td><td>Dùng lineage để tìm vòng, tách intermediate asset hoặc đảo lại dependency đúng chiều dữ liệu.</td><td>Thiết kế DAG từ source → staging → marts; không để report làm upstream cho staging.</td></tr>
+              <tr><td><code>Ingestr source table not found</code></td><td>Source connection đúng nhưng table/schema name sai, case-sensitive, hoặc user không thấy schema đó.</td><td>Query source catalog, sửa <code>source.table</code>, kiểm tra schema/database hiện tại.</td><td>Ghi rõ source contract và thêm smoke query khi onboard source mới.</td></tr>
+              <tr><td><code>Insufficient permissions on destination</code></td><td>Credentials thiếu quyền create table, insert, merge, delete, hoặc write vào dataset/schema.</td><td>Cấp quyền tối thiểu cần thiết cho destination hoặc đổi connection sang service account đúng.</td><td>Document IAM cho từng environment; test write permission trước production deploy.</td></tr>
+              <tr><td><code>bruin run timeout</code></td><td>Asset chạy quá lâu, full scan quá lớn, source/API chậm, hoặc không có timeout/retry strategy rõ.</td><td>Giới hạn date range, tối ưu query, split asset lớn, thêm retry/timeout ở Python/API layer.</td><td>Luôn dùng incremental/date filter; monitor duration trend và đặt SLA theo asset.</td></tr>
+              <tr><td><code>Schema mismatch: column '&lt;col&gt;' not found</code></td><td>Upstream asset đổi schema nhưng downstream SQL/check chưa update.</td><td>So sánh schema upstream, sửa SELECT/check/model downstream, rerun <code>--downstream</code>.</td><td>Review schema changes như breaking change; validate lineage và query sample trong PR.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">D</span>
+          Debugging checklist theo thứ tự ưu tiên
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ol>
+            <li>Đọc error message đầu tiên, không chỉ dòng cuối cùng của stack trace.</li>
+            <li>Xác định scope: fail ở connection, parse YAML, validation, run asset, quality check hay downstream query.</li>
+            <li>Chạy <code>bruin validate ./pipeline/pipeline.yml</code> trước khi rerun để loại lỗi config/DAG.</li>
+            <li>Dùng <code>bruin lineage ./pipeline/pipeline.yml --asset &lt;asset&gt;</code> để xem upstream/downstream.</li>
+            <li>Rerun asset nhỏ nhất có thể bằng <code>--asset</code> và đúng <code>--start-date</code>/<code>--end-date</code>.</li>
+            <li>Kiểm tra output bằng <code>bruin query</code>: row count, max timestamp, duplicate key, null key.</li>
+            <li>Nếu có partial write hoặc duplicate, cleanup/rebuild interval trước khi chạy downstream.</li>
+            <li>Chỉ dùng <code>--full-refresh</code> khi biết rõ blast radius và đã xác định downstream cần rebuild.</li>
+          </ol>
+          <div class="info-box note"><span><strong>Logbook:</strong> Sau mỗi lỗi, mở logbook và ghi lại: command đã chạy, error gốc, root cause, fix cuối cùng, và cách phòng tránh lần sau.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s7" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S7 · Interview Prep</div>
+        <div class="module-title">Interview Prep: từ Bruin project sang câu trả lời phỏng vấn</div>
+        <div class="module-subtitle">Mỗi câu có gợi ý trả lời và phần red flag để tránh trả lời hời hợt hoặc sai hướng.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">J</span>
+          Junior questions
+          <span class="badge badge-blue">Junior</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-blue">J1</span><strong>Data Platform là gì? Khác Data Warehouse và Data Pipeline thế nào?</strong></div>
+            <div class="interview-answer"><p>Data Platform là lớp hệ thống giúp team build, chạy, kiểm soát và quan sát data workflows: ingestion, transformation, orchestration, quality, lineage, metadata, security. Data Warehouse là nơi lưu và query dữ liệu đã được tổ chức. Data Pipeline là một flow cụ thể đưa data từ source sang destination. Nói ngắn: warehouse là storage/compute, pipeline là workflow, platform là môi trường vận hành nhiều pipeline có governance.</p><div class="red-flag"><strong>Red flag:</strong> đừng nói Data Platform chỉ là BigQuery/Snowflake hoặc chỉ là một ETL script.</div></div>
+          </div>
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-blue">J2</span><strong>Asset, Pipeline, Connection trong Bruin là gì? Quan hệ giữa chúng thế nào?</strong></div>
+            <div class="interview-answer"><p>Connection là cấu hình để Bruin truy cập source/destination như DuckDB, BigQuery, Postgres. Asset là unit công việc tạo/cập nhật một dataset: ingestr, SQL, Python, seed. Pipeline là nhóm assets có schedule, variables và default connections. Pipeline chạy asset graph theo dependency; asset dùng connection để đọc/ghi dữ liệu.</p><div class="red-flag"><strong>Red flag:</strong> đừng gọi asset là "một task bất kỳ" mà bỏ qua output/data contract của nó.</div></div>
+          </div>
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-blue">J3</span><strong>Tại sao khai báo dependency trong asset quan trọng hơn chạy script theo thứ tự thủ công?</strong></div>
+            <div class="interview-answer"><p>Dependency biến thứ tự chạy thành metadata có thể validate, visualize và retry. Khi asset fail, Bruin biết downstream nào bị ảnh hưởng; khi một upstream đổi, team biết blast radius. Chạy script thủ công phụ thuộc trí nhớ người vận hành, khó audit và dễ chạy thiếu bước.</p><div class="red-flag"><strong>Red flag:</strong> đừng trả lời chỉ là "cho tiện"; điểm chính là reproducibility, lineage và incident recovery.</div></div>
+          </div>
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-blue">J4</span><strong>SQL asset khác Python asset thế nào, khi nào dùng cái nào?</strong></div>
+            <div class="interview-answer"><p>SQL asset phù hợp transform set-based trong warehouse: join, filter, aggregate, dedup. Python asset phù hợp ingestion API/SDK, parsing file, logic procedural, ML hoặc validation tùy biến. Production rule: nếu data lớn và logic express được bằng SQL, pushdown vào warehouse; nếu cần gọi hệ thống ngoài SQL, dùng Python.</p><div class="red-flag"><strong>Red flag:</strong> đừng nói Python luôn mạnh hơn SQL; với warehouse transform lớn, Python local có thể là bottleneck.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">M</span>
+          Mid-level questions
+          <span class="badge badge-orange">Mid</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-orange">M5</span><strong>Variables <code>start_date</code> và <code>end_date</code> giải quyết vấn đề gì trong production pipeline?</strong></div>
+            <div class="interview-answer"><p>Chúng biến pipeline thành interval-based execution. Cùng một asset có thể chạy daily, rerun một ngày lỗi, backfill một tháng hoặc giới hạn scan để giảm cost. Date range cũng là nền tảng cho incremental và idempotency vì mỗi run có boundary rõ.</p><div class="red-flag"><strong>Red flag:</strong> đừng nói chỉ để "lọc dữ liệu"; phải nhắc retry, backfill, cost và repeatability.</div></div>
+          </div>
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-orange">M6</span><strong>Incremental asset hoạt động thế nào? Chạy 2 lần cùng date range có duplicate không?</strong></div>
+            <div class="interview-answer"><p>Incremental asset chỉ xử lý phần data mới hoặc một time interval thay vì rebuild toàn bộ. Có duplicate hay không phụ thuộc strategy: append sẽ duplicate nếu rerun cùng interval; merge/upsert với unique key hoặc time_interval delete-and-insert đúng window thì idempotent hơn. Luôn verify bằng row count và duplicate key check.</p><div class="red-flag"><strong>Red flag:</strong> đừng khẳng định incremental tự động luôn chống duplicate.</div></div>
+          </div>
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-orange">M7</span><strong><code>bruin validate</code> vs <code>bruin run</code> — khi nào dùng cái nào, validate check những gì?</strong></div>
+            <div class="interview-answer"><p><code>bruin validate</code> dùng trước khi chạy/deploy để kiểm tra asset definitions, dependency graph, circular dependency, broken references và connection config. <code>bruin run</code> tạo execution thật và materialize output. CI nên validate trên PR; run dùng cho local test, scheduled execution hoặc deploy/backfill.</p><div class="red-flag"><strong>Red flag:</strong> đừng dùng run như cách đầu tiên để phát hiện lỗi syntax/config.</div></div>
+          </div>
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-orange">M8</span><strong>Làm sao debug khi pipeline fail mà log không đủ thông tin để biết asset nào gây ra?</strong></div>
+            <div class="interview-answer"><p>Thu hẹp scope bằng lineage và selector. Chạy validate để loại lỗi graph/config. Dùng <code>bruin lineage --asset</code> quanh vùng nghi ngờ, rerun từng branch với date range nhỏ, query output upstream để xem schema/row count/freshness. Nếu ở Cloud, xem asset-level logs và quality check results thay vì chỉ pipeline-level status.</p><div class="red-flag"><strong>Red flag:</strong> đừng chỉ nói "xem log kỹ hơn"; phải có chiến thuật isolate failure.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">S</span>
+          Senior questions
+          <span class="badge badge-red">Senior</span>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-red">S9</span><strong>Pipeline ingest 50GB/ngày fail lúc 3h sáng sau 4 tiếng chạy, incremental asset ở dirty state — xử lý thế nào mà không mất data và không reprocess toàn bộ lịch sử?</strong></div>
+            <div class="interview-answer"><p>Đầu tiên freeze downstream/alert consumer vì output có thể bẩn. Xác định failed asset, date interval và write strategy. Kiểm tra raw/source of truth còn nguyên, query partition bị ảnh hưởng: row count, duplicate key, max timestamp. Nếu dirty state nằm trong một interval, cleanup hoặc full refresh đúng interval/asset đó, rồi rerun <code>--asset failed_asset --downstream --start-date ... --end-date ...</code>. Không full refresh toàn lịch sử trừ khi key/logic lịch sử sai. Sau incident, thêm idempotent merge/time_interval, quality check duplicate và runbook retry.</p><div class="red-flag"><strong>Red flag:</strong> đừng nói "rerun toàn bộ pipeline" ngay lập tức; đó là cost và risk lớn nếu 50GB/ngày.</div></div>
+          </div>
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-red">S10</span><strong>Team 5 DE cùng develop trên Bruin project, branching và deployment strategy thế nào để tránh conflict và đảm bảo production không bị ảnh hưởng bởi dev changes?</strong></div>
+            <div class="interview-answer"><p>Dùng branch per feature, PR review bắt buộc, CI chạy <code>bruin validate</code> và lineage diff trước merge. Tách environment dev/staging/prod bằng connection config; default là dev. Staging chạy sample/backfill nhỏ trước khi promote. Production deploy chỉ từ main/tag, credentials nằm trong Cloud/secret manager, không trong git. Với domain lớn, chia folder ownership hoặc split project khi release boundary khác nhau.</p><div class="red-flag"><strong>Red flag:</strong> đừng nói "ai cũng commit lên main rồi chạy prod nếu cần".</div></div>
+          </div>
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-red">S11</span><strong>Thiết kế data platform cho e-commerce: 3 sources (DB, API, events), cần real-time dashboard và daily batch reports — chọn asset types, connection strategy, execution schedule thế nào?</strong></div>
+            <div class="interview-answer"><p>DB orders/customers dùng ingestr hoặc CDC connector vào warehouse raw/staging theo incremental key. API catalog/payment dùng Python hoặc ingestr nếu connector có sẵn, với rate-limit/retry. Events realtime cần streaming path riêng cho dashboard low-latency; Bruin batch có thể consume curated event table để daily reports. Connections tách dev/staging/prod, service accounts least privilege. Schedule: realtime path near-real-time/event-driven; Bruin daily/hourly cho batch marts, quality checks và reconciliation giữa events/orders.</p><div class="red-flag"><strong>Red flag:</strong> đừng ép Bruin batch giải quyết toàn bộ real-time streaming nếu latency yêu cầu tính bằng giây.</div></div>
+          </div>
+          <div class="interview-question">
+            <div class="interview-head" onclick="toggleSection(this)"><span class="badge badge-red">S12</span><strong>Bruin MCP integration: AI generate asset code — review checklist những gì trước khi merge vào production?</strong></div>
+            <div class="interview-answer"><p>Review asset name, grain, dependencies, connection/environment, date filters, materialization strategy, idempotency, unique key, quality checks, schema contract, secrets leakage, cost of query, and blast radius. Bắt AI hoặc CI chạy <code>bruin validate</code>, render SQL, query sample, duplicate/null checks. Business logic phải do owner xác nhận, không merge chỉ vì AI code chạy được.</p><div class="red-flag"><strong>Red flag:</strong> đừng nói "AI generate xong validate pass là merge"; validate không chứng minh business logic đúng.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s8" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S8 · Checklist & Tổng kết</div>
+        <div class="module-title">Checklist hoàn thành Module 05</div>
+        <div class="module-subtitle">Tick các mục bạn thật sự làm được. Thanh tiến độ chỉ tính 18 mục level Beginner/Intermediate/Senior.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">P</span>
+          Progress checklist
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="progress-text" id="checklist-progress-text">0/18 mục hoàn thành (0%)</div>
+          <div class="progress-bar"><div class="progress-fill" id="checklist-progress-fill"></div></div>
+          <div class="summary-grid">
+            <div class="summary-item"><strong>Beginner</strong><ul class="checklist">
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Giải thích được Asset-based thinking khác Task-based thinking thế nào và tại sao quan trọng</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Cài được Bruin CLI và chạy <code>bruin version</code> thành công</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Tạo được connection config đúng cho DuckDB hoặc BigQuery không cần hỏi</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Chạy được <code>bruin validate</code> và đọc hiểu output báo lỗi gì</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Chạy được <code>bruin run</code> pipeline đầu tiên và verify data xuất hiện trong destination</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Đọc hiểu được lineage graph từ <code>bruin lineage</code> command</li>
+            </ul></div>
+            <div class="summary-item"><strong>Intermediate</strong><ul class="checklist">
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Tự viết SQL asset từ đầu: YAML header, depends, materialization, variables</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Tự viết ingestr asset: source connection, destination, date range config</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Hiểu incremental asset: unique_key, idempotency, khi nào cần <code>--full-refresh</code></li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Debug được lỗi connection và dependency không cần nhìn docs</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Dùng được <code>bruin run</code> với selector flags: <code>--asset</code>, <code>--downstream</code>, <code>--start-date</code>, <code>--end-date</code></li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Tạo được pipeline YAML config với schedule và default_connections</li>
+            </ul></div>
+            <div class="summary-item"><strong>Senior</strong><ul class="checklist">
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Thiết kế được multi-asset pipeline cho domain mới với đúng dependency chain</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Implement được incremental pipeline idempotent: chạy lại cùng date không duplicate</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Setup được CI/CD workflow: <code>bruin validate</code> trong PR check, <code>bruin run</code> trong deploy</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Giải thích được trade-offs Bruin vs dbt vs Airflow, justify cho team không biết Bruin</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Cấu hình được Bruin MCP và demonstrate AI-assisted asset authoring workflow</li>
+              <li><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Trả lời được 4 câu Senior interview không cần nhìn tài liệu</li>
+            </ul></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">S</span>
+          5 điểm chốt
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="summary-grid">
+            <div class="summary-item"><strong>1. Bruin = git-native data platform</strong>Define assets, declare dependencies, run anywhere từ local CLI tới Cloud.</div>
+            <div class="summary-item"><strong>2. Asset-based DAG là nguyên tắc nền tảng</strong>Mỗi asset là một unit có dependency, ownership và output contract rõ ràng.</div>
+            <div class="summary-item"><strong>3. Date variables + incremental</strong><code>start_date</code>/<code>end_date</code> và incremental strategy là nền tảng cho idempotency production.</div>
+            <div class="summary-item"><strong>4. Validate + lineage</strong><code>bruin validate</code> và <code>bruin lineage</code> là bộ đôi kiểm tra trước mọi deployment.</div>
+            <div class="summary-item"><strong>5. Concept transfer được</strong>DuckDB → BigQuery/Snowflake/Redshift; Bruin concept giữ nguyên bất kể warehouse. Ingestr giống Fivetran/Airbyte về ý tưởng managed ingestion; SQL asset giống dbt model về ý tưởng transform có metadata.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">D</span>
+          Definition of Done
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Tick đủ 5 mục này mới chuyển sang Module 06.</p>
+          <ul class="checklist">
+            <li><div class="check-box" onclick="toggleCheck(this)"></div><strong>Chạy được:</strong> Code/Pipeline chạy thành công từ đầu đến cuối không vấp.</li>
+            <li><div class="check-box" onclick="toggleCheck(this)"></div><strong>Hiểu được:</strong> Có thể vẽ lại kiến trúc ra giấy trắng mà không nhìn tài liệu.</li>
+            <li><div class="check-box" onclick="toggleCheck(this)"></div><strong>Phá được:</strong> Đã tự tạo ra ít nhất 1 lỗi và ghi chép lại cách fix vào Logbook.</li>
+            <li><div class="check-box" onclick="toggleCheck(this)"></div><strong>Tối ưu được:</strong> Code đã được format gọn gàng, chia file hợp lý, không hardcode password.</li>
+            <li><div class="check-box" onclick="toggleCheck(this)"></div><strong>Trả lời được:</strong> Giải quyết trôi chảy các câu hỏi Senior Questions của module này.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">N</span>
+          Preview Module 06
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Module tiếp theo: Batch Processing với Spark</h3>
+          <p><strong>Cần chuẩn bị:</strong> hiểu data pipeline fundamentals từ module này, làm quen với distributed computing concepts.</p>
+          <a class="nav-btn primary" href="Module06_Batch_Processing.html">Module tiếp theo: Batch Processing với Spark</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const modules=document.querySelectorAll('.module');
+const navItems=document.querySelectorAll('.nav-item');
+
+function showModule(index,navItem){
+  modules.forEach(m=>{m.classList.remove('active');m.style.display='none'});
+  navItems.forEach(i=>i.classList.remove('active'));
+  const target=document.getElementById(`s${index}`);
+  if(target){target.classList.add('active');target.style.display='block'}
+  if(navItem)navItem.classList.add('active');
+  else if(navItems[index])navItems[index].classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toggleSection(header){
+  const content=header.nextElementSibling;
+  if(!content)return;
+  if(content.classList.contains('interview-answer')){
+    content.classList.toggle('show');
+    return;
+  }
+  const toggle=header.querySelector('.section-toggle');
+  const isHidden=content.style.display==='none';
+  content.style.display=isHidden?'block':'none';
+  if(toggle)toggle.textContent=isHidden?'▼':'▶';
+}
+
+function answerQuiz(questionId,answer,correct){
+  const el=questionId instanceof Element?questionId:document.querySelector(`[data-question="${questionId}"][data-answer="${answer}"]`);
+  const isCorrect=questionId instanceof Element?answer:correct;
+  const msg=questionId instanceof Element?correct:(el?el.dataset.explain:'');
+  if(!el)return;
+  const item=el.closest('.quiz-item');
+  const opts=item.querySelectorAll('.quiz-opt');
+  const explain=item.querySelector('.quiz-explain');
+  opts.forEach(opt=>(opt.style.pointerEvents='none'));
+  el.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect){opts.forEach(opt=>{const o=opt.getAttribute('onclick');if(o&&o.includes('true'))opt.classList.add('correct')})}
+  explain.textContent=(isCorrect?'✓ Chính xác! ':'✗ Sai. ')+msg;
+  explain.classList.add('show');
+}
+
+function toggleSolution(taskId){
+  const btn=taskId instanceof Element?taskId:document.querySelector(`[data-task="${taskId}"]`);
+  if(!btn)return;
+  const box=btn.nextElementSibling;
+  if(!box)return;
+  const show=box.classList.toggle('show');
+  btn.textContent=show?'Ẩn lời giải':'Xem lời giải';
+}
+
+function toggleInterview(header){
+  const answer=header.nextElementSibling;
+  if(answer)answer.classList.toggle('show');
+}
+
+function switchTab(groupId,tabId){
+  const group=document.getElementById(groupId);
+  if(!group)return;
+  group.querySelectorAll('.tab').forEach(tab=>tab.classList.remove('active'));
+  const clicked=group.querySelector(`[onclick*="${tabId}"]`);
+  if(clicked)clicked.classList.add('active');
+  const container=group.parentElement;
+  container.querySelectorAll('.tab-content').forEach(content=>content.classList.remove('active'));
+  const target=document.getElementById(tabId);
+  if(target)target.classList.add('active');
+}
+
+function toggleCheck(itemId){
+  const box=itemId instanceof Element?itemId:document.getElementById(itemId);
+  if(!box)return;
+  box.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress(){
+  const checks=document.querySelectorAll('.check-box[data-progress="true"]');
+  const checked=document.querySelectorAll('.check-box[data-progress="true"].checked').length;
+  const total=checks.length;
+  const pct=total===0?0:Math.round((checked/total)*100);
+  const fill=document.getElementById('checklist-progress-fill');
+  const text=document.getElementById('checklist-progress-text');
+  if(fill)fill.style.width=`${pct}%`;
+  if(text)text.textContent=`${checked}/${total} mục hoàn thành (${pct}%)`;
+}
+
+showModule(0,navItems[0]);
+updateProgress();
+</script>
+</body>
+</html>

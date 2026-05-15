@@ -1,0 +1,2628 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 07 - Streaming với Kafka, Redpanda & Flink</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+    --accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;
+    --text:#e6edf3;--text-muted:#8b949e;--code-bg:#0d1117;--highlight:#388bfd26;
+    --font-sans:'Inter','Segoe UI',-apple-system,sans-serif;--font-mono:'JetBrains Mono','Courier New','Consolas',monospace;
+    --radius:8px;--shadow:0 12px 30px #00000033;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font-sans);background:var(--bg);color:var(--text);line-height:1.7}
+  .hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 40%,#1a2a1e 100%);border-bottom:2px solid var(--accent4);padding:40px 24px 30px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#6e40c922,transparent 70%);pointer-events:none}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--accent4);letter-spacing:-0.5px}
+  .hero p{color:var(--text-muted);margin-top:8px;font-size:.95rem}
+  .badge-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;border:1px solid}
+  .badge-blue{color:var(--accent);border-color:var(--accent);background:#1f6feb1a}
+  .badge-green{color:var(--accent2);border-color:var(--accent2);background:#2ea04326}
+  .badge-orange{color:var(--accent5);border-color:var(--accent5);background:#d2940026}
+  .badge-purple{color:var(--accent4);border-color:var(--accent4);background:#6e40c926}
+  .container{display:flex;min-height:calc(100vh - 160px)}
+  .sidebar{width:290px;min-width:290px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:0 16px 12px}
+  .level-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 16px 4px;color:var(--accent4)}
+  .nav-item{display:block;padding:7px 16px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-left:3px solid transparent;transition:all .15s}
+  .nav-item:hover{color:var(--text);background:var(--surface2)}
+  .nav-item.active{color:var(--accent4);border-left-color:var(--accent4);background:#6e40c915;font-weight:600}
+  .nav-number{display:inline-block;width:44px;font-size:.7rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .main{flex:1;padding:32px 40px;max-width:980px}
+  .module{display:none}
+  .module.active{display:block}
+  .module-header{border:1px solid var(--border);border-radius:12px;padding:24px 28px;background:var(--surface);margin-bottom:24px;position:relative;overflow:hidden}
+  .module-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent4)}
+  .module-tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent4);margin-bottom:8px}
+  .module-title{font-size:1.6rem;font-weight:800;margin-bottom:8px}
+  .module-subtitle{color:var(--text-muted);font-size:.9rem}
+  .section{margin-bottom:28px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .section-header{padding:14px 20px;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--surface2);border-bottom:1px solid var(--border);user-select:none}
+  .section-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .icon-purpose{background:#1f6feb33}
+  .icon-detail{background:#2ea04326}
+  .icon-quiz{background:#d2940026}
+  .icon-summary{background:#6e40c926}
+  .icon-practice{background:#f7816626}
+  .section-content{padding:20px;background:var(--surface);overflow-x:auto}
+  .section-toggle{margin-left:auto;color:var(--text-muted);font-size:12px}
+  h3{font-size:1rem;font-weight:700;color:var(--accent4);margin:18px 0 10px}
+  h3:first-child{margin-top:0}
+  h3.blue{color:var(--accent)}
+  h3.green{color:var(--accent2)}
+  h3.orange{color:var(--accent5)}
+  h3.red{color:var(--accent3)}
+  p{margin-bottom:12px;color:var(--text);font-size:.88rem}
+  ul,ol{padding-left:20px;margin-bottom:12px}
+  li{font-size:.88rem;margin-bottom:5px}
+  strong{color:var(--text)}
+  .cmd-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .cmd-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .cmd-body{padding:14px}
+  pre{font-family:'JetBrains Mono','Courier New','Consolas',monospace;font-size:.82rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--text)}
+  .kw{color:#ff7b72}.kw2{color:var(--accent)}.str{color:var(--accent5)}.fn{color:var(--accent4)}.num{color:#79c0ff}.comment{color:var(--text-muted)}
+  .db-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.68rem;font-weight:700;letter-spacing:.5px;margin-bottom:6px}
+  .db-pg{background:#4169e122;color:#4d9de0;border:1px solid #4169e155}
+  .db-oracle{background:#cc000022;color:#f97316;border:1px solid #cc000055}
+  code{font-family:'JetBrains Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:.82rem;color:var(--accent4)}
+  .quiz-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
+  .quiz-q{font-weight:600;font-size:.88rem;margin-bottom:10px}
+  .quiz-q::before{content:'Q';display:inline-block;width:22px;height:22px;background:var(--accent4);color:#000;border-radius:50%;font-size:.7rem;font-weight:800;text-align:center;line-height:22px;margin-right:8px}
+  .quiz-options,.quiz-opts{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .quiz-opt{padding:8px 12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.84rem;transition:all .15s;background:var(--bg)}
+  .quiz-opt:hover{border-color:var(--accent4);color:var(--accent4)}
+  .quiz-opt.correct{border-color:var(--accent2);color:var(--accent2);background:#2ea04310}
+  .quiz-opt.wrong{border-color:var(--accent3);color:var(--accent3);background:#f7816610}
+  .quiz-explain{font-size:.82rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px;margin-top:8px;display:none}
+  .quiz-explain.show{display:block}
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .summary-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:.82rem}
+  .summary-item strong{color:var(--accent4);display:block;margin-bottom:4px}
+  .practice-task{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
+  .practice-task-header{padding:12px 16px;background:#6e40c915;border-bottom:1px solid var(--border);font-weight:700;font-size:.85rem;color:var(--accent4)}
+  .practice-task-body{padding:16px}
+  .solution-toggle{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:.8rem;cursor:pointer;color:var(--accent2);margin-top:10px;transition:all .15s}
+  .solution-toggle:hover{background:var(--surface2)}
+  .solution-box{margin-top:10px;display:none;border-top:1px solid var(--border);padding-top:12px}
+  .solution-box.show{display:block}
+  .info-box{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:.84rem;border:1px solid;display:flex;gap:10px}
+  .info-box.tip{border-color:var(--accent2);background:#2ea04310;color:var(--accent2)}
+  .info-box.warn{border-color:var(--accent5);background:#d2940015;color:var(--accent5)}
+  .info-box.note{border-color:var(--accent4);background:#6e40c915;color:var(--accent4)}
+  .info-box.danger{border-color:var(--accent3);background:#f7816610;color:var(--accent3)}
+  .info-box span{color:var(--text)}
+  .progress-bar{background:var(--surface2);border-radius:4px;height:4px;margin:16px 0;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent4),var(--accent2));border-radius:4px;width:0;transition:width .2s}
+  .nav-buttons{display:flex;gap:12px;margin-top:32px;justify-content:space-between}
+  .nav-btn{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:6px}
+  .nav-btn:hover{border-color:var(--accent4);color:var(--accent4)}
+  .nav-btn.primary{background:var(--accent4);color:#000;border-color:var(--accent4)}
+  .nav-btn.primary:hover{background:#e2c0ff}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.83rem}
+  .data-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.82rem}
+  .data-table th{background:var(--surface2);color:var(--accent4);border:1px solid var(--border);padding:8px 10px}
+  .data-table td{border:1px solid var(--border);padding:8px 10px;vertical-align:top}
+  th{background:var(--surface2);padding:8px 12px;text-align:left;border:1px solid var(--border);color:var(--accent4)}
+  td{padding:8px 12px;border:1px solid var(--border)}
+  tr:nth-child(even) td{background:#ffffff05}
+  .checklist{list-style:none;padding:0}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:.88rem;border-bottom:1px solid var(--border)}
+  .checklist li:last-child{border-bottom:none}
+  .checklist li::before{content:'[ ]';color:var(--accent4);font-size:.8rem;flex-shrink:0;margin-top:1px;font-family:'JetBrains Mono',monospace}
+  .test-question{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px}
+  .test-question.correct{border-color:var(--accent2);background:#2ea04312}
+  .test-question.wrong{border-color:var(--accent3);background:#f7816612}
+  .test-question.unanswered{border-color:var(--accent5);background:#d2940015}
+  .test-question-title{font-size:.86rem;font-weight:600;margin-bottom:8px}
+  .test-options{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+  .test-option{display:flex;align-items:center;gap:6px;font-size:.83rem;color:var(--text)}
+  .test-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .test-result{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)}
+  .score-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .score-chip{border:1px solid var(--border);border-radius:14px;padding:4px 10px;font-size:.78rem;color:var(--text);background:var(--bg)}
+  .score-chip.good{border-color:var(--accent2);color:var(--accent2)}
+  .score-chip.warn{border-color:var(--accent5);color:var(--accent5)}
+  .score-chip.bad{border-color:var(--accent3);color:var(--accent3)}
+  .mistake-list{margin-top:8px;padding-left:18px}
+  .tab-group{display:flex;gap:0;margin-bottom:0;border-bottom:1px solid var(--border)}
+  .tab{padding:8px 18px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab.active{color:var(--accent4);border-bottom-color:var(--accent4);font-weight:600}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  .schema-box{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin:14px 0;overflow-x:auto}
+  .schema-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+  .schema-table{border:1px solid var(--border);border-radius:8px;min-width:160px;overflow:hidden}
+  .schema-table-header{padding:8px 12px;font-size:.75rem;font-weight:700;text-align:center}
+  .schema-table-header.fact{background:#1f6feb33;color:var(--accent)}
+  .schema-table-header.dim{background:#6e40c926;color:var(--accent4)}
+  .schema-col{padding:5px 12px;font-size:.73rem;border-top:1px solid var(--border);display:flex;gap:6px}
+  .schema-col .pk{color:var(--accent5);font-weight:700;font-size:.65rem}
+  .schema-col .fk{color:var(--accent3);font-weight:700;font-size:.65rem}
+  .schema-col .col{color:var(--text-muted)}
+  .schema-arrow{align-self:center;color:var(--text-muted);font-size:1.4rem;padding:0 2px}
+  .mental-model{border-left:4px solid var(--accent);background:#1f6feb1a;padding:12px 14px;border-radius:6px;margin:12px 0;font-size:.88rem}
+  .checklist-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .check-box{width:16px;height:16px;border:1px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:.25rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  .check-box.checked{background:var(--accent2);border-color:var(--accent2)}
+  .check-box.checked::after{content:'✓';font-size:10px;color:#000;font-weight:600}
+  .progress-text{font-size:.8rem;color:var(--text-muted);margin-bottom:8px}
+  .hero-banner{display:contents}
+  .code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .tab-container{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .quiz-block{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+  .checklist-item{display:flex;align-items:flex-start;gap:10px}
+  @media(max-width:768px){.sidebar{display:none}.main{padding:16px}.summary-grid{grid-template-columns:1fr}.test-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Module 07 - Streaming với Kafka, Redpanda & Flink</h1>
+  <p>Xây mental model và nền tảng production cho pipeline event realtime trong repo.</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">Intermediate -&gt; Senior</span>
+    <span class="badge badge-green">~10 ngày</span>
+    <span class="badge badge-blue">Kafka</span>
+    <span class="badge badge-orange">PyFlink</span>
+    <span class="badge badge-purple">Real-time</span>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="sidebar-title">Module Navigation</div>
+    <div class="level-label">MODULE 07 · STREAMING</div>
+    <div class="nav-item active" onclick="showModule(0)"><span class="nav-number">S0</span>Tổng quan & Mục tiêu</div>
+    <div class="nav-item" onclick="showModule(1)"><span class="nav-number">S1</span>Lý thuyết nền</div>
+    <div class="nav-item" onclick="showModule(2)"><span class="nav-number">S2</span>Đọc hiểu code repo</div>
+    <div class="nav-item" onclick="showModule(3)"><span class="nav-number">S3</span>Thực hành từng bước</div>
+    <div class="nav-item" onclick="showModule(4)"><span class="nav-number">S4</span>Production Readiness</div>
+    <div class="nav-item" onclick="showModule(5)"><span class="nav-number">S5</span>Kiến thức nâng cao</div>
+    <div class="nav-item" onclick="showModule(6)"><span class="nav-number">S6</span>Lỗi thường gặp</div>
+    <div class="nav-item" onclick="showModule(7)"><span class="nav-number">S7</span>Interview Prep</div>
+    <div class="nav-item" onclick="showModule(8)"><span class="nav-number">S8</span>Checklist & Tổng kết</div>
+  </nav>
+
+  <main class="main">
+    <div id="s0" class="module section-content active">
+      <div class="module-header">
+        <div class="module-tag">S0 · Orientation</div>
+        <div class="module-title">Tổng quan & Mục tiêu</div>
+        <div class="module-subtitle">Streaming trong Module 07 đi từ event log Kafka-compatible đến xử lý stateful bằng PyFlink và sink PostgreSQL.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">S0</span>
+          Roadmap 9 sections
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Section</th><th>Tên section</th><th>Thời gian ước tính</th></tr></thead>
+            <tbody>
+              <tr><td>S0</td><td>Tổng quan & Mục tiêu</td><td>45 phút</td></tr>
+              <tr><td>S1</td><td>Lý thuyết nền</td><td>1.5 ngày</td></tr>
+              <tr><td>S2</td><td>Đọc hiểu code repo</td><td>1.5 ngày</td></tr>
+              <tr><td>S3</td><td>Thực hành từng bước</td><td>3 ngày</td></tr>
+              <tr><td>S4</td><td>Production Readiness</td><td>1 ngày</td></tr>
+              <tr><td>S5</td><td>Kiến thức nâng cao</td><td>1 ngày</td></tr>
+              <tr><td>S6</td><td>Lỗi thường gặp</td><td>0.75 ngày</td></tr>
+              <tr><td>S7</td><td>Interview Prep</td><td>0.75 ngày</td></tr>
+              <tr><td>S8</td><td>Checklist & Tổng kết</td><td>0.5 ngày</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">WHY</span>
+          Vấn đề thực tế Streaming giải quyết
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Batch và micro-batch vẫn phù hợp khi business chấp nhận dữ liệu trễ theo giờ hoặc theo ngày. Nhưng khi cần phản ứng trong vài giây hoặc vài phút, mô hình đó không còn đủ nhanh.</p>
+          <p>Các tình huống thường cần streaming gồm fraud/security detection, surge pricing, monitoring và alert realtime. Điểm đánh đổi là operational cost cao hơn vì broker và stream processing job chạy 24/7, không giống một batch job chạy xong rồi dừng.</p>
+          <div class="info-box warn"><span><strong>Cảnh báo:</strong> Streaming không tự động làm hệ thống đơn giản hơn. Nó giảm latency, nhưng tăng chi phí vận hành, debugging, monitoring và on-call.</span></div>
+
+          <h3 class="orange">Trước streaming người ta làm gì?</h3>
+          <ul>
+            <li>Cron job batch theo giờ hoặc theo ngày.</li>
+            <li>Polling database để tìm record mới.</li>
+            <li>Manual scripts khi cần xử lý một đợt dữ liệu khẩn cấp.</li>
+            <li>Micro-batch bằng Spark hoặc orchestration qua Airflow.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">STK</span>
+          Stack Module 07 trong repo
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Thành phần</th><th>Vai trò trong repo</th></tr></thead>
+            <tbody>
+              <tr><td>Redpanda</td><td>Kafka-compatible broker, expose listener ngoài Docker <code>localhost:9092</code> và listener nội bộ <code>redpanda:29092</code>.</td></tr>
+              <tr><td>Python producer/consumer</td><td>Ghi và đọc topic <code>rides</code>; consumer debug có thể in ra console hoặc ghi PostgreSQL.</td></tr>
+              <tr><td>PyFlink</td><td>Stream processing bằng Table API/SQL, Kafka source, JDBC sink, window aggregation, watermark và checkpointing.</td></tr>
+              <tr><td>PostgreSQL</td><td>Sink cho bảng <code>processed_events</code> và <code>processed_events_aggregated</code>.</td></tr>
+              <tr><td>Extras</td><td>JSON/Avro examples, Faust, Spark Structured Streaming và ksqlDB.</td></tr>
+              <tr><td>Theory Java</td><td>Kafka producer/consumer, Kafka Streams, Avro, custom serde và topology tests.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">FLOW</span>
+          Data flow diagram
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>module07-flows.txt</span></div>
+            <div class="cmd-body">
+<pre><span class="kw2">Workshop:</span>
+Python producer.py
+  -&gt; Redpanda topic rides (localhost:9092 / redpanda:29092)
+  -&gt; PyFlink pass_through_job.py / aggregation_job.py
+  -&gt; PostgreSQL processed_events / processed_events_aggregated
+
+<span class="kw2">Python consumer debug:</span>
+Redpanda topic rides
+  -&gt; consumer.py
+  -&gt; console output
+
+<span class="kw2">Extras Avro:</span>
+Avro producer
+  -&gt; Kafka topic with key/value schema
+  -&gt; Avro consumer
+
+<span class="kw2">Theory Java:</span>
+JsonProducer / AvroProducer
+  -&gt; Kafka topics
+  -&gt; Kafka Streams topology
+  -&gt; output topics / topology tests</pre>
+            </div>
+          </div>
+          <div class="mental-model"><strong>Mental model:</strong> <code>Kafka/Redpanda = durable event log</code>. <code>Flink = stateful event-time processor</code>. <code>PostgreSQL sink = materialized result for querying</code>.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">DONE</span>
+          Exit criteria
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul class="checklist">
+            <li>Giải thích được broker, topic, partition, consumer group và offset.</li>
+            <li>Chạy được Redpanda, producer và consumer trong workshop.</li>
+            <li>Hiểu vì sao producer ngoài Docker dùng <code>localhost:9092</code>, còn Flink trong Docker dùng <code>redpanda:29092</code>.</li>
+            <li>Đọc được PyFlink Kafka source và JDBC sink DDL.</li>
+            <li>Giải thích watermark, tumbling window, late events và upsert sink.</li>
+            <li>Nhận diện production gaps: checkpoint storage, DLQ, schema registry và monitoring lag.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="s1" class="module section-content" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S1 · Theory Foundation</div>
+        <div class="module-title">Lý thuyết nền</div>
+        <div class="module-subtitle">Ba nhóm kiến thức cần nắm trước khi đọc sâu producer, consumer, PyFlink job và extras trong repo.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">A</span>
+          Phần A - Streaming Fundamentals
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Batch vs Micro-batch vs Streaming</h3>
+          <table>
+            <thead><tr><th>Mô hình</th><th>Latency</th><th>Throughput</th><th>Complexity</th><th>Cost</th><th>Use case</th></tr></thead>
+            <tbody>
+              <tr><td>Batch</td><td>Giờ/ngày</td><td>Cao theo từng đợt</td><td>Thấp hơn</td><td>Rẻ hơn vì job có thể dừng</td><td>Daily reporting, backfill</td></tr>
+              <tr><td>Micro-batch</td><td>Phút</td><td>Cao</td><td>Trung bình</td><td>Trung bình</td><td>Fresh dashboard, near-real-time ELT</td></tr>
+              <tr><td>Streaming</td><td>Giây/phút</td><td>Liên tục</td><td>Cao</td><td>Cao vì chạy 24/7</td><td>Fraud, alerting, realtime monitoring</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="green">Kafka vocabulary</h3>
+          <table>
+            <thead><tr><th>Khái niệm</th><th>Cách hiểu thực dụng</th></tr></thead>
+            <tbody>
+              <tr><td>Event / message / record</td><td>Một sự kiện được ghi vào log, gồm key, value, timestamp và metadata.</td></tr>
+              <tr><td>Key</td><td>Giúp quyết định partition và giữ ordering cho các event cùng entity.</td></tr>
+              <tr><td>Value</td><td>Payload nghiệp vụ, ví dụ taxi ride JSON hoặc Avro record.</td></tr>
+              <tr><td>Topic</td><td>Luồng event có tên, như topic <code>rides</code> trong workshop.</td></tr>
+              <tr><td>Partition</td><td>Shard append-only của topic; scale throughput và ordering theo từng partition.</td></tr>
+              <tr><td>Offset</td><td>Vị trí của record trong partition; consumer group dùng offset để biết đã đọc tới đâu.</td></tr>
+              <tr><td>Consumer group</td><td>Nhiều consumer chia nhau partitions để scale đọc dữ liệu.</td></tr>
+              <tr><td>Broker vs cluster</td><td>Broker là một server; cluster là nhiều broker cùng phục vụ topic/partition.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>topic-partition-offset.txt</span></div>
+            <div class="cmd-body">
+<pre>topic rides
+  partition 0: offset 0 -&gt; offset 1 -&gt; offset 2
+  partition 1: offset 0 -&gt; offset 1 -&gt; offset 2
+
+consumer group flink-job
+  commits offset per topic + partition</pre>
+            </div>
+          </div>
+
+          <h3 class="orange">Producer, consumer và log policy</h3>
+          <ul>
+            <li>Producer ack/retry/idempotence là bộ cơ chế để giảm mất message hoặc ghi duplicate khi network/broker lỗi.</li>
+            <li>Consumer offset commit quyết định điểm resume sau crash. <code>earliest</code> đọc từ đầu khi chưa có offset; <code>latest</code> chỉ đọc event mới sau thời điểm consumer bắt đầu.</li>
+            <li>Retention xóa record theo thời gian/dung lượng. Compaction giữ record mới nhất theo key, phù hợp changelog/state topic.</li>
+          </ul>
+
+          <div class="info-box note"><span><strong>Repo note:</strong> Redpanda trong Module 07 là Kafka-compatible broker. Tài liệu repo mô tả Redpanda không cần JVM, không dùng ZooKeeper, là single binary và dùng Raft cho coordination.</span></div>
+          <div class="mental-model"><strong>Mental model:</strong> <code>Streaming = xử lý dòng event không kết thúc, không phải một file hữu hạn</code>.</div>
+
+          <h3 class="red">Quiz Phần A</h3>
+          <div class="quiz-item">
+            <div class="quiz-q">Consumer group mới đọc một topic đã có dữ liệu cũ với <code>latest</code> sẽ thấy gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'earliest mới đọc từ đầu topic khi group chưa có offset.')">A. Tất cả dữ liệu cũ từ offset 0</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'latest bắt đầu từ cuối log tại thời điểm subscribe, nên chỉ thấy event mới.')">B. Chỉ các event mới sau khi consumer bắt đầu</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Offset không tự reset ngẫu nhiên nếu cấu hình rõ ràng.')">C. Một số event ngẫu nhiên</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Vì sao cần key khi ghi Kafka?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Key giúp partitioning ổn định và giữ ordering cho các event cùng entity.')">A. Để các event cùng entity đi vào cùng partition</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Compression không phải lý do chính của key.')">B. Để value được nén tốt hơn</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Topic vẫn lưu record không có key, nhưng ordering theo entity sẽ khó kiểm soát.')">C. Vì Kafka không nhận record thiếu key</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Offset thuộc về broker hay consumer group?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Broker lưu log và record offset trong partition, nhưng tiến độ đọc là theo group.')">A. Chỉ thuộc về broker</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Offset là vị trí trong partition; committed offset dùng để resume được quản lý theo consumer group.')">B. Vị trí nằm trong partition, tiến độ đọc được commit theo consumer group</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Producer không quyết định consumer đã đọc tới đâu.')">C. Thuộc về producer</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Retention khác compaction thế nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Compaction không xóa theo tuổi một cách đơn giản như retention.')">A. Cả hai đều chỉ xóa theo thời gian</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Retention xóa theo time/size; compaction giữ bản mới nhất theo key.')">B. Retention xóa theo time/size, compaction giữ latest value theo key</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Compaction vẫn là policy trên log, không phải cơ chế consumer group.')">C. Retention dành cho producer, compaction dành cho consumer</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Khi nào streaming đáng dùng hơn micro-batch?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Nếu dữ liệu chấp nhận trễ vài giờ, batch/micro-batch thường đơn giản hơn.')">A. Khi dashboard daily chạy ổn với dữ liệu hôm qua</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Fraud/security/alert realtime là nhóm bài toán latency thấp đáng trả cost streaming.')">B. Khi business cần phản ứng trong vài giây hoặc vài phút</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Streaming không phải cách giảm vận hành; nó thường tăng vận hành.')">C. Khi muốn giảm on-call và monitoring</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Redpanda khác Kafka ở operational model nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Theo repo notes, Redpanda là Kafka-compatible nhưng không JVM, không ZooKeeper, single binary và dùng Raft.')">A. Kafka-compatible nhưng single binary, không JVM, không ZooKeeper, dùng Raft</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Repo dùng Kafka API, không nói Redpanda bỏ topic/partition.')">B. Không có topic và partition</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Python Kafka client vẫn dùng được với Redpanda trong repo.')">C. Không tương thích Kafka clients</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">B</span>
+          Phần B - Stream Processing & Flink
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Flink xử lý gì?</h3>
+          <table>
+            <thead><tr><th>Khái niệm</th><th>Ý nghĩa</th><th>Ví dụ trong Module 07</th></tr></thead>
+            <tbody>
+              <tr><td>Stateless processing</td><td>Xử lý từng event độc lập, không cần nhớ lịch sử.</td><td>Pass-through ghi từng ride vào <code>processed_events</code>.</td></tr>
+              <tr><td>Stateful processing</td><td>Cần state để aggregate, join hoặc window.</td><td>Đếm chuyến và doanh thu theo window trong <code>processed_events_aggregated</code>.</td></tr>
+              <tr><td>Event time</td><td>Thời gian sự kiện thực sự xảy ra.</td><td>Dùng timestamp trong ride để tạo window.</td></tr>
+              <tr><td>Processing time</td><td>Thời gian Flink xử lý event.</td><td>Dễ dùng nhưng sai khi event đến trễ.</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="green">Watermark và windows</h3>
+          <p>Watermark là tín hiệu Flink dùng để ước lượng rằng event-time đã đi tới một mốc nhất định. Window cần watermark để biết khi nào nên đóng bucket và publish kết quả.</p>
+          <table>
+            <thead><tr><th>Window</th><th>Cách hoạt động</th><th>Khi dùng</th></tr></thead>
+            <tbody>
+              <tr><td>Tumbling</td><td>Bucket cố định, không overlap.</td><td>Tổng số chuyến mỗi 1 giờ.</td></tr>
+              <tr><td>Sliding</td><td>Bucket overlap theo slide interval.</td><td>Rolling metric mỗi 5 phút trên cửa sổ 1 giờ.</td></tr>
+              <tr><td>Session</td><td>Bucket đóng khi có khoảng im lặng.</td><td>Nhóm activity theo phiên người dùng hoặc thiết bị.</td></tr>
+            </tbody>
+          </table>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>watermark-window.txt</span></div>
+            <div class="cmd-body">
+<pre>event time:  10:00 ---- 10:05 ---- 10:10 ---- 10:15
+window:      [10:00,10:10)          [10:10,10:20)
+watermark:                 passes 10:10 -&gt; close first bucket</pre>
+            </div>
+          </div>
+
+          <h3 class="orange">Late events, checkpoint và exactly-once</h3>
+          <ul>
+            <li>Late events là event đến sau các event mới hơn. Allowed lateness quyết định Flink còn nhận event trễ trong bao lâu sau khi watermark đi qua.</li>
+            <li>Checkpoint là snapshot định kỳ của state và offsets để job recover. Savepoint là snapshot có chủ đích để nâng cấp hoặc redeploy có kiểm soát.</li>
+            <li>Exactly-once cần source, processor và sink cùng hỗ trợ semantics phù hợp. Nếu sink không idempotent/transactional, pipeline có thể vẫn duplicate khi retry.</li>
+          </ul>
+          <div class="info-box note"><span><strong>Repo note:</strong> PyFlink jobs trong workshop bật checkpointing 10 giây và dùng bootstrap server nội bộ <code>redpanda:29092</code>. Notes cũng chỉ ra production gap là chưa cấu hình durable checkpoint storage, savepoints, restart strategy và state backend production.</span></div>
+
+          <h3 class="green">Flink architecture và API</h3>
+          <table>
+            <thead><tr><th>Thành phần</th><th>Vai trò</th></tr></thead>
+            <tbody>
+              <tr><td>JobManager</td><td>Coordinator: nhận job, lập lịch, quản lý checkpoint.</td></tr>
+              <tr><td>TaskManager</td><td>Worker: chạy task thực tế.</td></tr>
+              <tr><td>Task slot</td><td>Đơn vị tài nguyên để chạy operator/subtask.</td></tr>
+              <tr><td>Parallelism</td><td>Số subtask song song; phải cân với partition và sink capacity.</td></tr>
+              <tr><td>Table API</td><td>Phù hợp khi logic dạng SQL/table/window aggregation như workshop.</td></tr>
+              <tr><td>DataStream API</td><td>Phù hợp khi cần logic custom sâu ở mức event/operator.</td></tr>
+            </tbody>
+          </table>
+          <p>JDBC sink upsert cần primary key <code>NOT ENFORCED</code> để Flink biết khóa logic của kết quả aggregate, dù database/Flink connector không enforce constraint như database truyền thống.</p>
+          <div class="mental-model"><strong>Mental model:</strong> <code>Window = bucket</code>, <code>Watermark = khi nào đóng bucket</code>, <code>Upsert = sửa kết quả khi event đến muộn</code>.</div>
+
+          <h3 class="red">Quiz Phần B</h3>
+          <div class="quiz-item">
+            <div class="quiz-q">Watermark 5 giây nghĩa là gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Nó cho phép Flink chờ event trễ trong ngưỡng khoảng 5 giây trước khi coi window đã đủ để publish.')">A. Flink xem event-time an toàn ở phía sau event mới nhất khoảng 5 giây</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Watermark không phải lịch checkpoint.')">B. Flink checkpoint mỗi 5 giây</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Watermark liên quan event-time, không phải retention của Kafka.')">C. Kafka xóa event sau 5 giây</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Event đến sau watermark thì chuyện gì xảy ra?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Không phải lúc nào cũng crash; đó là tình huống late data.')">A. Job luôn crash</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Nếu quá allowed lateness, event có thể bị drop hoặc cần xử lý late-data riêng.')">B. Nó có thể bị coi là quá muộn nếu vượt allowed lateness</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Offset không tự đổi vì event đến muộn.')">C. Kafka tự ghi lại offset cũ</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Vì sao aggregation sink cần primary key?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Aggregate theo window/location có thể cập nhật nhiều lần; primary key cho sink biết row nào cần upsert.')">A. Để Flink upsert đúng row kết quả khi aggregate thay đổi</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Primary key không làm query nhanh một cách tự động trong mọi connector.')">B. Chỉ để SELECT nhanh hơn</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Kafka source không cần primary key JDBC sink để đọc message.')">C. Để Kafka đọc được topic</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Checkpoint khác savepoint thế nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Checkpoint là snapshot tự động để recovery; savepoint là snapshot chủ động để nâng cấp/redeploy có kiểm soát.')">A. Checkpoint tự động cho recovery, savepoint chủ động cho vận hành</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Savepoint không phải log Kafka.')">B. Checkpoint nằm trong PostgreSQL, savepoint nằm trong Kafka</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Cả hai đều liên quan state, không phải chỉ config UI.')">C. Không khác nhau</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">JobManager khác TaskManager?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'JobManager không phải nơi chạy tất cả records.')">A. JobManager xử lý từng event, TaskManager chỉ lưu metadata</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'JobManager điều phối job/checkpoint; TaskManager chạy task thực tế.')">B. JobManager điều phối, TaskManager thực thi</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Cả hai đều là thành phần Flink, không phải Kafka broker.')">C. Cả hai đều là Kafka broker</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Khi nào dùng Table API thay vì DataStream API?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Khi logic tự nhiên là table/SQL/window aggregation, Table API ngắn gọn và hợp với workshop.')">A. Khi bài toán giống SQL/table aggregation</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Custom operator phức tạp thường hợp DataStream API hơn.')">B. Khi cần custom operator cực sâu cho từng event</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Table API không thay thế Kafka broker.')">C. Khi muốn bỏ broker</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">C</span>
+          Phần C - Serialization, Schema & Stream Applications
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Serialization choices</h3>
+          <table>
+            <thead><tr><th>Format</th><th>Ưu điểm</th><th>Điểm yếu</th><th>Khi dùng</th></tr></thead>
+            <tbody>
+              <tr><td>JSON</td><td>Dễ đọc, dễ debug, dễ bắt đầu.</td><td>Không chặt schema, payload lớn, lỗi type dễ lọt vào runtime.</td><td>Prototype, workshop, debug.</td></tr>
+              <tr><td>Avro</td><td>Schema rõ, compact, hợp Schema Registry và evolution.</td><td>Cần registry/tooling, khó đọc bằng mắt hơn JSON.</td><td>Production event pipeline.</td></tr>
+              <tr><td>Protobuf</td><td>Compact, contract mạnh, phổ biến trong service communication.</td><td>Schema evolution cần kỷ luật tag/field.</td><td>Microservices, low-latency APIs/events.</td></tr>
+              <tr><td>Raw bytes</td><td>Linh hoạt tối đa.</td><td>Không tự mô tả, dễ tạo technical debt.</td><td>Trường hợp đặc biệt có protocol riêng.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box note"><span><strong>Repo note:</strong> Module 07 có JSON examples, Avro examples với key/value schema, và Java theory project cho Avro schema compatibility.</span></div>
+
+          <h3 class="green">Schema Registry và evolution</h3>
+          <p>Schema Registry quản lý schema theo subject, ví dụ subject cho key và value của một topic. Compatibility mode quyết định producer có được đăng schema mới hay không. Evolution tốt nghĩa là consumer cũ và mới không bị phá bởi thay đổi field.</p>
+          <table>
+            <thead><tr><th>Thay đổi schema</th><th>Production judgement</th></tr></thead>
+            <tbody>
+              <tr><td>Thêm nullable field có default</td><td>Thường compatible vì consumer cũ có thể bỏ qua và consumer mới có default.</td></tr>
+              <tr><td>Đổi type field đang tồn tại</td><td>Rủi ro cao, có thể break consumer.</td></tr>
+              <tr><td>Xóa field bắt buộc</td><td>Rủi ro nếu consumer còn phụ thuộc field đó.</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="orange">Stream applications</h3>
+          <ul>
+            <li>Kafka Streams dùng stream, table, joins, windows và state store để build app xử lý event trong Java.</li>
+            <li>Spark Structured Streaming dùng <code>readStream</code>/<code>writeStream</code>, trigger, checkpoint và output mode. Repo extras có ví dụ Spark đọc Kafka/Redpanda stream, parse JSON schema và xử lý taxi rides.</li>
+            <li>Faust và ksqlDB là high-level streaming abstractions: viết app/query streaming nhanh hơn, đổi lại ít kiểm soát hơn so với Flink/DataStream-level logic.</li>
+            <li>Outbox pattern giúp service ghi database transaction và event cùng lúc một cách đáng tin hơn. CDC đọc change log từ database khi không muốn producer app tự emit event. Event sourcing lưu event là nguồn sự thật. Stream-table duality xem stream là lịch sử thay đổi, table là trạng thái mới nhất.</li>
+          </ul>
+          <div class="info-box warn"><span><strong>Senior trade-off:</strong> Chọn streaming khi business latency requirement đủ quan trọng để trả chi phí broker, stateful job, schema governance, monitoring lag và on-call.</span></div>
+
+          <h3 class="red">Quiz Phần C</h3>
+          <div class="quiz-item">
+            <div class="quiz-q">Vì sao JSON dễ bắt đầu nhưng yếu trong production?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'JSON dễ đọc nhưng thiếu schema contract mạnh, payload lớn và lỗi type thường xuất hiện muộn.')">A. Dễ debug nhưng yếu contract/schema và kém compact</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'JSON vẫn dùng được với Kafka; điểm yếu là governance và type safety.')">B. Kafka không hỗ trợ JSON</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'JSON không tự động exactly-once.')">C. JSON tự bật exactly-once nên nguy hiểm</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Thêm field nullable với default trong Avro có compatible không?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đây thường là thay đổi compatible vì record cũ có thể dùng default và consumer cũ có thể bỏ qua field mới.')">A. Thường compatible nếu thiết kế đúng default/nullability</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Không phải mọi thay đổi đều phá schema; nullable default là pattern phổ biến để evolve.')">B. Luôn không compatible</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Compatibility không phụ thuộc vào restart broker.')">C. Chỉ compatible nếu restart broker</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Kafka Streams state store dùng để làm gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'State store giữ trạng thái local cho aggregation, join, window và table materialization.')">A. Lưu state cho aggregation/join/window</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Nó không thay thế Kafka broker.')">B. Thay Kafka topic</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Schema Registry quản lý schema; state store quản lý state xử lý.')">C. Đăng ký Avro schema</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Spark Structured Streaming micro-batch khác Flink continuous thế nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Spark thường xử lý theo các micro-batch trigger; Flink thiết kế quanh continuous event-at-a-time/stateful event-time processing.')">A. Spark thường chạy theo micro-batch trigger, Flink thiên về continuous stream processing</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Cả hai đều có thể đọc Kafka; khác biệt chính là execution model.')">B. Spark không đọc được Kafka</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Flink không chỉ dùng cho batch file hữu hạn.')">C. Flink chỉ chạy batch</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Khi nào dùng CDC thay vì producer app tự emit event?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'CDC hợp khi source of truth là database và khó/sợ sửa từng app để emit event nhất quán.')">A. Khi cần capture thay đổi từ database source of truth mà không sửa nhiều app</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'CDC không phải cách tránh schema governance.')">B. Khi không cần quan tâm schema</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'CDC vẫn cần vận hành connector và monitoring.')">C. Khi muốn không cần monitoring</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Vì sao streaming job cần on-call?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Job chạy 24/7; lag, schema lỗi, sink chậm hoặc checkpoint fail đều ảnh hưởng dữ liệu realtime.')">A. Vì pipeline chạy liên tục và lỗi có thể làm lag hoặc mất freshness ngay</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Streaming thường tăng nhu cầu vận hành, không giảm xuống 0.')">B. Vì streaming không bao giờ lỗi</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'On-call không phụ thuộc riêng vào việc dùng PostgreSQL.')">C. Chỉ vì có PostgreSQL</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="s2" class="module section-content" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S2 · Repo Reading</div>
+        <div class="module-title">Đọc hiểu code repo</div>
+        <div class="module-subtitle">Đi theo lineage thật của `07-streaming/`: Docker Compose dựng broker/Flink/Postgres, Python ghi topic `rides`, PyFlink đọc Kafka và materialize sang PostgreSQL.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">TREE</span>
+          Cấu trúc `07-streaming/`
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header"><span>● ● ●</span><span>repo_notes_M07.md · section 1</span></div>
+            <div class="cmd-body">
+<pre><span class="comment">.gitignore
+extras
+extras\ksqldb
+extras\ksqldb\commands.md
+extras\pyflink
+extras\pyflink\.gitignore
+extras\pyflink\docker-compose.yml
+extras\pyflink\Dockerfile.flink
+extras\pyflink\homework.md
+extras\pyflink\LICENSE
+extras\pyflink\Makefile
+extras\pyflink\README.md
+extras\pyflink\requirements.txt
+extras\pyflink\src
+extras\pyflink\src\job
+extras\pyflink\src\job\aggregation_job.py
+extras\pyflink\src\job\start_job.py
+extras\pyflink\src\job\taxi_job.py
+extras\pyflink\src\producers
+extras\pyflink\src\producers\load_taxi_data.py
+extras\pyflink\src\producers\producer.py
+extras\python
+extras\python\avro_example
+extras\python\avro_example\consumer.py
+extras\python\avro_example\producer.py
+extras\python\avro_example\ride_record.py
+extras\python\avro_example\ride_record_key.py
+extras\python\avro_example\settings.py
+extras\python\docker
+extras\python\docker\docker-compose.yml
+extras\python\docker\kafka
+extras\python\docker\kafka\docker-compose.yml
+extras\python\docker\README.md
+extras\python\docker\spark
+extras\python\docker\spark\build.sh
+extras\python\docker\spark\cluster-base.Dockerfile
+extras\python\docker\spark\docker-compose.yml
+extras\python\docker\spark\jupyterlab.Dockerfile
+extras\python\docker\spark\spark-base.Dockerfile
+extras\python\docker\spark\spark-master.Dockerfile
+extras\python\docker\spark\spark-worker.Dockerfile
+extras\python\json_example
+extras\python\json_example\consumer.py
+extras\python\json_example\producer.py
+extras\python\json_example\ride.py
+extras\python\json_example\settings.py
+extras\python\README.md
+extras\python\redpanda_example
+extras\python\redpanda_example\consumer.py
+extras\python\redpanda_example\docker-compose.yaml
+extras\python\redpanda_example\producer.py
+extras\python\redpanda_example\README.md
+extras\python\redpanda_example\ride.py
+extras\python\redpanda_example\settings.py
+extras\python\requirements.txt
+extras\python\resources
+extras\python\resources\schemas
+extras\python\resources\schemas\taxi_ride_key.avsc
+extras\python\resources\schemas\taxi_ride_value.avsc
+extras\python\streams-example
+extras\python\streams-example\faust
+extras\python\streams-example\faust\branch_price.py
+extras\python\streams-example\faust\producer_taxi_json.py
+extras\python\streams-example\faust\stream.py
+extras\python\streams-example\faust\stream_count_vendor_trips.py
+extras\python\streams-example\faust\taxi_rides.py
+extras\python\streams-example\faust\windowing.py
+extras\python\streams-example\pyspark
+extras\python\streams-example\pyspark\consumer.py
+extras\python\streams-example\pyspark\producer.py
+extras\python\streams-example\pyspark\README.md
+extras\python\streams-example\pyspark\settings.py
+extras\python\streams-example\pyspark\spark-submit.sh
+extras\python\streams-example\pyspark\streaming.py
+extras\python\streams-example\pyspark\streaming-notebook.ipynb
+extras\python\streams-example\redpanda
+extras\python\streams-example\redpanda\consumer.py
+extras\python\streams-example\redpanda\docker-compose.yaml
+extras\python\streams-example\redpanda\producer.py
+extras\python\streams-example\redpanda\README.md
+extras\python\streams-example\redpanda\settings.py
+extras\python\streams-example\redpanda\spark-submit.sh
+extras\python\streams-example\redpanda\streaming.py
+extras\python\streams-example\redpanda\streaming-notebook.ipynb
+extras\README.md
+README.md
+theory
+theory\java
+theory\java\kafka_examples
+theory\java\kafka_examples\.gitignore
+theory\java\kafka_examples\build
+theory\java\kafka_examples\build\generated-main-avro-java
+theory\java\kafka_examples\build\generated-main-avro-java\schemaregistry
+theory\java\kafka_examples\build\generated-main-avro-java\schemaregistry\RideRecord.java
+theory\java\kafka_examples\build\generated-main-avro-java\schemaregistry\RideRecordCompatible.java
+theory\java\kafka_examples\build\generated-main-avro-java\schemaregistry\RideRecordNoneCompatible.java
+theory\java\kafka_examples\build.gradle
+theory\java\kafka_examples\gradle
+theory\java\kafka_examples\gradle\wrapper
+theory\java\kafka_examples\gradle\wrapper\gradle-wrapper.jar
+theory\java\kafka_examples\gradle\wrapper\gradle-wrapper.properties
+theory\java\kafka_examples\gradlew
+theory\java\kafka_examples\gradlew.bat
+theory\java\kafka_examples\settings.gradle
+theory\java\kafka_examples\src
+theory\java\kafka_examples\src\main
+theory\java\kafka_examples\src\main\avro
+theory\java\kafka_examples\src\main\avro\rides.avsc
+theory\java\kafka_examples\src\main\avro\rides_compatible.avsc
+theory\java\kafka_examples\src\main\avro\rides_non_compatible.avsc
+theory\java\kafka_examples\src\main\java
+theory\java\kafka_examples\src\main\java\org
+theory\java\kafka_examples\src\main\java\org\example
+theory\java\kafka_examples\src\main\java\org\example\AvroProducer.java
+theory\java\kafka_examples\src\main\java\org\example\JsonConsumer.java
+theory\java\kafka_examples\src\main\java\org\example\JsonKStream.java
+theory\java\kafka_examples\src\main\java\org\example\JsonKStreamJoins.java
+theory\java\kafka_examples\src\main\java\org\example\JsonKStreamWindow.java
+theory\java\kafka_examples\src\main\java\org\example\JsonProducer.java
+theory\java\kafka_examples\src\main\java\org\example\JsonProducerPickupLocation.java
+theory\java\kafka_examples\src\main\java\org\example\Secrets.java
+theory\java\kafka_examples\src\main\java\org\example\Topics.java
+theory\java\kafka_examples\src\main\java\org\example\customserdes
+theory\java\kafka_examples\src\main\java\org\example\customserdes\CustomSerdes.java
+theory\java\kafka_examples\src\main\java\org\example\data
+theory\java\kafka_examples\src\main\java\org\example\data\PickupLocation.java
+theory\java\kafka_examples\src\main\java\org\example\data\Ride.java
+theory\java\kafka_examples\src\main\java\org\example\data\VendorInfo.java
+theory\java\kafka_examples\src\main\resources
+theory\java\kafka_examples\src\main\resources\rides.csv
+theory\java\kafka_examples\src\test
+theory\java\kafka_examples\src\test\java
+theory\java\kafka_examples\src\test\java\org
+theory\java\kafka_examples\src\test\java\org\example
+theory\java\kafka_examples\src\test\java\org\example\helper
+theory\java\kafka_examples\src\test\java\org\example\helper\DataGeneratorHelper.java
+theory\java\kafka_examples\src\test\java\org\example\JsonKStreamJoinsTest.java
+theory\java\kafka_examples\src\test\java\org\example\JsonKStreamTest.java
+theory\README.md
+workshop
+workshop\docker-compose.yml
+workshop\Dockerfile.flink
+workshop\Dockerfile_ARM64.flink
+workshop\flink-config.yaml
+workshop\live
+workshop\live\.gitignore
+workshop\live\.python-version
+workshop\live\docker-compose.yaml
+workshop\live\Dockerfile.flink
+workshop\live\flink-config.yaml
+workshop\live\main.py
+workshop\live\notebooks
+workshop\live\notebooks\consumer_db.ipynb
+workshop\live\notebooks\models.py
+workshop\live\notebooks\producer.ipynb
+workshop\live\pyproject.flink.toml
+workshop\live\pyproject.toml
+workshop\live\README.md
+workshop\live\src
+workshop\live\src\job
+workshop\live\src\job\aggregation_job.py
+workshop\live\src\job\pass_through_job.py
+workshop\live\src\producers
+workshop\live\src\producers\models.py
+workshop\live\src\producers\producer_realtime.py
+workshop\live\uv.lock
+workshop\Makefile
+workshop\pyproject.flink.toml
+workshop\pyproject.toml
+workshop\README.md
+workshop\src
+workshop\src\consumers\consumer.py
+workshop\src\consumers\consumer_postgres.py
+workshop\src\job\aggregation_job.py
+workshop\src\job\aggregation_job_demo.py
+workshop\src\job\pass_through_job.py
+workshop\src\models.py
+workshop\src\producers\producer.py
+workshop\src\producers\producer_realtime.py
+workshop\uv.lock</span></pre>
+            </div>
+          </div>
+          <table>
+            <thead><tr><th>Nhóm</th><th>Mục đích</th></tr></thead>
+            <tbody>
+              <tr><td><code>workshop/</code></td><td>Pipeline chính: Python producer -> Redpanda Kafka API -> PyFlink -> PostgreSQL.</td></tr>
+              <tr><td><code>workshop/live/</code></td><td>Bản live/demo tương tự workshop, có notebook producer/consumer và PyFlink jobs.</td></tr>
+              <tr><td><code>extras/python/</code></td><td>Ví dụ JSON, Avro, Redpanda, Faust và Spark Structured Streaming.</td></tr>
+              <tr><td><code>extras/pyflink/</code></td><td>Ví dụ PyFlink cũ với Kafka-compatible broker và Table/DataStream API.</td></tr>
+              <tr><td><code>theory/java/kafka_examples/</code></td><td>Java Kafka producer/consumer, Kafka Streams, Avro compatibility và topology tests.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">YAML</span>
+          Tab group 1 - `workshop/docker-compose.yml`
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2-compose-tabs">
+            <div class="tab active" onclick="switchTab('s2-compose-tabs','code')">Code</div>
+            <div class="tab" onclick="switchTab('s2-compose-tabs','services')">Services</div>
+            <div class="tab" onclick="switchTab('s2-compose-tabs','weaknesses')">Weaknesses</div>
+          </div>
+          <div class="tab-content active" id="s2-compose-tabs-code">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>workshop/docker-compose.yml</span></div><div class="cmd-body">
+<pre><span class="kw">services</span>:
+  <span class="kw2">redpanda</span>:
+    image: redpandadata/redpanda:v25.3.9
+    command:
+      - redpanda
+      - start
+      - --smp
+      - '1'
+      - --reserve-memory
+      - 0M
+      - --overprovisioned
+      - --node-id
+      - '1'
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+      - --pandaproxy-addr
+      - PLAINTEXT://0.0.0.0:28082,OUTSIDE://0.0.0.0:8082
+      - --advertise-pandaproxy-addr
+      - PLAINTEXT://redpanda:28082,OUTSIDE://localhost:8082
+      - --rpc-addr
+      - 0.0.0.0:33145
+      - --advertise-rpc-addr
+      - redpanda:33145
+    ports:
+      - 8082:8082
+      - 9092:9092
+      - 28082:28082
+      - 29092:29092
+
+  <span class="kw2">jobmanager</span>:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.flink
+    image: pyflink-workshop
+    pull_policy: never
+    expose:
+      - "6123"
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./:/opt/flink/usrlib
+      - ./src/:/opt/src
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        jobmanager.memory.process.size: 1600m
+
+  <span class="kw2">taskmanager</span>:
+    image: pyflink-workshop
+    pull_policy: never
+    expose:
+      - "6121"
+      - "6122"
+    volumes:
+      - ./:/opt/flink/usrlib
+      - ./src/:/opt/src
+    depends_on:
+      - jobmanager
+    command: taskmanager --taskmanager.registration.timeout 5 min
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.memory.process.size: 1728m
+        taskmanager.numberOfTaskSlots: 15
+        parallelism.default: 3
+
+  <span class="kw2">postgres</span>:
+    image: postgres:18
+    restart: on-failure
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"</pre>
+            </div></div>
+          </div>
+          <div class="tab-content" id="s2-compose-tabs-services">
+            <table>
+              <thead><tr><th>Service</th><th>Điểm cần đọc</th></tr></thead>
+              <tbody>
+                <tr><td><code>redpanda</code></td><td>Image <code>redpandadata/redpanda:v25.3.9</code>; ports <code>8082/9092/28082/29092</code>; advertised Kafka listener nội bộ <code>redpanda:29092</code> và ngoài Docker <code>localhost:9092</code>.</td></tr>
+                <tr><td><code>jobmanager</code></td><td>Build local image <code>pyflink-workshop</code> từ <code>Dockerfile.flink</code>, expose UI <code>8081</code>, mount <code>./</code> vào <code>/opt/flink/usrlib</code> và <code>./src/</code> vào <code>/opt/src</code>.</td></tr>
+                <tr><td><code>taskmanager</code></td><td>Dùng cùng image, phụ thuộc <code>jobmanager</code>, cấu hình <code>taskmanager.numberOfTaskSlots: 15</code> và <code>parallelism.default: 3</code>.</td></tr>
+                <tr><td><code>postgres</code></td><td>Image <code>postgres:18</code>; database/user/password đều là <code>postgres</code>; port <code>5432</code> publish ra host.</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box note"><span><strong>Vì sao có 2 Kafka address:</strong> producer/consumer chạy trên laptop dùng <code>localhost:9092</code>; Flink chạy trong Docker network nên dùng DNS service <code>redpanda:29092</code>.</span></div>
+          </div>
+          <div class="tab-content" id="s2-compose-tabs-weaknesses">
+            <div class="info-box warn"><span><strong>Production gaps:</strong> single broker, không replication, không TLS/SASL, DB password plaintext, PostgreSQL không có persistent volume, Compose không có healthcheck rõ ràng cho readiness của broker/database.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">IMG</span>
+          Tab group 2 - Flink image/config
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2-flink-tabs">
+            <div class="tab active" onclick="switchTab('s2-flink-tabs','dockerfile')">Dockerfile</div>
+            <div class="tab" onclick="switchTab('s2-flink-tabs','arm')">ARM64</div>
+            <div class="tab" onclick="switchTab('s2-flink-tabs','config')">Config</div>
+            <div class="tab" onclick="switchTab('s2-flink-tabs','analysis')">Analysis</div>
+          </div>
+          <div class="tab-content active" id="s2-flink-tabs-dockerfile">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>workshop/Dockerfile.flink</span></div><div class="cmd-body">
+<pre><span class="kw">FROM</span> flink:2.2.0-scala_2.12-java17
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
+
+<span class="kw">WORKDIR</span> /opt/pyflink
+COPY pyproject.flink.toml pyproject.toml
+RUN uv python install 3.12 &amp;&amp; uv sync
+ENV PATH="/opt/pyflink/.venv/bin:$PATH"
+
+<span class="comment"># Download connector libraries</span>
+WORKDIR /opt/flink/lib
+RUN wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-json/2.2.0/flink-json-2.2.0.jar; \
+    wget https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka/4.0.1-2.0/flink-sql-connector-kafka-4.0.1-2.0.jar; \
+    wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-connector-jdbc-core/4.0.0-2.0/flink-connector-jdbc-core-4.0.0-2.0.jar; \
+    wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-connector-jdbc-postgres/4.0.0-2.0/flink-connector-jdbc-postgres-4.0.0-2.0.jar; \
+    wget https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.10/postgresql-42.7.10.jar
+
+COPY flink-config.yaml /opt/flink/conf/config.yaml
+
+WORKDIR /opt/flink</pre>
+            </div></div>
+          </div>
+          <div class="tab-content" id="s2-flink-tabs-arm">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>workshop/Dockerfile_ARM64.flink</span></div><div class="cmd-body">
+<pre><span class="kw">FROM</span> flink:2.2.0-scala_2.12-java17
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
+USER root
+RUN apt-get update &amp;&amp; apt-get install -y --no-install-recommends \
+    openjdk-17-jdk-headless \
+    build-essential \
+    python3-dev \
+    wget \
+    ca-certificates \
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+RUN JDK_DIR="$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")" \
+    &amp;&amp; rm -rf /opt/java/openjdk \
+    &amp;&amp; ln -s "${JDK_DIR}" /opt/java/openjdk \
+    &amp;&amp; test -d /opt/java/openjdk/include
+
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+WORKDIR /opt/pyflink
+COPY pyproject.flink.toml pyproject.toml
+RUN uv python install 3.12 &amp;&amp; uv sync
+ENV PATH="/opt/pyflink/.venv/bin:$PATH"
+
+WORKDIR /opt/flink/lib
+RUN wget https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka/4.0.1-2.0/flink-sql-connector-kafka-4.0.1-2.0.jar \
+    &amp;&amp; wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-connector-jdbc-core/4.0.0-2.0/flink-connector-jdbc-core-4.0.0-2.0.jar \
+    &amp;&amp; wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-connector-jdbc-postgres/4.0.0-2.0/flink-connector-jdbc-postgres-4.0.0-2.0.jar \
+    &amp;&amp; wget https://repo1.maven.org/maven2/org/postgresql/postgresql/42.7.10/postgresql-42.7.10.jar
+
+COPY flink-config.yaml /opt/flink/conf/config.yaml
+WORKDIR /opt/flink</pre>
+            </div></div>
+          </div>
+          <div class="tab-content" id="s2-flink-tabs-config">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>workshop/flink-config.yaml</span></div><div class="cmd-body">
+<pre><span class="comment"># Custom Flink config for PyFlink workshop.</span>
+taskmanager:
+  memory:
+    process:
+      size: 1728m
+    jvm-metaspace:
+      size: 512m
+  bind-host: 0.0.0.0
+  numberOfTaskSlots: 15
+jobmanager:
+  execution:
+    failover-strategy: region
+  rpc:
+    address: jobmanager
+    port: 6123
+  memory:
+    process:
+      size: 1600m
+  bind-host: 0.0.0.0
+parallelism:
+  default: 1
+rest:
+  address: 0.0.0.0</pre>
+            </div></div>
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>workshop/pyproject.flink.toml</span></div><div class="cmd-body">
+<pre>[project]
+name = "pyflink-workshop"
+version = "0.1.0"
+requires-python = "&gt;=3.12"
+dependencies = [
+    "apache-flink==2.2.0",
+]</pre>
+            </div></div>
+          </div>
+          <div class="tab-content" id="s2-flink-tabs-analysis">
+            <ul>
+              <li>Base image là <code>flink:2.2.0-scala_2.12-java17</code>.</li>
+              <li>Python/PyFlink được cài qua <code>uv</code>, Python 3.12 và dependency <code>apache-flink==2.2.0</code>.</li>
+              <li>Connector jars gồm JSON, Kafka SQL connector, JDBC core, JDBC Postgres và PostgreSQL driver.</li>
+              <li><code>flink-config.yaml</code> tăng process memory và metaspace để PyFlink ổn định hơn trong Docker.</li>
+            </ul>
+            <div class="info-box warn"><span><strong>Production gaps:</strong> connector versions pinned/hardcoded bằng URL Maven, image build local, không có SBOM, vulnerability scan, checksum verification hoặc artifact repository nội bộ.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">PY</span>
+          Tab group 3 - Python data model + producer/consumer
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2-python-tabs">
+            <div class="tab active" onclick="switchTab('s2-python-tabs','models')">models.py</div>
+            <div class="tab" onclick="switchTab('s2-python-tabs','producer')">Producers</div>
+            <div class="tab" onclick="switchTab('s2-python-tabs','consumer')">Consumers</div>
+            <div class="tab" onclick="switchTab('s2-python-tabs','analysis')">Analysis</div>
+          </div>
+          <div class="tab-content active" id="s2-python-tabs-models">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>workshop/src/models.py</span></div><div class="cmd-body">
+<pre><span class="kw">import</span> json
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+
+
+<span class="kw">@dataclass</span>
+<span class="kw">class</span> <span class="fn">Ride</span>:
+    PULocationID: int
+    DOLocationID: int
+    trip_distance: float
+    total_amount: float
+    tpep_pickup_datetime: int  <span class="comment"># epoch milliseconds</span>
+
+
+<span class="kw">def</span> <span class="fn">ride_from_row</span>(row):
+    <span class="kw">return</span> Ride(
+        PULocationID=int(row['PULocationID']),
+        DOLocationID=int(row['DOLocationID']),
+        trip_distance=float(row['trip_distance']),
+        total_amount=float(row['total_amount']),
+        tpep_pickup_datetime=int(row['tpep_pickup_datetime'].timestamp() * 1000),
+    )
+
+
+<span class="kw">def</span> <span class="fn">ride_deserializer</span>(data):
+    json_str = data.decode('utf-8')
+    ride_dict = json.loads(json_str)
+    <span class="kw">return</span> Ride(**ride_dict)</pre>
+            </div></div>
+          </div>
+          <div class="tab-content" id="s2-python-tabs-producer">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>workshop/src/producers/producer.py</span></div><div class="cmd-body">
+<pre><span class="kw">import</span> dataclasses
+<span class="kw">import</span> json
+<span class="kw">import</span> sys
+<span class="kw">import</span> time
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> kafka <span class="kw">import</span> KafkaProducer
+<span class="kw">from</span> models <span class="kw">import</span> Ride, ride_from_row
+
+url = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2025-11.parquet"
+columns = ['PULocationID', 'DOLocationID', 'trip_distance', 'total_amount', 'tpep_pickup_datetime']
+df = pd.read_parquet(url, columns=columns).head(1000)
+
+<span class="kw">def</span> <span class="fn">ride_serializer</span>(ride):
+    ride_dict = dataclasses.asdict(ride)
+    json_str = json.dumps(ride_dict)
+    <span class="kw">return</span> json_str.encode('utf-8')
+
+server = 'localhost:9092'
+producer = KafkaProducer(bootstrap_servers=[server], value_serializer=ride_serializer)
+topic_name = 'rides'
+
+<span class="kw">for</span> _, row <span class="kw">in</span> df.iterrows():
+    ride = ride_from_row(row)
+    producer.send(topic_name, value=ride)
+    print(f"Sent: {ride}")
+    time.sleep(0.01)
+
+producer.flush()</pre>
+            </div></div>
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>workshop/src/producers/producer_realtime.py</span></div><div class="cmd-body">
+<pre><span class="kw">def</span> <span class="fn">make_ride</span>(delay_seconds=0):
+    now_ms = int(time.time() * 1000) - delay_seconds * 1000
+    <span class="kw">return</span> Ride(
+        PULocationID=random.choice(PICKUP_LOCATIONS),
+        DOLocationID=random.choice(DROPOFF_LOCATIONS),
+        trip_distance=round(random.uniform(0.5, 20.0), 2),
+        total_amount=round(random.uniform(5.0, 100.0), 2),
+        tpep_pickup_datetime=now_ms,
+    )
+
+server = 'localhost:9092'
+producer = KafkaProducer(bootstrap_servers=[server], value_serializer=ride_serializer)
+topic_name = 'rides'
+
+<span class="kw">while</span> True:
+    <span class="comment"># ~20% chance of a late event (3-10 seconds old)</span>
+    <span class="kw">if</span> random.random() &lt; 0.2:
+        delay = random.randint(3, 10)
+        ride = make_ride(delay_seconds=delay)
+    <span class="kw">else</span>:
+        ride = make_ride()
+    producer.send(topic_name, value=ride)
+    time.sleep(0.5)</pre>
+            </div></div>
+          </div>
+          <div class="tab-content" id="s2-python-tabs-consumer">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>consumer.py / consumer_postgres.py</span></div><div class="cmd-body">
+<pre>server = 'localhost:9092'
+topic_name = 'rides'
+
+consumer = KafkaConsumer(
+    topic_name,
+    bootstrap_servers=[server],
+    auto_offset_reset='earliest',
+    group_id='rides-console',
+    value_deserializer=ride_deserializer
+)
+
+conn = psycopg2.connect(
+    host='localhost',
+    port=5432,
+    database='postgres',
+    user='postgres',
+    password='postgres'
+)
+
+consumer = KafkaConsumer(
+    topic_name,
+    bootstrap_servers=[server],
+    auto_offset_reset='earliest',
+    group_id='rides-to-postgres',
+    value_deserializer=ride_deserializer
+)
+
+cur.execute(
+    """INSERT INTO processed_events
+       (PULocationID, DOLocationID, trip_distance, total_amount, pickup_datetime)
+       VALUES (%s, %s, %s, %s, %s)""",
+    (ride.PULocationID, ride.DOLocationID,
+     ride.trip_distance, ride.total_amount, pickup_dt)
+)</pre>
+            </div></div>
+          </div>
+          <div class="tab-content" id="s2-python-tabs-analysis">
+            <ul>
+              <li><code>Ride</code> có 5 fields: pickup/dropoff location, distance, amount và pickup timestamp epoch milliseconds.</li>
+              <li><code>ride_from_row()</code> convert row parquet sang dataclass, đặc biệt biến <code>tpep_pickup_datetime</code> thành epoch milliseconds.</li>
+              <li><code>ride_serializer()</code> dùng <code>dataclasses.asdict()</code> rồi JSON encode; <code>ride_deserializer()</code> decode JSON về <code>Ride</code>.</li>
+              <li>Topic chính là <code>rides</code>; Python scripts dùng <code>bootstrap_servers=['localhost:9092']</code>.</li>
+              <li><code>rides-console</code> và <code>rides-to-postgres</code> là hai consumer groups khác nhau, nên mỗi group có tiến độ offset riêng.</li>
+              <li><code>consumer_postgres.py</code> insert vào <code>processed_events</code> bằng credentials hardcoded <code>postgres/postgres</code>.</li>
+            </ul>
+            <div class="info-box warn"><span><strong>Production gaps:</strong> producer không gửi key, chưa cấu hình idempotent producer, retry/backoff, DLQ, schema validation; DB credentials hardcoded; insert không có dedup key nên replay có thể duplicate.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">SQL</span>
+          Tab group 4 - PyFlink jobs
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2-pyflink-tabs">
+            <div class="tab active" onclick="switchTab('s2-pyflink-tabs','pass')">pass_through</div>
+            <div class="tab" onclick="switchTab('s2-pyflink-tabs','agg')">aggregation</div>
+            <div class="tab" onclick="switchTab('s2-pyflink-tabs','demo')">demo</div>
+            <div class="tab" onclick="switchTab('s2-pyflink-tabs','analysis')">Analysis</div>
+          </div>
+          <div class="tab-content active" id="s2-pyflink-tabs-pass">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>workshop/src/job/pass_through_job.py</span></div><div class="cmd-body">
+<pre><span class="kw">from</span> pyflink.datastream <span class="kw">import</span> StreamExecutionEnvironment
+<span class="kw">from</span> pyflink.table <span class="kw">import</span> EnvironmentSettings, StreamTableEnvironment
+
+<span class="kw">def</span> <span class="fn">create_events_source_kafka</span>(t_env):
+    table_name = "events"
+    source_ddl = f"""
+        CREATE TABLE {table_name} (
+            PULocationID INTEGER,
+            DOLocationID INTEGER,
+            trip_distance DOUBLE,
+            total_amount DOUBLE,
+            tpep_pickup_datetime BIGINT
+        ) WITH (
+            'connector' = 'kafka',
+            'properties.bootstrap.servers' = 'redpanda:29092',
+            'topic' = 'rides',
+            'scan.startup.mode' = 'latest-offset',
+            'properties.auto.offset.reset' = 'latest',
+            'format' = 'json'
+        );
+        """
+    t_env.execute_sql(source_ddl)
+    return table_name
+
+env = StreamExecutionEnvironment.get_execution_environment()
+env.enable_checkpointing(10 * 1000)
+
+t_env.execute_sql(f"""
+    INSERT INTO {postgres_sink}
+    SELECT PULocationID, DOLocationID, trip_distance, total_amount,
+           TO_TIMESTAMP_LTZ(tpep_pickup_datetime, 3) as pickup_datetime
+    FROM {source_table}
+""").wait()</pre>
+            </div></div>
+          </div>
+          <div class="tab-content" id="s2-pyflink-tabs-agg">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>workshop/src/job/aggregation_job.py</span></div><div class="cmd-body">
+<pre><span class="kw">def</span> <span class="fn">create_events_aggregated_sink</span>(t_env):
+    table_name = 'processed_events_aggregated'
+    sink_ddl = f"""
+        CREATE TABLE {table_name} (
+            window_start TIMESTAMP(3),
+            PULocationID INT,
+            num_trips BIGINT,
+            total_revenue DOUBLE,
+            PRIMARY KEY (window_start, PULocationID) NOT ENFORCED
+        ) WITH (
+            'connector' = 'jdbc',
+            'url' = 'jdbc:postgresql://postgres:5432/postgres',
+            'table-name' = '{table_name}',
+            'username' = 'postgres',
+            'password' = 'postgres',
+            'driver' = 'org.postgresql.Driver'
+        );
+        """
+
+source_ddl = f"""
+    CREATE TABLE events (
+        PULocationID INTEGER,
+        DOLocationID INTEGER,
+        trip_distance DOUBLE,
+        total_amount DOUBLE,
+        tpep_pickup_datetime BIGINT,
+        event_timestamp AS TO_TIMESTAMP_LTZ(tpep_pickup_datetime, 3),
+        WATERMARK for event_timestamp as event_timestamp - INTERVAL '5' SECOND
+    ) WITH (
+        'connector' = 'kafka',
+        'properties.bootstrap.servers' = 'redpanda:29092',
+        'topic' = 'rides',
+        'scan.startup.mode' = 'earliest-offset',
+        'properties.auto.offset.reset' = 'earliest',
+        'format' = 'json'
+    );
+"""
+
+env.enable_checkpointing(10 * 1000)
+env.set_parallelism(3)
+
+INSERT INTO processed_events_aggregated
+SELECT window_start, PULocationID, COUNT(*) AS num_trips, SUM(total_amount) AS total_revenue
+FROM TABLE(
+    TUMBLE(TABLE events, DESCRIPTOR(event_timestamp), INTERVAL '1' HOUR)
+)
+GROUP BY window_start, PULocationID;</pre>
+            </div></div>
+          </div>
+          <div class="tab-content" id="s2-pyflink-tabs-demo">
+            <p><code>aggregation_job_demo.py</code> dùng cùng source/sink pattern nhưng chuyển window sang <code>INTERVAL '10' SECOND</code>, startup mode <code>latest-offset</code> và <code>env.set_parallelism(1)</code> để quan sát watermark behavior với <code>producer_realtime.py</code>.</p>
+            <div class="info-box note"><span><strong>Late events demo:</strong> comment trong file ghi rõ late events <code>&lt;=5s</code> có thể được include trước khi watermark đóng window; events <code>&gt;5s</code> có thể bị drop sau khi window đóng.</span></div>
+          </div>
+          <div class="tab-content" id="s2-pyflink-tabs-analysis">
+            <ul>
+              <li>Kafka source DDL đọc topic <code>rides</code>, format <code>json</code>, bootstrap server <code>redpanda:29092</code>.</li>
+              <li><code>pass_through_job.py</code> dùng <code>latest-offset</code>; <code>aggregation_job.py</code> dùng <code>earliest-offset</code>.</li>
+              <li><code>event_timestamp AS TO_TIMESTAMP_LTZ(tpep_pickup_datetime, 3)</code> là computed column từ pickup timestamp epoch milliseconds.</li>
+              <li>Watermark là <code>event_timestamp - INTERVAL '5' SECOND</code>.</li>
+              <li>JDBC sink dùng PostgreSQL URL <code>jdbc:postgresql://postgres:5432/postgres</code>.</li>
+              <li><code>PRIMARY KEY (window_start, PULocationID) NOT ENFORCED</code> cho Flink biết khóa upsert của aggregate result.</li>
+              <li><code>TUMBLE(TABLE events, DESCRIPTOR(event_timestamp), INTERVAL '1' HOUR)</code> tạo tumbling window một giờ.</li>
+            </ul>
+            <div class="info-box warn"><span><strong>Production gaps:</strong> checkpointing có bật nhưng chưa có durable checkpoint storage, savepoint/restart strategy/state backend production; không có DLQ; DB credentials hardcoded; sink Postgres có thể thành bottleneck khi throughput tăng.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">EXT</span>
+          Tab group 5 - Extras Python
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2-extras-tabs">
+            <div class="tab active" onclick="switchTab('s2-extras-tabs','json')">JSON</div>
+            <div class="tab" onclick="switchTab('s2-extras-tabs','avro')">Avro</div>
+            <div class="tab" onclick="switchTab('s2-extras-tabs','faust')">Faust</div>
+            <div class="tab" onclick="switchTab('s2-extras-tabs','spark')">Spark</div>
+            <div class="tab" onclick="switchTab('s2-extras-tabs','redpanda')">Redpanda Spark</div>
+          </div>
+          <div class="tab-content active" id="s2-extras-tabs-json">
+            <table><thead><tr><th>File</th><th>Vai trò</th></tr></thead><tbody>
+              <tr><td><code>settings.py</code></td><td><code>INPUT_DATA_PATH='../resources/rides.csv'</code>, <code>BOOTSTRAP_SERVERS=['localhost:9092']</code>, topic <code>rides_json</code>.</td></tr>
+              <tr><td><code>ride.py</code></td><td>Model <code>Ride</code> parse CSV fields và <code>from_dict()</code> để deserialize JSON.</td></tr>
+              <tr><td><code>producer.py</code></td><td>Đọc CSV, serialize <code>json.dumps(x.__dict__, default=str)</code>, key là <code>pu_location_id</code>.</td></tr>
+              <tr><td><code>consumer.py</code></td><td>Subscribe topic, key deserializer int, value deserializer JSON -> <code>Ride.from_dict()</code>.</td></tr>
+            </tbody></table>
+            <p><strong>Flow:</strong> rides.csv -> JSON producer -> topic <code>rides_json</code> -> JSON consumer -> console output.</p>
+          </div>
+          <div class="tab-content" id="s2-extras-tabs-avro">
+            <table><thead><tr><th>File</th><th>Vai trò</th></tr></thead><tbody>
+              <tr><td><code>settings.py</code></td><td>Topic <code>rides_avro</code>, Schema Registry <code>http://localhost:8081</code>, key/value schema paths.</td></tr>
+              <tr><td><code>ride_record_key.py</code></td><td>Key record chứa <code>vendor_id</code> và converter dict.</td></tr>
+              <tr><td><code>ride_record.py</code></td><td>Value record gồm vendor/passenger/distance/payment/amount.</td></tr>
+              <tr><td><code>producer.py</code></td><td>Dùng <code>SchemaRegistryClient</code> và <code>AvroSerializer</code> cho key/value.</td></tr>
+              <tr><td><code>consumer.py</code></td><td>Dùng <code>AvroDeserializer</code> cho key/value, group <code>datatalkclubs.taxirides.avro.consumer.2</code>.</td></tr>
+            </tbody></table>
+            <p><strong>Flow:</strong> rides.csv -> Avro key/value producer -> topic <code>rides_avro</code> with schemas -> Avro consumer -> console output.</p>
+          </div>
+          <div class="tab-content" id="s2-extras-tabs-faust">
+            <table><thead><tr><th>File</th><th>Transform</th></tr></thead><tbody>
+              <tr><td><code>stream.py</code></td><td>Faust app đọc topic và process event stream.</td></tr>
+              <tr><td><code>branch_price.py</code></td><td>Branch theo giá tiền/chuyến.</td></tr>
+              <tr><td><code>stream_count_vendor_trips.py</code></td><td>Count trips theo vendor.</td></tr>
+              <tr><td><code>windowing.py</code></td><td>Windowing trong Faust.</td></tr>
+              <tr><td><code>producer_taxi_json.py</code>, <code>taxi_rides.py</code></td><td>Producer/model taxi JSON cho Faust examples.</td></tr>
+            </tbody></table>
+            <p><strong>Flow:</strong> taxi JSON producer -> Kafka topic -> Faust stream/table/window -> console hoặc downstream topic tùy script.</p>
+          </div>
+          <div class="tab-content" id="s2-extras-tabs-spark">
+            <table><thead><tr><th>File</th><th>Vai trò</th></tr></thead><tbody>
+              <tr><td><code>settings.py</code></td><td>Kafka bootstrap và topic settings.</td></tr>
+              <tr><td><code>producer.py</code> / <code>consumer.py</code></td><td>Ghi/đọc taxi rides qua Kafka.</td></tr>
+              <tr><td><code>streaming.py</code></td><td>Spark Structured Streaming đọc Kafka, parse JSON schema, transform stream.</td></tr>
+              <tr><td><code>spark-submit.sh</code></td><td>Submit job với package Kafka connector và checkpoint option.</td></tr>
+            </tbody></table>
+            <p><strong>Flow:</strong> producer -> Kafka -> Spark <code>readStream</code> -> transform dataframe -> sink/output mode.</p>
+          </div>
+          <div class="tab-content" id="s2-extras-tabs-redpanda">
+            <p>Nhóm <code>extras/python/streams-example/redpanda/</code> giữ cùng pattern Spark Structured Streaming nhưng broker là Redpanda. Docker Compose khởi động Redpanda, producer ghi rides, Spark job đọc stream qua Kafka API và checkpoint local.</p>
+            <p><strong>Flow:</strong> Redpanda docker compose -> producer -> Redpanda topic -> Spark streaming.py -> console/sink output.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">JAVA</span>
+          Tab group 6 - Java Kafka theory
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s2-java-tabs">
+            <div class="tab active" onclick="switchTab('s2-java-tabs','constants')">Constants</div>
+            <div class="tab" onclick="switchTab('s2-java-tabs','producers')">Producer/Consumer</div>
+            <div class="tab" onclick="switchTab('s2-java-tabs','streams')">Streams</div>
+            <div class="tab" onclick="switchTab('s2-java-tabs','tests')">Tests</div>
+          </div>
+          <div class="tab-content active" id="s2-java-tabs-constants">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>Topics.java / Secrets.java</span></div><div class="cmd-body">
+<pre><span class="kw">public class</span> <span class="fn">Topics</span> {
+    public static final String INPUT_RIDE_TOPIC = "rides";
+    public static final String INPUT_RIDE_LOCATION_TOPIC = "rides_location";
+    public static final String OUTPUT_TOPIC = "vendor_info";
+}
+
+<span class="kw">public class</span> <span class="fn">Secrets</span> {
+    public static final String KAFKA_CLUSTER_KEY = "REPLACE_WITH_YOUR_KAFKA_CLUSTER_KEY";
+    public static final String KAFKA_CLUSTER_SECRET = "REPLACE_WITH_YOUR_KAFKA_CLUSTER_SECRET";
+    public static final String SCHEMA_REGISTRY_KEY = "REPLACE_WITH_SCHEMA_REGISTRY_KEY";
+    public static final String SCHEMA_REGISTRY_SECRET = "REPLACE_WITH_SCHEMA_REGISTRY_SECRET";
+}</pre>
+            </div></div>
+            <p>Model classes <code>Ride</code>, <code>PickupLocation</code>, <code>VendorInfo</code> là payload cho JSON/Kafka Streams. <code>CustomSerdes.java</code> cung cấp serde JSON cho các model class này.</p>
+          </div>
+          <div class="tab-content" id="s2-java-tabs-producers">
+            <ul>
+              <li><code>JsonProducer.java</code> ghi ride JSON vào topic Kafka.</li>
+              <li><code>JsonProducerPickupLocation.java</code> ghi pickup location event để phục vụ join topology.</li>
+              <li><code>JsonConsumer.java</code> đọc JSON records từ Kafka.</li>
+              <li><code>AvroProducer.java</code> dùng generated Avro record và schema registry dependencies để minh họa Avro serialization.</li>
+            </ul>
+          </div>
+          <div class="tab-content" id="s2-java-tabs-streams">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>Kafka Streams topology snippets</span></div><div class="cmd-body">
+<pre><span class="comment">// JsonKStream.java</span>
+var ridesStream = streamsBuilder.stream("rides", Consumed.with(Serdes.String(), CustomSerdes.getSerde(Ride.class)));
+var puLocationCount = ridesStream.groupByKey().count().toStream();
+puLocationCount.to("rides-pulocation-count", Produced.with(Serdes.String(), Serdes.Long()));
+
+<span class="comment">// JsonKStreamJoins.java</span>
+KStream&lt;String, Ride&gt; rides = streamsBuilder.stream(Topics.INPUT_RIDE_TOPIC, Consumed.with(Serdes.String(), CustomSerdes.getSerde(Ride.class)));
+KStream&lt;String, PickupLocation&gt; pickupLocations = streamsBuilder.stream(Topics.INPUT_RIDE_LOCATION_TOPIC, Consumed.with(Serdes.String(), CustomSerdes.getSerde(PickupLocation.class)));
+var joined = rides.join(pickupLocationsKeyedOnPUId, valueJoiner, JoinWindows.ofTimeDifferenceAndGrace(Duration.ofMinutes(20), Duration.ofMinutes(5)), streamJoined);
+joined.filter((key, value) -&gt; value.isPresent()).mapValues(Optional::get).to(Topics.OUTPUT_TOPIC, Produced.with(Serdes.String(), CustomSerdes.getSerde(VendorInfo.class)));
+
+<span class="comment">// JsonKStreamWindow.java</span>
+var puLocationCount = ridesStream.groupByKey()
+    .windowedBy(TimeWindows.ofSizeAndGrace(Duration.ofSeconds(10), Duration.ofSeconds(5)))
+    .count().toStream();
+puLocationCount.to("rides-pulocation-window-count", Produced.with(windowSerde, Serdes.Long()));</pre>
+            </div></div>
+            <table>
+              <thead><tr><th>Topology</th><th>Source</th><th>Transform</th><th>Output</th></tr></thead>
+              <tbody>
+                <tr><td><code>JsonKStream</code></td><td><code>rides</code></td><td><code>groupByKey().count()</code></td><td><code>rides-pulocation-count</code></td></tr>
+                <tr><td><code>JsonKStreamJoins</code></td><td><code>rides</code> + <code>rides_location</code></td><td>selectKey, time-window join, filter Optional</td><td><code>vendor_info</code></td></tr>
+                <tr><td><code>JsonKStreamWindow</code></td><td><code>rides</code></td><td>10s time window + 5s grace</td><td><code>rides-pulocation-window-count</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="tab-content" id="s2-java-tabs-tests">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>TopologyTestDriver pattern</span></div><div class="cmd-body">
+<pre>props.setProperty(StreamsConfig.APPLICATION_ID_CONFIG, "testing_count_application");
+props.setProperty(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "dummy:1234");
+testDriver = new TopologyTestDriver(topology, props);
+inputTopic = testDriver.createInputTopic("rides", Serdes.String().serializer(), CustomSerdes.getSerde(Ride.class).serializer());
+outputTopic = testDriver.createOutputTopic("rides-pulocation-count", Serdes.String().deserializer(), Serdes.Long().deserializer());</pre>
+            </div></div>
+            <p><code>JsonKStreamTest.java</code> kiểm tra count theo key. <code>JsonKStreamJoinsTest.java</code> tạo input topics cho ride và pickup location rồi assert output <code>VendorInfo</code>. Vì dùng <code>TopologyTestDriver</code>, test chạy topology trong memory và không cần broker thật.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">DAG</span>
+          DAG / lineage diagram
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>lineage.txt</span></div><div class="cmd-body">
+<pre>producer.py
+  -&gt; topic rides
+  -&gt; consumer.py -&gt; console
+  -&gt; consumer_postgres.py -&gt; processed_events
+  -&gt; pass_through_job.py -&gt; processed_events
+  -&gt; aggregation_job.py -&gt; processed_events_aggregated
+
+producer_realtime.py
+  -&gt; topic rides with late events
+  -&gt; aggregation_job.py
+  -&gt; upsert processed_events_aggregated</pre>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">Q</span>
+          Quiz repo code
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item"><div class="quiz-q">Vì sao producer dùng <code>localhost:9092</code> còn Flink dùng <code>redpanda:29092</code>?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Producer chạy từ host nên dùng published port localhost; Flink chạy trong Docker network nên dùng service DNS redpanda và internal listener.')">A. Vì khác network namespace giữa host và Docker</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không phải do Python hay Java; đây là advertised listener/network routing.')">B. Vì Python chỉ hỗ trợ localhost</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Cả hai đều là Kafka protocol listener.')">C. Vì Flink không dùng Kafka protocol</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Nếu đổi topic name trong producer mà không đổi Flink source thì lỗi gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Flink vẫn subscribe topic cũ `rides`, nên không thấy event mới hoặc job/source có thể chờ dữ liệu mãi.')">A. Flink đọc topic cũ nên không nhận dữ liệu producer mới</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Đổi topic không tự sửa DDL trong Flink.')">B. Flink tự detect topic mới</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Postgres không quyết định Kafka topic.')">C. PostgreSQL tự tạo topic mới</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Vì sao <code>PRIMARY KEY NOT ENFORCED</code> quan trọng với JDBC upsert?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Aggregate result có thể cập nhật theo window/location; Flink cần khóa logic để phát upsert đúng row.')">A. Nó định nghĩa khóa upsert cho kết quả aggregate</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Nó không dùng để chọn Kafka partition trong job này.')">B. Nó chọn Kafka partition</div><div class="quiz-opt" onclick="answerQuiz(this,false,'NOT ENFORCED không có nghĩa là database tự validate mọi thứ.')">C. Nó ép PostgreSQL validate schema Kafka</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Consumer group khác nhau có đọc cùng dữ liệu không?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Mỗi group có committed offset riêng, nên `rides-console`, `rides-to-postgres` và Flink job có thể đọc cùng topic độc lập.')">A. Có, nếu mỗi group có offset riêng và retention còn dữ liệu</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Chỉ consumer trong cùng group mới chia partitions cho nhau.')">B. Không, Kafka chỉ cho một group đọc một topic</div><div class="quiz-opt" onclick="answerQuiz(this,false,'PostgreSQL không quản lý consumer group Kafka.')">C. Chỉ khi có PostgreSQL</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Watermark column lấy từ field nào?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'`event_timestamp` được compute từ `tpep_pickup_datetime` bằng `TO_TIMESTAMP_LTZ(..., 3)`.')">A. Từ <code>tpep_pickup_datetime</code> qua computed column <code>event_timestamp</code></div><div class="quiz-opt" onclick="answerQuiz(this,false,'total_amount dùng tính revenue, không làm event time.')">B. Từ <code>total_amount</code></div><div class="quiz-opt" onclick="answerQuiz(this,false,'PULocationID là grouping key, không phải timestamp.')">C. Từ <code>PULocationID</code></div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Java topology tests không cần broker thật vì sao?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'TopologyTestDriver chạy topology in-memory với input/output topics giả lập, nên bootstrap server chỉ là dummy.')">A. Vì <code>TopologyTestDriver</code> chạy topology trong memory</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Test vẫn kiểm tra logic stream, chỉ không cần broker thật.')">B. Vì tests không chạy topology</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Avro không phải lý do bỏ broker trong topology tests.')">C. Vì Avro tự thay Kafka broker</div></div><div class="quiz-explain"></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="s3" class="module section-content" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S3 · Hands-on</div>
+        <div class="module-title">Thực hành từng bước</div>
+        <div class="module-subtitle">Chạy pipeline theo đúng workshop: Redpanda -> Python producer/consumer -> PostgreSQL -> PyFlink pass-through -> PyFlink aggregation.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">SET</span>
+          Phần 1 - Setup môi trường
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="s3-setup-tabs">
+            <div class="tab active" onclick="switchTab('s3-setup-tabs','workshop')">Workshop chính</div>
+            <div class="tab" onclick="switchTab('s3-setup-tabs','full')">Full stack</div>
+            <div class="tab" onclick="switchTab('s3-setup-tabs','extras')">Extras Redpanda</div>
+          </div>
+
+          <div class="tab-content active" id="s3-setup-tabs-workshop">
+            <p><strong>Prerequisites:</strong> Docker, Docker Compose, <code>uv</code>, và SQL client như <code>pgcli</code>, DBeaver, pgAdmin hoặc DataGrip.</p>
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>setup-workshop.sh</span></div><div class="cmd-body">
+<pre><span class="kw">cd</span> data-engineering-zoomcamp/07-streaming/workshop
+uv sync
+docker compose up redpanda -d
+docker compose ps</pre>
+            </div></div>
+            <ul>
+              <li>Verify <code>docker compose ps</code> thấy service <code>redpanda</code> đang <code>Up</code>.</li>
+              <li>Verify port Kafka external <code>localhost:9092</code> available cho Python producer/consumer chạy từ host.</li>
+              <li>Redpanda container là broker Kafka-compatible duy nhất trong workshop.</li>
+            </ul>
+          </div>
+
+          <div class="tab-content" id="s3-setup-tabs-full">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>setup-full-stack.sh</span></div><div class="cmd-body">
+<pre><span class="kw">cd</span> data-engineering-zoomcamp/07-streaming/workshop
+docker compose up -d --build
+docker compose ps</pre>
+            </div></div>
+            <ul>
+              <li>Redpanda publish ports <code>9092</code>, <code>29092</code>, <code>8082</code>, <code>28082</code>.</li>
+              <li>Flink UI mở tại <code>http://localhost:8081</code>.</li>
+              <li>PostgreSQL publish port <code>5432</code>, user/password/database đều là <code>postgres</code>.</li>
+            </ul>
+            <div class="info-box note"><span><strong>Vai trò full stack:</strong> JobManager nhận job và quản lý checkpoint; TaskManager chạy task; Redpanda giữ topic; PostgreSQL là sink để query kết quả.</span></div>
+          </div>
+
+          <div class="tab-content" id="s3-setup-tabs-extras">
+            <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>extras-redpanda.sh</span></div><div class="cmd-body">
+<pre><span class="kw">cd</span> data-engineering-zoomcamp/07-streaming/extras/python/redpanda_example
+docker compose up -d
+
+<span class="comment"># optional rpk alias from README</span>
+alias rpk="docker exec -ti redpanda-1 rpk"
+rpk version
+
+<span class="comment"># terminal 1</span>
+python -m consumer.py
+
+<span class="comment"># terminal 2</span>
+python -m producer.py</pre>
+            </div></div>
+            <p>Redpanda Console của extras mở ở <code>http://localhost:8080</code>. README dùng container <code>redpanda-1</code> và Kafka listener ngoài Docker <code>localhost:9092</code>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">P/C</span>
+          Phần 2 - Producer/Consumer cơ bản
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ol>
+            <li>Đọc <code>src/models.py</code>. <code>Ride</code> gồm <code>PULocationID</code>, <code>DOLocationID</code>, <code>trip_distance</code>, <code>total_amount</code>, <code>tpep_pickup_datetime</code> dạng epoch milliseconds.</li>
+            <li>Chạy producer để đọc taxi parquet và ghi topic <code>rides</code>.</li>
+            <li>Mở terminal khác và chạy consumer console.</li>
+            <li>Verify consumer nhận 10 messages rồi dừng theo logic demo.</li>
+          </ol>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>producer-consumer.sh</span></div><div class="cmd-body">
+<pre><span class="comment"># terminal 1</span>
+uv run python src/producers/producer.py
+
+<span class="comment"># terminal 2</span>
+uv run python src/consumers/consumer.py</pre>
+          </div></div>
+          <table>
+            <thead><tr><th>Điểm cần hiểu</th><th>Giải thích</th></tr></thead>
+            <tbody>
+              <tr><td>Topic auto-created</td><td>README workshop ghi broker auto-creates topic <code>rides</code> khi producer gửi record đầu tiên.</td></tr>
+              <tr><td><code>auto_offset_reset='earliest'</code></td><td>Consumer group mới đọc từ đầu topic nếu chưa có committed offset.</td></tr>
+              <tr><td>Consumer group</td><td><code>rides-console</code> có offset riêng; restart cùng group sẽ tiếp tục từ offset đã commit.</td></tr>
+              <tr><td><code>producer.flush()</code></td><td>Chờ các record buffered được gửi xong trước khi script kết thúc.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">PG</span>
+          Phần 3 - Ghi events vào PostgreSQL bằng Python consumer
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>postgres-consumer.sh</span></div><div class="cmd-body">
+<pre>docker compose up postgres -d
+
+<span class="comment"># option A</span>
+uvx pgcli -h localhost -p 5432 -U postgres -d postgres
+
+<span class="comment"># option B</span>
+docker compose exec postgres psql -U postgres -d postgres</pre>
+          </div></div>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>processed_events.sql</span></div><div class="cmd-body">
+<pre><span class="kw">CREATE TABLE</span> processed_events (
+    PULocationID INTEGER,
+    DOLocationID INTEGER,
+    trip_distance DOUBLE PRECISION,
+    total_amount DOUBLE PRECISION,
+    pickup_datetime TIMESTAMP
+);
+
+<span class="kw">SELECT</span> count(*) <span class="kw">FROM</span> processed_events;</pre>
+          </div></div>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>run-python-postgres-consumer.sh</span></div><div class="cmd-body">
+<pre>uv run python src/consumers/consumer_postgres.py</pre>
+          </div></div>
+          <div class="info-box note"><span><strong>Trade-off:</strong> Python consumer ổn cho pass-through đơn giản: đọc một message, insert một row. Nó yếu khi cần window/state/late events/checkpointing/parallelism vì bạn phải tự implement toàn bộ logic mà Flink đã có sẵn.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">RUN</span>
+          Phần 4 - Submit PyFlink pass-through job
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ol>
+            <li>Start full stack bằng <code>docker compose up -d --build</code>.</li>
+            <li>Tạo bảng <code>processed_events</code> như phần 3.</li>
+            <li>Submit job vào JobManager.</li>
+            <li>Chạy producer.</li>
+            <li>Kiểm tra Flink UI tại <code>http://localhost:8081</code> và query PostgreSQL.</li>
+          </ol>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>submit-pass-through.sh</span></div><div class="cmd-body">
+<pre>docker compose up -d --build
+
+docker compose exec jobmanager ./bin/flink run \
+  -py /opt/src/job/pass_through_job.py \
+  --pyFiles /opt/src -d
+
+# Same command as one line for terminals that do not use shell continuations:
+docker compose exec jobmanager ./bin/flink run -py /opt/src/job/pass_through_job.py --pyFiles /opt/src -d
+
+uv run python src/producers/producer.py
+
+docker compose exec postgres psql -U postgres -d postgres -c "SELECT count(*) FROM processed_events;"</pre>
+          </div></div>
+          <ul>
+            <li>JobManager nhận job, expose UI và điều phối checkpoint.</li>
+            <li>TaskManager chạy các task thực tế.</li>
+            <li>Kafka source trong job đọc topic <code>rides</code> qua <code>redpanda:29092</code>.</li>
+            <li>JDBC sink ghi vào <code>processed_events</code>.</li>
+            <li>Pass-through job dùng startup mode <code>latest-offset</code>, nên dữ liệu đã gửi trước lúc job start có thể không được đọc.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">WIN</span>
+          Phần 5 - Submit aggregation job với tumbling window
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>processed_events_aggregated.sql</span></div><div class="cmd-body">
+<pre><span class="kw">CREATE TABLE</span> processed_events_aggregated (
+    window_start TIMESTAMP,
+    PULocationID INTEGER,
+    num_trips BIGINT,
+    total_revenue DOUBLE PRECISION,
+    PRIMARY KEY (window_start, PULocationID)
+);</pre>
+          </div></div>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>submit-aggregation.sh</span></div><div class="cmd-body">
+<pre>docker compose exec jobmanager ./bin/flink run \
+  -py /opt/src/job/aggregation_job.py \
+  --pyFiles /opt/src -d
+
+# Same command as one line for terminals that do not use shell continuations:
+docker compose exec jobmanager ./bin/flink run -py /opt/src/job/aggregation_job.py --pyFiles /opt/src -d
+
+uv run python src/producers/producer.py
+
+docker compose exec postgres psql -U postgres -d postgres -c "SELECT window_start, count(*) as locations, sum(num_trips) as total_trips, round(sum(total_revenue)::numeric, 2) as revenue FROM processed_events_aggregated GROUP BY window_start ORDER BY window_start;"</pre>
+          </div></div>
+          <p>Để thấy late events và upsert rõ hơn, chạy realtime producer rồi watch query:</p>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>late-events-watch.sh</span></div><div class="cmd-body">
+<pre><span class="comment"># terminal 1</span>
+uv run python src/producers/producer_realtime.py
+
+<span class="comment"># terminal 2</span>
+watch -n 1 'PGPASSWORD=postgres docker compose exec postgres psql -U postgres -d postgres -c "SELECT window_start, sum(num_trips) as trips, round(sum(total_revenue)::numeric, 2) as revenue FROM processed_events_aggregated GROUP BY window_start ORDER BY window_start;"'</pre>
+          </div></div>
+          <table>
+            <thead><tr><th>Concept</th><th>Trong job này</th></tr></thead>
+            <tbody>
+              <tr><td>Watermark</td><td><code>event_timestamp - INTERVAL '5' SECOND</code>: Flink chờ event trễ trong khoảng 5 giây trước khi đóng window.</td></tr>
+              <tr><td>Late events</td><td><code>producer_realtime.py</code> tạo khoảng 20% event có timestamp 3-10 giây trong quá khứ.</td></tr>
+              <tr><td>Upsert behavior</td><td>Khi aggregate cho cùng <code>window_start</code> + <code>PULocationID</code> đổi, sink update row thay vì append duplicate.</td></tr>
+              <tr><td>Primary key</td><td>Primary key trong PostgreSQL và <code>PRIMARY KEY (...) NOT ENFORCED</code> trong Flink DDL là khóa logic để JDBC sink upsert.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">LAB</span>
+          Phần 6 - Practice tasks
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="practice-task">
+            <div class="practice-task-header">Task 1 (Beginner) - Thêm key_serializer cho producer</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Sửa producer để key message theo <code>PULocationID</code>.</p>
+              <p><strong>Gợi ý:</strong> Kafka partitioning dùng key để giữ cùng pickup location vào cùng partition.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>producer-key.py</span></div><div class="cmd-body">
+<pre>producer = KafkaProducer(
+    bootstrap_servers=[server],
+    key_serializer=lambda key: str(key).encode('utf-8'),
+    value_serializer=ride_serializer
+)
+
+producer.send(topic_name, key=ride.PULocationID, value=ride)</pre>
+                </div></div>
+                <p>Trade-off: key giúp ordering theo pickup location, nhưng nếu một location quá hot có thể gây skew vào một partition.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">Task 2 (Intermediate) - Aggregate theo DOLocationID</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Tạo Flink job mới aggregate theo <code>DOLocationID</code> thay vì <code>PULocationID</code>.</p>
+              <p><strong>Gợi ý:</strong> Copy <code>aggregation_job.py</code>, đổi sink table và <code>GROUP BY</code>.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>aggregation_by_dropoff.sql</span></div><div class="cmd-body">
+<pre>CREATE TABLE processed_events_aggregated_do (
+    window_start TIMESTAMP(3),
+    DOLocationID INT,
+    num_trips BIGINT,
+    total_revenue DOUBLE,
+    PRIMARY KEY (window_start, DOLocationID) NOT ENFORCED
+) WITH (
+    'connector' = 'jdbc',
+    'url' = 'jdbc:postgresql://postgres:5432/postgres',
+    'table-name' = 'processed_events_aggregated_do',
+    'username' = 'postgres',
+    'password' = 'postgres',
+    'driver' = 'org.postgresql.Driver'
+);
+
+INSERT INTO processed_events_aggregated_do
+SELECT window_start, DOLocationID, COUNT(*) AS num_trips, SUM(total_amount) AS total_revenue
+FROM TABLE(
+    TUMBLE(TABLE events, DESCRIPTOR(event_timestamp), INTERVAL '1' HOUR)
+)
+GROUP BY window_start, DOLocationID;</pre>
+                </div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">Task 3 (Intermediate) - Watermark 1 phút</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Tăng watermark tolerance từ 5 giây lên 1 phút và giải thích effect.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>watermark-change.sql</span></div><div class="cmd-body">
+<pre>WATERMARK for event_timestamp as event_timestamp - INTERVAL '1' MINUTE</pre>
+                </div></div>
+                <p>Effect: kết quả window publish chậm hơn, nhưng có cơ hội include nhiều event trễ hơn. Đây là trade-off latency vs completeness.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">Task 4 (Advanced) - Thiết kế DLQ cho JSON parse lỗi</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Thêm DLQ topic cho message lỗi JSON parse.</p>
+              <p><strong>Gợi ý:</strong> Workshop Table API JSON source không xử lý DLQ sẵn; cân nhắc consumer preprocessing hoặc DataStream side output.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>dlq-design.txt</span></div><div class="cmd-body">
+<pre>Option A: preprocessing consumer
+raw topic rides_raw
+  -> Python validator consumer
+       valid JSON/schema -> topic rides
+       invalid payload + error + timestamp -> topic rides_dlq
+  -> Flink Table API reads topic rides
+
+Option B: Flink DataStream
+KafkaSource bytes
+  -> parse function
+       success -> main output Ride
+       failure -> side output DLQEvent
+  -> KafkaSink rides_dlq for side output</pre>
+                </div></div>
+                <p>Production note: DLQ event nên giữ raw payload, exception class/message, source topic/partition/offset và ingest timestamp.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-task">
+            <div class="practice-task-header">Task 5 (Advanced) - Chuyển Postgres credentials sang env vars</div>
+            <div class="practice-task-body">
+              <p><strong>Đề:</strong> Không hardcode <code>postgres/postgres</code> trong Python và Flink DDL.</p>
+              <button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button>
+              <div class="solution-box">
+                <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>env-pattern.yaml</span></div><div class="cmd-body">
+<pre>environment:
+  - POSTGRES_DB=postgres
+  - POSTGRES_USER=${POSTGRES_USER}
+  - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}</pre>
+                </div></div>
+                <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>python-flink-env.py</span></div><div class="cmd-body">
+<pre>import os
+
+pg_user = os.environ["POSTGRES_USER"]
+pg_password = os.environ["POSTGRES_PASSWORD"]
+
+sink_ddl = f"""
+WITH (
+    'connector' = 'jdbc',
+    'url' = 'jdbc:postgresql://postgres:5432/postgres',
+    'username' = '{pg_user}',
+    'password' = '{pg_password}'
+)
+"""</pre>
+                </div></div>
+                <div class="info-box danger"><span><strong>Không log secrets:</strong> Env vars tốt hơn hardcode trong repo, nhưng production nên dùng secret manager/Kubernetes Secret và không print DDL chứa password.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">BUG</span>
+          Phần 7 - Cố tình phá
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>#</th><th>Kịch bản</th><th>Triệu chứng</th><th>Nguyên nhân</th><th>Debug steps</th><th>Fix</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Consumer không thấy message</td><td>Producer gửi thành công, consumer đứng im.</td><td>Consumer group đã commit offset cuối topic.</td><td>Đổi <code>group_id</code>; kiểm tra group bằng <code>rpk group list</code>; gửi message mới.</td><td>Dùng group mới, reset offset, hoặc hiểu rằng <code>earliest</code> chỉ áp dụng khi group chưa có offset.</td></tr>
+              <tr><td>2</td><td>Flink không connect Kafka</td><td>Job fail/không đọc source.</td><td>Dùng <code>localhost:9092</code> trong container thay vì <code>redpanda:29092</code>.</td><td>Xem exception trong Flink UI/log; kiểm tra DDL source; exec vào container ping service name.</td><td>Trong Flink DDL dùng <code>'properties.bootstrap.servers' = 'redpanda:29092'</code>.</td></tr>
+              <tr><td>3</td><td>PostgreSQL sink fail</td><td>Job fail khi insert hoặc JDBC báo relation/table missing.</td><td>Chưa tạo table sink trong PostgreSQL.</td><td><code>docker compose exec postgres psql -U postgres -d postgres -c "\\dt"</code>; xem Flink task exception.</td><td>Tạo <code>processed_events</code> hoặc <code>processed_events_aggregated</code> đúng schema trước khi chạy job.</td></tr>
+              <tr><td>4</td><td>Aggregation không upsert</td><td>Late updates tạo duplicate hoặc connector không nhận changelog.</td><td>Thiếu primary key trong aggregation sink.</td><td>Đọc sink DDL; kiểm tra table PostgreSQL có primary key; xem Flink planner error.</td><td>Thêm <code>PRIMARY KEY (window_start, PULocationID) NOT ENFORCED</code> trong Flink DDL và primary key trong PostgreSQL.</td></tr>
+              <tr><td>5</td><td>Port bị chiếm</td><td>Compose fail bind <code>9092</code> hoặc <code>5432</code>.</td><td>Process/container khác đang dùng port.</td><td><code>docker compose ps</code>; kiểm tra service local; xem Docker error bind address already in use.</td><td>Dừng process/container đang chiếm port hoặc đổi port mapping trong Compose.</td></tr>
+              <tr><td>6</td><td>Thiếu connector JAR</td><td>Flink báo không tìm thấy connector <code>kafka</code> hoặc <code>jdbc</code>.</td><td>Image chưa build đúng hoặc JAR download fail.</td><td><code>docker compose exec jobmanager ls /opt/flink/lib</code>; rebuild image; xem build log.</td><td><code>docker compose build --no-cache jobmanager</code>, đảm bảo Kafka/JDBC/Postgres jars có trong <code>/opt/flink/lib</code>.</td></tr>
+              <tr><td>7</td><td>Job không đọc dữ liệu cũ</td><td>Producer đã chạy trước, Flink job mới không có output.</td><td><code>scan.startup.mode='latest-offset'</code>.</td><td>Đọc source DDL; gửi thêm event mới; so sánh với <code>earliest-offset</code>.</td><td>Dùng <code>earliest-offset</code> khi cần replay dữ liệu cũ; dùng <code>latest-offset</code> cho realtime-only.</td></tr>
+              <tr><td>8</td><td>Window sai thời gian</td><td>Window rơi vào năm/giờ bất thường hoặc không đóng như kỳ vọng.</td><td>Timestamp seconds vs milliseconds sai unit.</td><td>Query sample payload; kiểm tra <code>TO_TIMESTAMP_LTZ(tpep_pickup_datetime, 3)</code>; so giá trị epoch.</td><td>Đảm bảo producer dùng <code>timestamp() * 1000</code>; nếu source là seconds thì dùng precision phù hợp hoặc multiply sang milliseconds.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box tip"><span><strong>Debug order:</strong> container status -> port/listener -> topic/offset -> schema/payload -> Flink UI/logs -> sink table/schema -> credentials.</span></div>
+        </div>
+      </div>
+    </div>
+    <div id="s4" class="module section-content" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S4 · Production Readiness</div>
+        <div class="module-title">Production Readiness</div>
+        <div class="module-subtitle">8 câu hỏi senior map trực tiếp vào `workshop/docker-compose.yml`, Python producer/consumer, PyFlink jobs, Avro extras và Java Kafka Streams.</div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">MAP</span>Repo map production gaps<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <table><thead><tr><th>File thật trong repo</th><th>Hiện trạng</th><th>Gap production</th></tr></thead><tbody>
+            <tr><td><code>workshop/docker-compose.yml</code></td><td>Single Redpanda broker, listeners <code>localhost:9092</code>/<code>redpanda:29092</code>, Postgres <code>postgres/postgres</code>.</td><td>Không HA, plaintext, secret hardcoded, thiếu volume/healthcheck production.</td></tr>
+            <tr><td><code>workshop/src/producers/producer.py</code></td><td>JSON producer gửi topic <code>rides</code>, không key, không idempotence.</td><td>Retry/replay dễ duplicate, ordering không deterministic.</td></tr>
+            <tr><td><code>workshop/src/consumers/consumer_postgres.py</code></td><td>Insert Postgres bằng credential hardcoded.</td><td>Replay duplicate, leak secret, thiếu retry/backoff/DLQ.</td></tr>
+            <tr><td><code>workshop/src/job/pass_through_job.py</code></td><td><code>latest-offset</code>, checkpoint 10 giây.</td><td>Deploy job mới có thể bỏ qua backlog nếu không restore state.</td></tr>
+            <tr><td><code>workshop/src/job/aggregation_job.py</code></td><td><code>earliest-offset</code>, watermark 5 giây, JDBC upsert theo <code>(window_start, PULocationID)</code>.</td><td>Replay, late event, checkpoint durability và sink correctness cần runbook.</td></tr>
+            <tr><td><code>extras/python/avro_example/*</code></td><td>Có Schema Registry + Avro producer/consumer.</td><td>Chưa tích hợp vào workshop JSON flow.</td></tr>
+            <tr><td><code>theory/java/kafka_examples/*</code></td><td>Có Kafka Streams, Avro compatibility, topology tests.</td><td>Là nền để bổ sung contract/topology testing.</td></tr>
+          </tbody></table>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>production-flow.txt</span></div><div class="cmd-body"><pre>producer.py / producer_realtime.py
+  -> Redpanda topic rides
+  -> Flink events source table
+  -> tumbling aggregation by PULocationID
+  -> JDBC upsert processed_events_aggregated
+  -> dashboard / analyst query
+
+Production control planes:
+  secrets, TLS/SASL, schema registry, durable checkpoints, savepoints,
+  metrics, DLQ, replay runbook, least-privilege sink user</pre></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">Q1</span>SECURITY - Broker và database đang plaintext/hardcoded<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Context thực tế:</strong> Compose dùng <code>localhost:9092</code>, <code>redpanda:29092</code> và DB <code>postgres/postgres</code>; PyFlink JDBC DDL và <code>consumer_postgres.py</code> cũng hardcode credential.</p>
+          <p><strong>Risk:</strong> plaintext traffic bị sniff, secret nằm trong repo/log, superuser DB bị dùng chung, khó audit service nào ghi dữ liệu.</p>
+          <p><strong>Cách debug:</strong> chạy <code>rg "postgres|localhost:9092|redpanda:29092|password"</code>; xem listener trong Compose; kiểm tra Flink log có in DDL chứa password; query <code>\du</code> trong Postgres.</p>
+          <p><strong>Cách fix:</strong> env vars/Docker secrets/Kubernetes Secret, Kafka <code>SASL_SSL</code>, DB user ít quyền chỉ được upsert sink tables, rotate secret và không log DDL có password.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>compose-env-and-python.py</span></div><div class="cmd-body"><pre>services:
+  postgres:
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_APP_USER}
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_app_password
+    secrets:
+      - postgres_app_password
+
+secrets:
+  postgres_app_password:
+    file: ./secrets/postgres_app_password.txt
+
+import os
+conn = psycopg2.connect(
+    host=os.environ.get("POSTGRES_HOST", "localhost"),
+    port=int(os.environ.get("POSTGRES_PORT", "5432")),
+    database=os.environ["POSTGRES_DB"],
+    user=os.environ["POSTGRES_APP_USER"],
+    password=os.environ["POSTGRES_APP_PASSWORD"],
+)</pre></div></div>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>kafka-sasl-ssl.properties</span></div><div class="cmd-body"><pre>security.protocol=SASL_SSL
+sasl.mechanism=SCRAM-SHA-512
+sasl.username=${KAFKA_APP_USER}
+sasl.password=${KAFKA_APP_PASSWORD}
+ssl.truststore.location=/etc/secrets/kafka.truststore.jks</pre></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">Q2</span>DELIVERY SEMANTICS - At-least-once vs exactly-once<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Context thực tế:</strong> <code>producer.py</code> không bật idempotence; Flink bật checkpoint nhưng chưa có durable checkpoint storage; JDBC upsert đúng chỉ khi Postgres có primary key khớp Flink DDL.</p>
+          <p><strong>Risk:</strong> producer retry tạo duplicate, Flink replay offset sau fail, insert non-idempotent làm revenue tăng sai. Exactly-once end-to-end không tự có chỉ vì gọi <code>enable_checkpointing</code>.</p>
+          <p><strong>Cách debug:</strong> gửi cùng batch hai lần, count duplicate theo event id; xem checkpoint completed/failed trong Flink UI; kiểm tra primary key Postgres; inspect effective producer config.</p>
+          <p><strong>Cách fix:</strong> deterministic key/event_id, idempotent producer, durable checkpoint storage, transactional sink khi có thể; với JDBC dùng upsert idempotent và primary key thật.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>idempotent-producer.py</span></div><div class="cmd-body"><pre>producer = KafkaProducer(
+    bootstrap_servers=os.environ["KAFKA_BOOTSTRAP_SERVERS"].split(","),
+    key_serializer=lambda k: k.encode("utf-8"),
+    value_serializer=ride_serializer,
+    acks="all",
+    retries=10,
+    enable_idempotence=True,
+    max_in_flight_requests_per_connection=5,
+)
+
+event_key = f"{ride.PULocationID}:{ride.tpep_pickup_datetime}"
+producer.send("rides", key=event_key, value=ride)</pre></div></div>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>postgres-upsert.sql</span></div><div class="cmd-body"><pre>CREATE TABLE processed_events_aggregated (
+  window_start TIMESTAMP NOT NULL,
+  pulocationid INTEGER NOT NULL,
+  num_trips BIGINT NOT NULL,
+  total_revenue DOUBLE PRECISION NOT NULL,
+  PRIMARY KEY (window_start, pulocationid)
+);</pre></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">Q3</span>OFFSET & REPROCESSING<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Context thực tế:</strong> <code>pass_through_job.py</code> dùng <code>latest-offset</code>; <code>aggregation_job.py</code> dùng <code>earliest-offset</code>. Startup mode chỉ quan trọng khi job không restore checkpoint/savepoint.</p>
+          <p><strong>Risk:</strong> đổi job identity với <code>earliest-offset</code> có thể replay toàn topic vào sink production; <code>latest-offset</code> có thể bỏ backlog khi submit job mới.</p>
+          <p><strong>Cách debug:</strong> xem submission có <code>--fromSavepoint</code> không; kiểm tra Flink checkpoints; dùng <code>rpk group describe</code>; so row count/totals trước và sau deploy.</p>
+          <p><strong>Cách fix:</strong> upgrade stateful job bằng stop-with-savepoint rồi restore; backfill chạy job/table riêng; deployment policy cấm đổi group/job id tùy tiện.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>reprocessing-runbook.txt</span></div><div class="cmd-body"><pre>Normal deploy:
+1. Stop current Flink job with savepoint: s3://flink-savepoints/rides-agg/...
+2. Submit new artifact with --fromSavepoint that path
+3. Verify restored state, checkpoint completion, Kafka lag decreasing
+
+Backfill:
+1. Start separate job with earliest-offset and fixed date filter
+2. Write to processed_events_aggregated_backfill
+3. Reconcile totals before merge/swap</pre></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">Q4</span>SCHEMA EVOLUTION<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Context thực tế:</strong> workshop chính dùng JSON không Schema Registry; Avro extras có <code>SchemaRegistryClient</code>; Java theory có <code>rides_compatible.avsc</code> và <code>rides_non_compatible.avsc</code>.</p>
+          <p><strong>Risk:</strong> rename/type change làm Flink JSON source fail hoặc đọc null; producer release phá consumer cũ; CI không bắt contract break.</p>
+          <p><strong>Cách debug:</strong> sample raw message, validate với schema expected, so schema id/version producer với Flink DDL, chạy contract test trong CI.</p>
+          <p><strong>Cách fix:</strong> tích hợp Schema Registry, compatibility mode, subject naming strategy, schema contract tests; migrate JSON workshop flow sang Avro/Protobuf khi production.</p>
+          <table><thead><tr><th>Schema change</th><th>Decision</th><th>Lý do</th></tr></thead><tbody>
+            <tr><td>Thêm <code>payment_type</code> có default <code>"unknown"</code></td><td>Allow</td><td>Consumer mới đọc event cũ nhờ default; consumer cũ bỏ qua field mới.</td></tr>
+            <tr><td>Đổi <code>total_amount</code> double -> string</td><td>Block</td><td><code>SUM(total_amount)</code> trong <code>aggregation_job.py</code> cần numeric.</td></tr>
+            <tr><td>Rename <code>PULocationID</code> không alias</td><td>Block</td><td>Flink DDL và upsert key đang phụ thuộc field cũ.</td></tr>
+          </tbody></table>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>schema-contract-test.sh</span></div><div class="cmd-body"><pre>curl -s -X POST \
+  "$SCHEMA_REGISTRY_URL/compatibility/subjects/rides-value/versions/latest" \
+  -H "Content-Type: application/vnd.schemaregistry.v1+json" \
+  --data "{\"schema\": $(jq -Rs . &lt; schemas/rides_value.avsc)}"</pre></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">Q5</span>LATE EVENTS & WATERMARK POLICY<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Context thực tế:</strong> <code>aggregation_job.py</code> dùng watermark 5 giây; <code>producer_realtime.py</code> sinh late events 3-10 giây để quan sát update/drop.</p>
+          <p><strong>Risk:</strong> 5 giây là arbitrary. Event mobile/network trễ 1-2 phút sẽ bị thiếu khỏi revenue; watermark quá lớn làm dashboard chậm và state phình.</p>
+          <p><strong>Cách debug:</strong> log <code>event_time</code>, <code>processing_time</code>; tính distribution lateness; xem late/drop metrics; reconcile realtime với batch cuối ngày.</p>
+          <p><strong>Cách fix:</strong> chọn watermark theo percentile lateness và SLA; dùng allowed lateness/side output; upsert sink để update window đã publish khi late event còn hợp lệ.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>watermark-policy.sql</span></div><div class="cmd-body"><pre>-- Nếu p99 lateness là 45 giây và SLA dashboard cho phép trễ 1 phút:
+WATERMARK for event_timestamp as event_timestamp - INTERVAL '60' SECOND
+
+-- Event trễ hơn policy đi rides_dlq hoặc quarantine table,
+-- không im lặng biến mất khỏi doanh thu.</pre></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">Q6</span>BACKPRESSURE & SCALING<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Context thực tế:</strong> một Redpanda broker; Flink task slots 15, parallelism 3; topic partition count/key chưa thiết kế; JDBC Postgres sink có thể là bottleneck.</p>
+          <p><strong>Risk:</strong> single broker fail là downtime; topic 1 partition làm parallelism 3 không giúp source; hot <code>PULocationID</code> tạo skew; sink DB nghẽn làm checkpoint chậm.</p>
+          <p><strong>Cách debug:</strong> Flink UI BackPressure, busy/backpressured time, checkpoint duration; topic partition lag; broker CPU/disk; Postgres locks/WAL/slow query.</p>
+          <p><strong>Cách fix:</strong> partition count theo throughput, key cân bằng nhưng giữ ordering cần thiết, broker RF>=3, consumer/Flink parallelism <= partitions, batch/upsert sink hoặc OLAP sink nếu Postgres không đủ.</p>
+          <table><thead><tr><th>Layer</th><th>Scale lever</th><th>Signal</th></tr></thead><tbody>
+            <tr><td>Broker</td><td>Partitions, brokers, replication, retention.</td><td>Per-partition lag, disk, CPU, under-replicated partitions.</td></tr>
+            <tr><td>Flink</td><td>Parallelism, slots, state backend, checkpoint tuning.</td><td>Backpressure, checkpoint duration, restart count.</td></tr>
+            <tr><td>Postgres</td><td>Batch size, indexes, upsert key, connection pool.</td><td>TPS, locks, WAL, slow queries.</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">Q7</span>OBSERVABILITY<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Context thực tế:</strong> repo expose Flink UI <code>8081</code> nhưng chưa có Kafka lag dashboard, Flink metrics reporter, DB sink metrics, structured logs. Producer chỉ print event.</p>
+          <p><strong>Risk:</strong> chỉ phát hiện khi dashboard sai; không biết nghẽn ở producer, broker, Flink hay Postgres; không có offset/run_id để replay incident.</p>
+          <p><strong>Cách debug:</strong> trace theo flow producer rate -> broker append rate -> consumer lag -> Flink throughput/checkpoint/backpressure -> sink success/error -> dashboard freshness.</p>
+          <p><strong>Cách fix:</strong> Prometheus/Grafana, Redpanda Console/Kafka exporter, Flink Prometheus reporter, Postgres exporter, alert lag/checkpoint/DLQ/sink/freshness.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>structured-log.json</span></div><div class="cmd-body"><pre>{
+  "run_id": "rides-agg-2026-05-15T08:00Z",
+  "topic": "rides",
+  "partition": 2,
+  "offset": 1048221,
+  "event_time": "2026-05-15T07:59:58.120Z",
+  "processing_time": "2026-05-15T08:00:03.812Z",
+  "sink_status": "upsert_ok"
+}</pre></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">Q8</span>DATA QUALITY & DLQ<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Context thực tế:</strong> Flink JSON source kỳ vọng numeric/timestamp hợp lệ. Demo parquet sạch, nhưng production có JSON parse error, timestamp sai unit, null ID, negative amount.</p>
+          <p><strong>Risk:</strong> poison message làm job fail loop; null key/upsert sai; amount âm làm revenue sai; event quá trễ mất audit.</p>
+          <p><strong>Cách debug:</strong> lưu raw payload + parse error, đếm invalid theo rule, query DLQ/quarantine theo source offset, replay offset range vào staging topic.</p>
+          <p><strong>Cách fix:</strong> validation layer trước Table API hoặc DataStream parse function có side output; DLQ topic giữ raw bytes + exception + metadata; quarantine table và replay procedure.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>dlq-design.txt</span></div><div class="cmd-body"><pre>KafkaSource(bytes from rides_raw)
+  -> ParseAndValidateRide
+       valid -> rides_valid
+       invalid -> rides_dlq + rides_quarantine
+
+DLQEvent = {
+  raw_payload, error_type, error_message,
+  topic, partition, offset, ingest_time, replay_status
+}
+
+Rules:
+  PULocationID is not null
+  DOLocationID is not null
+  total_amount &gt;= 0
+  tpep_pickup_datetime within accepted clock skew</pre></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="s5" class="module section-content" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S5 · Advanced Knowledge</div>
+        <div class="module-title">Kiến thức nâng cao</div>
+        <div class="module-subtitle">Kafka/Redpanda, Flink, Kafka Streams, Spark Structured Streaming và design scenario cho realtime taxi revenue dashboard.</div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">KFK</span>Phần 1 - Kafka/Redpanda internals<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Map với repo:</strong> Redpanda trong <code>workshop/docker-compose.yml</code> là Kafka-compatible broker, expose <code>localhost:9092</code> cho Python và <code>redpanda:29092</code> cho Flink.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>partition-model.txt</span></div><div class="cmd-body"><pre>topic rides
+  partition 0 leader broker-1 replicas [1,2,3] ISR [1,2,3]
+  partition 1 leader broker-2 replicas [2,3,1] ISR [2,3]
+  partition 2 leader broker-3 replicas [3,1,2] ISR [3,1,2]
+
+producer key -> partition -> leader append log segment
+             -> followers replicate -> consumer group reads assigned partitions</pre></div></div>
+          <ul>
+            <li><strong>Partition leadership:</strong> mỗi partition có leader nhận read/write; follower replicate; leader fail thì controller chọn leader mới từ ISR.</li>
+            <li><strong>Replication factor, ISR:</strong> RF=3 chịu broker failure; ISR là replicas đang bắt kịp leader.</li>
+            <li><strong>Controller/KRaft/Raft:</strong> Kafka hiện đại dùng KRaft; Redpanda dùng Raft nội bộ.</li>
+            <li><strong>Log segment, retention, compaction:</strong> partition là append-only log chia segment; retention xóa segment cũ; compaction giữ latest value theo key cho changelog/KTable.</li>
+            <li><strong>Producer:</strong> <code>acks</code>, retries, <code>linger.ms</code>, batching, compression, idempotence quyết định throughput/latency/durability.</li>
+            <li><strong>Consumer group:</strong> rebalance khi member đổi; cooperative rebalance giảm pause; static membership giảm rebalance khi pod restart nhanh.</li>
+          </ul>
+          <table><thead><tr><th>Goal</th><th>Config bias</th><th>Trade-off</th><th>Repo impact</th></tr></thead><tbody>
+            <tr><td>Throughput</td><td>Batch lớn, <code>linger.ms</code> cao, compression zstd/lz4.</td><td>Latency tăng.</td><td>Producer gửi taxi events hiệu quả hơn.</td></tr>
+            <tr><td>Latency</td><td><code>linger.ms=0..5</code>, batch nhỏ.</td><td>CPU/network overhead tăng.</td><td>Dashboard nhanh hơn.</td></tr>
+            <tr><td>Durability</td><td><code>acks=all</code>, RF=3, min ISR=2, idempotence.</td><td>Write latency và cost tăng.</td><td>Tránh mất ride event khi broker fail.</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">FLK</span>Phần 2 - Flink advanced<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Map với repo:</strong> <code>aggregation_job.py</code> dùng event time, watermark 5 giây, checkpoint 10 giây, tumbling window 1 giờ và JDBC upsert sink.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>flink-checkpoint-barriers.txt</span></div><div class="cmd-body"><pre>Kafka partitions       Flink operators                  State/sink
+p0: e1 e2 |barrier 7|  source subtasks
+p1: e3    |barrier 7|       -> map/parse -> window aggregate -> JDBC upsert
+p2: e4 e5 |barrier 7|
+
+Checkpoint completes after barrier 7 passes operators and snapshots state.</pre></div></div>
+          <ul>
+            <li><strong>Event time:</strong> timestamp trong event, đúng cho taxi pickup; <strong>processing time</strong> dùng clock máy; <strong>ingestion time</strong> dùng lúc Flink nhận event.</li>
+            <li><strong>Watermark per partition:</strong> partition idle có thể kéo watermark toàn job nếu không cấu hình idle timeout.</li>
+            <li><strong>Checkpoint barrier/alignment:</strong> barrier snapshot consistent state; alignment chậm khi backpressure.</li>
+            <li><strong>Savepoint vs checkpoint:</strong> checkpoint cho failure recovery; savepoint cho upgrade/migration có chủ ý.</li>
+            <li><strong>State backend, TTL, RocksDB:</strong> window state lớn cần RocksDB/managed backend và TTL/retention rõ.</li>
+            <li><strong>Restart strategy:</strong> fixed-delay/failure-rate strategy thay vì fail im lặng.</li>
+            <li><strong>Exactly-once sinks:</strong> cần checkpoint + transactional sink hoặc idempotent upsert; JDBC trong repo phụ thuộc primary key.</li>
+            <li><strong>Deployment:</strong> Flink Kubernetes Operator hoặc managed Flink chuẩn hóa HA, savepoints, scaling, metrics.</li>
+          </ul>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>flink-production-config.yaml</span></div><div class="cmd-body"><pre>execution.checkpointing.interval: 10s
+execution.checkpointing.mode: EXACTLY_ONCE
+execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
+state.checkpoints.dir: s3://de-prod-flink/checkpoints/rides-agg/
+state.savepoints.dir: s3://de-prod-flink/savepoints/rides-agg/
+restart-strategy.type: failure-rate
+restart-strategy.failure-rate.max-failures-per-interval: 3
+restart-strategy.failure-rate.delay: 30 s</pre></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">KST</span>Phần 3 - Kafka Streams advanced<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Map với repo:</strong> <code>JsonKStream.java</code>, <code>JsonKStreamJoins.java</code>, <code>JsonKStreamWindow.java</code> và <code>TopologyTestDriver</code> tests trong `theory/java/kafka_examples`.</p>
+          <table><thead><tr><th>Concept</th><th>Ý nghĩa</th><th>File liên quan</th></tr></thead><tbody>
+            <tr><td>KStream</td><td>Append-only event stream.</td><td><code>JsonKStream.java</code></td></tr>
+            <tr><td>KTable</td><td>Latest state theo key từ changelog.</td><td>Join/lookup dimension.</td></tr>
+            <tr><td>GlobalKTable</td><td>Copy table nhỏ đến mỗi instance.</td><td>Pickup/vendor dimension nhỏ.</td></tr>
+            <tr><td>State stores + changelog</td><td>Local state backup bằng Kafka topic.</td><td>Aggregate/window topology.</td></tr>
+            <tr><td>Repartition topics</td><td>Tạo khi đổi key trước groupBy/join.</td><td>Cần monitor storage/traffic.</td></tr>
+            <tr><td>Window stores</td><td>State theo key + window.</td><td><code>JsonKStreamWindow.java</code></td></tr>
+            <tr><td>Exactly-once v2</td><td>Transactions cho consume-process-produce.</td><td>Hợp Kafka-in/Kafka-out.</td></tr>
+            <tr><td>Interactive queries</td><td>Query state store từ app.</td><td>Low-latency internal dashboard.</td></tr>
+            <tr><td>Topology testing</td><td>Deterministic test không cần broker.</td><td><code>JsonKStreamTest.java</code></td></tr>
+          </tbody></table>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>kafka-streams-eos.properties</span></div><div class="cmd-body"><pre>application.id=taxi-revenue-streams
+bootstrap.servers=${KAFKA_BOOTSTRAP_SERVERS}
+processing.guarantee=exactly_once_v2
+num.stream.threads=3
+replication.factor=3
+commit.interval.ms=1000</pre></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">SPK</span>Phần 4 - Spark Structured Streaming advanced<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Map với repo:</strong> <code>extras/python/streams-example/pyspark/streaming.py</code> và Redpanda variant đọc Kafka, parse JSON schema, dùng <code>checkpoint</code>.</p>
+          <ul>
+            <li><strong>Micro-batch trigger:</strong> xử lý mỗi vài giây/phút, hợp lakehouse hơn ultra-low-latency.</li>
+            <li><strong>Output modes:</strong> append, update, complete.</li>
+            <li><strong>Watermark state cleanup:</strong> quyết định khi Spark được xóa state cũ.</li>
+            <li><strong>Checkpoint directory:</strong> phải nằm trên durable storage ở production.</li>
+            <li><strong><code>foreachBatch</code>:</strong> dùng writer batch idempotent vào DB/warehouse.</li>
+            <li><strong>Khi dùng Spark thay Flink:</strong> chọn Spark khi latency chục giây-phút chấp nhận được, team đã có Spark/lakehouse và logic gần batch ETL.</li>
+          </ul>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>spark-foreachbatch.py</span></div><div class="cmd-body"><pre>query = (
+    revenue_df.writeStream
+    .outputMode("update")
+    .option("checkpointLocation", "s3://de-prod/spark-checkpoints/taxi-revenue")
+    .trigger(processingTime="30 seconds")
+    .foreachBatch(lambda batch_df, batch_id: upsert_revenue(batch_df, batch_id))
+    .start()
+)</pre></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">ARC</span>Phần 5 - Streaming architecture patterns<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <table><thead><tr><th>Pattern</th><th>Dùng khi nào</th><th>Map với taxi pipeline</th></tr></thead><tbody>
+            <tr><td>Lambda</td><td>Cần batch exact + stream low latency.</td><td>Flink realtime, Spark/dbt reconcile cuối ngày.</td></tr>
+            <tr><td>Kappa</td><td>Event log lưu đủ lâu để replay.</td><td>Replay topic <code>rides</code> rebuild aggregate.</td></tr>
+            <tr><td>CDC</td><td>DB là source of truth.</td><td>Debezium phát trip changes vào Kafka.</td></tr>
+            <tr><td>Outbox</td><td>Publish event atomic với DB write.</td><td>Booking service ghi trip + outbox.</td></tr>
+            <tr><td>Event sourcing</td><td>State dựng từ event bất biến.</td><td>requested -> accepted -> completed -> paid.</td></tr>
+            <tr><td>CQRS</td><td>Tách write model/read model.</td><td>Raw rides vs dashboard aggregate table.</td></tr>
+            <tr><td>Stream-table duality</td><td>Table là latest state của changelog.</td><td><code>processed_events_aggregated</code>.</td></tr>
+            <tr><td>Backfill/replay</td><td>Sửa bug logic hoặc rebuild history.</td><td>earliest-offset vào staging sink rồi reconcile.</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">MAT</span>Phần 6 - Trade-off matrices<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">Engine choice</h3>
+          <table><thead><tr><th>Option</th><th>Strength</th><th>Weakness</th><th>Best fit</th></tr></thead><tbody>
+            <tr><td>Kafka consumer app</td><td>Đơn giản, full control.</td><td>Tự lo offset/state/watermark/recovery.</td><td>Stateless validation/sink đơn giản.</td></tr>
+            <tr><td>Flink</td><td>Event-time/stateful/low-latency mạnh.</td><td>Ops phức tạp.</td><td>Realtime revenue/fraud/surge.</td></tr>
+            <tr><td>Kafka Streams</td><td>Library gọn, state/changelog tốt.</td><td>Kafka-in/Kafka-out, JVM app.</td><td>Stream microservice gần Kafka.</td></tr>
+            <tr><td>Spark Structured Streaming</td><td>Lakehouse/batch ecosystem mạnh.</td><td>Micro-batch latency.</td><td>Near-real-time ETL.</td></tr>
+            <tr><td>ksqlDB</td><td>SQL nhanh trên Kafka.</td><td>Ít linh hoạt hơn code.</td><td>Prototype/materialized views.</td></tr>
+          </tbody></table>
+          <h3 class="green">Serialization</h3>
+          <table><thead><tr><th>Format</th><th>Pros</th><th>Cons</th><th>Repo relation</th></tr></thead><tbody>
+            <tr><td>JSON</td><td>Dễ đọc, dễ demo.</td><td>Không enforce schema, payload lớn.</td><td>Workshop chính.</td></tr>
+            <tr><td>Avro</td><td>Schema evolution tốt, compact.</td><td>Cần registry/tooling.</td><td>Avro extras và Java schemas.</td></tr>
+            <tr><td>Protobuf</td><td>Compact, typed, polyglot.</td><td>Evolution rules khác Avro.</td><td>Hợp service contract.</td></tr>
+          </tbody></table>
+          <h3 class="orange">Platform</h3>
+          <table><thead><tr><th>Option</th><th>Pros</th><th>Cons</th><th>Decision cue</th></tr></thead><tbody>
+            <tr><td>Redpanda self-hosted</td><td>Kafka API, footprint gọn.</td><td>Vẫn phải vận hành cluster.</td><td>Muốn performance/control.</td></tr>
+            <tr><td>Kafka self-hosted</td><td>Ecosystem mature.</td><td>Ops broker/KRaft/security/upgrade.</td><td>Team có Kafka expertise.</td></tr>
+            <tr><td>Confluent Cloud</td><td>Managed Kafka, Schema Registry, connectors.</td><td>Cost/vendor/network egress.</td><td>Muốn giảm ops.</td></tr>
+          </tbody></table>
+          <h3 class="red">Push streaming vs micro-batch</h3>
+          <table><thead><tr><th>Mode</th><th>Latency</th><th>Operational model</th><th>Fit</th></tr></thead><tbody>
+            <tr><td>Push/continuous</td><td>Millis đến vài giây.</td><td>Long-running jobs, checkpoint/state.</td><td>Flink/Kafka Streams.</td></tr>
+            <tr><td>Micro-batch</td><td>Vài giây đến phút.</td><td>Batch-like triggers/checkpoints.</td><td>Spark into warehouse/lakehouse.</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">DES</span>Phần 7 - Senior design scenario: realtime taxi revenue dashboard<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>taxi-revenue-architecture.txt</span></div><div class="cmd-body"><pre>Taxi app / batch loader
+  -> rides_raw topic (Avro, key=trip_id, RF=3, partitions=24)
+  -> validator/enricher
+       -> rides_valid topic
+       -> rides_dlq topic + quarantine table
+  -> Flink rides-revenue job
+       event-time windows, measured watermark
+       upsert by (window_start, location_id)
+  -> revenue_dashboard table / OLAP store
+  -> Grafana alerts + analyst dashboard</pre></div></div>
+          <table><thead><tr><th>Design area</th><th>Decision</th><th>Why</th></tr></thead><tbody>
+            <tr><td>Producer contract</td><td>Avro/Protobuf schema: trip_id, locations, amount, event_time, producer_version.</td><td>Contract tests bắt breaking changes.</td></tr>
+            <tr><td>Topic partitioning</td><td>Raw key <code>trip_id</code>; aggregate repartition by <code>PULocationID</code>.</td><td>Raw uniqueness và business aggregation rõ.</td></tr>
+            <tr><td>Schema registry</td><td>Backward compatibility + CI check + owner approval.</td><td>Đóng gap JSON workshop.</td></tr>
+            <tr><td>Flink aggregation</td><td>Event-time windows, measured watermark, durable checkpoints/savepoints.</td><td>Correct late data và recoverable deploy.</td></tr>
+            <tr><td>Upsert sink</td><td>PK <code>(window_start, PULocationID)</code>; idempotent writes.</td><td>Late updates không duplicate rows.</td></tr>
+            <tr><td>Monitoring</td><td>Producer rate, lag, checkpoint, backpressure, DLQ, sink errors, freshness.</td><td>Tìm bottleneck nhanh.</td></tr>
+            <tr><td>Backfill</td><td>Replay vào staging sink, reconcile, rồi swap/merge.</td><td>Không phá production table.</td></tr>
+            <tr><td>DLQ</td><td>Raw payload, schema id, error, topic/partition/offset, replay status.</td><td>Audit và replay được.</td></tr>
+            <tr><td>On-call runbook</td><td>Triage lag -> Flink -> sink -> DLQ -> schema deploy -> replay.</td><td>Incident xử lý nhất quán.</td></tr>
+          </tbody></table>
+          <div class="cmd-block"><div class="cmd-header"><span>● ● ●</span><span>on-call-runbook.txt</span></div><div class="cmd-body"><pre>Alert: dashboard freshness &gt; 5 minutes
+1. Check Kafka lag for rides_valid by group rides-revenue-flink
+2. If lag grows and Flink backpressure high, inspect slow operator and sink
+3. If checkpoint failing, preserve logs and restore from latest valid savepoint
+4. If DLQ spike, identify schema_id/producer_version and pause bad release
+5. Do not reset offsets blindly
+6. Replay DLQ or offset range into staging, reconcile totals, then merge</pre></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="s6" class="module section-content" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S6 · Troubleshooting</div>
+        <div class="module-title">Lỗi thường gặp</div>
+        <div class="module-subtitle">Bảng debug theo đúng pipeline trong repo: Redpanda, Python producer/consumer, PyFlink, PostgreSQL.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">ERR</span>14 lỗi bắt buộc khi chạy Module 07<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <table class="data-table">
+            <thead><tr><th>Lỗi / Triệu chứng</th><th>Nguyên nhân</th><th>Debug steps</th><th>Cách fix</th><th>Phòng tránh</th></tr></thead>
+            <tbody>
+              <tr><td><code>NoBrokersAvailable</code> khi producer connect <code>localhost:9092</code>.</td><td>Redpanda chưa chạy, port 9092 không publish, hoặc advertised listener sai.</td><td><code>docker compose ps</code>; xem log redpanda; kiểm tra port 9092; chạy consumer thử.</td><td><code>docker compose up redpanda -d</code>; dùng đúng Compose ở <code>workshop/</code>; sửa listener về <code>OUTSIDE://localhost:9092</code>.</td><td>Healthcheck broker trước khi chạy <code>producer.py</code>; ghi rõ internal/external listener trong README/runbook.</td></tr>
+              <tr><td>Consumer không nhận message.</td><td><code>auto_offset_reset='latest'</code> hoặc consumer group đã commit offset cuối topic.</td><td>Đổi <code>group_id</code>; inspect group offset; gửi message mới; so topic có data.</td><td>Dùng group mới khi replay; reset offset nếu cần; dùng <code>earliest</code> cho debug historical.</td><td>Đặt naming convention consumer group và runbook reset offset.</td></tr>
+              <tr><td>Flink Kafka source không connect.</td><td>Trong container dùng nhầm <code>localhost:9092</code>; localhost lúc này là container Flink.</td><td>Xem Flink UI logs; kiểm tra DDL trong <code>pass_through_job.py</code>/<code>aggregation_job.py</code>; exec vào container.</td><td>Dùng <code>'properties.bootstrap.servers' = 'redpanda:29092'</code> trong Flink DDL.</td><td>Template config theo context: host dùng <code>localhost:9092</code>, Docker dùng <code>redpanda:29092</code>.</td></tr>
+              <tr><td><code>Table ... does not exist</code> khi JDBC sink ghi PostgreSQL.</td><td>Bảng <code>processed_events</code> hoặc <code>processed_events_aggregated</code> chưa được tạo trong DB.</td><td><code>docker compose exec postgres psql -U postgres -d postgres -c "\dt"</code>; xem task exception.</td><td>Tạo đúng schema table trước khi submit job; đảm bảo table-name trong DDL khớp.</td><td>Migration SQL versioned; start job phụ thuộc migration completed.</td></tr>
+              <tr><td><code>ClassNotFoundException</code> Kafka/JDBC/Postgres connector trong Flink.</td><td>Image thiếu connector JAR hoặc build Dockerfile fail khi download Maven artifacts.</td><td><code>docker compose exec jobmanager ls /opt/flink/lib</code>; xem build log; kiểm tra version JAR.</td><td>Rebuild image; pin connector đúng Flink version; thêm checksum/artifact repo nội bộ khi production.</td><td>CI build image và smoke test tạo Kafka/JDBC table.</td></tr>
+              <tr><td><code>Could not execute SQL statement</code> do Flink DDL sai field/type.</td><td>Field trong DDL không khớp JSON payload hoặc type sai, ví dụ amount string nhưng DDL double.</td><td>Copy raw message từ topic; so với DDL source; xem planner/validation error trong log.</td><td>Sửa DDL field/type; thêm computed column đúng; deploy lại từ savepoint nếu stateful.</td><td>Contract test schema và sample fixtures cho Flink DDL.</td></tr>
+              <tr><td>JSON parse/deserialization lỗi do schema event không khớp <code>Ride</code>.</td><td>Producer đổi field, thiếu field, null ngoài dự kiến, hoặc JSON invalid.</td><td>In raw payload; test <code>ride_deserializer</code>; kiểm tra producer version; đếm lỗi theo offset.</td><td>Thêm validation + DLQ; rollback producer breaking change; chuyển sang Avro/Schema Registry.</td><td>Schema compatibility và contract tests trước release.</td></tr>
+              <tr><td>Timestamp unit sai: window rơi vào năm 1970 hoặc tương lai.</td><td>Dữ liệu seconds nhưng Flink dùng <code>TO_TIMESTAMP_LTZ(..., 3)</code> như milliseconds, hoặc ngược lại.</td><td>Query sample <code>tpep_pickup_datetime</code>; convert thử epoch; so event_time trong Flink output.</td><td>Producer dùng <code>timestamp() * 1000</code>; nếu source seconds thì multiply/cast trước khi timestamp.</td><td>Data quality rule cho timestamp range và unit test conversion.</td></tr>
+              <tr><td>Aggregation không update.</td><td>JDBC sink thiếu primary key/upsert hoặc Postgres table không có key tương ứng.</td><td>Đọc sink DDL; kiểm tra Postgres primary key; xem output có duplicate window/location không.</td><td>Thêm <code>PRIMARY KEY (window_start, PULocationID) NOT ENFORCED</code> trong Flink và PK thật trong DB.</td><td>Migration test xác nhận key trước khi job chạy.</td></tr>
+              <tr><td>Flink job restart rồi đọc lại từ đầu.</td><td>Submit job mới với <code>earliest-offset</code> nhưng không restore checkpoint/savepoint cũ.</td><td>Xem job id mới/cũ; kiểm tra savepoint path; so offset/row count sau deploy.</td><td>Stop-with-savepoint và submit <code>--fromSavepoint</code>; backfill dùng job/table riêng.</td><td>Deployment policy bắt buộc savepoint cho stateful job.</td></tr>
+              <tr><td>Port conflict <code>9092</code>, <code>8081</code>, <code>5432</code>.</td><td>Container/process khác đang bind port Kafka, Flink UI hoặc Postgres.</td><td><code>docker compose ps</code>; xem Docker bind error; kiểm tra process local giữ port.</td><td>Dừng process/container trùng hoặc đổi port mapping trong Compose.</td><td>Chuẩn hóa dev ports và cleanup containers trước workshop.</td></tr>
+              <tr><td>Redpanda container up nhưng client connect timeout.</td><td>Advertised listener trả địa chỉ client không reach được.</td><td>Đọc <code>--advertise-kafka-addr</code>; test từ host và từ Flink container; xem metadata response.</td><td>Host dùng <code>OUTSIDE://localhost:9092</code>; Docker network dùng <code>PLAINTEXT://redpanda:29092</code>.</td><td>Luôn test cả hai context sau khi sửa Compose.</td></tr>
+              <tr><td>PostgreSQL duplicate rows khi Python consumer insert.</td><td><code>consumer_postgres.py</code> insert không idempotent, không có event_id/unique key.</td><td>Group/replay lại consumer; query duplicates theo business key; xem transaction/retry logs.</td><td>Dùng unique key + <code>ON CONFLICT DO UPDATE/NOTHING</code>; tạo event_id deterministic.</td><td>Idempotent sink contract cho mọi consumer ghi DB.</td></tr>
+              <tr><td>Late events không xuất hiện trong aggregation.</td><td>Watermark 5 giây/allowed lateness không phù hợp, event đến sau khi window đóng.</td><td>Log event_time vs processing_time; chạy <code>producer_realtime.py</code>; xem aggregate update/drop.</td><td>Tune watermark theo lateness distribution; side output/DLQ cho event quá trễ; upsert sink cho update.</td><td>Định nghĩa SLA latency vs completeness và reconcile với batch.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box note">
+            <span><strong>Bằng chứng cần giữ khi debug:</strong> đừng chỉ ghi "job fail". Lưu lại service context, exact command, topic, consumer group, offset range, sample payload, Flink job id, checkpoint status và sink table schema.</span>
+          </div>
+          <ul>
+            <li><strong>Broker evidence:</strong> output của <code>docker compose ps</code>, Redpanda logs và listener đang dùng.</li>
+            <li><strong>Topic evidence:</strong> topic name <code>rides</code>, message count mẫu và payload JSON raw.</li>
+            <li><strong>Consumer evidence:</strong> group id, committed offset, lag theo partition và startup mode.</li>
+            <li><strong>Flink evidence:</strong> JobManager UI, exception root cause, checkpoint completed/failed và backpressure.</li>
+            <li><strong>PostgreSQL evidence:</strong> <code>\dt</code>, schema table, primary key và row count trước/sau replay.</li>
+            <li><strong>Schema evidence:</strong> field thiếu/sai type, timestamp unit và producer version sinh event.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">DBG</span>Debugging checklist theo thứ tự ưu tiên<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <ol>
+            <li>Service có chạy không? Kiểm tra <code>docker compose ps</code> và logs.</li>
+            <li>Đang ở trong Docker hay ngoài Docker?</li>
+            <li>Broker address đúng context chưa: <code>localhost:9092</code> hay <code>redpanda:29092</code>?</li>
+            <li>Topic có data không?</li>
+            <li>Consumer group offset ở đâu?</li>
+            <li>Schema message có khớp với <code>Ride</code> và Flink DDL không?</li>
+            <li>Sink table tồn tại chưa, primary key đúng chưa?</li>
+            <li>Flink UI log nói gì: connector, DDL, checkpoint hay sink error?</li>
+            <li>Checkpoint/savepoint state ra sao?</li>
+            <li>Có DLQ/log raw event không để replay và audit?</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div id="s7" class="module section-content" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S7 · Interview Prep</div>
+        <div class="module-title">Interview Prep</div>
+        <div class="module-subtitle">15 câu hỏi theo level, dùng chính chi tiết trong repo để trả lời có trọng lượng.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">MAP</span>
+          Cách chấm câu trả lời
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Mỗi câu nên trả lời theo cấu trúc: khái niệm ngắn gọn, map vào file thật trong repo, nêu trade-off, rồi nói điều không nên làm trong production.</p>
+          <table class="data-table">
+            <thead>
+              <tr><th>Level</th><th>Kỳ vọng</th><th>Repo anchor nên nhắc</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Junior</td><td>Giải thích đúng Kafka/Flink vocabulary và không nhầm network context.</td><td><code>producer.py</code>, <code>consumer.py</code>, topic <code>rides</code>.</td></tr>
+              <tr><td>Mid</td><td>Đọc được DDL/job behavior, biết startup mode, watermark, primary key và schema trade-off.</td><td><code>pass_through_job.py</code>, <code>aggregation_job.py</code>, <code>docker-compose.yml</code>.</td></tr>
+              <tr><td>Senior</td><td>Thiết kế được recovery, replay, schema incident, scaling và exactly-once có điều kiện.</td><td>Checkpoint/savepoint, DLQ, Schema Registry, PostgreSQL upsert, monitoring lag.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box warn">
+            <span><strong>Nguyên tắc:</strong> câu trả lời tốt không hứa tuyệt đối. Với PostgreSQL/JDBC sink, phải nói rõ điều kiện idempotent key/upsert hoặc transaction semantics.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">REF</span>
+          Repo facts cần thuộc trước khi phỏng vấn
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li>Host Python producer/consumer dùng <code>localhost:9092</code>; Flink container dùng <code>redpanda:29092</code>.</li>
+            <li>Workshop topic chính là <code>rides</code>; console group là <code>rides-console</code>; Postgres consumer group là <code>rides-to-postgres</code>.</li>
+            <li><code>pass_through_job.py</code> dùng <code>latest-offset</code>; <code>aggregation_job.py</code> dùng <code>earliest-offset</code>.</li>
+            <li>Event time lấy từ <code>tpep_pickup_datetime</code> epoch milliseconds qua <code>TO_TIMESTAMP_LTZ(..., 3)</code>.</li>
+            <li>Aggregation dùng watermark <code>5 SECOND</code>, tumbling window <code>1 HOUR</code> và key <code>(window_start, PULocationID)</code>.</li>
+            <li>Java Kafka Streams tests dùng <code>TopologyTestDriver</code>, không cần Kafka broker thật.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 class="blue">Junior - 5 câu nền tảng</h3>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">J1</span><span class="badge badge-blue">Junior</span>Kafka topic, partition, offset là gì?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Topic là log logical chứa event cùng loại, ví dụ <code>rides</code>. Partition là shard vật lý của topic, mỗi partition là append-only log có ordering riêng. Offset là vị trí tăng dần của record trong một partition, được consumer group commit để biết đã đọc tới đâu.</p><p><strong>Red flag: đừng nói...</strong> offset là global cho toàn topic hoặc Kafka tự đảm bảo ordering toàn topic.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">J2</span><span class="badge badge-blue">Junior</span>Producer và consumer khác nhau thế nào?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Producer serialize event và ghi vào broker, như <code>workshop/src/producers/producer.py</code> đọc parquet rồi gửi JSON. Consumer subscribe topic và đọc event, như <code>consumer.py</code> in message hoặc <code>consumer_postgres.py</code> ghi DB.</p><p><strong>Red flag: đừng nói...</strong> producer gửi trực tiếp cho consumer; thực tế producer ghi vào log broker, consumer đọc độc lập.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">J3</span><span class="badge badge-blue">Junior</span>Consumer group dùng để làm gì?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Consumer group chia partitions cho nhiều consumer instance để scale đọc. Mỗi group có offset riêng, nên group <code>rides-console</code> và <code>rides-to-postgres</code> có thể đọc cùng topic với tiến độ độc lập.</p><p><strong>Red flag: đừng nói...</strong> thêm consumer trong cùng group luôn tăng throughput; nếu partitions ít hơn consumers thì instance dư sẽ idle.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">J4</span><span class="badge badge-blue">Junior</span><code>earliest</code> và <code>latest</code> khác nhau thế nào?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Khi group/job chưa có committed offset, <code>earliest</code> đọc từ đầu topic, <code>latest</code> chỉ đọc event mới sau thời điểm start. Trong repo, <code>aggregation_job.py</code> dùng <code>earliest-offset</code>, còn <code>pass_through_job.py</code> dùng <code>latest-offset</code>.</p><p><strong>Red flag: đừng nói...</strong> đổi startup mode sẽ override checkpoint đang restore; khi có checkpoint/savepoint, state đó quyết định offset.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">J5</span><span class="badge badge-blue">Junior</span>Vì sao Redpanda chạy được với Kafka client?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Redpanda implement Kafka protocol/API, nên thư viện <code>kafka-python</code> và Flink Kafka connector vẫn nói chuyện được như với Kafka broker. Trong workshop, ta nói Kafka concepts nhưng broker thật là Redpanda.</p><p><strong>Red flag: đừng nói...</strong> Redpanda là Kafka wrapper cần ZooKeeper; Redpanda là broker riêng và không cần ZooKeeper.</p></div></div>
+
+      <h3 class="orange">Mid - 5 câu đọc code và vận hành</h3>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">M6</span><span class="badge badge-orange">Mid</span>Vì sao producer ngoài Docker dùng <code>localhost:9092</code>, Flink trong Docker dùng <code>redpanda:29092</code>?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Kafka client bootstrap xong sẽ nhận advertised address. Từ host laptop, <code>localhost:9092</code> là published port. Từ container Flink, <code>localhost</code> là chính container Flink, nên phải dùng DNS service trong Docker network: <code>redpanda:29092</code>.</p><p><strong>Red flag: đừng nói...</strong> localhost luôn trỏ đến máy host dù đang ở container.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">M7</span><span class="badge badge-orange">Mid</span>Watermark trong Flink giải quyết vấn đề gì?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Watermark báo tiến độ event time để Flink biết khi nào có thể đóng/publish window dù event đến out-of-order. Repo dùng <code>event_timestamp - INTERVAL '5' SECOND</code>, nghĩa là chấp nhận trễ khoảng 5 giây trước khi coi window đã đủ.</p><p><strong>Red flag: đừng nói...</strong> watermark là timeout theo processing time hoặc tự động sửa mọi late event.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">M8</span><span class="badge badge-orange">Mid</span>Tumbling window khác sliding window thế nào?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Tumbling window không overlap, mỗi event thuộc một window, như revenue theo từng giờ trong <code>aggregation_job.py</code>. Sliding window overlap theo slide interval, một event có thể góp vào nhiều windows, phù hợp rolling metrics.</p><p><strong>Red flag: đừng nói...</strong> hai loại window chỉ khác tên hoặc sliding luôn rẻ hơn tumbling.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">M9</span><span class="badge badge-orange">Mid</span>Vì sao aggregation JDBC sink cần primary key?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Window aggregate phát changelog/update khi late event làm thay đổi kết quả. Primary key <code>(window_start, PULocationID)</code> cho Flink/JDBC biết row nào cần upsert, tránh insert duplicate cho cùng window/location.</p><p><strong>Red flag: đừng nói...</strong> primary key chỉ để query nhanh; ở streaming sink nó còn định nghĩa semantics update.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">M10</span><span class="badge badge-orange">Mid</span>JSON vs Avro trong streaming production khác nhau thế nào?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> JSON dễ debug và hợp workshop, nhưng không enforce schema, payload lớn, dễ breaking change ngầm. Avro đi với Schema Registry, compact hơn, hỗ trợ compatibility rules; repo có <code>extras/python/avro_example</code> và Java Avro schemas để minh họa.</p><p><strong>Red flag: đừng nói...</strong> JSON luôn đủ cho production nếu team cẩn thận; thiếu contract vẫn là rủi ro lớn.</p></div></div>
+
+      <h3 class="red">Senior - 5 câu system design và incident</h3>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">S11</span><span class="badge badge-purple">Senior</span>Thiết kế pipeline realtime taxi revenue từ producer đến dashboard, yêu cầu late events và replay.<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Producer contract Avro/Protobuf có <code>trip_id</code>, amount, event_time; topic raw RF=3 và partition key rõ. Validator tách <code>rides_valid</code>/<code>rides_dlq</code>. Flink đọc valid topic bằng event time, watermark dựa trên distribution lateness, aggregate tumbling/sliding tùy dashboard, upsert sink theo <code>(window_start, location_id)</code>. Checkpoint/savepoint durable, monitoring lag/checkpoint/DLQ/freshness, backfill replay vào staging rồi reconcile.</p><p><strong>Red flag: đừng nói...</strong> chỉ cần Kafka + Flink là tự đúng exactly-once và late events không cần policy.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">S12</span><span class="badge badge-purple">Senior</span>Flink job fail 30 phút, restart thế nào để không mất/nhân đôi dữ liệu?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Xác định fail là recoverable hay code bug. Nếu checkpoint còn tốt, restart từ checkpoint/savepoint, không submit job mới từ <code>earliest-offset</code> vào sink production. Kiểm tra checkpoint completion, Kafka lag, sink idempotency/primary key. Nếu code bug đã ghi sai, dừng job, snapshot offsets/state, backfill vào staging, reconcile và merge.</p><p><strong>Red flag: đừng nói...</strong> cứ reset offset về earliest hoặc xóa checkpoint để chạy lại cho nhanh.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">S13</span><span class="badge badge-purple">Senior</span>Kafka lag tăng liên tục, bạn điều tra và scale ra sao?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Tách producer rate tăng hay consumer throughput giảm; xem lag theo partition để phát hiện skew; kiểm tra Flink backpressure/checkpoint/sink latency; kiểm tra broker disk/network. Scale consumer/Flink chỉ hiệu quả nếu partitions đủ. Nếu sink nghẽn, scale DB/batch writes/đổi sink. Về lâu dài thiết kế partition count, key strategy, autoscaling và alert thresholds.</p><p><strong>Red flag: đừng nói...</strong> lag tăng thì chỉ cần tăng replicas consumer, bất kể partition count và sink bottleneck.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">S14</span><span class="badge badge-purple">Senior</span>Schema producer đổi field breaking change, xử lý incident thế nào?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Dừng/rollback producer xấu, xác định schema_id/version và offset range bị ảnh hưởng, chuyển bad events sang DLQ/quarantine nếu có, patch consumer/Flink DDL khi cần, replay từ DLQ/staging sau validation. Prevention là Schema Registry compatibility, contract tests và producer release gate.</p><p><strong>Red flag: đừng nói...</strong> sửa consumer trực tiếp trên production rồi bỏ qua events fail parse.</p></div></div>
+      <div class="section"><div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">S15</span><span class="badge badge-purple">Senior</span>Exactly-once end-to-end có thật sự đạt được với Kafka -> Flink -> PostgreSQL không?<span class="section-toggle">▼</span></div><div class="section-content"><p><strong>Gợi ý trả lời:</strong> Kafka + Flink có thể đạt exactly-once trong phần source/state khi checkpoint đúng. End-to-end tới PostgreSQL phụ thuộc sink semantics: transactional two-phase sink hoặc idempotent upsert với primary key deterministic. JDBC thường không magic exactly-once; nếu commit DB thành công nhưng checkpoint fail, replay có thể ghi lại, nên sink phải chịu duplicate bằng key/upsert. Trade-off là latency, complexity, checkpoint duration và DB load.</p><p><strong>Red flag: đừng nói...</strong> bật checkpoint là exactly-once toàn hệ thống, không cần quan tâm sink.</p></div></div>
+    </div>
+
+    <div id="s8" class="module section-content" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S8 · Checklist & Tổng kết</div>
+        <div class="module-title">Checklist & Tổng kết</div>
+        <div class="module-subtitle">Exit criteria cho Module 07: hiểu concept, chạy workshop, đọc được Flink job và trả lời được production scenarios.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">CHK</span>Progress checklist 24 items<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="progress-text" id="checklist-progress-text">0/24 mục hoàn thành (0%)</div>
+          <div class="progress-bar"><div class="progress-fill" id="checklist-progress-fill"></div></div>
+          <div class="summary-grid">
+            <div class="summary-item"><strong>Foundation</strong><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Giải thích được topic/partition/offset/consumer group.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Phân biệt được batch, micro-batch, streaming.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Giải thích được Redpanda compatible Kafka nghĩa là gì.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Biết <code>earliest</code> vs <code>latest</code>.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Biết key ảnh hưởng partitioning.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Biết retention vs compaction.</div></div>
+            <div class="summary-item"><strong>Workshop Hands-on</strong><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Chạy được <code>docker compose up redpanda -d</code>.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Chạy được <code>producer.py</code> ghi topic <code>rides</code>.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Chạy được <code>consumer.py</code> đọc message.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Tạo được PostgreSQL table <code>processed_events</code>.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Submit được <code>pass_through_job.py</code>.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Submit được <code>aggregation_job.py</code> và query <code>processed_events_aggregated</code>.</div></div>
+            <div class="summary-item"><strong>Flink/Streaming Processing</strong><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Đọc hiểu được Kafka source DDL.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Đọc hiểu được JDBC sink DDL.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Giải thích được event time + watermark.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Giải thích được tumbling window.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Giải thích được late events + upsert.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Biết checkpoint/savepoint khác nhau.</div></div>
+            <div class="summary-item"><strong>Production/Senior</strong><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Nhận diện được hardcoded secrets/listeners trong repo.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Thiết kế được DLQ/quarantine flow.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Chọn được JSON vs Avro vs Protobuf theo context.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Đề xuất monitoring Kafka lag + Flink metrics.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Giải thích được replay/backfill strategy.</div><div class="checklist-row"><div class="check-box" data-progress="true" onclick="toggleCheck(this)"></div>Trả lời được 5 câu Senior interview không cần tài liệu.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">SUM</span>6 điểm chốt<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="summary-grid">
+            <div class="summary-item"><strong>1. Event log</strong>Kafka/Redpanda là event log bền vững, không chỉ là message queue.</div>
+            <div class="summary-item"><strong>2. Offset</strong>Offset thuộc consumer group, không thuộc từng consumer đơn lẻ.</div>
+            <div class="summary-item"><strong>3. Flink state</strong>Flink xử lý stateful stream bằng event time, watermark và checkpoint.</div>
+            <div class="summary-item"><strong>4. Upsert key</strong>Upsert sink cần key rõ ràng để late events không tạo duplicate.</div>
+            <div class="summary-item"><strong>5. Schema</strong>JSON dễ học nhưng schema registry/Avro quan trọng cho production.</div>
+            <div class="summary-item"><strong>6. Business fit</strong>Streaming chỉ đáng làm khi business cần latency thấp và team chịu được vận hành 24/7.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">MAP</span>File mapping<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <table class="data-table"><thead><tr><th>File</th><th>Vai trò</th></tr></thead><tbody>
+            <tr><td><code>workshop/docker-compose.yml</code></td><td>Infrastructure local.</td></tr>
+            <tr><td><code>workshop/src/producers/producer.py</code></td><td>Source events.</td></tr>
+            <tr><td><code>workshop/src/consumers/consumer.py</code></td><td>Debug consumer.</td></tr>
+            <tr><td><code>workshop/src/job/pass_through_job.py</code></td><td>Kafka to JDBC pass-through.</td></tr>
+            <tr><td><code>workshop/src/job/aggregation_job.py</code></td><td>Windowed aggregation.</td></tr>
+            <tr><td><code>extras/python/avro_example/*</code></td><td>Schema/Avro.</td></tr>
+            <tr><td><code>theory/java/kafka_examples/*</code></td><td>Kafka Streams/topology tests.</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-purpose">DOD</span>Definition of Done<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p>DoD lấy từ tinh thần `master_de_roadmap.html`: chạy được, hiểu được, phá được, tối ưu được, trình bày được. Dưới đây là bản module-specific cho Streaming.</p>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><strong>Chạy được:</strong> Pipeline Redpanda -> Python -> Flink -> PostgreSQL chạy end-to-end.</div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><strong>Hiểu được:</strong> Vẽ lại kiến trúc, listeners, offsets, watermark, checkpoint mà không nhìn tài liệu.</div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><strong>Phá được:</strong> Tự tạo ít nhất một incident như sai listener, sai schema hoặc port conflict và ghi lại cách fix.</div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><strong>Tối ưu được:</strong> Chỉ ra hardcoded secrets/listeners, thêm idempotent/upsert/DLQ/monitoring proposal.</div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><strong>Trình bày được:</strong> Trả lời senior scenario về replay, lag, schema break và exactly-once với trade-off rõ.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">NEXT</span>Preview module tiếp theo<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p>Module tiếp theo: Capstone / Final Project - tích hợp ingestion, batch, analytics và streaming.</p>
+          <p>Repo có tài liệu project tại <code>cohorts/2026/project.md</code> và thư mục <code>projects/</code>; file HTML module tiếp theo chưa thấy trong site hiện tại nên không tạo link hỏng.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+function showModule(index){
+  document.querySelectorAll('.main > div[id^="s"]').forEach(section=>{
+    section.style.display='none';
+    section.classList.remove('active');
+  });
+  document.querySelectorAll('.nav-item').forEach(item=>item.classList.remove('active'));
+  const target=document.getElementById(`s${index}`);
+  if(target){
+    target.style.display='block';
+    target.classList.add('active');
+  }
+  const nav=document.querySelectorAll('.nav-item')[index];
+  if(nav)nav.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toggleSection(id){
+  const header=typeof id==='string'?document.getElementById(id):id;
+  if(!header)return;
+  const content=header.nextElementSibling;
+  const toggle=header.querySelector('.section-toggle');
+  if(!content)return;
+  const isHidden=content.style.display==='none';
+  content.style.display=isHidden?'block':'none';
+  if(toggle)toggle.textContent=isHidden?'▼':'▶';
+}
+
+function answerQuiz(questionId, answer, correct){
+  const el=typeof questionId==='string'?document.getElementById(questionId):questionId;
+  if(!el)return;
+  const isCorrect=typeof answer==='boolean'?answer:!!correct;
+  const msg=typeof correct==='string'?correct:(typeof answer==='string'?answer:'');
+  const item=el.closest('.quiz-item');
+  if(!item)return;
+  const opts=item.querySelectorAll('.quiz-opt');
+  const explain=item.querySelector('.quiz-explain');
+  opts.forEach(opt=>{opt.style.pointerEvents='none'});
+  el.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect){
+    opts.forEach(opt=>{
+      const handler=opt.getAttribute('onclick') || '';
+      if(handler.includes('true'))opt.classList.add('correct');
+    });
+  }
+  if(explain){
+    explain.textContent=(isCorrect?'Chính xác. ':'Chưa đúng. ')+msg;
+    explain.classList.add('show');
+  }
+}
+
+function toggleSolution(taskId){
+  const btn=typeof taskId==='string'?document.getElementById(taskId):taskId;
+  if(!btn)return;
+  const box=btn.nextElementSibling;
+  if(!box)return;
+  const show=box.classList.toggle('show');
+  btn.textContent=show?'Ẩn lời giải':'Xem lời giải';
+}
+
+function switchTab(group, name){
+  const groupEl=document.getElementById(group);
+  if(!groupEl)return;
+  groupEl.querySelectorAll('.tab').forEach(tab=>tab.classList.remove('active'));
+  const activeTab=groupEl.querySelector(`[data-tab="${name}"], [onclick*="${name}"]`);
+  if(activeTab)activeTab.classList.add('active');
+  const container=groupEl.parentElement || document;
+  container.querySelectorAll('.tab-content').forEach(content=>content.classList.remove('active'));
+  const target=document.getElementById(`${group}-${name}`) || document.getElementById(name);
+  if(target)target.classList.add('active');
+}
+
+function toggleCheck(itemId){
+  const box=typeof itemId==='string'?document.getElementById(itemId):itemId;
+  if(!box)return;
+  box.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress(){
+  const checks=document.querySelectorAll('#s8 .check-box[data-progress="true"]');
+  const checked=document.querySelectorAll('#s8 .check-box[data-progress="true"].checked').length;
+  const total=checks.length;
+  const pct=total===0?0:Math.round((checked/total)*100);
+  const fill=document.getElementById('checklist-progress-fill');
+  const text=document.getElementById('checklist-progress-text');
+  if(fill)fill.style.width=`${pct}%`;
+  if(text)text.textContent=`${checked}/${total} mục hoàn thành (${pct}%)`;
+}
+
+showModule(0);
+updateProgress();
+</script>
+</body>
+</html>

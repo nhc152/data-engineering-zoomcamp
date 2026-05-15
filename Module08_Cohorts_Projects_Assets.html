@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 08 - Cohorts, Projects & Course Assets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+    --accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;
+    --text:#e6edf3;--text-muted:#8b949e;--code-bg:#0d1117;--highlight:#388bfd26;
+    --font:'Inter','Segoe UI',-apple-system,sans-serif;--font-mono:'JetBrains Mono','Courier New','Consolas',monospace;
+    --radius:8px;--radius-lg:12px;--shadow:0 12px 30px #00000033;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter','Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+  .hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 40%,#1a2a1e 100%);border-bottom:2px solid var(--accent4);padding:40px 24px 30px;text-align:center;position:relative;overflow:hidden}
+  .hero-banner{box-shadow:var(--shadow)}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#6e40c922,transparent 70%);pointer-events:none}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--accent4);letter-spacing:-0.5px}
+  .hero p{color:var(--text-muted);margin-top:8px;font-size:.95rem}
+  .badge-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;border:1px solid}
+  .badge-blue{color:var(--accent);border-color:var(--accent);background:#1f6feb1a}
+  .badge-green{color:var(--accent2);border-color:var(--accent2);background:#2ea04326}
+  .badge-orange{color:var(--accent5);border-color:var(--accent5);background:#d2940026}
+  .badge-purple{color:var(--accent4);border-color:var(--accent4);background:#6e40c926}
+  .container{display:flex;min-height:calc(100vh - 160px)}
+  .sidebar{width:290px;min-width:290px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:0 16px 12px}
+  .level-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 16px 4px;color:var(--accent4)}
+  .nav-item{display:block;padding:7px 16px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-left:3px solid transparent;transition:all .15s}
+  .nav-item:hover{color:var(--text);background:var(--surface2)}
+  .nav-item.active{color:var(--accent4);border-left-color:var(--accent4);background:#6e40c915;font-weight:600}
+  .nav-number{display:inline-block;width:44px;font-size:.7rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .main{flex:1;padding:32px 40px;max-width:980px}
+  .module{display:none}
+  .module.active{display:block}
+  .module-header{border:1px solid var(--border);border-radius:12px;padding:24px 28px;background:var(--surface);margin-bottom:24px;position:relative;overflow:hidden}
+  .module-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent4)}
+  .module-tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent4);margin-bottom:8px}
+  .module-title{font-size:1.6rem;font-weight:800;margin-bottom:8px}
+  .module-subtitle{color:var(--text-muted);font-size:.9rem}
+  .section{margin-bottom:28px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .section-header{padding:14px 20px;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--surface2);border-bottom:1px solid var(--border);user-select:none}
+  .section-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .icon-purpose{background:#1f6feb33}
+  .icon-detail{background:#2ea04326}
+  .icon-quiz{background:#d2940026}
+  .icon-summary{background:#6e40c926}
+  .icon-practice{background:#f7816626}
+  .section-content{padding:20px;background:var(--surface);overflow-x:auto}
+  .section-toggle{margin-left:auto;color:var(--text-muted);font-size:12px}
+  h3{font-size:1rem;font-weight:700;color:var(--accent4);margin:18px 0 10px}
+  h3:first-child{margin-top:0}
+  h3.blue{color:var(--accent)}
+  h3.green{color:var(--accent2)}
+  h3.orange{color:var(--accent5)}
+  h3.red{color:var(--accent3)}
+  p{margin-bottom:12px;color:var(--text);font-size:.88rem}
+  ul,ol{padding-left:20px;margin-bottom:12px}
+  li{font-size:.88rem;margin-bottom:5px}
+  strong{color:var(--text)}
+  .cmd-block,.code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .cmd-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .cmd-body{padding:14px}
+  pre{font-family:'JetBrains Mono','Courier New','Consolas',monospace;font-size:.82rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--text)}
+  .kw{color:#ff7b72}.kw2{color:var(--accent)}.str{color:var(--accent5)}.fn{color:var(--accent4)}.num{color:#79c0ff}.comment{color:var(--text-muted)}
+  code{font-family:'JetBrains Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:.82rem;color:var(--accent4)}
+  .quiz-item,.quiz-block{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
+  .quiz-q{font-weight:600;font-size:.88rem;margin-bottom:10px}
+  .quiz-q::before{content:'Q';display:inline-block;width:22px;height:22px;background:var(--accent4);color:#000;border-radius:50%;font-size:.7rem;font-weight:800;text-align:center;line-height:22px;margin-right:8px}
+  .quiz-options{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .quiz-opt{padding:8px 12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.84rem;transition:all .15s;background:var(--bg)}
+  .quiz-opt:hover{border-color:var(--accent4);color:var(--accent4)}
+  .quiz-opt.correct{border-color:var(--accent2);color:var(--accent2);background:#2ea04310}
+  .quiz-opt.wrong{border-color:var(--accent3);color:var(--accent3);background:#f7816610}
+  .quiz-explain{font-size:.82rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px;margin-top:8px;display:none}
+  .quiz-explain.show{display:block}
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .summary-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:.82rem}
+  .summary-item strong{color:var(--accent4);display:block;margin-bottom:4px}
+  .practice-task{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
+  .practice-task-header{padding:12px 16px;background:#6e40c915;border-bottom:1px solid var(--border);font-weight:700;font-size:.85rem;color:var(--accent4)}
+  .practice-task-body{padding:16px}
+  .solution-toggle{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:.8rem;cursor:pointer;color:var(--accent2);margin-top:10px;transition:all .15s}
+  .solution-toggle:hover{background:var(--surface2)}
+  .solution-box{margin-top:10px;display:none;border-top:1px solid var(--border);padding-top:12px}
+  .solution-box.show{display:block}
+  .info-box{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:.84rem;border:1px solid;display:flex;gap:10px}
+  .info-box.tip{border-color:var(--accent2);background:#2ea04310;color:var(--accent2)}
+  .info-box.warn{border-color:var(--accent5);background:#d2940015;color:var(--accent5)}
+  .info-box.note{border-color:var(--accent4);background:#6e40c915;color:var(--accent4)}
+  .info-box.danger{border-color:var(--accent3);background:#f7816610;color:var(--accent3)}
+  .info-box span{color:var(--text)}
+  .progress-bar{background:var(--surface2);border-radius:4px;height:4px;margin:16px 0;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent4),var(--accent2));border-radius:4px;width:0;transition:width .2s}
+  .nav-buttons{display:flex;gap:12px;margin-top:32px;justify-content:space-between}
+  .nav-btn{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:6px}
+  .nav-btn:hover{border-color:var(--accent4);color:var(--accent4)}
+  .nav-btn.primary{background:var(--accent4);color:#000;border-color:var(--accent4)}
+  .nav-btn.primary:hover{background:#e2c0ff}
+  table,.data-table{width:100%;max-width:100%;border-collapse:collapse;margin:12px 0;font-size:.83rem}
+  th{background:var(--surface2);padding:8px 12px;text-align:left;border:1px solid var(--border);color:var(--accent4)}
+  td{padding:8px 12px;border:1px solid var(--border)}
+  tr:nth-child(even) td{background:#ffffff05}
+  .checklist{list-style:none;padding:0}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:.88rem;border-bottom:1px solid var(--border)}
+  .checklist li:last-child{border-bottom:none}
+  .checklist li::before{content:'□';color:var(--accent4);font-size:1.1rem;flex-shrink:0;margin-top:-1px}
+  .tab-group,.tab-container{display:flex;gap:0;margin-bottom:0;border-bottom:1px solid var(--border)}
+  .tab{padding:8px 18px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab.active{color:var(--accent4);border-bottom-color:var(--accent4);font-weight:600}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  .mental-model{border-left:4px solid var(--accent);background:#1f6feb1a;padding:12px 14px;border-radius:6px;margin:12px 0;font-size:.88rem}
+  .checklist-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .check-box{width:16px;height:16px;border:1px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:.25rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  .check-box.checked{background:var(--accent2);border-color:var(--accent2)}
+  .check-box.checked::after{content:'✓';font-size:10px;color:#000;font-weight:600}
+  .progress-text{font-size:.8rem;color:var(--text-muted);margin-bottom:8px}
+  @media(max-width:768px){.sidebar{display:none}.main{padding:16px}.summary-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero hero-banner">
+  <h1>Module 08 - Cohorts, Projects & Course Assets</h1>
+  <p>Bản đồ phụ trợ của repo: lịch sử cohorts, final project rubric, datasets và static assets để biến course thành portfolio.</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">Meta Module</span>
+    <span class="badge badge-blue">Course Archive</span>
+    <span class="badge badge-green">Final Project</span>
+    <span class="badge badge-orange">Assets</span>
+    <span class="badge badge-purple">Portfolio</span>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="sidebar-title">Module Navigation</div>
+    <div class="level-label">MODULE 08 · META</div>
+    <div class="nav-item active" onclick="showModule(0,this)"><span class="nav-number">S0</span>Tổng quan & Mục tiêu</div>
+    <div class="nav-item" onclick="showModule(1,this)"><span class="nav-number">S1</span>Bản đồ repo phụ trợ</div>
+    <div class="nav-item" onclick="showModule(2,this)"><span class="nav-number">S2</span>Cohorts qua các năm</div>
+    <div class="nav-item" onclick="showModule(3,this)"><span class="nav-number">S3</span>Homework & Workshops</div>
+    <div class="nav-item" onclick="showModule(4,this)"><span class="nav-number">S4</span>Final Project</div>
+    <div class="nav-item" onclick="showModule(5,this)"><span class="nav-number">S5</span>Course Assets</div>
+    <div class="nav-item" onclick="showModule(6,this)"><span class="nav-number">S6</span>Cách học & Lộ trình</div>
+    <div class="nav-item" onclick="showModule(7,this)"><span class="nav-number">S7</span>Review Checklist</div>
+    <div class="nav-item" onclick="showModule(8,this)"><span class="nav-number">S8</span>Tổng kết & Portfolio</div>
+  </nav>
+
+  <main class="main">
+    <div class="module active" id="s0">
+      <div class="module-header">
+        <div class="module-tag">S0 · Orientation</div>
+        <div class="module-title">Tổng quan & Mục tiêu Module 08</div>
+        <div class="module-subtitle">Module này giúp bạn đọc phần phụ trợ của repo như một hệ thống tài liệu: học gì, luyện ở đâu, làm project theo rubric nào.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">S0</span>
+          Roadmap 9 sections
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Section</th><th>Tên section</th><th>Thời gian ước tính</th></tr></thead>
+            <tbody>
+              <tr><td>S0</td><td>Tổng quan & Mục tiêu</td><td>30-45 phút</td></tr>
+              <tr><td>S1</td><td>Bản đồ repo phụ trợ</td><td>1.5-2 giờ</td></tr>
+              <tr><td>S2</td><td>Cohorts qua các năm</td><td>2-3 giờ</td></tr>
+              <tr><td>S3</td><td>Homework & Workshops</td><td>3-4 giờ</td></tr>
+              <tr><td>S4</td><td>Final Project</td><td>2-3 giờ</td></tr>
+              <tr><td>S5</td><td>Course Assets</td><td>1-2 giờ</td></tr>
+              <tr><td>S6</td><td>Cách học & Lộ trình</td><td>1.5-2 giờ</td></tr>
+              <tr><td>S7</td><td>Review Checklist</td><td>2 giờ</td></tr>
+              <tr><td>S8</td><td>Tổng kết & Portfolio</td><td>1 giờ</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">WHY</span>
+          Module 08 giải quyết vấn đề gì?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Đây không phải module kỹ thuật lõi</h3>
+          <p><code>cohorts/</code>, <code>projects/</code>, và <code>images/</code> không giống <code>01-docker-terraform</code> hay <code>07-streaming</code>. Chúng là lớp course wrapper: lịch sử khóa học, bài tập theo năm, hướng dẫn final project, và tài sản hình ảnh.</p>
+          <div class="info-box note"><span><strong>Mental model:</strong> Module 01-07 dạy công cụ và pipeline. Module 08 dạy cách dùng repo như một bản đồ học tập và bản thiết kế portfolio.</span></div>
+
+          <h3 class="green">3 folder chính</h3>
+          <table>
+            <thead><tr><th>Folder</th><th>Vai trò trong repo</th><th>Giá trị thực tế</th></tr></thead>
+            <tbody>
+              <tr><td><code>cohorts/</code></td><td>Lịch sử course 2022-2026, homework, workshops, project links.</td><td>Chọn đúng homework theo năm, đọc lại tool cũ như Airflow 2022 hoặc Kestra 2025.</td></tr>
+              <tr><td><code>projects/</code></td><td>Final project requirements, rubric, datasets, peer review, portfolio advice.</td><td>Tự chấm capstone trước khi submit hoặc đưa vào CV.</td></tr>
+              <tr><td><code>images/</code></td><td>Static assets: architecture diagrams, logos, AWS screenshot.</td><td>Biết ảnh nào phục vụ README, workshop, hoặc project diagram.</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="orange">Vấn đề thực tế</h3>
+          <ul>
+            <li>Người học dễ chỉ đọc cohort mới nhất và bỏ qua homework/workshop hữu ích ở cohort cũ như Airflow 2022 hoặc Confluent/Spark 2023.</li>
+            <li>Final project thường fail không phải vì thiếu tool, mà vì thiếu rubric, dataset strategy, reproducibility và documentation.</li>
+            <li>Assets/images bị dùng rải rác trong README/cohorts; nếu không inventory, HTML hoặc project README dễ có broken link hoặc ảnh sai context.</li>
+          </ul>
+          <div class="info-box warn"><span><strong>Cảnh báo:</strong> Không bao giờ ghi "homework.md" trống context. Luôn dùng full path như <code>cohorts/2026/03-data-warehouse/homework.md</code>.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">MAP</span>
+          Scope và ASCII overview
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Scope của module này là cohorts 2022-2026, final project docs trong <code>projects/</code>, và image assets trong <code>images/</code>. Module này không đi sâu lại toàn bộ module 01-07; nó chỉ map cohort/project/asset về module tương ứng.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>Module08</span><span>course-wrapper-map.txt</span></div>
+            <div class="cmd-body">
+<pre>README.md
+  -&gt; current course modules 01-07
+  -&gt; cohorts/2026/* homework + workshops
+  -&gt; projects/ final project rubric + datasets
+  -&gt; images/ architecture + tool logos
+
+cohorts/
+  2022 -&gt; Airflow era + old homework/project
+  2023 -&gt; Prefect/Confluent era + leaderboard
+  2024 -&gt; Mage/dlt/RisingWave era
+  2025 -&gt; Kestra + dlt + updated homework
+  2026 -&gt; latest cohort + data platforms + updated dlt workshop</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">OK</span>
+          Exit criteria
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li>Giải thích được vai trò từng folder <code>cohorts/</code>, <code>projects/</code>, <code>images/</code>.</li>
+            <li>Biết nên học cohort nào cho từng chủ đề: latest homework, Airflow cũ, Kestra flows, dlt workshop, project examples.</li>
+            <li>Đọc được project rubric và tự đánh giá capstone project theo problem, cloud/IaC, ingestion, DWH, transformation, dashboard, reproducibility.</li>
+            <li>Biết NYC taxi dataset không được dùng cho final project và biết cách chọn dataset thay thế.</li>
+            <li>Biết ảnh/logo nào được dùng ở README/cohort/workshop nào, và không copy binary vào notes.</li>
+            <li>Biết chuyển course materials thành portfolio project có checklist, README, architecture diagram và reproducible commands.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s1">
+      <div class="module-header">
+        <div class="module-tag">S1 · Repo Map</div>
+        <div class="module-title">Bản đồ repo phụ trợ</div>
+        <div class="module-subtitle">Hiểu 3 folder phụ trợ trước khi đi vào timeline, homework, project và assets.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">A</span>
+          Phần A - <code>cohorts/</code> là gì?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><code>cohorts/</code> là archive theo từng năm học. Theo <code>repo_notes_M08.md</code>, repo hiện có <code>2022</code>, <code>2023</code>, <code>2024</code>, <code>2025</code>, <code>2026</code>.</p>
+          <table>
+            <thead><tr><th>Năm</th><th>Style tổ chức</th><th>Điểm đáng đọc</th></tr></thead>
+            <tbody>
+              <tr><td>2022</td><td>Week-based</td><td>Airflow ingestion và warehouse examples trong week 2/3.</td></tr>
+              <tr><td>2023</td><td>Week-based</td><td>Prefect-era workflow docs, Confluent/Spark streaming, leaderboard.</td></tr>
+              <tr><td>2024</td><td>Module-based</td><td>Mage-era orchestration, dlt workshop, RisingWave workshop, solutions module 1.</td></tr>
+              <tr><td>2025</td><td>Module-based</td><td>Kestra YAML flows, updated dlt workshop, streaming notebook.</td></tr>
+              <tr><td>2026</td><td>Module-based latest</td><td>Latest homework, Data Platforms/Bruin, PyFlink/Redpanda homework, updated AI-assisted dlt workshop.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box tip"><span><strong>Rule:</strong> học lần đầu thì dùng root modules 01-07 và <code>cohorts/2026</code>. Dùng cohorts cũ để hiểu lịch sử tool hoặc luyện thêm.</span></div>
+          <div class="info-box danger"><span><strong>Không gộp:</strong> <code>cohorts/2024/01-docker-terraform/homework.md</code>, <code>cohorts/2025/01-docker-terraform/homework.md</code>, và <code>cohorts/2026/01-docker-terraform/homework.md</code> là 3 file khác nhau.</span></div>
+
+          <h3 class="blue">Mini quiz - cohorts</h3>
+          <div class="quiz-item">
+            <div class="quiz-q">Muốn xem homework Docker mới nhất trong repo thì đọc folder nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'2022 là cohort cũ, hữu ích cho Airflow nhưng không phải latest homework.')">A. cohorts/2022</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. repo_notes_M08.md ghi 2026 là latest cohort trong repo.')">B. cohorts/2026</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'projects/ chứa final project docs, không phải module homework.')">C. projects/</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Muốn đọc Airflow examples cũ nên bắt đầu ở đâu?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. 2022 week 2/3 có Airflow ingestion và warehouse DAGs.')">A. cohorts/2022/week_2_data_ingestion và week_3_data_warehouse</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'2026 là latest path nhưng không phải nơi chứa Airflow examples cũ.')">B. cohorts/2026/02-workflow-orchestration</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'images/ chỉ chứa static assets.')">C. images/architecture</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Vì sao không gộp mọi <code>homework.md</code> lại với nhau?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Tên giống nhau không có nghĩa nội dung và tool giống nhau.')">A. Vì Markdown không cho phép trùng tên</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Homework cùng tên nhưng khác năm/module có dataset, tool, rubric và câu hỏi khác nhau.')">B. Vì mỗi path mang context năm, module, tool và dataset riêng</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Repo vẫn có nhiều homework.md; vấn đề là citation/context.')">C. Vì repo chỉ có một homework.md duy nhất</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Leaderboard dùng để làm gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Leaderboard là showcase/project reference, hữu ích khi tìm project examples.')">A. Xem project examples và learner showcase</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Leaderboard không phải execution engine.')">B. Chạy pipeline batch tự động</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Dataset ideas nằm trong projects/datasets.md.')">C. Chứa toàn bộ dataset public</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Khi docs 2024 trỏ nhầm hoặc trỏ path cũ, review nên xử lý thế nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Không nên sửa bằng đoán mò.')">A. Tự đoán path mới và không ghi chú</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Module 08 phải fact-check path, ghi warning nếu relative link fragile hoặc sai context.')">B. Kiểm tra path thực tế, ghi warning/fix rõ ràng</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Bỏ qua làm mất giá trị của asset/doc inventory.')">C. Xóa toàn bộ link khỏi notes</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">B</span>
+          Phần B - <code>projects/</code> là gì?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><code>projects/</code> là phần final project chung. Nó không chứa source code project của học viên; nó chứa yêu cầu, rubric, dataset suggestions, peer review và lời khuyên portfolio.</p>
+          <table>
+            <thead><tr><th>File</th><th>Vai trò</th><th>Điểm cần nhớ</th></tr></thead>
+            <tbody>
+              <tr><td><code>projects/README.md</code></td><td>Final project requirements/rubric</td><td>End-to-end pipeline, dashboard 2 tiles, peer review 3 projects, reproducibility.</td></tr>
+              <tr><td><code>projects/datasets.md</code></td><td>Dataset suggestions</td><td>Kaggle, AWS, BigQuery public data, streaming datasets, Open Food Facts, Binance, NOAA...</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box warn"><span><strong>Dataset rule:</strong> NYC taxi dataset dùng xuyên suốt course và homework, nên không được dùng cho final project. Chọn dataset khác.</span></div>
+          <div class="mental-model"><strong>Mental model:</strong> <code>projects/README.md</code> là contract giao hàng. Bạn không bắt đầu final project từ tool; bạn bắt đầu từ rubric, problem statement và dataset.</div>
+
+          <h3 class="green">Mini quiz - projects</h3>
+          <div class="quiz-item">
+            <div class="quiz-q">Vì sao final project không nên dùng NYC taxi dataset?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. projects/README.md nói NYC taxi đã dùng trong modules/homework và không được dùng cho project.')">A. Vì dataset này đã dùng trong course và bị cấm cho project</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Không có claim này trong notes; lý do là policy của project docs.')">B. Vì BigQuery không đọc được taxi data</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Dataset public không tự động hợp lệ cho project nếu docs cấm.')">C. Vì dataset public luôn bị cấm</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Peer review yêu cầu gì theo project docs?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Review chỉ chính project của mình không đủ theo docs.')">A. Chỉ tự review project của mình</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. docs yêu cầu evaluate 3 projects của peers để có điểm project.')">B. Evaluate 3 projects của peers</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Leaderboard không thay peer review process.')">C. Chỉ thêm project vào leaderboard</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Rubric khác checklist học tập thế nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Rubric là tiêu chí chấm sản phẩm cuối; checklist học tập là tiến độ tự học.')">A. Rubric chấm deliverable, checklist đo tiến độ học</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Rubric không chỉ là command list.')">B. Rubric chỉ là list command shell</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Checklist không thay thế được rubric project.')">C. Hai thứ giống hệt nhau</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Vì sao nên tạo repo riêng cho project?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Không phải để tách khỏi GitHub; vẫn nên dùng GitHub/repo rõ ràng.')">A. Để tránh dùng GitHub</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. docs khuyến nghị repo mới với title có nghĩa, README chi tiết, dễ showcase portfolio.')">B. Để reviewer và nhà tuyển dụng thấy project độc lập, rõ ràng, dễ chạy</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Repo riêng không có nghĩa bỏ README.')">C. Để không cần viết README</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Dataset tốt cho project nên có tiêu chí gì?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Dataset quá nhỏ có thể không thể hiện pipeline value.')">A. Càng nhỏ càng tốt, không cần schema</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Dataset nên public, đủ lớn, có schema/cadence rõ, trả lời được business question, ít PII risk.')">B. Public, đủ dữ liệu, schema rõ, có câu hỏi phân tích và rủi ro pháp lý thấp</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Không cần dùng NYC taxi, và docs còn cấm dataset đó cho project.')">C. Luôn dùng NYC taxi vì quen thuộc</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">C</span>
+          Phần C - <code>images/</code> là gì?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p><code>images/</code> là static asset layer. Nó chứa ảnh architecture, logo tool/sponsor và screenshot cloud. Không có logic pipeline trong các ảnh này.</p>
+          <table>
+            <thead><tr><th>Nhóm</th><th>Files</th><th>Vai trò</th></tr></thead>
+            <tbody>
+              <tr><td>Root logos/assets</td><td><code>bruin.svg</code>, <code>dlthub.png</code>, <code>kestra.svg</code>, <code>mage.svg</code>, <code>piperider.png</code>, <code>rising-wave.png</code></td><td>Logo/tool assets cho README và workshop context.</td></tr>
+              <tr><td>Architecture</td><td><code>architecture/arch_v5_workshops.png</code>, <code>arch_v4_workshops.jpg</code>, <code>arch_v3_workshops.jpg</code>, <code>photo1700757552.jpeg</code></td><td>Overview/workshop architecture images. <code>arch_v5_workshops.png</code> là ảnh chính của README.</td></tr>
+              <tr><td>AWS</td><td><code>aws/iam.png</code></td><td>AWS IAM screenshot được docs 2022 transfer service tham chiếu.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box note"><span><strong>Asset review:</strong> Khi build HTML hoặc README project, kiểm tra path từ vị trí file hiện tại. Một số docs cũ có relative path dễ gãy.</span></div>
+          <div class="info-box tip"><span><strong>Best use:</strong> Dùng ảnh để truyền đạt architecture hoặc tool context; không dùng logo thay cho giải thích kỹ thuật.</span></div>
+
+          <h3 class="orange">Mini quiz - images</h3>
+          <div class="quiz-item">
+            <div class="quiz-q">Ảnh architecture chính của README là file nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. README root dùng /images/architecture/arch_v5_workshops.png làm overview image.')">A. images/architecture/arch_v5_workshops.png</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'File này tồn tại nhưng không phải ảnh overview chính của README hiện tại.')">B. images/aws/iam.png</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Đây là tool logo, không phải overview architecture.')">C. images/kestra.svg</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Logo tool dùng để làm gì trong docs?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Logo không chứa executable logic.')">A. Chạy pipeline tự động</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Logo là visual context cho sponsor/tool/workshop sections.')">B. Cung cấp visual context cho tool, sponsor hoặc workshop</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Logo không thay thế được README/rubric.')">C. Thay thế project README</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Có nên copy binary image vào notes không?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Prompt và notes yêu cầu không copy binary.')">A. Có, paste toàn bộ binary vào Markdown</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Chỉ ghi path, vai trò, nơi tham chiếu; không copy nội dung nhị phân.')">B. Không, chỉ mô tả path/vai trò/reference</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Xóa ảnh sẽ phá docs/assets.')">C. Nên xóa ảnh khỏi repo</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Khi ảnh không được tham chiếu ở đâu, ghi nhận thế nào?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Ghi là asset inventory hoặc likely older asset, không bịa reference.')">A. Ghi path và vai trò khả dĩ, đánh dấu chưa xác định reference</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Không nên bịa reference.')">B. Bịa một README đang dùng ảnh đó</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Không nên bỏ qua nếu prompt yêu cầu không bỏ file nào.')">C. Bỏ qua khỏi inventory</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+          <div class="quiz-item">
+            <div class="quiz-q">Vì sao asset inventory quan trọng khi build HTML học?</div>
+            <div class="quiz-options">
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Không liên quan đến việc compile code.')">A. Vì ảnh compile Python nhanh hơn</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Inventory giúp tránh broken link, chọn đúng ảnh context, và viết alt text/role rõ ràng.')">B. Vì giúp tránh broken links và dùng đúng ảnh theo context</div>
+              <div class="quiz-opt" onclick="answerQuiz(this,false,'Inventory không thay thế nội dung học.')">C. Vì chỉ cần ảnh, không cần nội dung</div>
+            </div>
+            <div class="quiz-explain"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s2">
+      <div class="module-header">
+        <div class="module-tag">S2 · Cohort Timeline</div>
+        <div class="module-title">Cohorts qua các năm</div>
+        <div class="module-subtitle">Đọc lịch sử khóa học như một timeline: năm nào dùng tool gì, homework ở đâu, project docs và leaderboard nằm chỗ nào.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">TREE</span>
+          Tree cấp cao của <code>cohorts/</code>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Tree này chỉ giữ cấp cao để bạn định vị nhanh. Khi cần file cụ thể, luôn dùng full path từ <code>repo_notes_M08.md</code>.</p>
+          <div class="cmd-block">
+            <div class="cmd-header"><span>cohorts</span><span>high-level-tree.txt</span></div>
+            <div class="cmd-body">
+<pre>cohorts/
+  2022/
+    README.md
+    project.md
+    week_1_basics_n_setup/homework.md
+    week_2_data_ingestion/
+      README.md
+      homework/
+      transfer_service/
+      airflow/               # Airflow ingestion DAGs + setup
+    week_3_data_warehouse/
+      airflow/               # Airflow GCS -&gt; BigQuery DAGs
+    week_5_batch_processing/homework.md
+    week_6_stream_processing/homework.md
+
+  2023/
+    README.md
+    project.md
+    leaderboard.md
+    week_1_docker_sql/
+    week_1_terraform/
+    week_2_workflow_orchestration/
+    week_3_data_warehouse/
+    week_4_analytics_engineering/
+    week_5_batch_processing/
+    week_6_stream_processing/ # Confluent + Spark files
+    workshops/piperider.md
+
+  2024/
+    README.md
+    project.md
+    leaderboard.md
+    01-docker-terraform/
+    02-workflow-orchestration/
+    03-data-warehouse/
+    04-analytics-engineering/
+    05-batch/
+    06-streaming/
+    workshops/
+      dlt.md
+      rising-wave.md
+      dlt_resources/
+
+  2025/
+    README.md
+    project.md
+    01-docker-terraform/
+    02-workflow-orchestration/
+      flows/                 # Kestra YAML flows
+      images/
+        homework.png
+    03-data-warehouse/
+    04-analytics-engineering/
+    05-batch/
+    06-streaming/
+    workshops/dlt/
+
+  2026/
+    README.md
+    project.md
+    01-docker-terraform/
+    02-workflow-orchestration/
+    03-data-warehouse/
+    04-analytics-engineering/
+    05-data-platforms/
+    06-batch/
+    07-streaming/
+    workshops/
+      dlt.md
+      dlt/                   # AI-assisted dlt workshop</pre>
+            </div>
+          </div>
+          <div class="info-box warn"><span><strong>Không gộp homework:</strong> file cùng tên như <code>homework.md</code> xuất hiện ở nhiều năm. Luôn cite đủ path để tránh nhầm dataset, tool và câu hỏi.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">TIME</span>
+          Timeline 2022-2026
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Structure style</th>
+                <th>Main orchestration/tool era</th>
+                <th>Project docs?</th>
+                <th>Leaderboard?</th>
+                <th>Notable workshops/code</th>
+                <th>Nên đọc khi nào</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2022</td>
+                <td>Week-based</td>
+                <td>Airflow, GCS, BigQuery</td>
+                <td><code>project.md</code></td>
+                <td>External Google Sheet link in README</td>
+                <td>Airflow ingestion DAG, GCS to BigQuery DAG</td>
+                <td>Khi muốn hiểu Airflow historical setup hoặc homework cũ.</td>
+              </tr>
+              <tr>
+                <td>2023</td>
+                <td>Week-based</td>
+                <td>Prefect-era workflow, Confluent/Spark streaming</td>
+                <td><code>project.md</code></td>
+                <td><code>leaderboard.md</code></td>
+                <td>PipeRider workshop, Confluent producer, Spark Structured Streaming</td>
+                <td>Khi cần project examples hoặc luyện Confluent streaming practice.</td>
+              </tr>
+              <tr>
+                <td>2024</td>
+                <td>Module-based</td>
+                <td>Mage-era workflow, Redpanda/PySpark, dlt/RisingWave</td>
+                <td><code>project.md</code></td>
+                <td><code>leaderboard.md</code></td>
+                <td>dlt workshop, RisingWave workshop, <code>solutions.md</code> for M1</td>
+                <td>Khi muốn thấy quá trình chuyển sang module-based course.</td>
+              </tr>
+              <tr>
+                <td>2025</td>
+                <td>Module-based</td>
+                <td>Kestra, BigQuery, dbt, Spark, Redpanda</td>
+                <td><code>project.md</code></td>
+                <td>Không có local leaderboard file trong inventory</td>
+                <td>Kestra YAML flows, DLT upload notebook/script, dlt workshop, streaming notebook</td>
+                <td>Khi cần Kestra current-ish orchestration flow.</td>
+              </tr>
+              <tr>
+                <td>2026</td>
+                <td>Module-based latest</td>
+                <td>Latest course path, Data Platforms/Bruin, PyFlink/Redpanda, AI-assisted dlt</td>
+                <td><code>project.md</code></td>
+                <td>Không có local leaderboard file trong inventory</td>
+                <td><code>05-data-platforms</code>, updated dlt workshop, ETL diagram, current homework</td>
+                <td>Default cho người học lần đầu và current homework.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">TAB</span>
+          Chi tiết từng cohort
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="tab-group" id="cohort-years">
+            <div class="tab active" onclick="switchTab('cohort-years','y2022')">2022</div>
+            <div class="tab" onclick="switchTab('cohort-years','y2023')">2023</div>
+            <div class="tab" onclick="switchTab('cohort-years','y2024')">2024</div>
+            <div class="tab" onclick="switchTab('cohort-years','y2025')">2025</div>
+            <div class="tab" onclick="switchTab('cohort-years','y2026')">2026</div>
+          </div>
+
+          <div class="tab-content active" id="cohort-years-y2022">
+            <h3 class="blue">2022 - Airflow era</h3>
+            <table>
+              <thead><tr><th>Nhóm</th><th>Path</th><th>Vai trò</th></tr></thead>
+              <tbody>
+                <tr><td>Root</td><td><code>cohorts/2022/README.md</code>, <code>project.md</code></td><td>Landing cohort + project submission.</td></tr>
+                <tr><td>Week 1</td><td><code>week_1_basics_n_setup</code></td><td>GCP SDK, Terraform, Postgres SQL homework.</td></tr>
+                <tr><td>Week 2</td><td><code>week_2_data_ingestion</code></td><td>Data ingestion, Airflow local setup, GCS upload, BigQuery external table.</td></tr>
+                <tr><td>Week 3</td><td><code>week_3_data_warehouse/airflow</code></td><td>GCS to BigQuery warehouse DAG and partitioned table flow.</td></tr>
+                <tr><td>Week 5/6</td><td><code>week_5_batch_processing</code>, <code>week_6_stream_processing</code></td><td>Old Spark and streaming homework.</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box tip"><span><strong>Giá trị:</strong> 2022 là nơi đọc Airflow historical setup, old homework, GCS/BigQuery Airflow DAGs. Đặc biệt quan trọng nếu bạn muốn hiểu Airflow trong repo này.</span></div>
+          </div>
+
+          <div class="tab-content" id="cohort-years-y2023">
+            <h3 class="blue">2023 - Prefect + Confluent/Spark era</h3>
+            <table>
+              <thead><tr><th>Nhóm</th><th>Path</th><th>Vai trò</th></tr></thead>
+              <tbody>
+                <tr><td>Root</td><td><code>README.md</code>, <code>project.md</code>, <code>leaderboard.md</code></td><td>Cohort map, project submission, public top-100 project gallery.</td></tr>
+                <tr><td>Week 1</td><td><code>week_1_docker_sql</code>, <code>week_1_terraform</code></td><td>Docker/SQL and Terraform homework separated.</td></tr>
+                <tr><td>Week 2</td><td><code>week_2_workflow_orchestration</code></td><td>Prefect-era workflow orchestration docs/homework.</td></tr>
+                <tr><td>Week 3-5</td><td><code>week_3_data_warehouse</code>, <code>week_4_analytics_engineering</code>, <code>week_5_batch_processing</code></td><td>Warehouse, dbt, Spark homework.</td></tr>
+                <tr><td>Week 6</td><td><code>week_6_stream_processing</code></td><td><code>client.properties</code>, <code>settings.py</code>, <code>producer_confluent.py</code>, <code>streaming_confluent.py</code>, <code>spark-submit.sh</code>.</td></tr>
+                <tr><td>Workshop</td><td><code>workshops/piperider.md</code></td><td>PipeRider + dbt workshop.</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box tip"><span><strong>Giá trị:</strong> 2023 tốt để xem project gallery/leaderboard và luyện Confluent streaming practice bằng producer + Spark Structured Streaming.</span></div>
+          </div>
+
+          <div class="tab-content" id="cohort-years-y2024">
+            <h3 class="blue">2024 - Transition to module-based course</h3>
+            <table>
+              <thead><tr><th>Nhóm</th><th>Path</th><th>Vai trò</th></tr></thead>
+              <tbody>
+                <tr><td>Root</td><td><code>README.md</code>, <code>project.md</code>, <code>leaderboard.md</code></td><td>Cohort map, project attempts, public project leaderboard.</td></tr>
+                <tr><td>Modules</td><td><code>01-docker-terraform</code> ... <code>06-streaming</code></td><td>Module-based homework from intro through streaming.</td></tr>
+                <tr><td>Solutions</td><td><code>01-docker-terraform/solutions.md</code></td><td>Published solutions for Docker/Terraform homework.</td></tr>
+                <tr><td>Workshops</td><td><code>workshops/dlt.md</code>, <code>workshops/rising-wave.md</code>, <code>dlt_resources/</code></td><td>dlt workshop, RisingWave stream processing, notebooks and images.</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box tip"><span><strong>Giá trị:</strong> 2024 cho thấy chuyển đổi từ week naming sang module naming. Đây cũng là nơi tốt để đọc Mage/workshop context và dlt/RisingWave materials.</span></div>
+          </div>
+
+          <div class="tab-content" id="cohort-years-y2025">
+            <h3 class="blue">2025 - Kestra current-ish orchestration</h3>
+            <table>
+              <thead><tr><th>Nhóm</th><th>Path</th><th>Vai trò</th></tr></thead>
+              <tbody>
+                <tr><td>Root</td><td><code>README.md</code>, <code>project.md</code></td><td>Cohort map and project submission links.</td></tr>
+                <tr><td>Module homework</td><td><code>01-docker-terraform</code> ... <code>06-streaming</code></td><td>Updated homework set through streaming.</td></tr>
+                <tr><td>Kestra flows</td><td><code>02-workflow-orchestration/flows/*.yaml</code></td><td>Getting started, Postgres taxi, scheduled flow, dbt, GCP KV/setup, GCS/BigQuery taxi, BigQuery dbt.</td></tr>
+                <tr><td>Warehouse helper</td><td><code>03-data-warehouse/load_yellow_taxi_data.py</code>, <code>DLT_upload_to_GCP.ipynb</code></td><td>Download/upload helper and notebook for DWH homework.</td></tr>
+                <tr><td>Workshops</td><td><code>workshops/dlt/</code>, <code>dynamic_load_dlt.py</code></td><td>dlt workshop and dynamic loading helper.</td></tr>
+                <tr><td>Streaming notebook</td><td><code>06-streaming/homework/homework.ipynb</code></td><td>Notebook support for streaming homework.</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box tip"><span><strong>Giá trị:</strong> 2025 là năm quan trọng nếu bạn muốn đọc Kestra YAML flows thực tế và updated homework trước 2026.</span></div>
+          </div>
+
+          <div class="tab-content" id="cohort-years-y2026">
+            <h3 class="blue">2026 - Latest cohort in repo</h3>
+            <table>
+              <thead><tr><th>Nhóm</th><th>Path</th><th>Vai trò</th></tr></thead>
+              <tbody>
+                <tr><td>Root</td><td><code>README.md</code>, <code>project.md</code></td><td>Latest cohort map and project submission links.</td></tr>
+                <tr><td>Modules</td><td><code>01-docker-terraform</code> ... <code>07-streaming</code></td><td>Current homework path including data platforms and streaming.</td></tr>
+                <tr><td>Data Platforms</td><td><code>05-data-platforms/homework.md</code></td><td>Bruin pipeline structure, materialization, variables, quality checks, lineage.</td></tr>
+                <tr><td>Updated dlt workshop</td><td><code>workshops/dlt.md</code>, <code>workshops/dlt/README.md</code>, <code>dlt_homework.md</code></td><td>AI-assisted data ingestion with dlt and Open Library API.</td></tr>
+                <tr><td>dlt code/assets</td><td><code>pyproject.toml</code>, <code>open_library_pipeline.py</code>, <code>analysis.py</code>, <code>dlt_Pipeline_Overview.ipynb</code>, <code>cohorts/2026/workshops/dlt/images/etl_diagram.png</code></td><td>Project files, scripts, notebook and ETL diagram for updated workshop.</td></tr>
+              </tbody>
+            </table>
+            <div class="info-box tip"><span><strong>Giá trị:</strong> 2026 là default cho current course path và current homework. Nếu bạn học lần đầu, bắt đầu ở đây rồi dùng cohorts cũ như reference.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">SHIFT</span>
+          So sánh chuyển đổi course
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Trục thay đổi</th><th>2022/2023</th><th>2024+</th><th>Ý nghĩa khi học</th></tr></thead>
+            <tbody>
+              <tr><td>Naming</td><td><code>week_X_*</code></td><td><code>01-*</code>, <code>02-*</code>, module-based</td><td>Đọc full path để biết đang ở thế hệ course nào.</td></tr>
+              <tr><td>Orchestration</td><td>Airflow 2022, Prefect 2023</td><td>Mage 2024, Kestra 2025/2026</td><td>Tool thay đổi, nhưng concepts như DAG/task/retry/idempotency vẫn giữ giá trị.</td></tr>
+              <tr><td>Workshops</td><td>PipeRider 2023</td><td>dlt, RisingWave, Data Platforms/Bruin, AI-assisted dlt</td><td>Workshops phản ánh ecosystem thay đổi theo năm.</td></tr>
+              <tr><td>Streaming</td><td>Older Confluent/Spark examples</td><td>Redpanda/PySpark, newer Module 07 direction</td><td>Dùng 2023 để hiểu Confluent/Spark; dùng latest root/2026 để học current stream path.</td></tr>
+              <tr><td>Project docs</td><td>Cohort-specific submission links</td><td>Cohort-specific links + common <code>projects/README.md</code></td><td>Rubric chung nằm ở <code>projects/</code>; cohort <code>project.md</code> thường là logistics.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">GO</span>
+          Decision guide: nên đọc cohort nào?
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Tình huống</th><th>Ưu tiên đọc</th><th>Lý do</th></tr></thead>
+            <tbody>
+              <tr><td>Tôi đang học lần đầu</td><td><code>cohorts/2026</code> + module root 01-07</td><td>2026 là latest cohort trong repo; module root là current source chính.</td></tr>
+              <tr><td>Tôi muốn hiểu Airflow trong repo</td><td><code>cohorts/2022</code></td><td>Airflow ingestion và warehouse examples nằm ở week 2/3.</td></tr>
+              <tr><td>Tôi muốn xem project examples</td><td><code>cohorts/2023/leaderboard.md</code>, <code>cohorts/2024/leaderboard.md</code>, Projects Gallery trong <code>projects/README.md</code></td><td>Leaderboard và gallery cho project references thật.</td></tr>
+              <tr><td>Tôi muốn luyện homework cũ</td><td>Đọc theo năm/module cụ thể</td><td>Không gộp câu hỏi vì dataset/tool/version thay đổi.</td></tr>
+              <tr><td>Tôi muốn build portfolio</td><td><code>projects/README.md</code> + newest cohort <code>project.md</code></td><td>Rubric/dataset guidance nằm ở projects; cohort project.md có submission logistics.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box danger"><span><strong>Production habit:</strong> Khi dùng homework cũ, ghi rõ "source year" trong notes. Đây là cách tránh học nhầm tool/version rồi áp dụng sai vào current project.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">Q</span>
+          Quiz - cohort navigation
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item"><div class="quiz-q">Bạn muốn học theo current course path. Nên bắt đầu ở đâu?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. 2026 là latest cohort trong repo; module root 01-07 là source chính.')">A. Root modules 01-07 + cohorts/2026 homework</div><div class="quiz-opt" onclick="answerQuiz(this,false,'2022 hữu ích cho Airflow cũ, không phải default latest path.')">B. Chỉ cohorts/2022</div><div class="quiz-opt" onclick="answerQuiz(this,false,'images chỉ là asset layer.')">C. images/</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Cần Airflow ingestion DAG từ repo. Path nào hợp lý nhất?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. 2022 week 2 có Airflow ingestion DAG data_ingestion_gcs_dag.py.')">A. cohorts/2022/week_2_data_ingestion/airflow</div><div class="quiz-opt" onclick="answerQuiz(this,false,'2025 workflow là Kestra, không phải Airflow.')">B. cohorts/2025/02-workflow-orchestration/flows</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Project docs không chứa Airflow DAG code.')">C. projects/README.md</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Cần xem Confluent/Spark streaming example. Năm nào nổi bật?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'2024 streaming thiên Redpanda/PySpark homework.')">A. 2024</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. 2023 week_6_stream_processing có producer_confluent.py và streaming_confluent.py.')">B. 2023</div><div class="quiz-opt" onclick="answerQuiz(this,false,'2026 là latest nhưng không phải Confluent/Spark example cũ.')">C. 2026</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Cần Kestra flow YAML thực tế. Nên đọc đâu?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'2022 là Airflow era.')">A. cohorts/2022/week_3_data_warehouse</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Kestra YAML flows nằm trong cohorts/2025/02-workflow-orchestration/flows.')">B. cohorts/2025/02-workflow-orchestration/flows</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Leaderboard là project gallery, không phải flow YAML.')">C. cohorts/2023/leaderboard.md</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Cần homework Data Platforms/Bruin. Năm nào có module đó?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'2024/2025 không có local 05-data-platforms folder trong cohorts.')">A. 2024</div><div class="quiz-opt" onclick="answerQuiz(this,false,'2025 module 05 là batch.')">B. 2025</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. 2026 có cohorts/2026/05-data-platforms/homework.md.')">C. 2026</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Bạn thấy <code>homework.md</code> trong nhiều folder. Cách cite đúng là gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Tên file không đủ context.')">A. Chỉ ghi homework.md</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Full path giữ context năm/module/tool.')">B. Ghi full path như cohorts/2026/07-streaming/homework.md</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không nên bỏ qua file vì trùng tên.')">C. Bỏ qua toàn bộ homework.md</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Muốn xem project gallery/examples thì lựa chọn nào tốt?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. 2023/2024 có leaderboard local; projects/README.md trỏ tới Projects Gallery app.')">A. 2023/2024 leaderboard + Projects Gallery trong projects/README.md</div><div class="quiz-opt" onclick="answerQuiz(this,false,'pyproject.toml không phải project gallery.')">B. cohorts/2026/workshops/dlt/pyproject.toml</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Ảnh không thay thế project examples.')">C. images/architecture</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Cohort <code>project.md</code> và <code>projects/README.md</code> khác nhau thế nào?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Không giống hệt nhau; cohort project.md thường chứa logistics theo năm.')">A. Không khác gì</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. cohort project.md là submission logistics; projects/README.md là rubric/dataset guidance chung.')">B. project.md theo cohort là logistics, projects/README.md là rubric chung</div><div class="quiz-opt" onclick="answerQuiz(this,false,'README projects không chỉ chứa ảnh.')">C. projects/README.md chỉ là thư mục ảnh</div></div><div class="quiz-explain"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s3">
+      <div class="module-header">
+        <div class="module-tag">S3 · Homework & Workshops</div>
+        <div class="module-title">Homework & Workshops</div>
+        <div class="module-subtitle">Biến archive cohorts thành practice plan: homework nào luyện gì, workshop nào đáng dùng cho portfolio, code/config nào cần đọc kỹ.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">INV</span>
+          Inventory homework theo năm/module
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead>
+              <tr><th>Path</th><th>Năm</th><th>Module/topic</th><th>Loại</th><th>Dataset/service/tool</th><th>Nên dùng để luyện gì</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>cohorts/2022/week_1_basics_n_setup/homework.md</code></td><td>2022</td><td>Basics, GCP, Terraform, SQL</td><td>homework</td><td>GCP, Terraform, Postgres, taxi data</td><td>Ôn setup cloud và SQL cơ bản.</td></tr>
+              <tr><td><code>cohorts/2022/week_2_data_ingestion/homework/homework.md</code></td><td>2022</td><td>Data ingestion</td><td>homework</td><td>Airflow, GCS, Yellow/FHV/Zones</td><td>Luyện DAG ingestion và backfill mindset.</td></tr>
+              <tr><td><code>cohorts/2022/week_2_data_ingestion/airflow/dags/data_ingestion_gcs_dag.py</code></td><td>2022</td><td>Airflow ingestion</td><td>code</td><td>Airflow, GCS, BigQuery external table</td><td>Đọc flow CSV -> Parquet -> GCS -> BigQuery.</td></tr>
+              <tr><td><code>cohorts/2022/week_3_data_warehouse/airflow/dags/gcs_to_bq_dag.py</code></td><td>2022</td><td>Warehouse Airflow</td><td>code</td><td>GCS, BigQuery partitioned table</td><td>Đọc GCS -> external table -> native partitioned table.</td></tr>
+              <tr><td><code>cohorts/2023/week_1_docker_sql/homework.md</code></td><td>2023</td><td>Docker SQL</td><td>homework</td><td>Docker, Postgres, taxi data</td><td>Luyện Docker + SQL questions.</td></tr>
+              <tr><td><code>cohorts/2023/week_1_terraform/homework.md</code></td><td>2023</td><td>Terraform</td><td>homework</td><td>Terraform resources</td><td>Luyện IaC resource creation.</td></tr>
+              <tr><td><code>cohorts/2023/week_2_workflow_orchestration/homework.md</code></td><td>2023</td><td>Workflow orchestration</td><td>homework</td><td>Prefect, GCP, BigQuery</td><td>Hiểu Prefect-era orchestration.</td></tr>
+              <tr><td><code>cohorts/2023/week_6_stream_processing/*.py</code></td><td>2023</td><td>Streaming</td><td>code/config</td><td>Confluent Kafka, Spark Structured Streaming</td><td>Luyện producer, Kafka topics, streaming aggregation.</td></tr>
+              <tr><td><code>cohorts/2024/01-docker-terraform/homework.md</code></td><td>2024</td><td>Docker/Terraform</td><td>homework</td><td>Docker, Postgres, Terraform</td><td>Luyện module-based M1 homework.</td></tr>
+              <tr><td><code>cohorts/2024/01-docker-terraform/solutions.md</code></td><td>2024</td><td>Docker/Terraform</td><td>solution</td><td>SQL/Terraform answers</td><td>Review lời giải sau khi tự làm.</td></tr>
+              <tr><td><code>cohorts/2024/workshops/dlt.md</code></td><td>2024</td><td>dlt workshop</td><td>workshop</td><td>dlt, generators</td><td>Luyện data ingestion fundamentals.</td></tr>
+              <tr><td><code>cohorts/2024/workshops/rising-wave.md</code></td><td>2024</td><td>RisingWave</td><td>workshop</td><td>RisingWave stream processing</td><td>So sánh stream processing alternative.</td></tr>
+              <tr><td><code>cohorts/2025/02-workflow-orchestration/flows/*.yaml</code></td><td>2025</td><td>Workflow orchestration</td><td>config</td><td>Kestra, Postgres, GCS, BigQuery, dbt</td><td>Đọc orchestration flow production-ish hơn.</td></tr>
+              <tr><td><code>cohorts/2025/03-data-warehouse/load_yellow_taxi_data.py</code></td><td>2025</td><td>Data warehouse</td><td>code</td><td>GCS, Yellow Taxi parquet</td><td>Đọc download/upload helper, retry, hardcoded config risk.</td></tr>
+              <tr><td><code>cohorts/2025/workshops/dlt/README.md</code></td><td>2025</td><td>dlt workshop</td><td>workshop</td><td>dlt, REST APIs</td><td>Luyện REST API ingestion with dlt.</td></tr>
+              <tr><td><code>cohorts/2026/05-data-platforms/homework.md</code></td><td>2026</td><td>Data Platforms</td><td>homework</td><td>Bruin, lineage, quality checks</td><td>Luyện platform thinking và asset dependencies.</td></tr>
+              <tr><td><code>cohorts/2026/workshops/dlt/</code></td><td>2026</td><td>AI-assisted dlt</td><td>workshop/code/notebook</td><td>Open Library API, dlt, DuckDB, ibis, altair</td><td>Tạo mini portfolio project từ API -> dlt -> analysis.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box warn"><span><strong>Review rule:</strong> Nếu dùng solution, đọc sau khi tự làm. Copy solution mà không map dataset/table là học sai mục tiêu.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">MAP</span>
+          Nhóm homework theo chủ đề
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Chủ đề</th><th>Paths nên đọc</th><th>Ghi chú học tập</th></tr></thead>
+            <tbody>
+              <tr><td>Docker/Terraform</td><td><code>2023/week_1_docker_sql</code>, <code>2023/week_1_terraform</code>, <code>2024/01-docker-terraform</code>, <code>2025/01-docker-terraform</code>, <code>2026/01-docker-terraform</code></td><td>So sánh câu hỏi Docker networking, Postgres SQL và Terraform workflow qua các năm.</td></tr>
+              <tr><td>Workflow orchestration</td><td><code>2022/week_2_data_ingestion/airflow</code>, <code>2023/week_2_workflow_orchestration</code>, <code>2024/02-workflow-orchestration</code>, <code>2025/02-workflow-orchestration/flows</code>, <code>2026/02-workflow-orchestration</code></td><td>Đây là trục tool churn rõ nhất: Airflow -> Prefect -> Mage -> Kestra.</td></tr>
+              <tr><td>Data warehouse</td><td><code>2022/week_3_data_warehouse/airflow</code>, <code>2023/week_3_data_warehouse</code>, <code>2024/03-data-warehouse</code>, <code>2025/03-data-warehouse</code>, <code>2026/03-data-warehouse</code></td><td>Tập trung BigQuery, partitioning, clustering, external/native table.</td></tr>
+              <tr><td>Analytics engineering</td><td><code>2023/week_4_analytics_engineering</code>, <code>2024/04-analytics-engineering</code>, <code>2025/04-analytics-engineering</code>, <code>2026/04-analytics-engineering</code></td><td>dbt lineage, variables, macros, tests và revenue models.</td></tr>
+              <tr><td>Batch</td><td><code>2022/week_5_batch_processing</code>, <code>2023/week_5_batch_processing</code>, <code>2024/05-batch</code>, <code>2025/05-batch</code>, <code>2026/06-batch</code></td><td>Ôn Spark/PySpark và UI/debug batch jobs.</td></tr>
+              <tr><td>Streaming</td><td><code>2023/week_6_stream_processing</code>, <code>2024/06-streaming</code>, <code>2025/06-streaming</code>, <code>2026/07-streaming</code></td><td>Đọc 2023 nếu muốn Confluent/Spark, đọc 2026 nếu muốn current PyFlink-style homework.</td></tr>
+              <tr><td>Data platforms</td><td><code>2026/05-data-platforms/homework.md</code></td><td>Bruin pipeline structure, materialization, variables, quality checks, lineage.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">WS</span>
+          Workshop map
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Workshop</th><th>Path</th><th>Mục tiêu</th><th>Tool</th><th>Input/output</th><th>Assets/code liên quan</th></tr></thead>
+            <tbody>
+              <tr><td>2023 PipeRider</td><td><code>cohorts/2023/workshops/piperider.md</code></td><td>Tăng confidence khi thay đổi dbt model.</td><td>PipeRider, dbt</td><td>dbt project/model changes -> report/checks.</td><td><code>images/piperider.png</code> context asset.</td></tr>
+              <tr><td>2024 dlt</td><td><code>cohorts/2024/workshops/dlt.md</code>, <code>dlt_resources/</code></td><td>Data ingestion with dlt, generators, append/merge exercises.</td><td>dlt, Python generators</td><td>Generated/API-like data -> dlt pipeline exercises.</td><td><code>workshop.ipynb</code>, <code>homework_starter.ipynb</code>, <code>homework_solution.ipynb</code>, <code>incremental_loading.png</code>.</td></tr>
+              <tr><td>2024 RisingWave</td><td><code>cohorts/2024/workshops/rising-wave.md</code></td><td>Stream processing with RisingWave.</td><td>RisingWave</td><td>Streaming homework questions -> SQL/stream processing outputs.</td><td><code>images/rising-wave.png</code> context asset.</td></tr>
+              <tr><td>2025 dlt</td><td><code>cohorts/2025/workshops/dlt/README.md</code></td><td>REST API ingestion with dlt.</td><td>dlt, DuckDB</td><td>API/NYC Taxi style source -> dlt pipeline -> DuckDB exploration.</td><td><code>data_ingestion_workshop.md</code>, <code>dlt_homework.md</code>, <code>dynamic_load_dlt.py</code>, workshop images.</td></tr>
+              <tr><td>2026 dlt</td><td><code>cohorts/2026/workshops/dlt/README.md</code></td><td>AI-assisted data ingestion from APIs to warehouses.</td><td>dlt, Open Library API, DuckDB, ibis, altair, marimo</td><td>Open Library Search API -> dlt pipeline -> DuckDB dataset -> analysis charts.</td><td><code>open_library_pipeline.py</code>, <code>analysis.py</code>, <code>dlt_Pipeline_Overview.ipynb</code>, <code>cohorts/2026/workshops/dlt/images/etl_diagram.png</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">CODE</span>
+          Code/config mini deep-dive
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Airflow 2022 DAGs</h3>
+          <p><code>data_ingestion_gcs_dag.py</code> dạy flow ingestion: NYC TLC CSV trên S3 -> <code>BashOperator</code> curl -> pyarrow CSV to Parquet -> upload GCS -> BigQuery external table.</p>
+          <p><code>gcs_to_bq_dag.py</code> dạy warehouse flow: GCS raw parquet -> move to color prefix -> external table -> native partitioned BigQuery table.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>flow</span><span>airflow-2022.txt</span></div><div class="cmd-body"><pre>NYC TLC CSV
+  -&gt; Airflow download task
+  -&gt; Parquet conversion
+  -&gt; GCS raw/
+  -&gt; BigQuery external/native table</pre></div></div>
+
+          <h3 class="green">2023 Confluent/Spark streaming</h3>
+          <p><code>producer_confluent.py</code> đọc green/FHV CSV, tạo key/value và produce vào Confluent Kafka topics. <code>settings.py</code> giữ topic constants như <code>green_taxi_rides</code>, <code>fhv_taxi_rides</code>, <code>all_rides</code>. <code>streaming_confluent.py</code> dùng Spark Structured Streaming đọc Kafka, ghi topic hợp nhất rồi aggregate theo pickup location.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>flow</span><span>streaming-2023.txt</span></div><div class="cmd-body"><pre>green/fhv CSV
+  -&gt; producer_confluent.py
+  -&gt; Confluent topics green_taxi_rides / fhv_taxi_rides
+  -&gt; streaming_confluent.py
+  -&gt; topic all_rides
+  -&gt; group by PULocationID
+  -&gt; console output</pre></div></div>
+
+          <h3 class="orange">2025 Kestra YAML flows</h3>
+          <table>
+            <thead><tr><th>Flow</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>01_getting_started_data_pipeline.yaml</code></td><td>HTTP download -> Python transform -> DuckDB query.</td></tr>
+              <tr><td><code>02_postgres_taxi.yaml</code></td><td>Taxi data -> staging table -> CopyIn -> merge into Postgres final table.</td></tr>
+              <tr><td><code>02_postgres_taxi_scheduled.yaml</code></td><td>Same Postgres taxi flow with schedules.</td></tr>
+              <tr><td><code>03_postgres_dbt.yaml</code></td><td>Sync dbt files and run dbt CLI against Postgres.</td></tr>
+              <tr><td><code>04_gcp_kv.yaml</code></td><td>Set GCP project/location/bucket/dataset KV values.</td></tr>
+              <tr><td><code>05_gcp_setup.yaml</code></td><td>Create GCS bucket and BigQuery dataset.</td></tr>
+              <tr><td><code>06_gcp_taxi*.yaml</code></td><td>Upload taxi data to GCS and merge into BigQuery tables.</td></tr>
+              <tr><td><code>07_gcp_dbt.yaml</code></td><td>Run dbt CLI against BigQuery.</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="red">2025/2026 DLT scripts/notebooks</h3>
+          <p>2025 has dlt workshop materials and DLT upload notebooks for warehouse homework. 2026 gives a more portfolio-friendly example: <code>open_library_pipeline.py</code> creates a dlt source for Open Library Search API, writes to DuckDB dataset <code>open_library_data</code>, then <code>analysis.py</code> attaches to <code>open_library_pipeline</code> and uses ibis/altair/marimo for charts.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>flow</span><span>dlt-2026.txt</span></div><div class="cmd-body"><pre>Open Library Search API
+  -&gt; dlt rest_api_source(resource books)
+  -&gt; open_library_pipeline
+  -&gt; DuckDB dataset open_library_data
+  -&gt; analysis.py / notebook charts</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">TASK</span>
+          Practice tasks
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="practice-task"><div class="practice-task-header">Task 1 - Chọn 3 homework để ôn Docker -> Warehouse -> dbt</div><div class="practice-task-body"><p><strong>Đề:</strong> Chọn một chuỗi 3 homework giúp bạn ôn từ infrastructure tới warehouse tới analytics engineering.</p><p><strong>Hint:</strong> Dùng latest cohort nếu học lần đầu.</p><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p>Một path hợp lý: <code>cohorts/2026/01-docker-terraform/homework.md</code> -> <code>cohorts/2026/03-data-warehouse/homework.md</code> -> <code>cohorts/2026/04-analytics-engineering/homework.md</code>. Ghi rõ output sau mỗi homework: SQL answer, BigQuery tables, dbt model reasoning.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">Task 2 - So sánh Docker/Terraform 2024 vs 2026</div><div class="practice-task-body"><p><strong>Đề:</strong> Tạo bảng so sánh câu hỏi, dataset, Terraform requirement và phần solution nếu có.</p><p><strong>Hint:</strong> 2024 có <code>solutions.md</code>, 2026 có "Learning in Public".</p><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p>So sánh tối thiểu: path, Docker questions, Postgres SQL questions, Terraform workflow, dataset/time range, có solution hay không, có learning-in-public prompts hay không. Không copy answer trước khi tự làm.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">Task 3 - Map 2025 Kestra flows thành diagram</div><div class="practice-task-body"><p><strong>Đề:</strong> Vẽ data pipeline từ <code>01_getting_started</code> tới <code>07_gcp_dbt</code>.</p><p><strong>Hint:</strong> Tách local Postgres path và GCP BigQuery path.</p><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p>Diagram: HTTP download -> Python transform -> DuckDB; taxi parquet -> staging -> CopyIn -> Postgres merge; KV setup -> create GCS/BQ -> upload taxi -> external/tmp/final BQ tables -> dbt build. Ghi rõ flow nào scheduled.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">Task 4 - Dùng 2026 dlt workshop làm mini portfolio</div><div class="practice-task-body"><p><strong>Đề:</strong> Biến Open Library demo thành mini project có README, diagram, reproducible commands.</p><p><strong>Hint:</strong> Dùng <code>open_library_pipeline.py</code>, <code>analysis.py</code>, <code>etl_diagram.png</code>.</p><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p>Repo mini: <code>src/open_library_pipeline.py</code>, <code>analysis.py</code>, <code>pyproject.toml</code>, README problem statement, commands, architecture, screenshots/charts. Thêm data quality checks đơn giản: total books > 0, required columns exist, no null key.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">Task 5 - Tạo bảng homework gap</div><div class="practice-task-body"><p><strong>Đề:</strong> Chọn module bạn yếu nhất và lập bảng: current homework, old homework, workshop bổ trợ, production gap.</p><p><strong>Hint:</strong> Dùng trục chủ đề ở trên.</p><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p>Ví dụ với orchestration: current <code>cohorts/2026/02-workflow-orchestration/homework.md</code>, old Airflow <code>cohorts/2022/week_2_data_ingestion/airflow</code>, Kestra deep dive <code>cohorts/2025/02-workflow-orchestration/flows</code>, gap: retry policy, idempotency, alerting, secrets.</p></div></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">ERR</span>
+          Cố tình phá / lỗi học tập
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Lỗi học tập</th><th>Triệu chứng</th><th>Cách sửa</th></tr></thead>
+            <tbody>
+              <tr><td>Dùng homework năm cũ cho module mới mà không kiểm tra tool version</td><td>Lẫn Airflow/Prefect/Mage/Kestra, command không chạy.</td><td>Ghi year/tool ở đầu note, đối chiếu latest README.</td></tr>
+              <tr><td>Copy solution mà không hiểu dataset/table</td><td>Trả lời đúng nhưng không giải thích được query hoặc pipeline.</td><td>Làm lại từ input/output và viết giải thích 5 dòng.</td></tr>
+              <tr><td>Nhầm <code>cohorts/&lt;year&gt;/project.md</code> với <code>projects/README.md</code></td><td>Biết link submit nhưng không biết rubric.</td><td>Dùng cohort project.md cho logistics, projects/README.md cho rubric.</td></tr>
+              <tr><td>Bỏ qua notebooks vì tưởng chỉ là binary</td><td>Mất code cell quan trọng trong dlt/streaming homework.</td><td>Đọc notebook cell chính, không cần copy toàn JSON.</td></tr>
+              <tr><td>Không đọc images referenced trong homework</td><td>Thiếu context dataset hoặc architecture.</td><td>Inventory image path và vai trò.</td></tr>
+              <tr><td>Lẫn Airflow/Prefect/Mage/Kestra</td><td>So sánh sai orchestration concepts.</td><td>Tạo timeline: 2022 Airflow, 2023 Prefect, 2024 Mage, 2025+ Kestra.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s4">
+      <div class="module-header">
+        <div class="module-tag">S4 · Final Project</div>
+        <div class="module-title">Final Project</div>
+        <div class="module-subtitle">Đọc project docs như contract giao hàng: dataset hợp lệ, pipeline end-to-end, rubric rõ ràng, reviewer chạy được.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">REQ</span>
+          Phân tích <code>projects/README.md</code>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Mục</th><th>Nội dung từ docs</th><th>Ý nghĩa khi làm project</th></tr></thead>
+            <tbody>
+              <tr><td>Goal</td><td>Apply everything learned to build an end-to-end data pipeline.</td><td>Không làm notebook đơn lẻ; cần pipeline hoàn chỉnh.</td></tr>
+              <tr><td>Problem statement</td><td>Build dashboard with two tiles from selected dataset.</td><td>Phải có business question và output dễ hiểu.</td></tr>
+              <tr><td>Pipeline</td><td>Stream hoặc batch.</td><td>Chọn theo latency requirement, không chọn tool vì thấy mới.</td></tr>
+              <tr><td>Technologies</td><td>Có thể dùng AWS/GCP/Azure, Terraform/Pulumi, Airflow/Prefect, BigQuery/Snowflake, Spark/Flink, Kafka/Pulsar...</td><td>Nếu dùng tool ngoài course, phải giải thích nó làm gì.</td></tr>
+              <tr><td>Dashboard</td><td>Tối thiểu 2 tiles: categorical distribution và temporal distribution được gợi ý.</td><td>Dashboard phải có title/reference, không chỉ screenshot rời rạc.</td></tr>
+              <tr><td>Peer review</td><td>Evaluate 3 peer projects; extra points for evaluations.</td><td>README phải đủ rõ để reviewer hiểu và chạy.</td></tr>
+              <tr><td>Portfolio guidance</td><td>Repo mới, title có nghĩa, README chi tiết.</td><td>Project này có thể đưa vào CV nếu reproducible và defensible.</td></tr>
+              <tr><td>Extra mile</td><td>Tests, make, CI/CD optional but valuable.</td><td>Không bắt buộc để pass, nhưng tăng chất lượng portfolio.</td></tr>
+              <tr><td>Plagiarism</td><td>Không dùng project/notebook của người khác hoặc reuse project cũ bị cấm.</td><td>Vi phạm là 0 điểm.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">DATA</span>
+          Dataset strategy từ <code>projects/datasets.md</code>
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Dataset suggestions gồm Kaggle, AWS Open Data, UK government data, GitHub Archive, Awesome Public Datasets, BigQuery public data, streaming datasets, Open Food Facts, Binance Public Data, NOAA weather và nhiều nguồn khác. Docs cũng nói không bắt buộc dùng dataset trong list.</p>
+          <div class="info-box danger"><span><strong>Dataset rule:</strong> NYC taxi dataset đã dùng trong course modules và homework, nên không được dùng cho final project.</span></div>
+          <table>
+            <thead><tr><th>Tiêu chí</th><th>Câu hỏi tự kiểm</th></tr></thead>
+            <tbody>
+              <tr><td>Public access</td><td>Reviewer có tải được data không? Có cần token/key không?</td></tr>
+              <tr><td>Enough size</td><td>Dữ liệu đủ lớn để cần pipeline, DWH hoặc Spark không?</td></tr>
+              <tr><td>Update cadence</td><td>Data có update daily/hourly/realtime để justify orchestration hoặc streaming không?</td></tr>
+              <tr><td>Clear schema</td><td>Fields có document rõ, kiểu dữ liệu ổn định không?</td></tr>
+              <tr><td>Business question</td><td>Dashboard trả lời câu hỏi gì, ai cần xem?</td></tr>
+              <tr><td>Legal/PII risk thấp</td><td>Có thông tin cá nhân, license restriction, hoặc data nhạy cảm không?</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">ARCH</span>
+          Project architecture template
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block"><div class="cmd-header"><span>project</span><span>architecture-template.txt</span></div><div class="cmd-body"><pre>Data source
+  -&gt; ingestion script/API connector
+  -&gt; data lake/object storage
+  -&gt; warehouse/lakehouse
+  -&gt; transformations/dbt/Spark
+  -&gt; dashboard/report
+  -&gt; README + reproducible commands + architecture diagram</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">RUB</span>
+          Rubric self-check table
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Rubric area</th><th>Để đạt mức tốt</th><th>Evidence trong repo project</th></tr></thead>
+            <tbody>
+              <tr><td>Problem description</td><td>Problem rõ, giải thích project giải quyết gì.</td><td>README intro + business question.</td></tr>
+              <tr><td>Cloud/IaC</td><td>Project developed in cloud and IaC used.</td><td>Terraform/Pulumi folder, cloud resource docs.</td></tr>
+              <tr><td>Workflow orchestration</td><td>End-to-end DAG/flow, multiple steps, upload to data lake.</td><td>Kestra/Airflow/Prefect flow files.</td></tr>
+              <tr><td>Data warehouse</td><td>Tables optimized with partitioning/clustering and explanation.</td><td>SQL DDL, README section, query cost rationale.</td></tr>
+              <tr><td>Transformations</td><td>dbt/Spark/similar transformations, not only one-off SQL.</td><td>dbt project, Spark jobs, tests.</td></tr>
+              <tr><td>Dashboard</td><td>At least 2 tiles.</td><td>Dashboard link/screenshots and explanation.</td></tr>
+              <tr><td>Reproducibility</td><td>Clear instructions, easy to run, code works.</td><td>README commands, env example, Makefile/docker compose if used.</td></tr>
+              <tr><td>Documentation</td><td>Architecture diagram, trade-offs, known limitations.</td><td>README, diagrams, runbook notes.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">EX</span>
+          Project design examples & anti-patterns
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Design examples</h3>
+          <table>
+            <thead><tr><th>Level</th><th>Design</th><th>Khi nào hợp lý</th></tr></thead>
+            <tbody>
+              <tr><td>Beginner</td><td>Batch ELT public API -> GCS/BigQuery -> dbt -> dashboard.</td><td>Khi dataset update daily/hourly và bạn cần project stable.</td></tr>
+              <tr><td>Intermediate</td><td>Scheduled ingestion + partitioned warehouse + dbt tests.</td><td>Khi muốn chấm cao ở orchestration, DWH optimization và transformations.</td></tr>
+              <tr><td>Advanced</td><td>Streaming/CDC hoặc dlt + orchestration + monitoring.</td><td>Khi data có real-time value hoặc API ingestion phức tạp.</td></tr>
+            </tbody>
+          </table>
+          <h3 class="red">Anti-patterns</h3>
+          <ul>
+            <li>Hardcoded local paths hoặc personal cloud project IDs.</li>
+            <li>Không chạy thử <code>docker compose up</code> trước khi submit.</li>
+            <li>Thiếu <code>dbt deps</code> khi dùng dbt packages.</li>
+            <li>README chỉ có screenshot, không có commands.</li>
+            <li>Không có architecture diagram.</li>
+            <li>Reuse dataset bị cấm như NYC taxi course dataset.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-quiz">Q</span>
+          Quiz - final project rubric, dataset, portfolio
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="quiz-item"><div class="quiz-q">Final project goal là gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. projects/README.md nói goal là apply everything learned để build end-to-end data pipeline.')">A. Build end-to-end data pipeline áp dụng kiến thức course</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không đủ. Dashboard là output, không phải toàn bộ project.')">B. Chỉ vẽ một dashboard</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không có yêu cầu chỉ làm notebook.')">C. Chỉ nộp notebook</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Dataset nào không được dùng?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. NYC taxi dataset được dùng xuyên suốt course và bị cấm cho final project.')">A. NYC taxi dataset của course</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Open Food Facts là dataset suggestion trong projects/datasets.md.')">B. Open Food Facts</div><div class="quiz-opt" onclick="answerQuiz(this,false,'NOAA weather là dataset suggestion.')">C. NOAA weather</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Dashboard cần tối thiểu gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Docs yêu cầu ít nhất 2 tiles.')">A. 0 tile nếu README tốt</div><div class="quiz-opt" onclick="answerQuiz(this,false,'1 tile chỉ đạt mức thấp hơn rubric.')">B. 1 tile</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. projects/README.md yêu cầu dashboard at least two tiles.')">C. 2 tiles</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Để đạt mức cao ở Cloud rubric cần gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Rubric 4 points: project developed in cloud and IaC tools are used.')">A. Cloud + IaC</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Local-only là 0 points theo rubric Cloud.')">B. Chạy local only</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Screenshot không thay cloud/IaC evidence.')">C. Screenshot dashboard</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Peer review yêu cầu gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Project docs yêu cầu evaluate 3 peer projects.')">A. Evaluate 3 peer projects</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không đủ.')">B. Chỉ tự chấm project của mình</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Leaderboard không thay peer review.')">C. Chỉ gửi link leaderboard</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Reproducibility tốt cần gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Screenshot không giúp reviewer chạy code.')">A. Chỉ có screenshots</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Rubric yêu cầu instructions clear, easy to run, code works.')">B. Commands rõ, env example, code chạy từ clean clone</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Hardcoded path là anti-pattern.')">C. Hardcoded local paths</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Nếu dùng tool ngoài course thì cần làm gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. projects/README.md nói nếu dùng tool ngoài course, hãy giải thích tool đó làm gì.')">A. Giải thích tool đó làm gì</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không cần giấu; cần document rõ.')">B. Giấu khỏi README</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không có rule cấm mọi tool ngoài course.')">C. Không bao giờ được dùng</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Missing <code>dbt deps</code> gây vấn đề gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Peer reviewer tips nói có project cần dbt_utils nhưng không install packages.')">A. Reviewer chạy dbt fail nếu package chưa cài</div><div class="quiz-opt" onclick="answerQuiz(this,false,'dbt deps không làm dashboard đẹp hơn trực tiếp.')">B. Dashboard đổi màu</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Không liên quan đến Kafka topic.')">C. Kafka mất topic</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Plagiarism policy cấm điều gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Docs cấm lấy project/notebook của người khác hoặc reuse project cũ bị nêu trong policy.')">A. Dùng project/notebook của người khác hoặc reuse project cũ bị cấm</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Dataset public không bị cấm nếu không phải NYC taxi course dataset và license cho phép.')">B. Dùng mọi dataset public</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Repo riêng được khuyến nghị.')">C. Tạo repo riêng</div></div><div class="quiz-explain"></div></div>
+          <div class="quiz-item"><div class="quiz-q">Cách bắt đầu project tốt nhất là gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz(this,false,'Chọn tool trước dễ over-engineer.')">A. Chọn tool mới nhất trước</div><div class="quiz-opt" onclick="answerQuiz(this,true,'Đúng. Bắt đầu từ problem, dataset, rubric rồi mới chọn architecture/tool.')">B. Bắt đầu từ problem, dataset và rubric</div><div class="quiz-opt" onclick="answerQuiz(this,false,'Ảnh chỉ hỗ trợ communication, không tạo project.')">C. Bắt đầu bằng logo tool</div></div><div class="quiz-explain"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s5">
+      <div class="module-header">
+        <div class="module-tag">S5 · Assets</div>
+        <div class="module-title">Course Assets</div>
+        <div class="module-subtitle">Inventory ảnh, logo và screenshot trong <code>images/</code>; biết asset nào phục vụ overview, workshop, cohort docs hoặc project README.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">INV</span>
+          Asset inventory table
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <p>Theo <code>repo_notes_M08.md</code>, <code>images/</code> là static asset layer. Không có logic pipeline trong ảnh; giá trị của chúng nằm ở việc giải thích architecture, nhận diện tool/workshop, hoặc hỗ trợ setup cloud.</p>
+          <table>
+            <thead><tr><th>Path</th><th>Type</th><th>Role</th><th>Referenced by</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td><code>images/architecture/arch_v5_workshops.png</code></td><td>PNG</td><td>Main course overview architecture</td><td>Root <code>README.md</code> first image</td><td>Ảnh overview chính, ưu tiên dùng khi cần giải thích toàn course.</td></tr>
+              <tr><td><code>images/architecture/arch_v4_workshops.jpg</code></td><td>JPG</td><td>Older course/workshop architecture</td><td>Asset inventory; likely older README/docs</td><td>Giữ như historical architecture asset, không bịa reference nếu không thấy trong notes.</td></tr>
+              <tr><td><code>images/architecture/arch_v3_workshops.jpg</code></td><td>JPG</td><td>Older course/workshop architecture</td><td>Asset inventory; likely older README/docs</td><td>Dùng để so sánh evolution của overview diagram.</td></tr>
+              <tr><td><code>images/architecture/photo1700757552.jpeg</code></td><td>JPEG</td><td>Photo/architecture asset</td><td>Asset inventory</td><td>Static asset, chưa có role học độc lập trong notes.</td></tr>
+              <tr><td><code>images/bruin.svg</code></td><td>SVG</td><td>Bruin sponsor/tool logo</td><td>Root <code>README.md</code>, Module 05 context</td><td>Liên quan Data Platforms/Bruin.</td></tr>
+              <tr><td><code>images/dlthub.png</code></td><td>PNG</td><td>dltHub logo</td><td>Root <code>README.md</code>, dlt workshop context</td><td>Gắn với dlt workshops 2024-2026.</td></tr>
+              <tr><td><code>images/kestra.svg</code></td><td>SVG</td><td>Kestra sponsor/tool logo</td><td>Root <code>README.md</code></td><td>Liên quan orchestration/Kestra era.</td></tr>
+              <tr><td><code>images/mage.svg</code></td><td>SVG</td><td>Mage logo</td><td>2024 workflow/Mage context</td><td>Hữu ích khi giải thích transition 2024.</td></tr>
+              <tr><td><code>images/piperider.png</code></td><td>PNG</td><td>PipeRider logo</td><td>2023 PipeRider workshop context</td><td>Gắn với workshop analytics/dbt quality.</td></tr>
+              <tr><td><code>images/rising-wave.png</code></td><td>PNG</td><td>RisingWave logo</td><td>2024 RisingWave workshop context</td><td>Gắn với stream processing workshop.</td></tr>
+              <tr><td><code>images/aws/iam.png</code></td><td>PNG</td><td>AWS IAM screenshot</td><td>2022 transfer service README references AWS IAM image</td><td>Relative path trong doc cũ đáng review vì có thể fragile.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box warn"><span><strong>Rule:</strong> Với binary assets, không copy nội dung nhị phân vào notes hoặc HTML. Chỉ ghi path, role, nơi được tham chiếu, và preview nếu path local hoạt động.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">IMG</span>
+          Nhóm assets và preview local
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <h3 class="blue">Architecture images</h3>
+          <div class="summary-grid">
+            <div class="summary-item"><strong><code>arch_v5_workshops.png</code></strong><img src="images/architecture/arch_v5_workshops.png" alt="Course overview architecture v5" style="width:100%;max-height:180px;object-fit:contain;border:1px solid var(--border);border-radius:6px;background:var(--bg);margin:8px 0" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><p style="display:none">Preview không khả dụng. Path: <code>images/architecture/arch_v5_workshops.png</code></p><p>Main README overview image.</p></div>
+            <div class="summary-item"><strong><code>arch_v4_workshops.jpg</code></strong><img src="images/architecture/arch_v4_workshops.jpg" alt="Older course architecture v4" style="width:100%;max-height:180px;object-fit:contain;border:1px solid var(--border);border-radius:6px;background:var(--bg);margin:8px 0" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><p style="display:none">Preview không khả dụng. Path: <code>images/architecture/arch_v4_workshops.jpg</code></p><p>Older architecture/workshop asset.</p></div>
+            <div class="summary-item"><strong><code>arch_v3_workshops.jpg</code></strong><img src="images/architecture/arch_v3_workshops.jpg" alt="Older course architecture v3" style="width:100%;max-height:180px;object-fit:contain;border:1px solid var(--border);border-radius:6px;background:var(--bg);margin:8px 0" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><p style="display:none">Preview không khả dụng. Path: <code>images/architecture/arch_v3_workshops.jpg</code></p><p>Historical overview/workshop asset.</p></div>
+            <div class="summary-item"><strong><code>photo1700757552.jpeg</code></strong><img src="images/architecture/photo1700757552.jpeg" alt="Architecture photo asset" style="width:100%;max-height:180px;object-fit:contain;border:1px solid var(--border);border-radius:6px;background:var(--bg);margin:8px 0" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><p style="display:none">Preview không khả dụng. Path: <code>images/architecture/photo1700757552.jpeg</code></p><p>Photo/architecture asset in inventory.</p></div>
+          </div>
+
+          <h3 class="green">Tool logos</h3>
+          <div class="summary-grid">
+            <div class="summary-item"><strong>Bruin</strong><img src="images/bruin.svg" alt="Bruin logo" style="height:70px;max-width:100%;object-fit:contain;margin:8px 0" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><p style="display:none">Preview không khả dụng. Path: <code>images/bruin.svg</code></p><p><code>images/bruin.svg</code> - root README, Data Platforms context.</p></div>
+            <div class="summary-item"><strong>dltHub</strong><img src="images/dlthub.png" alt="dltHub logo" style="height:70px;max-width:100%;object-fit:contain;margin:8px 0" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><p style="display:none">Preview không khả dụng. Path: <code>images/dlthub.png</code></p><p><code>images/dlthub.png</code> - root README, dlt workshops.</p></div>
+            <div class="summary-item"><strong>Kestra</strong><img src="images/kestra.svg" alt="Kestra logo" style="height:70px;max-width:100%;object-fit:contain;margin:8px 0" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><p style="display:none">Preview không khả dụng. Path: <code>images/kestra.svg</code></p><p><code>images/kestra.svg</code> - root README, orchestration context.</p></div>
+            <div class="summary-item"><strong>Mage</strong><img src="images/mage.svg" alt="Mage logo" style="height:70px;max-width:100%;object-fit:contain;margin:8px 0" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><p style="display:none">Preview không khả dụng. Path: <code>images/mage.svg</code></p><p><code>images/mage.svg</code> - 2024 workflow/Mage context.</p></div>
+            <div class="summary-item"><strong>PipeRider</strong><img src="images/piperider.png" alt="PipeRider logo" style="height:70px;max-width:100%;object-fit:contain;margin:8px 0" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><p style="display:none">Preview không khả dụng. Path: <code>images/piperider.png</code></p><p><code>images/piperider.png</code> - 2023 PipeRider workshop.</p></div>
+            <div class="summary-item"><strong>RisingWave</strong><img src="images/rising-wave.png" alt="RisingWave logo" style="height:70px;max-width:100%;object-fit:contain;margin:8px 0" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><p style="display:none">Preview không khả dụng. Path: <code>images/rising-wave.png</code></p><p><code>images/rising-wave.png</code> - 2024 RisingWave workshop.</p></div>
+          </div>
+
+          <h3 class="orange">Cloud screenshots</h3>
+          <div class="summary-item"><strong><code>images/aws/iam.png</code></strong><img src="images/aws/iam.png" alt="AWS IAM screenshot referenced by older cohort docs" style="width:100%;max-height:220px;object-fit:contain;border:1px solid var(--border);border-radius:6px;background:var(--bg);margin:8px 0" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><p style="display:none">Preview không khả dụng. Path: <code>images/aws/iam.png</code></p><p>AWS IAM screenshot được 2022 transfer service docs tham chiếu; cần kiểm tra relative path khi render từ file con.</p></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">USE</span>
+          Image usage analysis
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Usage</th><th>Asset</th><th>Review rule</th></tr></thead>
+            <tbody>
+              <tr><td>README overview image</td><td><code>images/architecture/arch_v5_workshops.png</code></td><td>Đây là overview image chính; dùng để giải thích course architecture, không thay cho nội dung module.</td></tr>
+              <tr><td>Workshop/tool sections</td><td><code>dlthub.png</code>, <code>mage.svg</code>, <code>piperider.png</code>, <code>rising-wave.png</code></td><td>Logo chỉ tạo context tool. Nội dung học vẫn phải trỏ về workshop/docs/code tương ứng.</td></tr>
+              <tr><td>Cohort docs references</td><td><code>images/aws/iam.png</code>, Airflow doc screenshots, homework images</td><td>Kiểm tra path từ vị trí file markdown, đặc biệt với docs cũ dùng relative path sâu.</td></tr>
+              <tr><td>Project README</td><td>Architecture images hoặc diagram tự vẽ</td><td>Project nên có diagram riêng phản ánh pipeline thật, không reuse logo/overview course như bằng chứng kỹ thuật.</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box danger"><span><strong>Relative path risk:</strong> Notes ghi <code>cohorts/2022/week_2_data_ingestion/transfer_service/README.md</code> tham chiếu <code>../../images/aws/iam.png</code>; từ vị trí file đó, link có thể không trỏ đúng root <code>images/</code>. Khi review, ghi rõ path fragile thay vì âm thầm sửa nội dung.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">✓</span>
+          Asset quality checklist
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul class="checklist">
+            <li>Alt text mô tả đúng nội dung ảnh, không chỉ lặp tên file.</li>
+            <li>File size hợp lý cho HTML học; ảnh quá lớn cần note hoặc resize trong UI bằng CSS.</li>
+            <li>Path ổn định từ vị trí file HTML hoặc README đang render.</li>
+            <li>Ghi rõ asset được referenced hay chỉ nằm trong inventory.</li>
+            <li>Asset liên quan đúng section: architecture cho overview/project, logo cho tool context, screenshot cho setup cloud.</li>
+            <li>Không nhúng external image nếu source không nằm trong repo.</li>
+            <li>Không dùng ảnh như source of truth cho claim kỹ thuật; claim phải dựa vào markdown/code/config trong notes.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s6">
+      <div class="module-header">
+        <div class="module-tag">S6 · Learning Path</div>
+        <div class="module-title">Cách học & Lộ trình</div>
+        <div class="module-subtitle">Biến Module 08 thành hệ thống điều hướng: học module root, dùng cohort đúng lúc, thiết kế final project sớm, và review theo production gaps.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">STR</span>
+          Learning strategy
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li>Học module root 01-07 trước để có path kỹ thuật chính.</li>
+            <li>Dùng <code>cohorts/2026</code> cho homework mới nhất và current course path.</li>
+            <li>Dùng cohorts cũ để hiểu tool history, luyện thêm, hoặc đọc material đã bị thay thế nhưng vẫn có giá trị như Airflow 2022, Confluent/Spark 2023, Mage/dlt/RisingWave 2024, Kestra 2025.</li>
+            <li>Dùng <code>projects/</code> ngay từ đầu để biết end goal: rubric, dataset rule, peer review, reproducibility, documentation.</li>
+            <li>Dùng <code>images/architecture</code> để tự vẽ lại architecture cho project, không copy máy móc overview course.</li>
+          </ul>
+          <div class="info-box note"><span><strong>Senior lens:</strong> Module 08 không dạy thêm một engine mới. Nó dạy cách đọc course repo như product/documentation system: version history, deliverable contract, asset governance và project readiness.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">PATH</span>
+          4 lộ trình học
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Lộ trình</th><th>Dành cho ai</th><th>Cách đi</th><th>Output</th></tr></thead>
+            <tbody>
+              <tr><td>Beginner path</td><td>Người học lần đầu</td><td>Root modules 01-07 -> <code>cohorts/2026</code> homework -> S4 final project rubric.</td><td>Nắm current course và đủ input để làm capstone.</td></tr>
+              <tr><td>Deep repo path</td><td>Muốn hiểu lịch sử repo/tool churn</td><td>Current path + đọc thêm 2022 Airflow, 2023 streaming, 2024 Mage/dlt/RisingWave, 2025 Kestra.</td><td>Biết mapping giữa tool cũ/mới và tránh nhầm docs theo năm.</td></tr>
+              <tr><td>Portfolio path</td><td>Muốn ra project nhanh</td><td>Đọc <code>projects/README.md</code> trước -> chọn dataset -> chọn 2-3 homework/workshop phục vụ project -> viết README.</td><td>Project có problem, architecture, commands, dashboard và review evidence.</td></tr>
+              <tr><td>Senior review path</td><td>Muốn nâng project lên production thinking</td><td>Dùng S7/S8 sau này + notes phần gaps: security, idempotency, observability, testing, cost, governance.</td><td>Review checklist giống delivery contract, không chỉ pass homework.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">14D</span>
+          Study plan 14 ngày cho Module 08
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Ngày</th><th>Focus</th><th>Deliverable</th></tr></thead>
+            <tbody>
+              <tr><td>Day 1-2</td><td>Map cohorts 2022-2026</td><td>Bảng năm, structure, tool era, nên đọc khi nào.</td></tr>
+              <tr><td>Day 3-5</td><td>Homework inventory</td><td>Danh sách homework theo topic và gap cá nhân.</td></tr>
+              <tr><td>Day 6-8</td><td>Workshops</td><td>Chọn 1 workshop chính và 1 workshop phụ để chuyển thành mini project.</td></tr>
+              <tr><td>Day 9-11</td><td>Final project design</td><td>Problem statement, dataset, architecture, tool choices, risks.</td></tr>
+              <tr><td>Day 12</td><td>Asset/diagram cleanup</td><td>Diagram riêng cho project, alt text, no broken links.</td></tr>
+              <tr><td>Day 13</td><td>Self-review with rubric</td><td>Rubric table tự chấm: cloud, orchestration, warehouse, transformations, dashboard, reproducibility.</td></tr>
+              <tr><td>Day 14</td><td>Portfolio README</td><td>README có commands, architecture, dataset note, screenshots, review checklist.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">TREE</span>
+          Decision tree
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="cmd-block">
+            <div class="cmd-header">navigation decision tree</div>
+            <div class="cmd-body"><pre>Need latest homework?
+  -> cohorts/2026
+Need older Airflow?
+  -> cohorts/2022
+Need final project rubric?
+  -> projects/README.md
+Need dataset idea?
+  -> projects/datasets.md
+Need diagram/logo?
+  -> images/</pre></div>
+          </div>
+          <div class="info-box tip"><span><strong>Rule of thumb:</strong> Khi không chắc, dùng latest cohort cho bài tập hiện tại, dùng cohort cũ như reference lịch sử, và dùng <code>projects/</code> làm contract của final deliverable.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">SC</span>
+          8 scenario cards
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="summary-grid">
+            <div class="summary-item"><strong>Tôi bị lạc giữa 2024 và 2026</strong>Chọn 2026 làm source hiện tại. Dùng 2024 để hiểu transition module-based, Mage, dlt và RisingWave; không trộn homework cùng tên nếu chưa ghi rõ full path.</div>
+            <div class="summary-item"><strong>Tôi muốn chọn dataset project</strong>Đọc <code>projects/datasets.md</code>, loại NYC taxi course dataset, kiểm tra public access, size, schema, update cadence, business question và PII/legal risk.</div>
+            <div class="summary-item"><strong>Tôi muốn làm project dùng dlt</strong>Bắt đầu từ 2026 dlt workshop: <code>open_library_pipeline.py</code>, <code>analysis.py</code>, <code>pyproject.toml</code>, notebook và <code>cohorts/2026/workshops/dlt/images/etl_diagram.png</code>; sau đó thay source bằng dataset riêng.</div>
+            <div class="summary-item"><strong>Tôi muốn dùng Airflow thay Kestra</strong>Đọc 2022 Airflow DAGs để hiểu pattern cũ, nhưng project README phải giải thích tool choice, setup, credentials, retries và idempotency theo rubric hiện tại.</div>
+            <div class="summary-item"><strong>Tôi cần thêm project vào CV</strong>Ưu tiên portfolio path: problem, architecture, cloud/IaC evidence, orchestration, warehouse optimization, dbt/Spark transforms, dashboard, reproducible commands.</div>
+            <div class="summary-item"><strong>Tôi muốn review project của bạn học</strong>Dùng rubric trong <code>projects/README.md</code>: problem, cloud, ingestion, warehouse, transformations, dashboard, reproducibility. Review bằng bằng chứng chạy được, không chỉ nhìn screenshot.</div>
+            <div class="summary-item"><strong>Tôi cần ảnh architecture cho README</strong>Dùng <code>images/architecture</code> làm reference visual, nhưng vẽ diagram riêng cho pipeline của bạn. Thêm alt text và kiểm tra path từ README project.</div>
+            <div class="summary-item"><strong>Tôi muốn tránh plagiarism</strong>Không reuse NYC taxi course dataset cho final project, không dùng notebook/project của người khác, và ghi rõ nguồn dataset/code template nếu có tham khảo.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">SR</span>
+          Senior DE perspective
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li>Project rubric là contract giao hàng: nếu không có reproducibility, architecture và dashboard evidence, project chưa đủ để review nghiêm túc.</li>
+            <li>Cohort history giúp nhận ra tool churn: Airflow, Prefect/Mage, Kestra, dlt, RisingWave, Bruin/Data Platforms. Kỹ năng quan trọng là migration mindset, không phải thuộc lòng một tool.</li>
+            <li>Assets giúp truyền đạt architecture rõ ràng, nhưng diagram phải phản ánh pipeline thật và có path ổn định.</li>
+            <li>Production gaps cần bổ sung ngoài repo: secrets, CI/CD, testing, observability, cost governance, schema contracts, lineage, IAM, runbooks.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s7">
+      <div class="module-header">
+        <div class="module-tag">S7 · Review</div>
+        <div class="module-title">Review Checklist</div>
+        <div class="module-subtitle">Checklist để review course navigation, final project, asset usage và chuẩn bị trả lời project defense.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">A</span>
+          Cohort navigation review
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Review item</th><th>Evidence cần có</th><th>Red flag</th></tr></thead>
+            <tbody>
+              <tr><td>Xác định đúng năm/module cần học</td><td>Ghi rõ <code>cohorts/2026</code> cho current homework hoặc cohort cũ cho historical material.</td><td>Nói chung chung "đọc homework.md".</td></tr>
+              <tr><td>Phân biệt current homework và historical homework</td><td>Giải thích vì sao dùng 2026, 2025, 2024, 2023 hoặc 2022.</td><td>Dùng bài cũ như bài mới mà không kiểm tra tool/context.</td></tr>
+              <tr><td>Ghi rõ path cho mỗi file tham chiếu</td><td>Full path như <code>cohorts/2025/02-workflow-orchestration/flows/06_gcp_taxi.yaml</code>.</td><td>Trích filename trùng nhau không có folder.</td></tr>
+              <tr><td>Kiểm tra tool version/context</td><td>Biết Airflow 2022, Confluent/Spark 2023, Mage/dlt/RisingWave 2024, Kestra 2025, latest 2026.</td><td>Lẫn Airflow, Mage, Kestra trong cùng một claim.</td></tr>
+              <tr><td>Tránh gộp sai homework cùng tên</td><td>Mỗi <code>homework.md</code> được review theo năm/module riêng.</td><td>Gộp đáp án hoặc yêu cầu từ nhiều năm thành một bài.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">B</span>
+          Final project review
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Review item</th><th>Pass condition</th></tr></thead>
+            <tbody>
+              <tr><td>Problem statement rõ ràng</td><td>Nêu business/user question, dataset, expected output.</td></tr>
+              <tr><td>Dataset hợp lệ</td><td>Không dùng NYC taxi course dataset; có source, schema, access, license/PII note.</td></tr>
+              <tr><td>Architecture diagram</td><td>Có source -> processing -> warehouse/lakehouse -> dashboard/report.</td></tr>
+              <tr><td>Reproducible commands</td><td>Reviewer chạy được từ clean clone với README, env example và commands rõ.</td></tr>
+              <tr><td>Cloud/IaC nếu rubric yêu cầu</td><td>Có cloud resource và Terraform/Pulumi/CloudFormation hoặc giải thích phạm vi nếu không dùng.</td></tr>
+              <tr><td>Orchestration rõ ràng</td><td>DAG/flow/schedule/backfill hoặc batch/stream trigger được mô tả.</td></tr>
+              <tr><td>Transformations/test rõ ràng</td><td>dbt/Spark/SQL transforms có test hoặc validation tối thiểu.</td></tr>
+              <tr><td>Dashboard/output có giá trị</td><td>Tối thiểu 2 tiles hoặc output trả lời business question.</td></tr>
+              <tr><td>README đủ để reviewer chạy/hiểu</td><td>Có problem, architecture, setup, commands, data model, screenshots, limitations.</td></tr>
+              <tr><td>Không hardcode secrets/local paths</td><td>Secrets qua env/secret manager; không commit credentials, local absolute path hoặc personal project ID.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">C</span>
+          Asset review
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul class="checklist">
+            <li>Ảnh có alt text mô tả đúng vai trò.</li>
+            <li>Path không broken khi render từ HTML hoặc README project.</li>
+            <li>Ảnh architecture đúng với project, không chỉ copy overview course.</li>
+            <li>Logo/tool image không dùng thay cho nội dung phân tích kỹ thuật.</li>
+            <li>Relative path trong cohort docs cũ được kiểm tra trước khi cite.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-practice">D</span>
+          Interview/project defense questions
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="practice-task"><div class="practice-task-header">1. Vì sao bạn chọn dataset này?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Gắn dataset với problem statement, public access, size, schema, update cadence và risk thấp.</p><p><strong>Evidence:</strong> Link dataset, schema sample, README dataset section.</p><p><strong>Red flag:</strong> Chọn dataset vì dễ copy hoặc dùng lại NYC taxi course dataset.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">2. Dataset có update cadence không?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Nêu daily/hourly/monthly/static và cadence đó quyết định batch/stream schedule thế nào.</p><p><strong>Evidence:</strong> Dataset docs, API metadata, timestamp columns, ingestion schedule.</p><p><strong>Red flag:</strong> Schedule tùy ý không liên quan source.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">3. Pipeline có idempotent không?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Mô tả partition/date key, staging table, merge/upsert hoặc overwrite an toàn.</p><p><strong>Evidence:</strong> Flow/DAG code, SQL merge, object path convention.</p><p><strong>Red flag:</strong> Rerun tạo duplicate hoặc không biết rerun sẽ xảy ra gì.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">4. Nếu ingestion fail giữa chừng thì recover thế nào?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Có retry, checkpoint, staging cleanup, rerun theo partition và log lỗi.</p><p><strong>Evidence:</strong> Orchestration config, runbook, error handling code.</p><p><strong>Red flag:</strong> Phải xóa thủ công toàn bộ warehouse để chạy lại.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">5. Vì sao chọn warehouse/lakehouse này?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Liên hệ query pattern, data size, cloud stack, cost và skill target.</p><p><strong>Evidence:</strong> Architecture diagram, table design, cost/region note.</p><p><strong>Red flag:</strong> Chọn vì course dùng mà không giải thích project fit.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">6. Partitioning/clustering/file layout thế nào?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Nêu partition key, clustering columns hoặc object layout theo date/source.</p><p><strong>Evidence:</strong> DDL, dbt model config, storage paths.</p><p><strong>Red flag:</strong> Full scan mọi query hoặc file nhỏ không kiểm soát.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">7. Transformations được test ra sao?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Có dbt tests, SQL assertions, schema checks, null/range checks hoặc validation script.</p><p><strong>Evidence:</strong> <code>schema.yml</code>, test command, validation output.</p><p><strong>Red flag:</strong> Chỉ nhìn dashboard rồi kết luận data đúng.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">8. Dashboard trả lời business question gì?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Mỗi tile phải gắn với câu hỏi và quyết định/action cụ thể.</p><p><strong>Evidence:</strong> Dashboard screenshot/link, metric definitions, README explanation.</p><p><strong>Red flag:</strong> Chart đẹp nhưng không trả lời câu hỏi nào.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">9. Project có reproducible từ máy khác không?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Clean clone, env setup, docker compose, dbt deps, seed/sample data và commands theo thứ tự.</p><p><strong>Evidence:</strong> README setup section, <code>.env.example</code>, compose/IaC files.</p><p><strong>Red flag:</strong> Chỉ chạy được trên laptop tác giả.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">10. Secrets được quản lý thế nào?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Dùng env vars, secret manager hoặc local ignored files; README chỉ hướng dẫn placeholders.</p><p><strong>Evidence:</strong> <code>.gitignore</code>, <code>.env.example</code>, secret docs.</p><p><strong>Red flag:</strong> Commit credential, token, service account hoặc hardcoded personal project ID.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">11. Peer reviewer cần chạy command nào đầu tiên?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Nêu command bootstrap đầu tiên và prerequisite rõ.</p><p><strong>Evidence:</strong> README quickstart, Makefile/script, docker compose command.</p><p><strong>Red flag:</strong> Reviewer phải đoán thứ tự chạy.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">12. Bạn dùng rubric để tự chấm ra sao?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Tự chấm từng area: problem, cloud, ingestion, warehouse, transformations, dashboard, reproducibility.</p><p><strong>Evidence:</strong> Rubric self-check table trong README hoặc project notes.</p><p><strong>Red flag:</strong> Không biết rubric có những hạng mục nào.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">13. Phần nào lấy cảm hứng từ cohort cũ?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Nêu rõ full path và chỉ ra bạn học pattern gì, không copy mù.</p><p><strong>Evidence:</strong> Reference section: Airflow 2022, streaming 2023, dlt 2024/2026 hoặc Kestra 2025.</p><p><strong>Red flag:</strong> Copy solution/code mà không hiểu dataset/table.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">14. Nếu đổi tool orchestration thì phần nào thay đổi?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Tách business logic khỏi scheduler; đổi DAG/flow wrapper, retry, secrets, schedule và deployment.</p><p><strong>Evidence:</strong> Pipeline modules, orchestration files, config boundaries.</p><p><strong>Red flag:</strong> Logic ingestion bị khóa chặt trong UI/tool cụ thể.</p></div></div></div>
+          <div class="practice-task"><div class="practice-task-header">15. Điều gì làm project này đủ portfolio?</div><div class="practice-task-body"><button class="solution-toggle" onclick="toggleSolution(this)">Xem lời giải</button><div class="solution-box"><p><strong>Answer guide:</strong> Project reviewable, reproducible, defensible: problem rõ, dataset hợp lệ, architecture thật, commands chạy được, insights có ý nghĩa.</p><p><strong>Evidence:</strong> README, demo/dashboard, tests, diagram, self-review rubric.</p><p><strong>Red flag:</strong> Chỉ là homework copy hoặc notebook rời rạc.</p></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s8">
+      <div class="module-header">
+        <div class="module-tag">S8 · Portfolio</div>
+        <div class="module-title">Tổng kết & Portfolio</div>
+        <div class="module-subtitle">Chốt lại Module 08 bằng checklist tiến độ, file mapping và Definition of Done để chuyển sang capstone/roadmap cá nhân.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">PROG</span>
+          Module completion checklist
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="progress-text" id="checklist-progress-text">0/28 mục hoàn thành (0%)</div>
+          <div class="progress-bar"><div class="progress-fill" id="checklist-progress-fill"></div></div>
+
+          <h3 class="blue">Repo Understanding</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Giải thích được vai trò <code>cohorts/</code>.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Giải thích được vai trò <code>projects/</code>.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Giải thích được vai trò <code>images/</code>.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Biết cohort mới nhất là 2026.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Biết 2022 có Airflow examples.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Biết 2025 có Kestra flows.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Biết 2026 có module data platforms và dlt workshop mới.</div></div>
+
+          <h3 class="green">Homework/Workshop Mastery</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Map được homework theo module.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Không gộp sai homework cùng tên khác năm.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Biết dùng cohorts cũ để luyện thêm.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Biết đọc notebook cell chính.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Biết đọc YAML flows.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Biết phân biệt homework vs solution vs workshop.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Biết tạo practice plan từ homework inventory.</div></div>
+
+          <h3 class="orange">Final Project Readiness</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Chọn được dataset hợp lệ.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Viết được problem statement.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Vẽ được architecture.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Thiết kế được reproducible setup.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Đối chiếu được rubric.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Chuẩn bị được peer review.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Tránh được plagiarism/reuse prohibited.</div></div>
+
+          <h3 class="red">Portfolio Quality</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>README rõ ràng.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Commands chạy được.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>No hardcoded secrets.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Dashboard/output có insight.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Có tests hoặc validation.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Có screenshots/diagrams đúng chỗ.</div></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><div>Có project defense answers.</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-summary">SUM</span>
+          8 điểm chốt
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <div class="summary-grid">
+            <div class="summary-item"><strong><code>cohorts/</code></strong>Là archive + homework/workshop timeline.</div>
+            <div class="summary-item"><strong><code>projects/</code></strong>Là contract để hoàn thành capstone.</div>
+            <div class="summary-item"><strong><code>images/</code></strong>Là static asset layer, không phải module học riêng.</div>
+            <div class="summary-item"><strong>Default cohort</strong>Cohort mới nhất nên là default, cohort cũ dùng để hiểu history/luyện thêm.</div>
+            <div class="summary-item"><strong>Full path</strong>Homework cùng tên nhưng khác năm phải review riêng.</div>
+            <div class="summary-item"><strong>Rubric first</strong>Final project nên bắt đầu từ rubric, không bắt đầu từ tool.</div>
+            <div class="summary-item"><strong>Dataset</strong>Dataset choice quyết định chất lượng project.</div>
+            <div class="summary-item"><strong>Portfolio</strong>Portfolio project cần reproducible, reviewable, defensible.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-detail">MAP</span>
+          File mapping
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>File/path</th><th>Dùng để làm gì</th></tr></thead>
+            <tbody>
+              <tr><td><code>cohorts/2026/README.md</code></td><td>Current cohort path.</td></tr>
+              <tr><td><code>cohorts/2022/week_2_data_ingestion/airflow/*</code></td><td>Historical Airflow examples.</td></tr>
+              <tr><td><code>cohorts/2025/02-workflow-orchestration/flows/*</code></td><td>Kestra flow examples.</td></tr>
+              <tr><td><code>cohorts/2026/workshops/dlt/*</code></td><td>Current dlt workshop.</td></tr>
+              <tr><td><code>projects/README.md</code></td><td>Final project rubric.</td></tr>
+              <tr><td><code>projects/datasets.md</code></td><td>Dataset ideas.</td></tr>
+              <tr><td><code>images/architecture/*</code></td><td>Course/project diagram assets.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)">
+          <span class="section-icon icon-purpose">DONE</span>
+          Definition of Done
+          <span class="section-toggle">▼</span>
+        </div>
+        <div class="section-content">
+          <ul>
+            <li>Hiểu được 3 folder phụ trợ và mối quan hệ với module 01-07.</li>
+            <li>Tạo được learning plan dùng cohorts đúng cách.</li>
+            <li>Tự chấm được final project theo rubric.</li>
+            <li>Chọn được dataset hợp lệ cho project.</li>
+            <li>Chuẩn bị được portfolio README outline.</li>
+          </ul>
+          <div class="info-box tip"><span><strong>Sau Module 08:</strong> dùng repo_notes_M01-M08 để build/review capstone project hoặc roadmap học cá nhân.</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const modules=document.querySelectorAll('.module');
+const navItems=document.querySelectorAll('.nav-item');
+
+function showModule(index,navItem){
+  modules.forEach(m=>{m.classList.remove('active');m.style.display='none'});
+  navItems.forEach(i=>i.classList.remove('active'));
+  const target=document.getElementById(`s${index}`);
+  if(target){target.classList.add('active');target.style.display='block'}
+  if(navItem)navItem.classList.add('active');
+  else if(navItems[index])navItems[index].classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toggleSection(id){
+  const header=typeof id==='string'?document.getElementById(id):id;
+  if(!header)return;
+  const content=header.nextElementSibling;
+  const toggle=header.querySelector('.section-toggle');
+  if(!content)return;
+  const isHidden=content.style.display==='none';
+  content.style.display=isHidden?'block':'none';
+  if(toggle)toggle.textContent=isHidden?'▼':'▶';
+}
+
+function answerQuiz(questionId,answer,correct){
+  let el=questionId;
+  let isCorrect=answer;
+  let msg=correct;
+  if(typeof questionId==='string'){
+    el=document.getElementById(questionId);
+    isCorrect=!!correct;
+    msg=answer;
+  }
+  if(!el)return;
+  const item=el.closest('.quiz-item');
+  const opts=item.querySelectorAll('.quiz-opt');
+  const explain=item.querySelector('.quiz-explain');
+  opts.forEach(opt=>(opt.style.pointerEvents='none'));
+  el.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect){opts.forEach(opt=>{const o=opt.getAttribute('onclick');if(o&&o.includes('true'))opt.classList.add('correct')})}
+  explain.textContent=(isCorrect?'✓ Chính xác! ':'✗ Sai. ')+msg;
+  explain.classList.add('show');
+}
+
+function toggleSolution(taskId){
+  const btn=typeof taskId==='string'?document.getElementById(taskId):taskId;
+  if(!btn)return;
+  const box=btn.nextElementSibling;
+  if(!box)return;
+  const show=box.classList.toggle('show');
+  btn.textContent=show?'Ẩn lời giải':'Xem lời giải';
+}
+
+function switchTab(group,name){
+  const groupEl=document.getElementById(group);
+  if(!groupEl)return;
+  groupEl.querySelectorAll('.tab').forEach(tab=>tab.classList.remove('active'));
+  const clicked=groupEl.querySelector(`[data-tab="${name}"],[onclick*="${name}"]`);
+  if(clicked)clicked.classList.add('active');
+  const container=groupEl.parentElement;
+  container.querySelectorAll('.tab-content').forEach(content=>content.classList.remove('active'));
+  const target=document.getElementById(`${group}-${name}`)||document.getElementById(name);
+  if(target)target.classList.add('active');
+}
+
+function toggleCheck(itemId){
+  const box=typeof itemId==='string'?document.getElementById(itemId):itemId;
+  if(!box)return;
+  box.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress(){
+  const checks=document.querySelectorAll('.check-box');
+  const checked=document.querySelectorAll('.check-box.checked').length;
+  const total=checks.length;
+  const pct=total===0?0:Math.round((checked/total)*100);
+  const fill=document.getElementById('checklist-progress-fill');
+  const text=document.getElementById('checklist-progress-text');
+  if(fill)fill.style.width=`${pct}%`;
+  if(text)text.textContent=`${checked}/${total} mục hoàn thành (${pct}%)`;
+}
+
+showModule(0,navItems[0]);
+updateProgress();
+</script>
+</body>
+</html>

@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 06 — Batch Processing với Apache Spark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+    --accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;
+    --text:#e6edf3;--text-muted:#8b949e;--code-bg:#0d1117;--highlight:#388bfd26;
+    --color-primary:var(--accent);--color-secondary:var(--accent4);--color-accent:var(--accent2);
+    --color-bg:var(--bg);--color-surface:var(--surface);--color-border:var(--border);
+    --font-main:'Inter','Segoe UI',-apple-system,sans-serif;--font-mono:'JetBrains Mono',monospace;
+    --radius:8px;--shadow:0 12px 32px #00000033;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter','Segoe UI',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+  .hero,.hero-banner{background:linear-gradient(135deg,#0d1117 0%,#161b22 40%,#1a2a1e 100%);border-bottom:2px solid var(--accent4);padding:40px 24px 30px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#6e40c922,transparent 70%);pointer-events:none}
+  .hero h1{font-size:2rem;font-weight:800;color:var(--accent4);letter-spacing:-0.5px}
+  .hero p{color:var(--text-muted);margin-top:8px;font-size:.95rem}
+  .badge-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;border:1px solid}
+  .badge-blue{color:var(--accent);border-color:var(--accent);background:#1f6feb1a}
+  .badge-green{color:var(--accent2);border-color:var(--accent2);background:#2ea04326}
+  .badge-orange{color:var(--accent5);border-color:var(--accent5);background:#d2940026}
+  .badge-red{color:var(--accent3);border-color:var(--accent3);background:#f781661a}
+  .badge-purple{color:var(--accent4);border-color:var(--accent4);background:#6e40c926}
+  .container{display:flex;min-height:calc(100vh - 160px)}
+  .sidebar{width:290px;min-width:290px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .sidebar-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:0 16px 12px}
+  .level-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:8px 16px 4px;color:var(--accent4)}
+  .nav-item{display:block;padding:7px 16px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-left:3px solid transparent;transition:all .15s}
+  .nav-item:hover{color:var(--text);background:var(--surface2)}
+  .nav-item.active{color:var(--accent4);border-left-color:var(--accent4);background:#6e40c915;font-weight:600}
+  .nav-number{display:inline-block;width:44px;font-size:.7rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .main{flex:1;padding:32px 40px;max-width:980px}
+  .module{display:none}
+  .module.active{display:block}
+  .module-header{border:1px solid var(--border);border-radius:12px;padding:24px 28px;background:var(--surface);margin-bottom:24px;position:relative;overflow:hidden}
+  .module-header::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent4)}
+  .module-tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent4);margin-bottom:8px}
+  .module-title{font-size:1.6rem;font-weight:800;margin-bottom:8px}
+  .module-subtitle{color:var(--text-muted);font-size:.9rem}
+  .section{margin-bottom:28px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .section-header{padding:14px 20px;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--surface2);border-bottom:1px solid var(--border);user-select:none}
+  .section-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .icon-purpose{background:#1f6feb33}
+  .icon-detail{background:#2ea04326}
+  .icon-quiz{background:#d2940026}
+  .icon-summary{background:#6e40c926}
+  .icon-practice{background:#f7816626}
+  .section-content{padding:20px;background:var(--surface)}
+  .section-toggle{margin-left:auto;color:var(--text-muted);font-size:12px}
+  h3{font-size:1rem;font-weight:700;color:var(--accent4);margin:18px 0 10px}
+  h3:first-child{margin-top:0}
+  h3.blue{color:var(--accent)}
+  h3.green{color:var(--accent2)}
+  h3.orange{color:var(--accent5)}
+  h3.red{color:var(--accent3)}
+  p{margin-bottom:12px;color:var(--text);font-size:.88rem}
+  ul,ol{padding-left:20px;margin-bottom:12px}
+  li{font-size:.88rem;margin-bottom:5px}
+  strong{color:var(--text)}
+  .cmd-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .cmd-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+  .cmd-body{padding:14px}
+  pre{font-family:'JetBrains Mono','Courier New','Consolas',monospace;font-size:.82rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--text)}
+  .kw{color:#ff7b72}.kw2{color:var(--accent)}.str{color:var(--accent5)}.fn{color:var(--accent4)}.num{color:#79c0ff}.comment{color:var(--text-muted)}
+  .db-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.68rem;font-weight:700;letter-spacing:.5px;margin-bottom:6px}
+  .db-pg{background:#4169e122;color:#4d9de0;border:1px solid #4169e155}
+  .db-oracle{background:#cc000022;color:#f97316;border:1px solid #cc000055}
+  code{font-family:'JetBrains Mono',monospace;background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:4px;font-size:.82rem;color:var(--accent4)}
+  .quiz-item,.quiz-block{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px}
+  .quiz-q{font-weight:600;font-size:.88rem;margin-bottom:10px}
+  .quiz-q::before{content:'Q';display:inline-block;width:22px;height:22px;background:var(--accent4);color:#000;border-radius:50%;font-size:.7rem;font-weight:800;text-align:center;line-height:22px;margin-right:8px}
+  .quiz-options{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .quiz-opt{padding:8px 12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.84rem;transition:all .15s;background:var(--bg)}
+  .quiz-opt:hover{border-color:var(--accent4);color:var(--accent4)}
+  .quiz-opt.correct{border-color:var(--accent2);color:var(--accent2);background:#2ea04310}
+  .quiz-opt.wrong{border-color:var(--accent3);color:var(--accent3);background:#f7816610}
+  .quiz-explain{font-size:.82rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px;margin-top:8px;display:none}
+  .quiz-explain.show{display:block}
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .summary-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:.82rem}
+  .summary-item strong{color:var(--accent4);display:block;margin-bottom:4px}
+  .practice-task{background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
+  .practice-task-header{padding:12px 16px;background:#6e40c915;border-bottom:1px solid var(--border);font-weight:700;font-size:.85rem;color:var(--accent4)}
+  .practice-task-body{padding:16px}
+  .solution-toggle{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:.8rem;cursor:pointer;color:var(--accent2);margin-top:10px;transition:all .15s}
+  .solution-toggle:hover{background:var(--surface2)}
+  .solution-box{margin-top:10px;display:none;border-top:1px solid var(--border);padding-top:12px}
+  .solution-box.show{display:block}
+  .info-box{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:.84rem;border:1px solid;display:flex;gap:10px}
+  .info-box.tip{border-color:var(--accent2);background:#2ea04310;color:var(--accent2)}
+  .info-box.warn{border-color:var(--accent5);background:#d2940015;color:var(--accent5)}
+  .info-box.note{border-color:var(--accent4);background:#6e40c915;color:var(--accent4)}
+  .info-box.danger{border-color:var(--accent3);background:#f7816610;color:var(--accent3)}
+  .info-box span{color:var(--text)}
+  .progress-bar{background:var(--surface2);border-radius:4px;height:4px;margin:16px 0;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent4),var(--accent2));border-radius:4px;width:0;transition:width .2s}
+  .nav-buttons{display:flex;gap:12px;margin-top:32px;justify-content:space-between}
+  .nav-btn{padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;align-items:center;gap:6px}
+  .nav-btn:hover{border-color:var(--accent4);color:var(--accent4)}
+  .nav-btn.primary{background:var(--accent4);color:#000;border-color:var(--accent4)}
+  .nav-btn.primary:hover{background:#e2c0ff}
+  table,.data-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.83rem}
+  th{background:var(--surface2);padding:8px 12px;text-align:left;border:1px solid var(--border);color:var(--accent4)}
+  td{padding:8px 12px;border:1px solid var(--border)}
+  tr:nth-child(even) td{background:#ffffff05}
+  .checklist{list-style:none;padding:0}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:.88rem;border-bottom:1px solid var(--border)}
+  .checklist li:last-child{border-bottom:none}
+  .checklist li::before{content:'□';color:var(--accent4);font-size:1.1rem;flex-shrink:0;margin-top:-1px}
+  .test-question{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px}
+  .test-question.correct{border-color:var(--accent2);background:#2ea04312}
+  .test-question.wrong{border-color:var(--accent3);background:#f7816612}
+  .test-question.unanswered{border-color:var(--accent5);background:#d2940015}
+  .test-question-title{font-size:.86rem;font-weight:600;margin-bottom:8px}
+  .test-options{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+  .test-option{display:flex;align-items:center;gap:6px;font-size:.83rem;color:var(--text)}
+  .test-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .test-result{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)}
+  .score-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .score-chip{border:1px solid var(--border);border-radius:14px;padding:4px 10px;font-size:.78rem;color:var(--text);background:var(--bg)}
+  .score-chip.good{border-color:var(--accent2);color:var(--accent2)}
+  .score-chip.warn{border-color:var(--accent5);color:var(--accent5)}
+  .score-chip.bad{border-color:var(--accent3);color:var(--accent3)}
+  .mistake-list{margin-top:8px;padding-left:18px}
+  .tab-container{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:12px 0}
+  .code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;margin:12px 0;overflow:hidden}
+  .tab-group{display:flex;gap:0;margin-bottom:0;border-bottom:1px solid var(--border)}
+  .tab{padding:8px 18px;cursor:pointer;font-size:.82rem;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab.active{color:var(--accent4);border-bottom-color:var(--accent4);font-weight:600}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+  .schema-box{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin:14px 0;overflow-x:auto}
+  .schema-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+  .schema-table{border:1px solid var(--border);border-radius:8px;min-width:160px;overflow:hidden}
+  .schema-table-header{padding:8px 12px;font-size:.75rem;font-weight:700;text-align:center}
+  .schema-table-header.fact{background:#1f6feb33;color:var(--accent)}
+  .schema-table-header.dim{background:#6e40c926;color:var(--accent4)}
+  .schema-col{padding:5px 12px;font-size:.73rem;border-top:1px solid var(--border);display:flex;gap:6px}
+  .schema-col .pk{color:var(--accent5);font-weight:700;font-size:.65rem}
+  .schema-col .fk{color:var(--accent3);font-weight:700;font-size:.65rem}
+  .schema-col .col{color:var(--text-muted)}
+  .schema-arrow{align-self:center;color:var(--text-muted);font-size:1.4rem;padding:0 2px}
+  .mental-model{border-left:4px solid var(--accent);background:#1f6feb1a;padding:12px 14px;border-radius:6px;margin:12px 0;font-size:.88rem}
+  .checklist-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .check-box{width:16px;height:16px;border:1px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:.25rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  .check-box.checked{background:var(--accent2);border-color:var(--accent2)}
+  .check-box.checked::after{content:'✓';font-size:10px;color:#000;font-weight:600}
+  .progress-text{font-size:.8rem;color:var(--text-muted);margin-bottom:8px}
+  @media(max-width:768px){.sidebar{display:none}.main{padding:16px}.summary-grid{grid-template-columns:1fr}.test-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero hero-banner">
+  <h1>Module 06 — Batch Processing với Apache Spark</h1>
+  <p>Từ PySpark local đến Dataproc production trên GCP</p>
+  <div class="badge-row">
+    <span class="badge badge-blue">Junior</span>
+    <span class="badge badge-orange">Mid</span>
+    <span class="badge badge-red">Senior</span>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="sidebar">
+    <div class="sidebar-title">Module Navigation</div>
+    <div class="level-label">MODULE 06 · BATCH SPARK</div>
+    <div class="nav-item active" onclick="showModule(0)"><span class="nav-number">S0</span>Tổng quan & Mục tiêu</div>
+    <div class="nav-item" onclick="showModule(1)"><span class="nav-number">S1</span>Lý thuyết nền</div>
+    <div class="nav-item" onclick="showModule(2)"><span class="nav-number">S2</span>Đọc hiểu code repo</div>
+    <div class="nav-item" onclick="showModule(3)"><span class="nav-number">S3</span>Thực hành từng bước</div>
+    <div class="nav-item" onclick="showModule(4)"><span class="nav-number">S4</span>Production Readiness</div>
+    <div class="nav-item" onclick="showModule(5)"><span class="nav-number">S5</span>Kiến thức nâng cao</div>
+    <div class="nav-item" onclick="showModule(6)"><span class="nav-number">S6</span>Lỗi thường gặp</div>
+    <div class="nav-item" onclick="showModule(7)"><span class="nav-number">S7</span>Interview Prep</div>
+    <div class="nav-item" onclick="showModule(8)"><span class="nav-number">S8</span>Checklist & Tổng kết</div>
+  </nav>
+
+  <main class="main">
+    <div class="module active" id="s0" style="display:block">
+      <div class="module-header">
+        <div class="module-tag">S0 · Orientation</div>
+        <div class="module-title">Tổng quan & Mục tiêu</div>
+        <div class="module-subtitle">Module này đưa bạn từ xử lý batch local bằng PySpark đến chạy job Spark production trên GCP Dataproc và BigQuery.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">S0</span>Bảng 9 sections<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Section</th><th>Tên</th><th>Thời gian ước tính</th></tr></thead>
+            <tbody>
+              <tr><td>S0</td><td>Tổng quan & Mục tiêu</td><td>30-45 phút</td></tr>
+              <tr><td>S1</td><td>Lý thuyết nền</td><td>3-4 giờ</td></tr>
+              <tr><td>S2</td><td>Đọc hiểu code repo</td><td>2-3 giờ</td></tr>
+              <tr><td>S3</td><td>Thực hành từng bước</td><td>1-2 ngày</td></tr>
+              <tr><td>S4</td><td>Production Readiness</td><td>2-3 giờ</td></tr>
+              <tr><td>S5</td><td>Kiến thức nâng cao</td><td>3-4 giờ</td></tr>
+              <tr><td>S6</td><td>Lỗi thường gặp</td><td>1-2 giờ</td></tr>
+              <tr><td>S7</td><td>Interview Prep</td><td>2 giờ</td></tr>
+              <tr><td>S8</td><td>Checklist & Tổng kết</td><td>45-60 phút</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-purpose">WHY</span>Vấn đề Batch Processing là gì?<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">Tại sao không dùng pandas thuần?</h3>
+          <p>Pandas chạy rất tốt khi dữ liệu vừa với RAM của một máy và logic xử lý không cần phân tán. Khi dữ liệu tăng lên hàng chục GB, hàng trăm GB hoặc cần backfill nhiều tháng lịch sử, single-machine limit trở thành bottleneck: RAM đầy, CPU một máy không đủ, và script tuần tự chạy quá lâu.</p>
+          <h3 class="green">Trước Spark người ta làm gì?</h3>
+          <ul>
+            <li><strong>Hadoop MapReduce:</strong> bền và scale tốt nhưng phải ghi đọc disk nhiều vòng, code dài và chậm cho workflow lặp.</li>
+            <li><strong>Hive:</strong> tiện viết SQL trên Hadoop nhưng latency thường cao, phù hợp batch lớn hơn là exploration nhanh.</li>
+            <li><strong>Sequential scripts:</strong> Python/bash chạy lần lượt, dễ bắt đầu nhưng khó scale, khó retry từng partition, dễ đụng giới hạn RAM.</li>
+          </ul>
+          <h3 class="orange">Spark giải quyết gì?</h3>
+          <p>Spark là engine xử lý phân tán in-memory. Bạn mô tả pipeline bằng transformations, Spark giữ kế hoạch dưới dạng DAG, tối ưu lazy evaluation bằng Catalyst, rồi chia thành stages và tasks chạy trên executors khi action được gọi.</p>
+          <div class="mental-model"><strong>Mental model:</strong> Spark giúp biến một recipe xử lý dữ liệu lớn thành nhiều task nhỏ chạy song song trên cluster.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">DF</span>Data Flow Diagram — ASCII<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">Flow A — Local Batch</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>local-batch.txt</span><span>repo flow</span></div><div class="cmd-body"><pre>download_data.sh
+  |
+  v
+data/raw/{type}/{year}/{month}/ (CSV.gz)
+  |
+  v
+05_taxi_schema.ipynb (define schema, repartition)
+  |
+  v
+data/pq/{type}/{year}/{month}/ (Parquet)
+  |
+  v
+06_spark_sql.ipynb / 06_spark_sql.py
+  |
+  v
+data/report-{year}/ (aggregated Parquet, coalesce 1)</pre></div></div>
+          <h3 class="green">Flow B — Cloud (GCP)</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>gcp-batch.txt</span><span>cloud flow</span></div><div class="cmd-body"><pre>Parquet local
+  |
+  v
+gsutil  gs://bucket/pq/
+  |
+  v
+09_spark_gcs.ipynb (GCS connector, service account)
+  |
+  v
+Spark reads gs:// directly
+  |
+  v
+06_spark_sql_big_query.py (BigQuery connector jar)
+  |
+  v
+trips_data_all.reports-{year} (BigQuery table)
+  |
+  v
+gcloud dataproc jobs submit pyspark
+  |
+  v
+Dataproc cluster  GCS temp bucket  BigQuery</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">OK</span>Exit Criteria<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Bạn đã nắm module này khi có thể:</strong></p>
+          <ul class="checklist">
+            <li>Giải thích Spark execution model: DAG, stages, tasks.</li>
+            <li>Viết PySpark job từ đầu: đọc CSV với schema, transform, ghi Parquet.</li>
+            <li>Biết khi nào dùng DataFrame API vs Spark SQL.</li>
+            <li>Submit job lên Dataproc và kiểm tra kết quả trên BigQuery.</li>
+            <li>Đọc Spark UI và hiểu stage/shuffle/task breakdown.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s1" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S1 · Foundation</div>
+        <div class="module-title">Lý thuyết nền</div>
+        <div class="module-subtitle">Nền tảng để đọc hiểu repo và biết vì sao Spark xử lý batch khác pandas, SQL engine, hay Hadoop MapReduce.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-purpose">A</span>Batch vs Stream & Spark Overview<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">Batch vs Stream Processing</h3>
+          <table>
+            <thead><tr><th>Chiều so sánh</th><th>Batch Processing</th><th>Stream Processing</th></tr></thead>
+            <tbody>
+              <tr><td>Latency</td><td>Phút, giờ, hoặc theo lịch cố định.</td><td>Milli-giây đến vài giây/phút.</td></tr>
+              <tr><td>Throughput</td><td>Tối ưu cho khối lượng lớn theo lô.</td><td>Tối ưu cho dòng event liên tục.</td></tr>
+              <tr><td>Use case</td><td>Daily report, backfill, ETL lịch sử, feature build offline.</td><td>Fraud detection, alert real-time, clickstream, IoT.</td></tr>
+              <tr><td>Complexity</td><td>Dễ retry và kiểm tra theo partition hơn.</td><td>Khó hơn vì state, late data, checkpoint, exactly-once boundary.</td></tr>
+              <tr><td>Cost</td><td>Có thể bật cluster theo job rồi tắt.</td><td>Thường cần hạ tầng chạy liên tục.</td></tr>
+              <tr><td>Framework examples</td><td>Spark batch, Hive, dbt, BigQuery scheduled queries.</td><td>Kafka Streams, Flink, Spark Structured Streaming.</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="green">Spark Architecture</h3>
+          <p><strong>Driver program</strong> là process chạy main application, giữ SparkSession/SparkContext, build DAG và điều phối job. <strong>SparkContext</strong> là cửa ngõ nói chuyện với cluster manager. <strong>Cluster Manager</strong> cấp tài nguyên: local mode, Standalone, YARN, Kubernetes hoặc Dataproc-managed cluster. <strong>Executors</strong> là process chạy trên worker nodes, thực thi tasks và giữ cache/shuffle data. <strong>Task</strong> là đơn vị chạy nhỏ nhất trên một partition.</p>
+          <ul>
+            <li><strong>Local mode:</strong> mọi thứ chạy trên máy local, ví dụ <code>local[*]</code> dùng tất cả CPU cores khả dụng.</li>
+            <li><strong>Standalone:</strong> Spark tự quản master/worker.</li>
+            <li><strong>YARN:</strong> Hadoop cluster manager, phổ biến trong Hadoop ecosystem.</li>
+            <li><strong>Kubernetes:</strong> chạy driver/executor dưới dạng pods.</li>
+          </ul>
+
+          <h3 class="orange">Lazy Evaluation</h3>
+          <p><strong>Transformations</strong> như <code>map</code>, <code>filter</code>, <code>select</code>, <code>groupBy</code>, <code>join</code> chỉ xây execution plan. <strong>Actions</strong> như <code>count</code>, <code>show</code>, <code>write</code>, <code>collect</code> mới trigger execution. Lazy evaluation cho phép Catalyst nhìn toàn bộ DAG, tối ưu projection/filter pushdown, join strategy và physical plan trước khi chạy.</p>
+          <div class="mental-model">Spark = distributed lazy computation engine — bạn define recipe, Spark optimize và cook khi cần.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">Q</span>Quiz 6 câu — Phần A<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="quiz-item" id="qa1"><div class="quiz-q">Khi gọi <code>df.groupBy().count()</code> thì Spark thực thi ngay hay chưa?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qa1',this,false)">A. Có, vì groupBy là action</div><div class="quiz-opt" onclick="answerQuiz('qa1',this,true)">B. Chưa, đây vẫn là transformation cho tới khi có action</div><div class="quiz-opt" onclick="answerQuiz('qa1',this,false)">C. Luôn collect về driver</div><div class="quiz-opt" onclick="answerQuiz('qa1',this,false)">D. Chỉ chạy nếu dùng SQL</div></div><div class="quiz-explain">groupBy tạo grouped DataFrame; action như show, count trên kết quả, hoặc write mới trigger job.</div></div>
+          <div class="quiz-item" id="qa2"><div class="quiz-q">Executor khác Driver ở điểm nào?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qa2',this,false)">A. Driver chạy task, executor chỉ lưu config</div><div class="quiz-opt" onclick="answerQuiz('qa2',this,true)">B. Driver điều phối DAG/job, executor chạy tasks trên partitions</div><div class="quiz-opt" onclick="answerQuiz('qa2',this,false)">C. Executor chỉ dùng cho local mode</div><div class="quiz-opt" onclick="answerQuiz('qa2',this,false)">D. Driver và executor là một khái niệm</div></div><div class="quiz-explain">Driver giữ application control plane; executors là compute plane chạy task và quản lý cache/shuffle data.</div></div>
+          <div class="quiz-item" id="qa3"><div class="quiz-q"><code>local[*]</code> nghĩa là gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qa3',this,false)">A. Chạy trên mọi node trong cloud</div><div class="quiz-opt" onclick="answerQuiz('qa3',this,false)">B. Chạy một task duy nhất</div><div class="quiz-opt" onclick="answerQuiz('qa3',this,true)">C. Chạy local và dùng tất cả cores khả dụng</div><div class="quiz-opt" onclick="answerQuiz('qa3',this,false)">D. Chạy trên YARN mặc định</div></div><div class="quiz-explain">Dấu * trong local[*] bảo Spark dùng toàn bộ logical cores của máy local.</div></div>
+          <div class="quiz-item" id="qa4"><div class="quiz-q">Tại sao Spark thường nhanh hơn Hadoop MapReduce?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qa4',this,true)">A. Spark giữ dữ liệu trung gian in-memory tốt hơn và tối ưu DAG</div><div class="quiz-opt" onclick="answerQuiz('qa4',this,false)">B. Spark không cần CPU</div><div class="quiz-opt" onclick="answerQuiz('qa4',this,false)">C. Spark luôn chạy trên một máy</div><div class="quiz-opt" onclick="answerQuiz('qa4',this,false)">D. Spark chỉ đọc CSV</div></div><div class="quiz-explain">MapReduce thường ghi đọc disk giữa các step; Spark tối ưu DAG và giảm materialization không cần thiết.</div></div>
+          <div class="quiz-item" id="qa5"><div class="quiz-q">Wide transformation khác narrow transformation ở điểm nào?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qa5',this,false)">A. Wide luôn nhanh hơn</div><div class="quiz-opt" onclick="answerQuiz('qa5',this,true)">B. Wide cần shuffle data giữa partitions/nodes</div><div class="quiz-opt" onclick="answerQuiz('qa5',this,false)">C. Narrow chỉ có trong RDD</div><div class="quiz-opt" onclick="answerQuiz('qa5',this,false)">D. Wide không tạo stage mới</div></div><div class="quiz-explain">Wide dependency như groupBy/join/repartition thường tạo shuffle boundary và stage mới.</div></div>
+          <div class="quiz-item" id="qa6"><div class="quiz-q">Action nào trong list sau?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qa6',this,false)">A. select</div><div class="quiz-opt" onclick="answerQuiz('qa6',this,false)">B. filter</div><div class="quiz-opt" onclick="answerQuiz('qa6',this,true)">C. count</div><div class="quiz-opt" onclick="answerQuiz('qa6',this,false)">D. withColumn</div></div><div class="quiz-explain">count phải thực sự quét dữ liệu để trả về số dòng, nên nó trigger Spark job.</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-purpose">B</span>RDD, DataFrame, Dataset<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">RDD vs DataFrame vs Dataset</h3>
+          <table>
+            <thead><tr><th>Chiều so sánh</th><th>RDD</th><th>DataFrame</th><th>Dataset</th></tr></thead>
+            <tbody>
+              <tr><td>Type-safety</td><td>Compile-time theo object type trong Scala/Java.</td><td>Runtime schema, Python dùng Row/columns.</td><td>Compile-time type-safety trong Scala/Java.</td></tr>
+              <tr><td>Optimization</td><td>Ít Catalyst optimization.</td><td>Catalyst + Tungsten tối ưu mạnh.</td><td>Catalyst + typed API.</td></tr>
+              <tr><td>API style</td><td>Low-level functional: map, reduceByKey.</td><td>Table-like: select, groupBy, join, SQL.</td><td>Typed object API + relational ops.</td></tr>
+              <tr><td>Serialization</td><td>Java/Kryo object serialization.</td><td>Optimized binary internal format.</td><td>Encoder-based serialization.</td></tr>
+              <tr><td>Khi nào dùng</td><td>Logic rất custom, low-level control.</td><td>ETL, analytics, SQL, production PySpark.</td><td>Scala/Java app cần type-safety.</td></tr>
+            </tbody>
+          </table>
+          <p>Repo chủ yếu dùng <strong>DataFrame</strong>; RDD xuất hiện trong <code>08_rdds.ipynb</code> để minh họa reduceByKey và mapPartitions.</p>
+
+          <h3 class="green">Narrow vs Wide Dependencies</h3>
+          <p><strong>Narrow</strong> không cần shuffle: <code>map</code>, <code>filter</code>, <code>union</code>. Dữ liệu của output partition đến từ một hoặc vài input partition cố định. <strong>Wide</strong> cần shuffle: <code>groupBy</code>, <code>join</code>, <code>repartition</code>. Dữ liệu phải di chuyển giữa partitions.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>dependencies.txt</span><span>ASCII</span></div><div class="cmd-body"><pre>Narrow:
+P1 -> map/filter -> P1'
+P2 -> map/filter -> P2'
+P3 -> map/filter -> P3'
+
+Wide:
+P1 --\
+P2 ---- shuffle by key ----> R1, R2, R3
+P3 --/</pre></div></div>
+
+          <h3 class="orange">Partitions & Shuffle</h3>
+          <ul>
+            <li><code>repartition(n)</code>: full shuffle, phân phối đều hơn, đắt hơn.</li>
+            <li><code>coalesce(n)</code>: giảm số partition với ít shuffle hơn, nhanh hơn nhưng dễ uneven.</li>
+            <li><code>spark.sql.shuffle.partitions</code>: mặc định 200, ảnh hưởng số partition sau shuffle SQL/DataFrame.</li>
+          </ul>
+          <div class="info-box warn"><span><strong>Production concern:</strong> repo dùng <code>repartition(4)</code> và <code>coalesce(1)</code> hardcoded. Với data/cluster khác, 4 partitions có thể quá ít hoặc quá nhiều; <code>coalesce(1)</code> ép single file, tạo bottleneck, phá parallelism và dễ OOM ở task cuối.</span></div>
+
+          <h3 class="red">Senior box — Catalyst & Tungsten</h3>
+          <p><strong>Catalyst pipeline:</strong> Unresolved Logical Plan -> Analyzed Logical Plan -> Optimized Logical Plan -> Physical Plan -> RDD execution. <strong>Tungsten</strong> tập trung whole-stage codegen, off-heap memory và binary processing để giảm overhead object JVM. Khi debug performance, dùng <code>df.explain(True)</code> để xem parsed/analyzed/optimized/physical plan, filter pushdown, join strategy và shuffle boundary.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">Q</span>Quiz 6 câu — Phần B<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="quiz-item" id="qb1"><div class="quiz-q"><code>coalesce(1)</code> khác <code>repartition(1)</code> ở điểm gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qb1',this,true)">A. coalesce thường giảm partition ít shuffle hơn; repartition full shuffle</div><div class="quiz-opt" onclick="answerQuiz('qb1',this,false)">B. coalesce luôn nhanh và an toàn production</div><div class="quiz-opt" onclick="answerQuiz('qb1',this,false)">C. repartition không đổi số partition</div><div class="quiz-opt" onclick="answerQuiz('qb1',this,false)">D. Không khác gì</div></div><div class="quiz-explain">coalesce dùng khi giảm partition; repartition shuffle lại toàn bộ data để phân phối đều hơn.</div></div>
+          <div class="quiz-item" id="qb2"><div class="quiz-q">Vì sao <code>groupBy</code> gây wide transformation?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qb2',this,false)">A. Vì groupBy chỉ chạy trên driver</div><div class="quiz-opt" onclick="answerQuiz('qb2',this,true)">B. Vì các row cùng key phải gom về cùng reducer partition</div><div class="quiz-opt" onclick="answerQuiz('qb2',this,false)">C. Vì groupBy không dùng partition</div><div class="quiz-opt" onclick="answerQuiz('qb2',this,false)">D. Vì groupBy luôn đọc JSON</div></div><div class="quiz-explain">Shuffle theo key là điều kiện để tính aggregate đúng trên dữ liệu phân tán.</div></div>
+          <div class="quiz-item" id="qb3"><div class="quiz-q">DataFrame có lợi gì so với RDD thuần?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qb3',this,true)">A. Có schema và được Catalyst/Tungsten tối ưu</div><div class="quiz-opt" onclick="answerQuiz('qb3',this,false)">B. Không bao giờ cần shuffle</div><div class="quiz-opt" onclick="answerQuiz('qb3',this,false)">C. Chỉ chạy được local</div><div class="quiz-opt" onclick="answerQuiz('qb3',this,false)">D. Không cần action</div></div><div class="quiz-explain">DataFrame cho Spark nhiều thông tin hơn về schema/columns để tối ưu execution plan.</div></div>
+          <div class="quiz-item" id="qb4"><div class="quiz-q">Catalyst optimize ở layer nào?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qb4',this,false)">A. Chỉ ở storage layer</div><div class="quiz-opt" onclick="answerQuiz('qb4',this,true)">B. Logical/physical planning layer trước khi execution</div><div class="quiz-opt" onclick="answerQuiz('qb4',this,false)">C. Chỉ sau khi collect</div><div class="quiz-opt" onclick="answerQuiz('qb4',this,false)">D. Chỉ trong Python interpreter</div></div><div class="quiz-explain">Catalyst phân tích và tối ưu plan trước khi Spark scheduler chạy tasks.</div></div>
+          <div class="quiz-item" id="qb5"><div class="quiz-q"><code>df.explain()</code> show gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qb5',this,false)">A. Nội dung toàn bộ DataFrame</div><div class="quiz-opt" onclick="answerQuiz('qb5',this,false)">B. GCP billing</div><div class="quiz-opt" onclick="answerQuiz('qb5',this,true)">C. Execution plan/logical và physical plan</div><div class="quiz-opt" onclick="answerQuiz('qb5',this,false)">D. Password service account</div></div><div class="quiz-explain">explain giúp debug Spark đang định đọc, filter, join, shuffle, aggregate như thế nào.</div></div>
+          <div class="quiz-item" id="qb6"><div class="quiz-q">Khi nào nên dùng RDD thay DataFrame?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qb6',this,false)">A. Mọi job ETL đều nên dùng RDD</div><div class="quiz-opt" onclick="answerQuiz('qb6',this,true)">B. Khi logic low-level/custom không biểu diễn tốt bằng relational API</div><div class="quiz-opt" onclick="answerQuiz('qb6',this,false)">C. Khi muốn Catalyst tối ưu SQL</div><div class="quiz-opt" onclick="answerQuiz('qb6',this,false)">D. Khi muốn ghi BigQuery nhanh hơn mặc định</div></div><div class="quiz-explain">RDD là lựa chọn cuối khi cần control thấp hơn; ETL thông thường nên ưu tiên DataFrame/Spark SQL.</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-purpose">C</span>File Formats & Storage<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">CSV vs JSON vs Parquet vs ORC vs Avro</h3>
+          <table>
+            <thead><tr><th>Format</th><th>Encoding</th><th>Schema</th><th>Splittable</th><th>Compression</th><th>Read perf</th><th>Write perf</th><th>Khi nào dùng</th></tr></thead>
+            <tbody>
+              <tr><td>CSV</td><td>Text row-based</td><td>Không native</td><td>Có, nếu không gzip nguyên file</td><td>Gzip/Snappy ngoài</td><td>Chậm</td><td>Nhanh/dễ</td><td>Exchange đơn giản, raw landing</td></tr>
+              <tr><td>JSON</td><td>Text semi-structured</td><td>Flexible</td><td>NDJSON splittable</td><td>Gzip/Snappy ngoài</td><td>Chậm</td><td>Trung bình</td><td>Nested events, APIs</td></tr>
+              <tr><td>Parquet</td><td>Binary columnar</td><td>Native</td><td>Có</td><td>Snappy/Gzip/Zstd</td><td>Rất tốt</td><td>Trung bình</td><td>Analytics, Spark, BigQuery, Athena</td></tr>
+              <tr><td>ORC</td><td>Binary columnar</td><td>Native</td><td>Có</td><td>Zlib/Snappy/Zstd</td><td>Rất tốt</td><td>Trung bình</td><td>Hive-heavy lakehouse</td></tr>
+              <tr><td>Avro</td><td>Binary row-based</td><td>Native/evolution</td><td>Có</td><td>Deflate/Snappy</td><td>Tốt cho row scan</td><td>Tốt</td><td>Kafka/batch interchange, schema evolution</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="green">Tại sao Parquet?</h3>
+          <ul>
+            <li><strong>Columnar storage:</strong> query <code>SELECT col1, col2</code> chỉ đọc columns cần thiết.</li>
+            <li><strong>Row group statistics:</strong> min/max/null count hỗ trợ predicate pushdown.</li>
+            <li><strong>Built-in compression:</strong> Snappy/Gzip/Zstd giúp giảm storage và scan bytes.</li>
+            <li><strong>Native support:</strong> Spark, BigQuery, Athena đều đọc tốt Parquet.</li>
+          </ul>
+
+          <h3 class="orange">Schema trong Spark</h3>
+          <p><strong>Infer schema</strong> tiện cho exploration nhưng chậm vì Spark phải scan dữ liệu, và dễ sai type khi sample không đại diện. <strong>Define schema bằng StructType</strong> nhanh, safe, rõ contract hơn cho production.</p>
+          <div class="schema-box"><pre>fhvhv schema:
+- hvfhs_license_num: StringType
+- dispatching_base_num: StringType
+- pickup_datetime: TimestampType
+- dropoff_datetime: TimestampType
+- PULocationID: IntegerType
+- DOLocationID: IntegerType
+- SR_Flag: StringType
+
+green schema:
+- VendorID: IntegerType
+- lpep_pickup_datetime: TimestampType
+- lpep_dropoff_datetime: TimestampType
+- store_and_fwd_flag: StringType
+- RatecodeID: IntegerType
+- PULocationID: IntegerType
+- DOLocationID: IntegerType
+- passenger_count: IntegerType
+- trip_distance: DoubleType
+- fare_amount: DoubleType
+- extra: DoubleType
+- mta_tax: DoubleType
+- tip_amount: DoubleType
+- tolls_amount: DoubleType
+- ehail_fee: DoubleType
+- improvement_surcharge: DoubleType
+- total_amount: DoubleType
+- payment_type: IntegerType
+- trip_type: IntegerType
+- congestion_surcharge: DoubleType
+
+yellow schema:
+- VendorID: IntegerType
+- tpep_pickup_datetime: TimestampType
+- tpep_dropoff_datetime: TimestampType
+- passenger_count: IntegerType
+- trip_distance: DoubleType
+- RatecodeID: IntegerType
+- store_and_fwd_flag: StringType
+- PULocationID: IntegerType
+- DOLocationID: IntegerType
+- payment_type: IntegerType
+- fare_amount: DoubleType
+- extra: DoubleType
+- mta_tax: DoubleType
+- tip_amount: DoubleType
+- tolls_amount: DoubleType
+- improvement_surcharge: DoubleType
+- total_amount: DoubleType
+- congestion_surcharge: DoubleType</pre></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">Q</span>Quiz 6 câu — Phần C<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="quiz-item" id="qc1"><div class="quiz-q">Tại sao Parquet đọc nhanh hơn CSV cho query <code>SELECT col1, col2</code>?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qc1',this,true)">A. Vì Parquet là columnar và có thể chỉ đọc columns cần</div><div class="quiz-opt" onclick="answerQuiz('qc1',this,false)">B. Vì CSV luôn nén tốt hơn</div><div class="quiz-opt" onclick="answerQuiz('qc1',this,false)">C. Vì Parquet không có schema</div><div class="quiz-opt" onclick="answerQuiz('qc1',this,false)">D. Vì CSV không thể đọc bằng Spark</div></div><div class="quiz-explain">CSV row-based thường phải parse cả dòng; Parquet có metadata và column chunks.</div></div>
+          <div class="quiz-item" id="qc2"><div class="quiz-q">Schema inference có vấn đề gì trong production?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qc2',this,false)">A. Luôn chính xác hơn schema định nghĩa</div><div class="quiz-opt" onclick="answerQuiz('qc2',this,true)">B. Chậm, dễ đoán sai type, khó kiểm soát data contract</div><div class="quiz-opt" onclick="answerQuiz('qc2',this,false)">C. Không đọc được CSV header</div><div class="quiz-opt" onclick="answerQuiz('qc2',this,false)">D. Chỉ chạy trên BigQuery</div></div><div class="quiz-explain">Production pipeline cần schema explicit để ổn định và fail rõ khi source đổi contract.</div></div>
+          <div class="quiz-item" id="qc3"><div class="quiz-q">Snappy vs Gzip: trade-off chính là gì?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qc3',this,false)">A. Snappy nén nhỏ nhất nhưng chậm nhất</div><div class="quiz-opt" onclick="answerQuiz('qc3',this,true)">B. Snappy nhanh hơn, Gzip thường nén nhỏ hơn nhưng CPU tốn hơn</div><div class="quiz-opt" onclick="answerQuiz('qc3',this,false)">C. Gzip không nén được text</div><div class="quiz-opt" onclick="answerQuiz('qc3',this,false)">D. Không có khác biệt</div></div><div class="quiz-explain">Analytics thường ưu tiên Snappy vì tốc độ đọc/ghi tốt; Gzip có ratio cao hơn nhưng tốn CPU.</div></div>
+          <div class="quiz-item" id="qc4"><div class="quiz-q">Splittable format quan trọng vì sao?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qc4',this,true)">A. Spark có thể chia file thành nhiều task đọc song song</div><div class="quiz-opt" onclick="answerQuiz('qc4',this,false)">B. Để driver đọc hết file một lần</div><div class="quiz-opt" onclick="answerQuiz('qc4',this,false)">C. Để không cần executor</div><div class="quiz-opt" onclick="answerQuiz('qc4',this,false)">D. Để bỏ schema</div></div><div class="quiz-explain">Nếu file không splittable, parallelism giảm và một task có thể thành bottleneck.</div></div>
+          <div class="quiz-item" id="qc5"><div class="quiz-q"><code>repartition(4)</code> trong <code>05_taxi_schema.ipynb</code> tạo ra bao nhiêu file output chính?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qc5',this,false)">A. 1 part file</div><div class="quiz-opt" onclick="answerQuiz('qc5',this,true)">B. Thường là 4 part files cho mỗi write output path</div><div class="quiz-opt" onclick="answerQuiz('qc5',this,false)">C. 200 files bắt buộc</div><div class="quiz-opt" onclick="answerQuiz('qc5',this,false)">D. Không tạo file nào</div></div><div class="quiz-explain">Mỗi partition thường ghi ra một part file, cộng metadata như _SUCCESS tùy filesystem/config.</div></div>
+          <div class="quiz-item" id="qc6"><div class="quiz-q"><code>coalesce(1)</code> có ý nghĩa gì và tại sao nguy hiểm production?</div><div class="quiz-options"><div class="quiz-opt" onclick="answerQuiz('qc6',this,false)">A. Nó tăng parallelism lên tối đa</div><div class="quiz-opt" onclick="answerQuiz('qc6',this,true)">B. Nó ép output về một partition/file, dễ bottleneck/OOM và phá parallelism</div><div class="quiz-opt" onclick="answerQuiz('qc6',this,false)">C. Nó tự broadcast dimension table</div><div class="quiz-opt" onclick="answerQuiz('qc6',this,false)">D. Nó chỉ đổi tên file</div></div><div class="quiz-explain">coalesce(1) tiện cho demo nhưng không phù hợp dữ liệu lớn vì toàn bộ output dồn về một task.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s2" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S2 · Code Reading</div>
+        <div class="module-title">Đọc hiểu code repo</div>
+        <div class="module-subtitle">Đi từ shell script download dữ liệu, notebook ingest/schema, Spark SQL transform, RDD, GCS đến submit Dataproc/BigQuery.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">TREE</span>Cây thư mục 06-batch/<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="cmd-block"><div class="cmd-header"><span>06-batch tree</span><span>purpose per file</span></div><div class="cmd-body"><pre>06-batch/
+|-- code - Notebook/script thực hành Spark: raw data, Parquet, SQL, groupBy/join, RDD, GCS/BigQuery, homework.
+|   |-- 03_test.ipynb - Notebook phụ; test Spark cơ bản.
+|   |-- 04_pyspark.ipynb - First look PySpark: SparkSession, CSV, schema, repartition, Parquet, DataFrame ops, UDF.
+|   |-- 05_taxi_schema.ipynb - Define taxi schemas và convert CSV raw sang Parquet.
+|   |-- 06_spark_sql.ipynb - Spark SQL/DataFrame union green/yellow taxi và revenue aggregation.
+|   |-- 06_spark_sql.py - Script hóa Spark SQL để chạy bằng python/spark-submit/Dataproc, output Parquet.
+|   |-- 06_spark_sql_big_query.py - Biến thể script ghi kết quả aggregation vào BigQuery.
+|   |-- 07_groupby_join.ipynb - GroupBy revenue, join green/yellow, join zone lookup.
+|   |-- 08_rdds.ipynb - RDD API, reduceByKey, mapPartitions và DataFrame conversion.
+|   |-- 09_spark_gcs.ipynb - Cấu hình SparkContext để đọc Parquet từ Google Cloud Storage.
+|   |-- cloud.md - Hướng dẫn GCS connector, local cluster, spark-submit, Dataproc, BigQuery connector.
+|   |-- download_data.sh - Download 12 tháng NYC TLC CSV gzip theo taxi type/year.
+|   `-- homework.ipynb - Notebook homework PySpark trên FHVHV Feb 2021.
+|-- setup - Tài liệu cài đặt Spark/PySpark và Hadoop/YARN.
+|   |-- config - Config mẫu cho Spark/YARN/GCS connector.
+|   |   |-- core-site.xml - Hadoop core-site cấu hình GCS filesystem và service account.
+|   |   |-- spark-defaults.conf - Spark defaults cho YARN và GCS auth.
+|   |   `-- spark.dockerfile - Dockerfile tối thiểu dùng OpenJDK 11.
+|   |-- hadoop-yarn.md - Cài Hadoop/YARN pseudo-distributed và chạy Spark on YARN/Docker/GCS.
+|   |-- linux.md - Cài Spark 4.x/PySpark trên Linux/Ubuntu/WSL.
+|   |-- macos.md - Cài Spark 4.x/PySpark trên macOS.
+|   `-- windows.md - Cài Spark 4.x/PySpark trên Windows Git Bash.
+|-- .gitignore - File ignore rỗng ở root module.
+`-- README.md - Mục lục Module 6 Batch Processing.</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">SH</span>TAB GROUP 1: download_data.sh<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="tab-group" id="tabs-download">
+            <div class="tab active" data-tab="download-code" onclick="switchTab('tabs-download','download-code')">Code</div>
+            <div class="tab" data-tab="download-analysis" onclick="switchTab('tabs-download','download-analysis')">Phân tích</div>
+            <div class="tab" data-tab="download-weakness" onclick="switchTab('tabs-download','download-weakness')">Điểm yếu</div>
+          </div>
+          <div class="tab-content active" id="download-code" data-tab-group="tabs-download">
+            <div class="cmd-block"><div class="cmd-header"><span>download_data.sh</span><span>nguyên văn</span></div><div class="cmd-body"><pre>set -e
+
+TAXI_TYPE=$1 # "yellow"
+YEAR=$2 # 2020
+
+URL_PREFIX="https://github.com/DataTalksClub/nyc-tlc-data/releases/download"
+
+for MONTH in {1..12}; do
+  FMONTH=`printf "%02d" ${MONTH}`
+  URL="${URL_PREFIX}/${TAXI_TYPE}/${TAXI_TYPE}_tripdata_${YEAR}-${FMONTH}.csv.gz"
+  LOCAL_PREFIX="data/raw/${TAXI_TYPE}/${YEAR}/${FMONTH}"
+  LOCAL_FILE="${TAXI_TYPE}_tripdata_${YEAR}_${FMONTH}.csv.gz"
+  LOCAL_PATH="${LOCAL_PREFIX}/${LOCAL_FILE}"
+  echo "downloading ${URL} to ${LOCAL_PATH}"
+  mkdir -p ${LOCAL_PREFIX}
+  wget ${URL} -O ${LOCAL_PATH}
+done</pre></div></div>
+          </div>
+          <div class="tab-content" id="download-analysis" data-tab-group="tabs-download">
+            <ul>
+              <li><strong>Arguments:</strong> <code>$1=TAXI_TYPE</code>, <code>$2=YEAR</code>.</li>
+              <li><strong><code>set -e</code>:</strong> dừng ngay khi một lệnh fail.</li>
+              <li><strong><code>printf "%02d"</code>:</strong> format month 2 chữ số <code>01..12</code>.</li>
+              <li><strong>Output path:</strong> <code>data/raw/{type}/{year}/{month}/{type}_tripdata_{year}_{month}.csv.gz</code>.</li>
+              <li><strong>Cách chạy:</strong> <code>bash download_data.sh yellow 2020</code>.</li>
+            </ul>
+          </div>
+          <div class="tab-content" id="download-weakness" data-tab-group="tabs-download">
+            <div class="info-box warn"><span><strong>Điểm yếu:</strong> Không checksum nên file download một nửa có thể không bị phát hiện; không skip-if-exists nên chạy lại tải lại toàn bộ; không retry/backoff nên network lỗi là job fail ngay; URL domain bị hardcode.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">CFG</span>TAB GROUP 2: Config Files<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="tab-group" id="tabs-config">
+            <div class="tab active" data-tab="cfg-docker" onclick="switchTab('tabs-config','cfg-docker')">spark.dockerfile</div>
+            <div class="tab" data-tab="cfg-core" onclick="switchTab('tabs-config','cfg-core')">core-site.xml</div>
+            <div class="tab" data-tab="cfg-defaults" onclick="switchTab('tabs-config','cfg-defaults')">spark-defaults.conf</div>
+          </div>
+          <div class="tab-content active" id="cfg-docker" data-tab-group="tabs-config">
+            <div class="cmd-block"><div class="cmd-header"><span>spark.dockerfile</span><span>nguyên văn</span></div><div class="cmd-body"><pre>FROM library/openjdk:11</pre></div></div>
+            <p>File này chỉ có Java base image. Nó thiếu Python, pip, PySpark và dependency runtime; phù hợp làm nền nếu bạn muốn tự build image Spark/PySpark đầy đủ.</p>
+          </div>
+          <div class="tab-content" id="cfg-core" data-tab-group="tabs-config">
+            <div class="cmd-block"><div class="cmd-header"><span>core-site.xml</span><span>nguyên văn</span></div><div class="cmd-body"><pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;?xml-stylesheet type="text/xsl" href="configuration.xsl"?&gt;
+&lt;configuration&gt;
+  &lt;property&gt;
+    &lt;name&gt;fs.AbstractFileSystem.gs.impl&lt;/name&gt;
+    &lt;value&gt;com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS&lt;/value&gt;
+  &lt;/property&gt;
+  &lt;property&gt;
+    &lt;name&gt;fs.gs.impl&lt;/name&gt;
+    &lt;value&gt;com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem&lt;/value&gt;
+  &lt;/property&gt;
+  &lt;property&gt;
+    &lt;name&gt;fs.gs.auth.service.account.json.keyfile&lt;/name&gt;
+    &lt;value&gt;/home/alexey/.google/credentials/google_credentials.json&lt;/value&gt;
+  &lt;/property&gt;
+  &lt;property&gt;
+    &lt;name&gt;fs.gs.auth.service.account.enable&lt;/name&gt;
+    &lt;value&gt;true&lt;/value&gt;
+  &lt;/property&gt;
+&lt;/configuration&gt;</pre></div></div>
+            <p><code>fs.gs.impl</code> và <code>fs.AbstractFileSystem.gs.impl</code> khai báo provider để Hadoop/Spark hiểu <code>gs://</code>. <code>fs.gs.auth.service.account.json.keyfile</code> trỏ tới service account JSON hardcoded, đây là vấn đề security/portability.</p>
+          </div>
+          <div class="tab-content" id="cfg-defaults" data-tab-group="tabs-config">
+            <div class="cmd-block"><div class="cmd-header"><span>spark-defaults.conf</span><span>nguyên văn</span></div><div class="cmd-body"><pre>spark-master    yarn
+spark.hadoop.google.cloud.auth.service.account.enable        true
+spark.hadoop.google.cloud.auth.service.account.json.keyfile  /home/alexey</pre></div></div>
+            <div class="info-box warn"><span><strong>Cảnh báo:</strong> key <code>spark-master</code> không phải key chuẩn Spark; thường phải là <code>spark.master</code>. Path keyfile <code>/home/alexey</code> cũng thiếu tên file JSON.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">ING</span>TAB GROUP 3: Notebooks — Schema & Ingest<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="tab-group" id="tabs-ingest">
+            <div class="tab active" data-tab="nb04" onclick="switchTab('tabs-ingest','nb04')">04_pyspark</div>
+            <div class="tab" data-tab="nb05" onclick="switchTab('tabs-ingest','nb05')">05_taxi_schema</div>
+          </div>
+          <div class="tab-content active" id="nb04" data-tab-group="tabs-ingest">
+            <p><strong>Mục tiêu:</strong> làm quen PySpark local: tạo SparkSession, đọc CSV, định nghĩa schema FHVHV, repartition, ghi/đọc Parquet, DataFrame ops và UDF.</p>
+            <div class="cmd-block"><div class="cmd-header"><span>04_pyspark.ipynb</span><span>key cells</span></div><div class="cmd-body"><pre>spark = SparkSession.builder \
+    .master("local[*]") \
+    .appName('test') \
+    .getOrCreate()
+
+schema = types.StructType([
+    types.StructField('hvfhs_license_num', types.StringType(), True),
+    types.StructField('dispatching_base_num', types.StringType(), True),
+    types.StructField('pickup_datetime', types.TimestampType(), True),
+    types.StructField('dropoff_datetime', types.TimestampType(), True),
+    types.StructField('PULocationID', types.IntegerType(), True),
+    types.StructField('DOLocationID', types.IntegerType(), True),
+    types.StructField('SR_Flag', types.StringType(), True)
+])
+
+df = spark.read \
+    .option("header", "true") \
+    .schema(schema) \
+    .csv('fhvhv_tripdata_2021-01.csv')
+
+df = df.repartition(24)
+df.write.parquet('fhvhv/2021/01/')
+
+def crazy_stuff(base_num):
+    num = int(base_num[1:])
+    if num % 7 == 0:
+        return f's/{num:03x}'
+    elif num % 3 == 0:
+        return f'a/{num:03x}'
+    else:
+        return f'e/{num:03x}'
+
+crazy_stuff_udf = F.udf(crazy_stuff, returnType=types.StringType())
+
+df \
+    .withColumn('pickup_date', F.to_date(df.pickup_datetime)) \
+    .withColumn('dropoff_date', F.to_date(df.dropoff_datetime)) \
+    .withColumn('base_id', crazy_stuff_udf(df.dispatching_base_num)) \
+    .select('base_id', 'pickup_date', 'dropoff_date', 'PULocationID', 'DOLocationID') \
+    .show()</pre></div></div>
+            <p><code>repartition(24)</code> dùng để phân phối dữ liệu thành 24 partitions, phù hợp demo trên máy có nhiều cores và tạo nhiều task output song song.</p>
+          </div>
+          <div class="tab-content" id="nb05" data-tab-group="tabs-ingest">
+            <p><strong>Mục tiêu:</strong> define schema Green/Yellow Taxi, đọc raw CSV gzip theo month, repartition và ghi Parquet vào <code>data/pq/{type}/{year}/{month}</code>.</p>
+            <div class="cmd-block"><div class="cmd-header"><span>05_taxi_schema.ipynb</span><span>schemas + ingest loop</span></div><div class="cmd-body"><pre>green_schema = types.StructType([
+    types.StructField("VendorID", types.IntegerType(), True),
+    types.StructField("lpep_pickup_datetime", types.TimestampType(), True),
+    types.StructField("lpep_dropoff_datetime", types.TimestampType(), True),
+    types.StructField("store_and_fwd_flag", types.StringType(), True),
+    types.StructField("RatecodeID", types.IntegerType(), True),
+    types.StructField("PULocationID", types.IntegerType(), True),
+    types.StructField("DOLocationID", types.IntegerType(), True),
+    types.StructField("passenger_count", types.IntegerType(), True),
+    types.StructField("trip_distance", types.DoubleType(), True),
+    types.StructField("fare_amount", types.DoubleType(), True),
+    types.StructField("extra", types.DoubleType(), True),
+    types.StructField("mta_tax", types.DoubleType(), True),
+    types.StructField("tip_amount", types.DoubleType(), True),
+    types.StructField("tolls_amount", types.DoubleType(), True),
+    types.StructField("ehail_fee", types.DoubleType(), True),
+    types.StructField("improvement_surcharge", types.DoubleType(), True),
+    types.StructField("total_amount", types.DoubleType(), True),
+    types.StructField("payment_type", types.IntegerType(), True),
+    types.StructField("trip_type", types.IntegerType(), True),
+    types.StructField("congestion_surcharge", types.DoubleType(), True)
+])
+
+yellow_schema = types.StructType([
+    types.StructField("VendorID", types.IntegerType(), True),
+    types.StructField("tpep_pickup_datetime", types.TimestampType(), True),
+    types.StructField("tpep_dropoff_datetime", types.TimestampType(), True),
+    types.StructField("passenger_count", types.IntegerType(), True),
+    types.StructField("trip_distance", types.DoubleType(), True),
+    types.StructField("RatecodeID", types.IntegerType(), True),
+    types.StructField("store_and_fwd_flag", types.StringType(), True),
+    types.StructField("PULocationID", types.IntegerType(), True),
+    types.StructField("DOLocationID", types.IntegerType(), True),
+    types.StructField("payment_type", types.IntegerType(), True),
+    types.StructField("fare_amount", types.DoubleType(), True),
+    types.StructField("extra", types.DoubleType(), True),
+    types.StructField("mta_tax", types.DoubleType(), True),
+    types.StructField("tip_amount", types.DoubleType(), True),
+    types.StructField("tolls_amount", types.DoubleType(), True),
+    types.StructField("improvement_surcharge", types.DoubleType(), True),
+    types.StructField("total_amount", types.DoubleType(), True),
+    types.StructField("congestion_surcharge", types.DoubleType(), True)
+])
+
+for month in range(1, 13):
+    input_path = f'data/raw/green/{year}/{month:02d}/'
+    output_path = f'data/pq/green/{year}/{month:02d}/'
+    df_green = spark.read.option("header", "true").schema(green_schema).csv(input_path)
+    df_green.repartition(4).write.parquet(output_path)
+
+for month in range(1, 13):
+    input_path = f'data/raw/yellow/{year}/{month:02d}/'
+    output_path = f'data/pq/yellow/{year}/{month:02d}/'
+    df_yellow = spark.read.option("header", "true").schema(yellow_schema).csv(input_path)
+    df_yellow.repartition(4).write.parquet(output_path)</pre></div></div>
+            <p><code>repartition(4)</code> tạo khoảng 4 output part files mỗi partition tháng. Repo notes ghi notebook dùng write Parquet overwrite trong workflow ingest; production nên parameterize partition count và mode thay vì hardcode.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">SQL</span>TAB GROUP 4: Notebooks — SQL & Transform<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="tab-group" id="tabs-sql">
+            <div class="tab active" data-tab="sql-ipynb" onclick="switchTab('tabs-sql','sql-ipynb')">06_spark_sql</div>
+            <div class="tab" data-tab="sql-py" onclick="switchTab('tabs-sql','sql-py')">06_spark_sql.py</div>
+            <div class="tab" data-tab="sql-bq" onclick="switchTab('tabs-sql','sql-bq')">06_spark_sql_big_query.py</div>
+          </div>
+          <div class="tab-content active" id="sql-ipynb" data-tab-group="tabs-sql">
+            <div class="cmd-block"><div class="cmd-header"><span>06_spark_sql.ipynb</span><span>key cells</span></div><div class="cmd-body"><pre>df_green = spark.read.parquet('data/pq/green/*/*')
+df_green = df_green \
+    .withColumnRenamed('lpep_pickup_datetime', 'pickup_datetime') \
+    .withColumnRenamed('lpep_dropoff_datetime', 'dropoff_datetime')
+
+df_yellow = spark.read.parquet('data/pq/yellow/*/*')
+df_yellow = df_yellow \
+    .withColumnRenamed('tpep_pickup_datetime', 'pickup_datetime') \
+    .withColumnRenamed('tpep_dropoff_datetime', 'dropoff_datetime')
+
+common_colums = []
+yellow_columns = set(df_yellow.columns)
+for col in df_green.columns:
+    if col in yellow_columns:
+        common_colums.append(col)
+
+df_green_sel = df_green.select(common_colums).withColumn('service_type', F.lit('green'))
+df_yellow_sel = df_yellow.select(common_colums).withColumn('service_type', F.lit('yellow'))
+df_trips_data = df_green_sel.unionAll(df_yellow_sel)
+df_trips_data.registerTempTable('trips_data')
+
+df_result = spark.sql("""
+SELECT 
+    -- Reveneue grouping 
+    PULocationID AS revenue_zone,
+    date_trunc('month', pickup_datetime) AS revenue_month, 
+    service_type, 
+
+    -- Revenue calculation 
+    SUM(fare_amount) AS revenue_monthly_fare,
+    SUM(extra) AS revenue_monthly_extra,
+    SUM(mta_tax) AS revenue_monthly_mta_tax,
+    SUM(tip_amount) AS revenue_monthly_tip_amount,
+    SUM(tolls_amount) AS revenue_monthly_tolls_amount,
+    SUM(improvement_surcharge) AS revenue_monthly_improvement_surcharge,
+    SUM(total_amount) AS revenue_monthly_total_amount,
+    SUM(congestion_surcharge) AS revenue_monthly_congestion_surcharge,
+
+    -- Additional calculations
+    AVG(passenger_count) AS avg_montly_passenger_count,
+    AVG(trip_distance) AS avg_montly_trip_distance
+FROM trips_data
+GROUP BY 1, 2, 3
+""")
+
+df_result.coalesce(1).write.parquet('data/report-2020', mode='overwrite')</pre></div></div>
+          </div>
+          <div class="tab-content" id="sql-py" data-tab-group="tabs-sql">
+            <div class="cmd-block"><div class="cmd-header"><span>06_spark_sql.py</span><span>nguyên văn toàn bộ file</span></div><div class="cmd-body"><pre>#!/usr/bin/env python
+# coding: utf-8
+
+import argparse
+
+import pyspark
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--input_green', required=True)
+parser.add_argument('--input_yellow', required=True)
+parser.add_argument('--output', required=True)
+args = parser.parse_args()
+
+input_green = args.input_green
+input_yellow = args.input_yellow
+output = args.output
+
+spark = SparkSession.builder \
+    .appName('test') \
+    .getOrCreate()
+
+df_green = spark.read.parquet(input_green)
+df_green = df_green \
+    .withColumnRenamed('lpep_pickup_datetime', 'pickup_datetime') \
+    .withColumnRenamed('lpep_dropoff_datetime', 'dropoff_datetime')
+
+df_yellow = spark.read.parquet(input_yellow)
+df_yellow = df_yellow \
+    .withColumnRenamed('tpep_pickup_datetime', 'pickup_datetime') \
+    .withColumnRenamed('tpep_dropoff_datetime', 'dropoff_datetime')
+
+common_colums = [
+    'VendorID',
+    'pickup_datetime',
+    'dropoff_datetime',
+    'store_and_fwd_flag',
+    'RatecodeID',
+    'PULocationID',
+    'DOLocationID',
+    'passenger_count',
+    'trip_distance',
+    'fare_amount',
+    'extra',
+    'mta_tax',
+    'tip_amount',
+    'tolls_amount',
+    'improvement_surcharge',
+    'total_amount',
+    'payment_type',
+    'congestion_surcharge'
+]
+
+
+
+df_green_sel = df_green \
+    .select(common_colums) \
+    .withColumn('service_type', F.lit('green'))
+
+df_yellow_sel = df_yellow \
+    .select(common_colums) \
+    .withColumn('service_type', F.lit('yellow'))
+df_trips_data = df_green_sel.unionAll(df_yellow_sel)
+df_trips_data.registerTempTable('trips_data')
+
+df_result = spark.sql("""
+SELECT 
+    PULocationID AS revenue_zone,
+    date_trunc('month', pickup_datetime) AS revenue_month, 
+    service_type, 
+    SUM(fare_amount) AS revenue_monthly_fare,
+    SUM(extra) AS revenue_monthly_extra,
+    SUM(mta_tax) AS revenue_monthly_mta_tax,
+    SUM(tip_amount) AS revenue_monthly_tip_amount,
+    SUM(tolls_amount) AS revenue_monthly_tolls_amount,
+    SUM(improvement_surcharge) AS revenue_monthly_improvement_surcharge,
+    SUM(total_amount) AS revenue_monthly_total_amount,
+    SUM(congestion_surcharge) AS revenue_monthly_congestion_surcharge,
+    AVG(passenger_count) AS avg_montly_passenger_count,
+    AVG(trip_distance) AS avg_montly_trip_distance
+FROM
+    trips_data
+GROUP BY
+    1, 2, 3
+""")
+
+df_result.coalesce(1) \
+    .write.parquet(output, mode='overwrite')
+
+
+
+</pre></div></div>
+            <p><strong>Arguments:</strong> <code>--input_green</code>, <code>--input_yellow</code>, <code>--output</code>. Chạy local bằng <code>python 06_spark_sql.py ...</code>, hoặc submit bằng <code>spark-submit --master local[*]</code> / <code>spark-submit --master spark://hostname:7077</code>.</p>
+          </div>
+          <div class="tab-content" id="sql-bq" data-tab-group="tabs-sql">
+            <div class="cmd-block"><div class="cmd-header"><span>06_spark_sql_big_query.py</span><span>nguyên văn toàn bộ file</span></div><div class="cmd-body"><pre>#!/usr/bin/env python
+# coding: utf-8
+
+import argparse
+
+import pyspark
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--input_green', required=True)
+parser.add_argument('--input_yellow', required=True)
+parser.add_argument('--output', required=True)
+
+args = parser.parse_args()
+
+input_green = args.input_green
+input_yellow = args.input_yellow
+output = args.output
+
+
+spark = SparkSession.builder \
+    .appName('test') \
+    .getOrCreate()
+
+spark.conf.set('temporaryGcsBucket', 'dataproc-temp-europe-west6-828225226997-fckhkym8')
+
+df_green = spark.read.parquet(input_green)
+
+df_green = df_green \
+    .withColumnRenamed('lpep_pickup_datetime', 'pickup_datetime') \
+    .withColumnRenamed('lpep_dropoff_datetime', 'dropoff_datetime')
+
+df_yellow = spark.read.parquet(input_yellow)
+
+
+df_yellow = df_yellow \
+    .withColumnRenamed('tpep_pickup_datetime', 'pickup_datetime') \
+    .withColumnRenamed('tpep_dropoff_datetime', 'dropoff_datetime')
+
+
+common_columns = [
+    'VendorID',
+    'pickup_datetime',
+    'dropoff_datetime',
+    'store_and_fwd_flag',
+    'RatecodeID',
+    'PULocationID',
+    'DOLocationID',
+    'passenger_count',
+    'trip_distance',
+    'fare_amount',
+    'extra',
+    'mta_tax',
+    'tip_amount',
+    'tolls_amount',
+    'improvement_surcharge',
+    'total_amount',
+    'payment_type',
+    'congestion_surcharge'
+]
+
+
+
+
+df_green_sel = df_green \
+    .select(common_columns) \
+    .withColumn('service_type', F.lit('green'))
+
+df_yellow_sel = df_yellow \
+    .select(common_columns) \
+    .withColumn('service_type', F.lit('yellow'))
+
+
+df_trips_data = df_green_sel.unionAll(df_yellow_sel)
+
+df_trips_data.registerTempTable('trips_data')
+
+
+df_result = spark.sql("""
+SELECT 
+    -- Revenue grouping 
+    PULocationID AS revenue_zone,
+    date_trunc('month', pickup_datetime) AS revenue_month, 
+    service_type, 
+
+    -- Revenue calculation 
+    SUM(fare_amount) AS revenue_monthly_fare,
+    SUM(extra) AS revenue_monthly_extra,
+    SUM(mta_tax) AS revenue_monthly_mta_tax,
+    SUM(tip_amount) AS revenue_monthly_tip_amount,
+    SUM(tolls_amount) AS revenue_monthly_tolls_amount,
+    SUM(improvement_surcharge) AS revenue_monthly_improvement_surcharge,
+    SUM(total_amount) AS revenue_monthly_total_amount,
+    SUM(congestion_surcharge) AS revenue_monthly_congestion_surcharge,
+
+    -- Additional calculations
+    AVG(passenger_count) AS avg_monthly_passenger_count,
+    AVG(trip_distance) AS avg_monthly_trip_distance
+FROM
+    trips_data
+GROUP BY
+    1, 2, 3
+""")
+
+
+df_result.write.format('bigquery') \
+    .option('table', output) \
+    .save()
+    
+
+
+
+</pre></div></div>
+            <div class="info-box warn"><span><strong>Điểm khác:</strong> script set <code>temporaryGcsBucket</code> và ghi bằng <code>df_result.write.format('bigquery').save(output)</code>. Bucket temp bị hardcode, gây vấn đề production về portability, IAM và environment separation.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">RDD</span>TAB GROUP 5: GroupBy, Join, RDD, GCS<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="tab-group" id="tabs-advanced-repo">
+            <div class="tab active" data-tab="nb07" onclick="switchTab('tabs-advanced-repo','nb07')">07_groupby_join</div>
+            <div class="tab" data-tab="nb08" onclick="switchTab('tabs-advanced-repo','nb08')">08_rdds</div>
+            <div class="tab" data-tab="nb09" onclick="switchTab('tabs-advanced-repo','nb09')">09_spark_gcs</div>
+          </div>
+          <div class="tab-content active" id="nb07" data-tab-group="tabs-advanced-repo">
+            <ul>
+              <li><strong>GroupBy revenue:</strong> <code>groupBy(revenue_zone, revenue_month, service_type).agg(SUM, AVG)</code> tạo aggregate theo zone/month/service_type.</li>
+              <li><strong>Join zones lookup:</strong> taxi trips <code>LEFT JOIN</code> zone lookup theo <code>PULocationID = LocationID</code>.</li>
+              <li><strong>Join để enrich:</strong> mục tiêu là thêm thông tin zone/borough vào dữ liệu, không phải filter bớt rows.</li>
+              <li><strong>Shuffle behavior:</strong> <code>groupBy</code> shuffle theo group key; join cũng thường shuffle hai phía theo join key nếu không broadcast.</li>
+              <li><strong>Missed optimization:</strong> repo không dùng <code>broadcast(df_zones)</code> dù zones là dimension nhỏ; broadcast hash join có thể tránh shuffle lớn phía dimension.</li>
+            </ul>
+          </div>
+          <div class="tab-content" id="nb08" data-tab-group="tabs-advanced-repo">
+            <p><strong>Mục tiêu:</strong> hiểu RDD API so với DataFrame và cách convert qua lại.</p>
+            <div class="cmd-block"><div class="cmd-header"><span>08_rdds.ipynb</span><span>key snippets</span></div><div class="cmd-body"><pre>rdd = df_green.select(columns).rdd
+
+df_result = rdd \
+    .filter(filter_outliers) \
+    .map(prepare_for_grouping) \
+    .reduceByKey(calculate_revenue) \
+    .map(unwrap) \
+    .toDF(result_schema)
+
+df_predicts = duration_rdd \
+    .mapPartitions(apply_model_in_batch)\
+    .toDF() \
+    .drop('Index')</pre></div></div>
+            <p><code>mapPartitions()</code> hiệu quả hơn <code>map()</code> khi cần init resource theo partition, ví dụ model, DB client hoặc pandas batch. RDD thực sự cần khi logic quá low-level: custom serialization, control partition-level, hoặc Python interop khó biểu diễn bằng DataFrame.</p>
+          </div>
+          <div class="tab-content" id="nb09" data-tab-group="tabs-advanced-repo">
+            <div class="cmd-block"><div class="cmd-header"><span>09_spark_gcs.ipynb</span><span>GCS connector config</span></div><div class="cmd-body"><pre>credentials_location = '/home/alexey/.google/credentials/google_credentials.json'
+
+conf = SparkConf() \
+    .setMaster('local[*]') \
+    .setAppName('test') \
+    .set("spark.jars", "./lib/gcs-connector-hadoop3-2.2.5.jar") \
+    .set("spark.hadoop.google.cloud.auth.service.account.enable", "true") \
+    .set("spark.hadoop.google.cloud.auth.service.account.json.keyfile", credentials_location)
+
+sc = SparkContext(conf=conf)
+hadoop_conf = sc._jsc.hadoopConfiguration()
+hadoop_conf.set("fs.AbstractFileSystem.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS")
+hadoop_conf.set("fs.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem")
+hadoop_conf.set("fs.gs.auth.service.account.json.keyfile", credentials_location)
+hadoop_conf.set("fs.gs.auth.service.account.enable", "true")
+
+df_green = spark.read.parquet('gs://dtc_data_lake_de-zoomcamp-nytaxi/pq/green/*/*')</pre></div></div>
+            <div class="info-box warn"><span><strong>Vấn đề:</strong> service account keyfile path hardcoded trong notebook. Production nên dùng service account của workload/Dataproc IAM hoặc config theo environment.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">GCP</span>TAB GROUP 6: Cloud Deployment (cloud.md)<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="tab-group" id="tabs-cloud">
+            <div class="tab active" data-tab="cloud-local" onclick="switchTab('tabs-cloud','cloud-local')">Local Cluster</div>
+            <div class="tab" data-tab="cloud-submit" onclick="switchTab('tabs-cloud','cloud-submit')">spark-submit</div>
+            <div class="tab" data-tab="cloud-dataproc" onclick="switchTab('tabs-cloud','cloud-dataproc')">Dataproc</div>
+            <div class="tab" data-tab="cloud-bq" onclick="switchTab('tabs-cloud','cloud-bq')">BigQuery</div>
+          </div>
+          <div class="tab-content active" id="cloud-local" data-tab-group="tabs-cloud">
+            <div class="cmd-block"><div class="cmd-header"><span>local cluster commands</span><span>cloud.md</span></div><div class="cmd-body"><pre>gsutil cp gs://hadoop-lib/gcs/gcs-connector-hadoop3-2.2.5.jar ./lib/
+
+./sbin/start-master.sh
+
+URL="spark://de-zoomcamp.europe-west1-b.c.de-zoomcamp-nytaxi.internal:7077"
+./sbin/start-worker.sh ${URL}</pre></div></div>
+            <p>Standalone master URL thường có dạng <code>spark://hostname:7077</code>.</p>
+          </div>
+          <div class="tab-content" id="cloud-submit" data-tab-group="tabs-cloud">
+            <div class="cmd-block"><div class="cmd-header"><span>spark-submit flow</span><span>cloud.md</span></div><div class="cmd-body"><pre>jupyter nbconvert --to=script 06_spark_sql.ipynb
+
+python 06_spark_sql.py \
+    --input_green=data/pq/green/2020/*/ \
+    --input_yellow=data/pq/yellow/2020/*/ \
+    --output=data/report-2020
+
+spark-submit \
+    --master="${URL}" \
+    06_spark_sql.py \
+        --input_green=data/pq/green/2021/*/ \
+        --input_yellow=data/pq/yellow/2021/*/ \
+        --output=data/report-2021</pre></div></div>
+          </div>
+          <div class="tab-content" id="cloud-dataproc" data-tab-group="tabs-cloud">
+            <div class="cmd-block"><div class="cmd-header"><span>Dataproc submit</span><span>cloud.md</span></div><div class="cmd-body"><pre>gsutil -m cp -r 06_spark_sql.py gs://bucket/code/
+
+gcloud dataproc jobs submit pyspark \
+    --cluster=de-zoomcamp-cluster \
+    --region=europe-west6 \
+    gs://bucket/code/06_spark_sql.py \
+    -- \
+        --input_green=gs://bucket/pq/green/2020/*/ \
+        --input_yellow=gs://bucket/pq/yellow/2020/*/ \
+        --output=gs://bucket/report-2020</pre></div></div>
+          </div>
+          <div class="tab-content" id="cloud-bq" data-tab-group="tabs-cloud">
+            <div class="cmd-block"><div class="cmd-header"><span>BigQuery connector submit</span><span>cloud.md</span></div><div class="cmd-body"><pre>gcloud dataproc jobs submit pyspark \
+    --cluster=de-zoomcamp-cluster \
+    --region=europe-west6 \
+    --jars=gs://spark-lib/bigquery/spark-bigquery-latest_2.12.jar \
+    gs://bucket/code/06_spark_sql_big_query.py \
+    -- \
+        --input_green=gs://bucket/pq/green/2020/*/ \
+        --input_yellow=gs://bucket/pq/yellow/2020/*/ \
+        --output=trips_data_all.reports-2020</pre></div></div>
+            <p>Dataproc 2.1+ images thường pre-install BigQuery connector nên có thể không cần <code>--jars</code>. Output table trong repo là <code>trips_data_all.reports-2020</code>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">HW</span>HOMEWORK SECTION — homework.ipynb<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>File:</strong> <code>homework.ipynb</code> — FHVHV Feb 2021.</p>
+          <div class="practice-task">
+            <div class="practice-task-header">Q1: Spark version</div>
+            <div class="practice-task-body"><p>Đề bài: kiểm tra version bằng <code>spark.version</code>.</p><button class="solution-toggle" onclick="toggleSolution('hw1-code')">Xem gợi ý code</button><div class="solution-box" id="hw1-code"><pre>spark.version</pre><p><strong>Đáp án repo:</strong> <code>3.0.3</code>.</p></div></div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Q2: Đọc CSV FHVHV Feb 2021, repartition 24, ghi Parquet</div>
+            <div class="practice-task-body"><p>Đề bài: ghi Parquet rồi kiểm tra số output files.</p><button class="solution-toggle" onclick="toggleSolution('hw2-code')">Xem gợi ý code</button><div class="solution-box" id="hw2-code"><pre>df = spark.read.option("header", "true").schema(schema).csv('fhvhv_tripdata_2021-02.csv')
+df = df.repartition(24)
+df.write.parquet('data/pq/fhvhv/2021/02/')</pre><p><strong>Đáp án:</strong> thường có 24 part files, vì mỗi partition ghi một output part file.</p></div></div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Q3: Bao nhiêu trips ngày 15/02/2021?</div>
+            <div class="practice-task-body"><p>Đề bài: count trips có pickup date là 2021-02-15.</p><button class="solution-toggle" onclick="toggleSolution('hw3-code')">Xem gợi ý code</button><div class="solution-box" id="hw3-code"><pre>df.withColumn('pickup_date', F.to_date(df.pickup_datetime)) \
+  .filter("pickup_date = '2021-02-15'") \
+  .count()</pre><p><strong>Đáp án:</strong> <code>367170</code>.</p></div></div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Q4: Longest trip mỗi ngày</div>
+            <div class="practice-task-body"><p>Đề bài: tính duration và tìm ngày có trip dài nhất.</p><button class="solution-toggle" onclick="toggleSolution('hw4-code')">Xem gợi ý code</button><div class="solution-box" id="hw4-code"><pre>df.withColumn('duration', df.dropoff_datetime.cast('long') - df.pickup_datetime.cast('long')) \
+  .withColumn('pickup_date', F.to_date(df.pickup_datetime)) \
+  .groupBy('pickup_date').max('duration') \
+  .orderBy('max(duration)', ascending=False) \
+  .limit(5).show()</pre><p><strong>Đáp án:</strong> ngày đứng đầu trong output là ngày có trip dài nhất.</p></div></div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Q5: Most frequent dispatching_base_num</div>
+            <div class="practice-task-body"><p>Đề bài: tìm base xuất hiện nhiều nhất và chú ý Spark UI stages.</p><button class="solution-toggle" onclick="toggleSolution('hw5-code')">Xem gợi ý code</button><div class="solution-box" id="hw5-code"><pre>df.groupBy('dispatching_base_num') \
+  .count() \
+  .orderBy('count', ascending=False) \
+  .limit(5) \
+  .show()</pre><p><strong>Đáp án:</strong> xem row đầu tiên của output notebook để lấy base frequent nhất.</p></div></div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Q6: Most common PUZone / DOZone pair</div>
+            <div class="practice-task-body"><p>Đề bài: join với zones để lấy tên zone pickup/dropoff rồi count pair.</p><button class="solution-toggle" onclick="toggleSolution('hw6-code')">Xem gợi ý code</button><div class="solution-box" id="hw6-code"><pre>spark.sql("""
+SELECT CONCAT(pul.Zone, ' / ', dol.Zone) AS pu_do_pair, COUNT(1)
+FROM fhvhv_2021_02 fhv
+LEFT JOIN zones pul ON fhv.PULocationID = pul.LocationID
+LEFT JOIN zones dol ON fhv.DOLocationID = dol.LocationID
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 5
+""").show()</pre><p><strong>Đáp án:</strong> pair phổ biến nhất là row đầu tiên của kết quả query.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s3" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S3 · Hands-on</div>
+        <div class="module-title">Thực hành từng bước</div>
+        <div class="module-subtitle">Chạy theo data flow thật của repo: setup PySpark, đọc CSV, ghi Parquet, transform, join, RDD và debug lỗi thường gặp.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">SET</span>Setup Prerequisites<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="info-box note"><span><strong>Yêu cầu:</strong> Java 11/17 cài đúng, <code>JAVA_HOME</code> đã set, và Python environment có <code>pyspark</code>.</span></div>
+          <div class="cmd-block"><div class="cmd-header"><span>smoke checks</span><span>terminal</span></div><div class="cmd-body"><pre>java --version
+python -c "import pyspark; print(pyspark.__version__)"</pre></div></div>
+          <p>Flow thực hành bám theo repo: download raw CSV gzip -> define schema -> ghi Parquet -> đọc Parquet green/yellow -> union/aggregate -> optional join/RDD/cloud.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">T1</span>TASK 1 — Hello PySpark (Junior)<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Mục tiêu:</strong> Tạo SparkSession đầu tiên, đọc CSV, in schema.</p>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 1: Tạo SparkSession</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>hello_spark.py</span><span>python</span></div><div class="cmd-body"><pre>from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .master("local[*]") \
+    .appName("hello_spark") \
+    .getOrCreate()
+
+print(spark.version)</pre></div></div>
+              <p><code>local[*]</code> dùng tất cả core trên máy local để chạy driver/executor trong cùng process Spark local.</p>
+            </div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 2: Download data mẫu</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>download sample</span><span>bash</span></div><div class="cmd-body"><pre>wget https://github.com/DataTalksClub/nyc-tlc-data/releases/download/fhvhv/fhvhv_tripdata_2021-01.csv.gz
+gzip -dc fhvhv_tripdata_2021-01.csv.gz > fhvhv_tripdata_2021-01.csv</pre></div></div>
+            </div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 3: Đọc CSV và xem schema</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>read csv</span><span>python</span></div><div class="cmd-body"><pre>df = spark.read \
+    .option("header", "true") \
+    .csv("fhvhv_tripdata_2021-01.csv")
+
+df.printSchema()
+df.show(5)
+print(f"Row count: {df.count()}")</pre></div></div>
+            </div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 4: So sánh infer schema vs define schema</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>explicit schema</span><span>python</span></div><div class="cmd-body"><pre>from pyspark.sql import types
+
+schema = types.StructType([
+    types.StructField('hvfhs_license_num', types.StringType(), True),
+    types.StructField('dispatching_base_num', types.StringType(), True),
+    types.StructField('pickup_datetime', types.TimestampType(), True),
+    types.StructField('dropoff_datetime', types.TimestampType(), True),
+    types.StructField('PULocationID', types.IntegerType(), True),
+    types.StructField('DOLocationID', types.IntegerType(), True),
+    types.StructField('SR_Flag', types.StringType(), True)
+])
+
+df = spark.read \
+    .option("header", "true") \
+    .schema(schema) \
+    .csv("fhvhv_tripdata_2021-01.csv")
+
+df.printSchema()</pre></div></div>
+              <div class="info-box tip"><span><strong>Expected output:</strong> schema hiện đúng types, không phải toàn <code>StringType</code>.</span></div>
+              <button class="solution-toggle" onclick="toggleSolution('task1-solution')">Xem điểm hay cần chú ý</button>
+              <div class="solution-box" id="task1-solution">
+                <ul>
+                  <li><code>pickup_datetime</code>/<code>dropoff_datetime</code> là <code>TimestampType</code>, không phải <code>StringType</code>.</li>
+                  <li><code>PULocationID</code>/<code>DOLocationID</code> là <code>IntegerType</code>.</li>
+                  <li><code>SR_Flag</code> vẫn là <code>StringType</code> vì thường là <code>Y</code> hoặc null.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">T2</span>TASK 2 — Parquet Pipeline (Mid)<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Mục tiêu:</strong> Xây dựng pipeline CSV -> Parquet, hiểu repartition và partition files.</p>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 1: Repartition và ghi Parquet</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>write parquet</span><span>python</span></div><div class="cmd-body"><pre>df = df.repartition(24)
+df.write.parquet("data/pq/fhvhv/2021/01/")</pre></div></div>
+              <p>Kiểm tra bằng <code>ls -lh data/pq/fhvhv/2021/01/</code>; kỳ vọng có 24 file <code>part-*.parquet</code>.</p>
+            </div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 2: Đọc lại Parquet và compare</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>read parquet</span><span>python</span></div><div class="cmd-body"><pre>df_parquet = spark.read.parquet("data/pq/fhvhv/2021/01/")
+df_parquet.printSchema()
+print(df_parquet.count())</pre></div></div>
+            </div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 3: Thử coalesce(1) — hiểu vấn đề</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>single output</span><span>python</span></div><div class="cmd-body"><pre>df.coalesce(1).write.parquet("data/pq/fhvhv/2021/01_single/")</pre></div></div>
+              <p>Kiểm tra bằng <code>ls</code>: chỉ có 1 file <code>part-*.parquet</code>. Câu hỏi: tại sao đây là vấn đề khi data lớn?</p>
+              <button class="solution-toggle" onclick="toggleSolution('task2-solution')">Xem giải thích</button>
+              <div class="solution-box" id="task2-solution">
+                <ul>
+                  <li><code>coalesce(1)</code> gom tất cả data về 1 executor/task, tạo bottleneck.</li>
+                  <li>Khi đọc lại, Spark chỉ có một file lớn nên parallelism kém hơn.</li>
+                  <li>Production nên dùng <code>coalesce(n)</code> hoặc <code>repartition(n)</code> theo data size, target file size và cluster size.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 4: Wildcard read</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>multi-month read</span><span>python</span></div><div class="cmd-body"><pre># Nếu đã có nhiều tháng:
+df_all = spark.read.parquet("data/pq/fhvhv/2021/*/")
+print(df_all.count())</pre></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">T3</span>TASK 3 — DataFrame Transformations (Mid)<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Mục tiêu:</strong> Column operations, filter, UDF — replica từ <code>04_pyspark.ipynb</code>.</p>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 1: Select và filter</div>
+            <div class="practice-task-body"><div class="cmd-block"><div class="cmd-header"><span>select filter</span><span>python</span></div><div class="cmd-body"><pre>from pyspark.sql import functions as F
+
+result = df \
+    .select('pickup_datetime', 'dropoff_datetime', 'PULocationID', 'DOLocationID') \
+    .filter(df.hvfhs_license_num == 'HV0003')
+
+result.show(5)</pre></div></div></div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 2: Tính duration</div>
+            <div class="practice-task-body"><div class="cmd-block"><div class="cmd-header"><span>duration columns</span><span>python</span></div><div class="cmd-body"><pre>df_with_duration = df \
+    .withColumn('duration_seconds',
+        df.dropoff_datetime.cast('long') - df.pickup_datetime.cast('long')) \
+    .withColumn('duration_minutes',
+        (df.dropoff_datetime.cast('long') - df.pickup_datetime.cast('long')) / 60) \
+    .withColumn('pickup_date', F.to_date(df.pickup_datetime))
+
+df_with_duration.select('pickup_date', 'duration_minutes').show(10)</pre></div></div></div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 3: Viết và dùng UDF</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>udf example</span><span>python</span></div><div class="cmd-body"><pre>def crazy_stuff(base_num):
+    num = int(base_num[1:])
+    if num % 7 == 0:
+        return f's/{num:03x}'
+    elif num % 3 == 0:
+        return f'a/{num:03x}'
+    else:
+        return f'e/{num:03x}'
+
+crazy_stuff_udf = F.udf(crazy_stuff, returnType=types.StringType())
+
+df \
+    .withColumn('pickup_date', F.to_date(df.pickup_datetime)) \
+    .withColumn('dropoff_date', F.to_date(df.dropoff_datetime)) \
+    .withColumn('base_id', crazy_stuff_udf(df.dispatching_base_num)) \
+    .select('base_id', 'pickup_date', 'dropoff_date', 'PULocationID', 'DOLocationID') \
+    .show()</pre></div></div>
+              <div class="info-box warn"><span><strong>UDF Performance:</strong> UDF phá vỡ nhiều tối ưu Catalyst; mỗi row có overhead serialize Python -> JVM -> Python. Ưu tiên <code>pyspark.sql.functions</code> built-in trước. Nếu phải UDF, xem xét Pandas UDF/vectorized UDF cho throughput tốt hơn.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">T4</span>TASK 4 — Spark SQL + Union Green/Yellow (Mid)<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Mục tiêu:</strong> Replica <code>06_spark_sql.ipynb</code> — union hai taxi types, revenue aggregation.</p>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 1: Đọc và rename</div>
+            <div class="practice-task-body"><div class="cmd-block"><div class="cmd-header"><span>read green/yellow</span><span>python</span></div><div class="cmd-body"><pre>df_green = spark.read.parquet("data/pq/green/*/*")
+df_green = df_green \
+    .withColumnRenamed('lpep_pickup_datetime', 'pickup_datetime') \
+    .withColumnRenamed('lpep_dropoff_datetime', 'dropoff_datetime')
+
+df_yellow = spark.read.parquet("data/pq/yellow/*/*")
+df_yellow = df_yellow \
+    .withColumnRenamed('tpep_pickup_datetime', 'pickup_datetime') \
+    .withColumnRenamed('tpep_dropoff_datetime', 'dropoff_datetime')</pre></div></div></div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 2: Tìm common columns và union</div>
+            <div class="practice-task-body"><div class="cmd-block"><div class="cmd-header"><span>union taxi types</span><span>python</span></div><div class="cmd-body"><pre>common_colums = [col for col in df_green.columns if col in set(df_yellow.columns)]
+
+df_green_sel = df_green.select(common_colums).withColumn('service_type', F.lit('green'))
+df_yellow_sel = df_yellow.select(common_colums).withColumn('service_type', F.lit('yellow'))
+
+df_trips_data = df_green_sel.unionAll(df_yellow_sel)
+df_trips_data.groupBy('service_type').count().show()</pre></div></div></div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 3: Revenue aggregation bằng Spark SQL</div>
+            <div class="practice-task-body"><div class="cmd-block"><div class="cmd-header"><span>revenue aggregation</span><span>python</span></div><div class="cmd-body"><pre>df_trips_data.registerTempTable('trips_data')
+
+df_result = spark.sql("""
+SELECT 
+    PULocationID AS revenue_zone,
+    date_trunc('month', pickup_datetime) AS revenue_month, 
+    service_type, 
+    SUM(fare_amount) AS revenue_monthly_fare,
+    SUM(extra) AS revenue_monthly_extra,
+    SUM(mta_tax) AS revenue_monthly_mta_tax,
+    SUM(tip_amount) AS revenue_monthly_tip_amount,
+    SUM(tolls_amount) AS revenue_monthly_tolls_amount,
+    SUM(improvement_surcharge) AS revenue_monthly_improvement_surcharge,
+    SUM(total_amount) AS revenue_monthly_total_amount,
+    AVG(passenger_count) AS avg_monthly_passenger_count,
+    AVG(trip_distance) AS avg_monthly_trip_distance
+FROM trips_data
+GROUP BY 1, 2, 3
+""")
+
+df_result.coalesce(1).write.parquet("data/report-2020", mode='overwrite')</pre></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">T5</span>TASK 5 — GroupBy, Join, RDD (Senior)<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Mục tiêu:</strong> Hiểu internals qua hands-on, optimize join.</p>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 1: Join zones lookup</div>
+            <div class="practice-task-body"><div class="cmd-block"><div class="cmd-header"><span>join lookup</span><span>python</span></div><div class="cmd-body"><pre>df_zones = spark.read.parquet("zones/")
+
+df_result_joined = df_trips_data \
+    .join(df_zones, df_trips_data.PULocationID == df_zones.LocationID, "left") \
+    .select('pickup_datetime', 'dropoff_datetime', 'service_type',
+            'Zone', 'fare_amount', 'total_amount')
+
+df_result_joined.show(5)</pre></div></div></div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 2: Broadcast join</div>
+            <div class="practice-task-body"><div class="cmd-block"><div class="cmd-header"><span>broadcast optimization</span><span>python</span></div><div class="cmd-body"><pre>from pyspark.sql.functions import broadcast
+
+df_result_broadcast = df_trips_data \
+    .join(broadcast(df_zones), df_trips_data.PULocationID == df_zones.LocationID, "left")
+
+# So sánh execution plan
+df_result_joined.explain()
+df_result_broadcast.explain()</pre></div></div><p>Đây là optimization không có trong repo. Với dimension nhỏ như zones, broadcast có thể tránh shuffle lớn.</p></div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Bước 3: RDD operations</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>rdd basics</span><span>python</span></div><div class="cmd-body"><pre># Convert DataFrame to RDD
+rdd = df_trips_data.rdd
+
+# map/filter
+rdd_filtered = rdd.filter(lambda row: row.total_amount > 10)
+rdd_mapped = rdd_filtered.map(lambda row: (row.service_type, row.total_amount))
+
+# reduceByKey
+rdd_revenue = rdd_mapped.reduceByKey(lambda a, b: a + b)
+rdd_revenue.collect()
+
+# Convert back to DataFrame
+df_from_rdd = rdd_revenue.toDF(['service_type', 'total_revenue'])
+df_from_rdd.show()</pre></div></div>
+              <div class="info-box tip"><span><strong>Khi nào dùng RDD:</strong> custom partitioning logic, binary/unstructured data, hoặc low-level fault tolerance. Tránh dùng khi DataFrame API đủ, vì Catalyst optimize DataFrame tốt hơn Python RDD code.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">T6</span>TASK 6 — Cố tình phá và debug (Senior)<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="practice-task">
+            <div class="practice-task-header">Kịch bản 1: Schema mismatch</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>wrong column</span><span>python</span></div><div class="cmd-body"><pre># Sai: dùng wrong column name
+df.select('pickup_time')  # column không tồn tại</pre></div></div>
+              <p><strong>Lỗi:</strong> <code>AnalysisException: Column 'pickup_time' not found</code>.</p>
+              <p><strong>Debug:</strong> dùng <code>df.columns</code> để xem đúng tên; dùng <code>df.printSchema()</code> để xem types.</p>
+            </div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Kịch bản 2: OOM khi collect()</div>
+            <div class="practice-task-body">
+              <div class="cmd-block"><div class="cmd-header"><span>driver OOM</span><span>python</span></div><div class="cmd-body"><pre>df.collect()  # collect 11M rows về driver</pre></div></div>
+              <p><strong>Lỗi:</strong> <code>OutOfMemoryError</code> hoặc driver OOM.</p>
+              <p><strong>Fix:</strong> dùng <code>df.take(100)</code>, <code>df.limit(1000).collect()</code>, hoặc write to disk thay vì collect.</p>
+            </div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Kịch bản 3: GCS auth fail</div>
+            <div class="practice-task-body">
+              <p><strong>Lỗi:</strong> <code>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem: ...AccessDeniedException</code>.</p>
+              <ol>
+                <li>Kiểm tra <code>GOOGLE_APPLICATION_CREDENTIALS</code> env var.</li>
+                <li>Kiểm tra service account có <code>Storage Object Viewer</code> role.</li>
+                <li>Kiểm tra <code>fs.gs.auth.service.account.json.keyfile</code> path đúng.</li>
+                <li>Kiểm tra GCS connector jar đã copy vào <code>$SPARK_HOME/jars/</code>.</li>
+              </ol>
+            </div>
+          </div>
+          <div class="practice-task">
+            <div class="practice-task-header">Kịch bản 4: Task straggler</div>
+            <div class="practice-task-body">
+              <p><strong>Triệu chứng:</strong> 1 task chạy rất lâu trong khi task khác đã xong.</p>
+              <p><strong>Nguyên nhân:</strong> data skew — một partition có quá nhiều data.</p>
+              <p><strong>Debug:</strong> Spark UI -> Stages -> xem task duration distribution.</p>
+              <p><strong>Fix:</strong> salt key để phân phối đều, hoặc bật AQE bằng <code>spark.sql.adaptive.enabled=true</code>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s4" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S4 · Production Readiness</div>
+        <div class="module-title">Production Readiness</div>
+        <div class="module-subtitle">Những khoảng trống giữa notebook chạy được và Spark batch job có thể vận hành thật.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">!</span>Những gì repo không dạy nhưng production cần ngay<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="info-box danger"><span><strong>Repo hiện là learning repo:</strong> có hardcoded credentials/path/bucket, thiếu retry/checksum, thiếu orchestration, thiếu metrics, thiếu data quality gates, và các partition count như <code>repartition(4)</code>/<code>coalesce(1)</code> chưa phù hợp production.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">4.1</span>Security issues trong repo<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>File</th><th>Vấn đề</th><th>Fix production</th></tr></thead>
+            <tbody>
+              <tr><td><code>core-site.xml</code></td><td>keyfile path hardcoded <code>/home/alexey/.google/credentials/google_credentials.json</code></td><td>Dùng Workload Identity trên GCP.</td></tr>
+              <tr><td><code>spark-defaults.conf</code></td><td>path thiếu tên file JSON</td><td>Secret Manager hoặc env var.</td></tr>
+              <tr><td><code>06_spark_sql_big_query.py</code></td><td><code>temporaryGcsBucket</code> hardcoded</td><td>Inject qua <code>--conf</code> hoặc env.</td></tr>
+              <tr><td><code>09_spark_gcs.ipynb</code></td><td>service account key trong notebook</td><td>Không để key trong notebook/git.</td></tr>
+            </tbody>
+          </table>
+          <h3 class="green">Code pattern an toàn hơn</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>config from env</span><span>python</span></div><div class="cmd-body"><pre>import os
+
+# Lấy config từ env vars thay vì hardcode
+gcs_bucket = os.environ.get("GCS_BUCKET")
+project_id = os.environ.get("GCP_PROJECT")
+temp_bucket = os.environ.get("SPARK_TEMP_BUCKET")
+
+spark = SparkSession.builder \
+    .config("spark.hadoop.google.cloud.auth.service.account.enable", "true") \
+    .config("temporaryGcsBucket", temp_bucket) \
+    .getOrCreate()</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">4.2</span>Idempotency & Reliability<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="orange">Vấn đề với download_data.sh</h3>
+          <ul>
+            <li>Không có skip-if-exists: re-download lãng phí.</li>
+            <li>Không có checksum: corrupt file không phát hiện.</li>
+            <li>Không có retry: network timeout làm job fail.</li>
+          </ul>
+          <h3 class="green">Pattern cải thiện</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>reliable download</span><span>bash</span></div><div class="cmd-body"><pre># Kiểm tra file tồn tại trước khi download
+if [ ! -f "${LOCAL_PATH}" ]; then
+    wget --retry-connrefused --waitretry=5 --tries=3 "${URL}" -O "${LOCAL_PATH}"
+    # Verify không rỗng
+    if [ ! -s "${LOCAL_PATH}" ]; then
+        rm -f "${LOCAL_PATH}"
+        echo "ERROR: Download failed for ${URL}"
+        exit 1
+    fi
+fi</pre></div></div>
+          <h3 class="blue">Idempotent Spark writes</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>partition overwrite</span><span>python</span></div><div class="cmd-body"><pre># Luôn dùng mode overwrite với partition để idempotent
+df.write \
+    .mode("overwrite") \
+    .partitionBy("year", "month") \
+    .parquet(output_path)</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">4.3</span>Partition Strategy<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">Công thức chọn số partitions</h3>
+          <p>Target partition size: <strong>100-200 MB</strong> uncompressed hoặc <strong>64-128 MB</strong> Parquet compressed. Số partitions xấp xỉ <code>total_data_size / target_partition_size</code>. <code>spark.sql.shuffle.partitions</code> mặc định 200 chỉ hợp lý khi data khoảng 20GB, không phải mọi workload.</p>
+          <h3 class="green">Pattern thực tế</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>partition sizing</span><span>python</span></div><div class="cmd-body"><pre># Thay vì hardcode repartition(4):
+num_cores = spark.sparkContext.defaultParallelism
+target_partitions = max(num_cores, data_size_mb // 128)
+df.repartition(target_partitions).write.parquet(output_path)
+
+# Hoặc dùng AQE để Spark tự quyết:
+spark = SparkSession.builder \
+    .config("spark.sql.adaptive.enabled", "true") \
+    .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
+    .getOrCreate()</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">4.4</span>Monitoring & Observability<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">Spark UI — những gì cần xem</h3>
+          <p>Mở <code>localhost:4040</code> khi Spark đang chạy.</p>
+          <ul>
+            <li><strong>Jobs tab:</strong> tổng thời gian, số stages.</li>
+            <li><strong>Stages tab:</strong> shuffle read/write, task duration distribution để phát hiện skew.</li>
+            <li><strong>Storage tab:</strong> cached RDD/DataFrame size.</li>
+            <li><strong>SQL tab:</strong> physical plan, số rows, bytes read/written.</li>
+          </ul>
+          <h3 class="green">Structured logging pattern</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>structured logging</span><span>python</span></div><div class="cmd-body"><pre>import logging
+import time
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+start = time.time()
+logger.info(f"Starting job: input_green={input_green}, output={output}")
+
+df = spark.read.parquet(input_green)
+row_count = df.count()
+logger.info(f"Read {row_count} rows from green taxi")
+
+df_result.write.parquet(output)
+logger.info(f"Job completed in {time.time()-start:.1f}s, output: {output}")</pre></div></div>
+          <div class="info-box tip"><span><strong>Metrics nên track:</strong> input rows per source, output rows per sink, null rates trên key columns, job duration per partition/month, shuffle spill. Nếu shuffle spill > 0, cần xem lại memory/partition/join strategy.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">4.5</span>GCP Dataproc Production<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Mode</th><th>Khi dùng</th><th>Trade-off</th></tr></thead>
+            <tbody>
+              <tr><td>Standard cluster</td><td>Job dài, tái sử dụng cluster</td><td>Chi phí khi idle.</td></tr>
+              <tr><td>Single-node</td><td>Dev/test</td><td>Không scale.</td></tr>
+              <tr><td>Serverless batches</td><td>Ad-hoc, sporadic</td><td>Cold start khoảng 2 phút.</td></tr>
+            </tbody>
+          </table>
+          <h3 class="green">Best practices</h3>
+          <ul>
+            <li>Dùng preemptible workers cho worker nodes để tiết kiệm khoảng 60-80%.</li>
+            <li>Autoscaling policy cho workloads không đều.</li>
+            <li>Component Gateway để truy cập Spark History Server mà không cần SSH.</li>
+            <li>Labels cho cost attribution: <code>--labels=env=prod,team=de,module=batch</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s5" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S5 · Advanced Knowledge</div>
+        <div class="module-title">Kiến thức nâng cao</div>
+        <div class="module-subtitle">Các chủ đề Senior DE cần biết để tối ưu, debug và thiết kế Spark batch systems vượt ngoài scope repo.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">NOTE</span>Dành cho Senior DE<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="info-box note"><span><strong>Phần này repo không dạy:</strong> Catalyst/Tungsten, memory model, join strategy, skew handling, incremental batch, BigQuery connector internals và Structured Streaming.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">5.1</span>Spark Internals (Senior)<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">Catalyst Optimizer — 4 phases</h3>
+          <ol>
+            <li><strong>Analysis:</strong> resolve column names, types -> Analyzed Logical Plan.</li>
+            <li><strong>Logical Optimization:</strong> predicate pushdown, constant folding, column pruning.</li>
+            <li><strong>Physical Planning:</strong> convert logical -> physical operators, chọn join strategy.</li>
+            <li><strong>Code Generation:</strong> Tungsten whole-stage codegen -> bytecode.</li>
+          </ol>
+          <h3 class="green">Đọc explain plan</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>explain extended</span><span>python</span></div><div class="cmd-body"><pre>df_result.explain(True)
+# Extended: Parsed LP  Analyzed LP  Optimized LP  Physical Plan
+# Tìm: FileScan (predicate pushdown), HashAggregate, Exchange (shuffle)</pre></div></div>
+          <h3 class="orange">Executor Memory Model</h3>
+          <ul>
+            <li><strong>Execution memory:</strong> shuffle, join, sort. Xấp xỉ <code>spark.executor.memory * 0.6 * 0.5</code>.</li>
+            <li><strong>Storage memory:</strong> cache/persist. Xấp xỉ <code>spark.executor.memory * 0.6 * 0.5</code>.</li>
+            <li><strong>User memory:</strong> UDF, internal data structures, object overhead.</li>
+            <li><strong>Overhead:</strong> off-heap, <code>spark.executor.memoryOverhead</code>, default <code>max(384MB, 10%)</code>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">5.2</span>Join Strategies<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Strategy</th><th>Khi dùng</th><th>Trigger</th></tr></thead>
+            <tbody>
+              <tr><td>Broadcast Hash Join</td><td>Small table nhỏ hơn <code>spark.sql.autoBroadcastJoinThreshold</code> (10MB)</td><td>Automatic hoặc <code>broadcast()</code> hint.</td></tr>
+              <tr><td>Sort-Merge Join</td><td>Large tables, sorted partitions</td><td>Default cho large joins.</td></tr>
+              <tr><td>Shuffle Hash Join</td><td>Medium tables</td><td><code>spark.sql.join.preferSortMergeJoin=false</code>.</td></tr>
+              <tr><td>Broadcast Nested Loop</td><td>Cross joins, non-equi joins</td><td>Tự động khi không có join key phù hợp.</td></tr>
+            </tbody>
+          </table>
+          <h3 class="red">Skew Join Handling</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>skew fixes</span><span>python</span></div><div class="cmd-body"><pre># Phát hiện skew: xem Stages tab  task duration varies heavily
+
+# Fix 1: AQE skew join
+spark.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")
+
+# Fix 2: Salting thủ công
+from pyspark.sql import functions as F
+import random
+
+SALT_FACTOR = 10
+
+df_large = df_large.withColumn('salt', (F.rand() * SALT_FACTOR).cast('int'))
+df_small_salted = df_small.withColumn('salt', F.explode(F.array([F.lit(i) for i in range(SALT_FACTOR)])))
+
+df_large.join(df_small_salted,
+    (df_large.key == df_small_salted.key) & (df_large.salt == df_small_salted.salt))</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">5.3</span>Incremental Batch Design<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="cmd-block"><div class="cmd-header"><span>full vs incremental</span><span>mental model</span></div><div class="cmd-body"><pre>Full load:    đọc toàn bộ data mỗi lần  đơn giản, tốn kém
+Incremental:  chỉ đọc data mới/thay đổi  phức tạp hơn, hiệu quả</pre></div></div>
+          <h3 class="green">Pattern: Partition-based incremental</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>missing partitions</span><span>python</span></div><div class="cmd-body"><pre># Xử lý theo partition date, chỉ chạy các partition chưa có
+import datetime
+
+def get_missing_partitions(output_path: str, start_date: str, end_date: str) -> list:
+    existing = spark.read.parquet(output_path).select('year', 'month').distinct()
+    # Compare với expected range, return missing ones
+    ...
+
+# Idempotent: overwrite partition cụ thể
+df_partition.write \
+    .mode("overwrite") \
+    .partitionBy("year", "month") \
+    .parquet(output_path)</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">5.4</span>BigQuery + Spark Integration (Deep)<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">Direct vs Indirect write</h3>
+          <ul>
+            <li><strong>Indirect default:</strong> Spark -> GCS temp -> BigQuery load job -> GCS temp cleanup.</li>
+            <li><strong>Direct write:</strong> Spark -> BigQuery Storage Write API, GA từ connector 0.27+.</li>
+          </ul>
+          <h3 class="green">Write Dispositions</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>bigquery write</span><span>python</span></div><div class="cmd-body"><pre>df.write.format('bigquery') \
+    .option('table', 'project.dataset.table') \
+    .option('writeDispositionMode', 'WRITE_APPEND') \
+    .save()</pre></div></div>
+          <p><code>WRITE_APPEND</code> có thể đổi thành <code>WRITE_TRUNCATE</code> hoặc <code>WRITE_EMPTY</code> theo nhu cầu ghi.</p>
+          <h3 class="orange">BigQuery Storage Read API — nhanh hơn JDBC</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>bigquery read</span><span>python</span></div><div class="cmd-body"><pre>df = spark.read.format('bigquery') \
+    .option('table', 'project.dataset.table') \
+    .option('filter', "date >= '2020-01-01'") \
+    .load()</pre></div></div>
+          <p><code>filter</code> minh họa predicate pushdown khi đọc từ BigQuery.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-detail">5.5</span>Structured Streaming (giới thiệu)<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">Batch vs Streaming Spark</h3>
+          <p><strong>Batch:</strong> một lần đọc toàn bộ data, process, write, stop. <strong>Streaming:</strong> đọc liên tục từ source như Kafka, GCS hoặc socket, xử lý micro-batch mỗi X giây.</p>
+          <h3 class="green">Micro-batch example</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>structured streaming</span><span>python</span></div><div class="cmd-body"><pre>df_stream = spark.readStream \
+    .schema(schema) \
+    .parquet("data/input/")
+
+query = df_stream.writeStream \
+    .outputMode("append") \
+    .format("parquet") \
+    .option("path", "data/output/") \
+    .option("checkpointLocation", "data/checkpoint/") \
+    .trigger(processingTime="1 minute") \
+    .start()
+
+query.awaitTermination()</pre></div></div>
+          <h3 class="orange">Watermarking — xử lý late data</h3>
+          <div class="cmd-block"><div class="cmd-header"><span>watermark</span><span>python</span></div><div class="cmd-body"><pre>df_with_watermark = df_stream \
+    .withWatermark("pickup_datetime", "2 hours") \
+    .groupBy(F.window("pickup_datetime", "1 hour"), "service_type") \
+    .agg(F.count("*"))</pre></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="module" id="s6" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S6 · Common Errors</div>
+        <div class="module-title">Lỗi thường gặp</div>
+        <div class="module-subtitle">Checklist debug theo triệu chứng, root cause, thứ tự kiểm tra và fix cụ thể.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">E1</span>Java Not Found / JAVA_HOME not set<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Triệu chứng:</strong> <code>JAVA_HOME is not set; results may vary</code>.</p>
+          <p><strong>Nguyên nhân gốc rễ:</strong> Java chưa cài, shell không thấy <code>java</code>, hoặc <code>JAVA_HOME</code> chưa trỏ đúng JDK.</p>
+          <ol>
+            <li><code>which java</code> có return path không?</li>
+            <li><code>echo $JAVA_HOME</code> có set không?</li>
+            <li><code>java --version</code> có chạy được không?</li>
+          </ol>
+          <div class="cmd-block"><div class="cmd-header"><span>fix java env</span><span>bash</span></div><div class="cmd-body"><pre># Linux/WSL:
+export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+export PATH="${JAVA_HOME}/bin:${PATH}"
+# Thêm vào ~/.bashrc để persist
+
+# macOS:
+export JAVA_HOME=$(brew --prefix openjdk@17)</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">E2</span>AnalysisException — Column not found<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Triệu chứng:</strong> <code>AnalysisException: Resolved attribute(s) pickup_time missing from schema</code>.</p>
+          <p><strong>Nguyên nhân gốc rễ:</strong> Tên column sai hoặc DataFrame đã transform/rename làm mất column cũ.</p>
+          <ol>
+            <li><code>df.columns</code> để liệt kê tất cả columns hiện tại.</li>
+            <li><code>df.printSchema()</code> để xem types.</li>
+            <li><code>df.explain()</code> để trace lại từ source.</li>
+          </ol>
+          <p><strong>Fix:</strong> Dùng đúng tên column; sau rename phải dùng tên mới như <code>pickup_datetime</code> thay vì tên cũ.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">E3</span>Path does not exist (Local)<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Triệu chứng:</strong> <code>AnalysisException: Path does not exist: file:/path/to/data/raw/green/2021/08</code>.</p>
+          <p><strong>Nguyên nhân gốc rễ:</strong> <code>download_data.sh</code> chưa chạy đủ, tháng đó thiếu file, hoặc working directory/path sai.</p>
+          <ol>
+            <li><code>ls data/raw/green/2021/</code> để xem tháng nào có.</li>
+            <li><code>pwd</code> để xác nhận working directory đúng.</li>
+            <li>Kiểm tra script đã chạy thành công chưa, đặc biệt exit code và log download.</li>
+          </ol>
+          <p><strong>Fix:</strong> Chạy lại <code>download_data.sh</code> cho đúng taxi type và year, ví dụ <code>bash download_data.sh green 2021</code>.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">E4</span>GCS Access Denied<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Triệu chứng:</strong> <code>com.google.api.client.googleapis.json.GoogleJsonResponseException: 403 Forbidden</code>.</p>
+          <p><strong>Nguyên nhân gốc rễ:</strong> service account thiếu IAM role, keyfile path sai, active account không đúng, hoặc bucket name sai.</p>
+          <ol>
+            <li>Kiểm tra service account có <code>Storage Object Viewer</code> / <code>Storage Object Creator</code>.</li>
+            <li><code>gcloud auth list</code> để xem account nào đang active.</li>
+            <li>Kiểm tra path keyfile trong <code>core-site.xml</code> đúng và file tồn tại.</li>
+            <li>Kiểm tra bucket name đúng, không có trailing slash không cần thiết.</li>
+          </ol>
+          <p><strong>Fix:</strong> Grant IAM role đúng và export <code>GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json</code>, hoặc dùng service account attached với Dataproc/Workload Identity.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">E5</span>OOM — OutOfMemoryError<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Triệu chứng:</strong> <code>java.lang.OutOfMemoryError: Java heap space</code> / <code>GC overhead limit exceeded</code>.</p>
+          <p><strong>Nguyên nhân gốc rễ:</strong> <code>collect()</code> trả quá nhiều data về driver hoặc executor memory không đủ cho shuffle/join/sort.</p>
+          <ol>
+            <li>Spark UI -> Stages -> xem shuffle spill.</li>
+            <li>Spark UI -> Executors -> xem Memory Used.</li>
+            <li>Tìm <code>.collect()</code> trong code.</li>
+          </ol>
+          <div class="cmd-block"><div class="cmd-header"><span>oom fixes</span><span>python</span></div><div class="cmd-body"><pre># Thay collect() bằng write + take(n) để preview
+df.write.parquet(output_path)
+df.take(10)  # Preview nhẹ
+
+# Tăng executor memory nếu shuffle spill:
+spark.conf.set("spark.executor.memory", "4g")
+spark.conf.set("spark.executor.memoryOverhead", "512m")</pre></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">E6</span>BigQuery Connector Version Mismatch<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Triệu chứng:</strong> <code>ClassNotFoundException</code> / <code>NoSuchMethodError</code> liên quan BigQuery jar.</p>
+          <p><strong>Nguyên nhân gốc rễ:</strong> <code>spark-bigquery-latest_2.12.jar</code> không compatible với Spark/Scala version đang chạy.</p>
+          <ol>
+            <li><code>spark.version</code> để xem Spark version đang dùng.</li>
+            <li>Check connector compatibility matrix tại <code>github.com/GoogleCloudDataproc/spark-bigquery-connector</code>.</li>
+          </ol>
+          <p><strong>Fix:</strong> Dùng đúng jar cho Spark version; trên Dataproc 2.1+ thường không cần <code>--jars</code> vì connector đã pre-install.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">E7</span>spark-defaults.conf key sai<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p><strong>Triệu chứng:</strong> Spark không connect YARN dù đã config <code>spark-defaults.conf</code>.</p>
+          <p><strong>Nguyên nhân gốc rễ:</strong> Key <code>spark-master yarn</code> không phải key chuẩn; phải là <code>spark.master yarn</code>.</p>
+          <p><strong>Debug:</strong> <code>cat $SPARK_HOME/conf/spark-defaults.conf</code>, so sánh với Spark docs.</p>
+          <div class="cmd-block"><div class="cmd-header"><span>spark-defaults.conf</span><span>fix</span></div><div class="cmd-body"><pre># Sai (từ repo):
+spark-master    yarn
+
+# Đúng:
+spark.master    yarn</pre></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s7" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S7 · Interview Prep</div>
+        <div class="module-title">Interview Prep</div>
+        <div class="module-subtitle">Câu hỏi Spark batch theo cấp độ Junior, Mid và Senior. Click từng câu để mở câu trả lời.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">JR</span><span class="badge badge-blue">Junior</span><span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="practice-task"><div class="section-header" onclick="toggleSection(this)">Q1: Spark khác Hadoop MapReduce ở điểm gì?<span class="section-toggle">▶</span></div><div class="section-content" style="display:none"><p>Spark xử lý in-memory, chỉ ghi disk khi cần như shuffle/spill; MapReduce thường ghi disk sau mỗi step. Spark nhanh hơn nhiều với iterative algorithms và có DataFrame/SQL/Streaming API; MapReduce chỉ có map/reduce primitives.</p></div></div>
+          <div class="practice-task"><div class="section-header" onclick="toggleSection(this)">Q2: Transformation và Action trong Spark khác gì nhau? Cho ví dụ.<span class="section-toggle">▶</span></div><div class="section-content" style="display:none"><p>Transformation là lazy: <code>map</code>, <code>filter</code>, <code>select</code>, <code>groupBy</code>, <code>join</code> chỉ build DAG. Action trigger execution: <code>count()</code>, <code>show()</code>, <code>collect()</code>, <code>write()</code>. Spark không chạy gì cho đến khi gặp action.</p></div></div>
+          <div class="practice-task"><div class="section-header" onclick="toggleSection(this)">Q3: Parquet tốt hơn CSV ở điểm nào cho batch processing?<span class="section-toggle">▶</span></div><div class="section-content" style="display:none"><p>Parquet là columnar nên chỉ đọc columns cần; có row group statistics cho predicate pushdown; có built-in compression như Snappy/Gzip; self-describing schema; splittable để đọc parallel.</p></div></div>
+          <div class="practice-task"><div class="section-header" onclick="toggleSection(this)">Q4: repartition và coalesce khác gì nhau? Khi nào dùng cái nào?<span class="section-toggle">▶</span></div><div class="section-content" style="display:none"><p><code>repartition(n)</code> full shuffle, tạo n partitions đồng đều, dùng khi muốn tăng partitions hoặc phân phối lại đều. <code>coalesce(n)</code> thường narrow operation, merge partitions để giảm số partitions, nhanh hơn nhưng có thể uneven.</p></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">MID</span><span class="badge badge-orange">Mid</span><span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="practice-task"><div class="section-header" onclick="toggleSection(this)">Q5: Khi nào nên dùng DataFrame API, khi nào Spark SQL?<span class="section-toggle">▶</span></div><div class="section-content" style="display:none"><p>DataFrame API tốt cho chaining transformations phức tạp, programmatic column selection và logic gắn với code. Spark SQL tốt cho aggregation phức tạp, team quen SQL và reuse query logic. Về performance, cả hai compile xuống physical plan, nên không có winner tuyệt đối.</p></div></div>
+          <div class="practice-task"><div class="section-header" onclick="toggleSection(this)">Q6: Giải thích data flow từ CSV raw đến BigQuery trong module này.<span class="section-toggle">▶</span></div><div class="section-content" style="display:none"><p><code>download_data.sh</code> tải raw CSV.gz local -> <code>05_taxi_schema.ipynb</code> define schema, repartition 4, write Parquet -> <code>data/pq/</code> -> <code>06_spark_sql.py</code> union green/yellow, aggregate revenue, coalesce 1, write Parquet -> upload GCS -> <code>06_spark_sql_big_query.py</code> trên Dataproc đọc GCS Parquet, ghi BigQuery qua connector -> <code>trips_data_all.reports-YYYY</code>.</p></div></div>
+          <div class="practice-task"><div class="section-header" onclick="toggleSection(this)">Q7: Tại sao registerTempTable bị deprecated và nên dùng gì thay?<span class="section-toggle">▶</span></div><div class="section-content" style="display:none"><p><code>registerTempTable</code> bị deprecated từ Spark 2.0. Dùng <code>createOrReplaceTempView('name')</code> hoặc <code>createGlobalTempView('name')</code>. Global temp view tồn tại qua SparkSession, local temp view chỉ trong session.</p></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-quiz">SR</span><span class="badge badge-red">Senior</span><span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <div class="practice-task"><div class="section-header" onclick="toggleSection(this)">Q8: Giải thích tại sao UDF trong PySpark chậm. Có giải pháp nào?<span class="section-toggle">▶</span></div><div class="section-content" style="display:none"><p>Python UDF phá vỡ Catalyst optimization và phải serialize mỗi row qua JVM -> Python via Py4J -> Python process -> JVM. Giải pháp theo thứ tự: dùng built-in <code>pyspark.sql.functions</code>; dùng Pandas UDF vectorized Arrow-based; dùng Scala UDF nếu có thể; nếu bắt buộc Python UDF thì batch nhiều operations trong một UDF.</p></div></div>
+          <div class="practice-task"><div class="section-header" onclick="toggleSection(this)">Q9: Bạn sẽ diagnose và fix data skew như thế nào?<span class="section-toggle">▶</span></div><div class="section-content" style="display:none"><p>Detect trong Spark UI -> Stages -> task duration, khi vài tasks chạy lâu hơn median rất nhiều. Root cause thường là hot keys như NULL, unknown, hot users. Fix: xử lý NULL riêng, bật AQE <code>spark.sql.adaptive.skewJoin.enabled=true</code>, salting key để phân tán và replicate dimension table, hoặc repartition theo key khác. Salting hiệu quả nhưng phức tạp hơn.</p></div></div>
+          <div class="practice-task"><div class="section-header" onclick="toggleSection(this)">Q10: Design một production batch pipeline xử lý taxi data monthly. Cần gì ngoài repo?<span class="section-toggle">▶</span></div><div class="section-content" style="display:none"><p>Cần orchestration với DAG per month, idempotent partitioned writes, config/secrets management, schema evolution, data quality gates, structured logging với run_id/input_partition/row_counts, alerting khi fail hoặc row count anomaly, cost controls như spot workers/autoscaling/auto-delete, CI/CD cho PySpark code, lineage tracking và SLA monitoring.</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="s8" style="display:none">
+      <div class="module-header">
+        <div class="module-tag">S8 · Checklist & Wrap-up</div>
+        <div class="module-title">Checklist & Tổng kết</div>
+        <div class="module-subtitle">Tick đủ 20 mục để tự đánh giá mức sẵn sàng trước khi sang streaming.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">%</span>Progress tracker<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <p class="progress-text" id="checklist-progress-text">Hoàn thành: 0 / 20 items (0%)</p>
+          <div class="progress-bar"><div class="progress-fill" id="checklist-progress-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-practice">✓</span>Checklist — 20 items<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <h3 class="blue">Setup</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Cài Java 11/17 đúng, <code>JAVA_HOME</code> set, <code>java --version</code> không lỗi.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><code>pip install pyspark</code>, import pyspark trong Python không lỗi.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Tạo SparkSession <code>local[*]</code> thành công, <code>spark.version</code> hiện ra.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><code>download_data.sh</code> chạy được, có file CSV.gz trong <code>data/raw/</code>.</span></div>
+
+          <h3 class="green">Parquet Pipeline</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Đọc CSV với <code>StructType</code> schema, không infer, <code>printSchema</code> đúng types.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><code>repartition(n)</code> -> <code>write.parquet</code> -> <code>ls</code> cho thấy đúng n files <code>part-*.parquet</code>.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Đọc lại Parquet, <code>count()</code> khớp với CSV gốc.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Giải thích được trade-off <code>repartition</code> vs <code>coalesce</code> cho người khác.</span></div>
+
+          <h3 class="orange">Spark SQL</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Union green/yellow taxi qua common columns + <code>F.lit</code> service_type.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><code>registerTempTable</code> và chạy SQL query aggregate revenue thành công.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Hiểu khi nào DataFrame API vs Spark SQL, nêu được ít nhất 2 tiêu chí.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span><code>coalesce(1).write.parquet</code> để output 1 file và giải thích được vấn đề production.</span></div>
+
+          <h3 class="blue">Cloud</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Đọc được Parquet từ <code>gs://</code> bucket qua GCS connector.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Submit job lên Dataproc bằng <code>gcloud dataproc jobs submit pyspark</code>.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Ghi kết quả vào BigQuery table qua BigQuery connector.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Kiểm tra Spark History Server trên Dataproc Component Gateway.</span></div>
+
+          <h3 class="red">Production Mindset</h3>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Phát hiện được 3 security issues trong repo như hardcoded keys/credentials.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Đọc được Spark UI: xác định stage có shuffle, task với duration outlier.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Viết được <code>df.explain(True)</code> và giải thích ít nhất 2 operator trong physical plan.</span></div>
+          <div class="checklist-row"><div class="check-box" onclick="toggleCheck(this)"></div><span>Nêu được 4 thứ cần thêm nếu làm production: orchestration, quality checks, logging, alerts.</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header" onclick="toggleSection(this)"><span class="section-icon icon-summary">SUM</span>Tổng kết module<span class="section-toggle">▼</span></div>
+        <div class="section-content">
+          <table>
+            <thead><tr><th>Concept</th><th>Tool/API</th><th>Production gap</th></tr></thead>
+            <tbody>
+              <tr><td>Batch pipeline</td><td>SparkSession, DataFrameReader</td><td>Orchestration, incremental</td></tr>
+              <tr><td>Schema management</td><td>StructType</td><td>Schema evolution, registry</td></tr>
+              <tr><td>Transformations</td><td>DataFrame API, Spark SQL</td><td>Catalyst optimization</td></tr>
+              <tr><td>File format</td><td>Parquet, repartition</td><td>File sizing, bucketing</td></tr>
+              <tr><td>Cloud execution</td><td>Dataproc, GCS, BigQuery</td><td>IAM, autoscaling, cost</td></tr>
+              <tr><td>Debugging</td><td>Spark UI, explain()</td><td>APM, alerts, lineage</td></tr>
+            </tbody>
+          </table>
+          <table>
+            <thead><tr><th>File</th><th>Concept chính</th></tr></thead>
+            <tbody>
+              <tr><td><code>download_data.sh</code></td><td>Bash scripting, idempotency gap</td></tr>
+              <tr><td><code>04_pyspark.ipynb</code></td><td>SparkSession, schema, repartition, UDF</td></tr>
+              <tr><td><code>05_taxi_schema.ipynb</code></td><td>StructType, multi-month ingest loop</td></tr>
+              <tr><td><code>06_spark_sql.ipynb</code></td><td>Union, Spark SQL, date_trunc, aggregation</td></tr>
+              <tr><td><code>06_spark_sql.py</code></td><td>argparse, spark-submit, script-ify notebook</td></tr>
+              <tr><td><code>06_spark_sql_big_query.py</code></td><td>BigQuery connector, temporaryGcsBucket</td></tr>
+              <tr><td><code>07_groupby_join.ipynb</code></td><td>GroupBy agg, join types, shuffle</td></tr>
+              <tr><td><code>08_rdds.ipynb</code></td><td>RDD API, reduceByKey, mapPartitions</td></tr>
+              <tr><td><code>09_spark_gcs.ipynb</code></td><td>GCS connector config, hadoopConf</td></tr>
+              <tr><td><code>cloud.md</code></td><td>Standalone cluster, Dataproc, deployment flow</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box note"><span><strong>Module tiếp theo:</strong> Streaming với Kafka và Spark Structured Streaming. <a href="Module07_Streaming.html">Module07_Streaming.html</a></span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const modules=document.querySelectorAll('.module');
+const navItems=document.querySelectorAll('.nav-item');
+
+function showModule(index){
+  modules.forEach(m=>{m.classList.remove('active');m.style.display='none'});
+  navItems.forEach(i=>i.classList.remove('active'));
+  const target=document.getElementById(`s${index}`);
+  if(target){target.classList.add('active');target.style.display='block'}
+  if(navItems[index])navItems[index].classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function toggleSection(id){
+  const header=typeof id==='string'?document.getElementById(id):id;
+  if(!header)return;
+  const content=header.nextElementSibling;
+  const toggle=header.querySelector('.section-toggle');
+  if(!content)return;
+  const isHidden=content.style.display==='none';
+  content.style.display=isHidden?'block':'none';
+  if(toggle)toggle.textContent=isHidden?'▼':'▶';
+}
+
+function answerQuiz(qId, ans, correct){
+  const item=document.getElementById(qId) || (ans && ans.closest ? ans.closest('.quiz-item') : null);
+  if(!item)return;
+  const opts=item.querySelectorAll('.quiz-opt');
+  const explain=item.querySelector('.quiz-explain');
+  opts.forEach(opt=>{opt.style.pointerEvents='none'});
+  if(ans && ans.classList)ans.classList.add(correct?'correct':'wrong');
+  if(!correct){
+    opts.forEach(opt=>{
+      const call=opt.getAttribute('onclick') || '';
+      if(call.includes('true'))opt.classList.add('correct');
+    });
+  }
+  if(explain){
+    explain.textContent=(correct?'Đúng! ':'Sai. ')+explain.textContent;
+    explain.classList.add('show');
+  }
+}
+
+function toggleSolution(taskId){
+  const box=typeof taskId==='string'?document.getElementById(taskId):taskId?.nextElementSibling;
+  if(!box)return;
+  box.classList.toggle('show');
+}
+
+function switchTab(group, name){
+  const groupEl=document.getElementById(group);
+  if(!groupEl)return;
+  groupEl.querySelectorAll('.tab').forEach(tab=>tab.classList.remove('active'));
+  groupEl.querySelectorAll(`[data-tab="${name}"]`).forEach(tab=>tab.classList.add('active'));
+  document.querySelectorAll(`[data-tab-group="${group}"]`).forEach(panel=>panel.classList.remove('active'));
+  const target=document.getElementById(name);
+  if(target)target.classList.add('active');
+}
+
+function toggleCheck(itemId){
+  const item=typeof itemId==='string'?document.getElementById(itemId):itemId;
+  if(!item)return;
+  item.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress(){
+  const checks=document.querySelectorAll('.check-box');
+  const checked=document.querySelectorAll('.check-box.checked').length;
+  const total=checks.length;
+  const pct=total===0?0:Math.round((checked/total)*100);
+  const fill=document.getElementById('checklist-progress-fill');
+  const text=document.getElementById('checklist-progress-text');
+  if(fill)fill.style.width=`${pct}%`;
+  if(text)text.textContent=`Hoàn thành: ${checked} / ${total} items (${pct}%)`;
+}
+
+showModule(0);
+updateProgress();
+</script>
+</body>
+</html>

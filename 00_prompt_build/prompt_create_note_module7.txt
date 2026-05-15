@@ -1,0 +1,364 @@
+Đọc TOÀN BỘ các file sau trong data-engineering-zoomcamp/07-streaming/:
+
+ROOT:
+- .gitignore
+- README.md
+
+WORKSHOP:
+- workshop/.python-version
+- workshop/README.md
+- workshop/docker-compose.yml
+- workshop/Dockerfile.flink
+- workshop/Dockerfile_ARM64.flink
+- workshop/flink-config.yaml
+- workshop/Makefile
+- workshop/pyproject.toml
+- workshop/pyproject.flink.toml
+- workshop/uv.lock
+- workshop/src/models.py
+- workshop/src/producers/producer.py
+- workshop/src/producers/producer_realtime.py
+- workshop/src/consumers/consumer.py
+- workshop/src/consumers/consumer_postgres.py
+- workshop/src/job/pass_through_job.py
+- workshop/src/job/aggregation_job.py
+- workshop/src/job/aggregation_job_demo.py
+
+WORKSHOP - LIVE:
+- workshop/live/.gitignore
+- workshop/live/.python-version
+- workshop/live/README.md
+- workshop/live/docker-compose.yaml
+- workshop/live/Dockerfile.flink
+- workshop/live/flink-config.yaml
+- workshop/live/main.py
+- workshop/live/pyproject.toml
+- workshop/live/pyproject.flink.toml
+- workshop/live/uv.lock
+- workshop/live/notebooks/models.py
+- workshop/live/notebooks/producer.ipynb
+- workshop/live/notebooks/consumer_db.ipynb
+- workshop/live/src/producers/models.py
+- workshop/live/src/producers/producer_realtime.py
+- workshop/live/src/job/pass_through_job.py
+- workshop/live/src/job/aggregation_job.py
+
+EXTRAS - ROOT:
+- extras/README.md
+
+EXTRAS - KSQLDB:
+- extras/ksqldb/commands.md
+
+EXTRAS - PYFLINK:
+- extras/pyflink/.gitignore
+- extras/pyflink/README.md
+- extras/pyflink/homework.md
+- extras/pyflink/docker-compose.yml
+- extras/pyflink/Dockerfile.flink
+- extras/pyflink/Makefile
+- extras/pyflink/requirements.txt
+- extras/pyflink/LICENSE
+- extras/pyflink/src/producers/load_taxi_data.py
+- extras/pyflink/src/producers/producer.py
+- extras/pyflink/src/job/start_job.py
+- extras/pyflink/src/job/taxi_job.py
+- extras/pyflink/src/job/aggregation_job.py
+
+EXTRAS - PYTHON ROOT:
+- extras/python/README.md
+- extras/python/requirements.txt
+
+EXTRAS - PYTHON JSON EXAMPLE:
+- extras/python/json_example/settings.py
+- extras/python/json_example/ride.py
+- extras/python/json_example/producer.py
+- extras/python/json_example/consumer.py
+
+EXTRAS - PYTHON AVRO EXAMPLE:
+- extras/python/avro_example/settings.py
+- extras/python/avro_example/ride_record.py
+- extras/python/avro_example/ride_record_key.py
+- extras/python/avro_example/producer.py
+- extras/python/avro_example/consumer.py
+
+EXTRAS - PYTHON REDPANDA EXAMPLE:
+- extras/python/redpanda_example/README.md
+- extras/python/redpanda_example/docker-compose.yaml
+- extras/python/redpanda_example/settings.py
+- extras/python/redpanda_example/ride.py
+- extras/python/redpanda_example/producer.py
+- extras/python/redpanda_example/consumer.py
+
+EXTRAS - PYTHON DOCKER:
+- extras/python/docker/README.md
+- extras/python/docker/docker-compose.yml
+- extras/python/docker/kafka/docker-compose.yml
+- extras/python/docker/spark/docker-compose.yml
+- extras/python/docker/spark/build.sh
+- extras/python/docker/spark/cluster-base.Dockerfile
+- extras/python/docker/spark/spark-base.Dockerfile
+- extras/python/docker/spark/spark-master.Dockerfile
+- extras/python/docker/spark/spark-worker.Dockerfile
+- extras/python/docker/spark/jupyterlab.Dockerfile
+
+EXTRAS - PYTHON RESOURCES:
+- extras/python/resources/schemas/taxi_ride_key.avsc
+- extras/python/resources/schemas/taxi_ride_value.avsc
+
+EXTRAS - PYTHON STREAMS EXAMPLE - FAUST:
+- extras/python/streams-example/faust/taxi_rides.py
+- extras/python/streams-example/faust/producer_taxi_json.py
+- extras/python/streams-example/faust/stream.py
+- extras/python/streams-example/faust/branch_price.py
+- extras/python/streams-example/faust/stream_count_vendor_trips.py
+- extras/python/streams-example/faust/windowing.py
+
+EXTRAS - PYTHON STREAMS EXAMPLE - PYSPARK:
+- extras/python/streams-example/pyspark/README.md
+- extras/python/streams-example/pyspark/settings.py
+- extras/python/streams-example/pyspark/producer.py
+- extras/python/streams-example/pyspark/consumer.py
+- extras/python/streams-example/pyspark/streaming.py
+- extras/python/streams-example/pyspark/streaming-notebook.ipynb
+- extras/python/streams-example/pyspark/spark-submit.sh
+
+EXTRAS - PYTHON STREAMS EXAMPLE - REDPANDA:
+- extras/python/streams-example/redpanda/README.md
+- extras/python/streams-example/redpanda/docker-compose.yaml
+- extras/python/streams-example/redpanda/settings.py
+- extras/python/streams-example/redpanda/producer.py
+- extras/python/streams-example/redpanda/consumer.py
+- extras/python/streams-example/redpanda/streaming.py
+- extras/python/streams-example/redpanda/streaming-notebook.ipynb
+- extras/python/streams-example/redpanda/spark-submit.sh
+
+THEORY:
+- theory/README.md
+
+THEORY - JAVA KAFKA EXAMPLES - BUILD/CONFIG:
+- theory/java/kafka_examples/.gitignore
+- theory/java/kafka_examples/build.gradle
+- theory/java/kafka_examples/settings.gradle
+- theory/java/kafka_examples/gradlew
+- theory/java/kafka_examples/gradlew.bat
+- theory/java/kafka_examples/gradle/wrapper/gradle-wrapper.properties
+- theory/java/kafka_examples/gradle/wrapper/gradle-wrapper.jar
+
+THEORY - JAVA KAFKA EXAMPLES - AVRO/RESOURCES:
+- theory/java/kafka_examples/src/main/avro/rides.avsc
+- theory/java/kafka_examples/src/main/avro/rides_compatible.avsc
+- theory/java/kafka_examples/src/main/avro/rides_non_compatible.avsc
+- theory/java/kafka_examples/src/main/resources/rides.csv
+
+THEORY - JAVA KAFKA EXAMPLES - MAIN JAVA:
+- theory/java/kafka_examples/src/main/java/org/example/Topics.java
+- theory/java/kafka_examples/src/main/java/org/example/Secrets.java
+- theory/java/kafka_examples/src/main/java/org/example/JsonProducer.java
+- theory/java/kafka_examples/src/main/java/org/example/JsonProducerPickupLocation.java
+- theory/java/kafka_examples/src/main/java/org/example/JsonConsumer.java
+- theory/java/kafka_examples/src/main/java/org/example/JsonKStream.java
+- theory/java/kafka_examples/src/main/java/org/example/JsonKStreamJoins.java
+- theory/java/kafka_examples/src/main/java/org/example/JsonKStreamWindow.java
+- theory/java/kafka_examples/src/main/java/org/example/AvroProducer.java
+- theory/java/kafka_examples/src/main/java/org/example/data/Ride.java
+- theory/java/kafka_examples/src/main/java/org/example/data/PickupLocation.java
+- theory/java/kafka_examples/src/main/java/org/example/data/VendorInfo.java
+- theory/java/kafka_examples/src/main/java/org/example/customserdes/CustomSerdes.java
+
+THEORY - JAVA KAFKA EXAMPLES - TESTS:
+- theory/java/kafka_examples/src/test/java/org/example/JsonKStreamTest.java
+- theory/java/kafka_examples/src/test/java/org/example/JsonKStreamJoinsTest.java
+- theory/java/kafka_examples/src/test/java/org/example/helper/DataGeneratorHelper.java
+
+THEORY - JAVA KAFKA EXAMPLES - GENERATED AVRO JAVA:
+- theory/java/kafka_examples/build/generated-main-avro-java/schemaregistry/RideRecord.java
+- theory/java/kafka_examples/build/generated-main-avro-java/schemaregistry/RideRecordCompatible.java
+- theory/java/kafka_examples/build/generated-main-avro-java/schemaregistry/RideRecordNoneCompatible.java
+
+Sau khi đọc xong TOÀN BỘ, tạo file repo_notes_M07.md:
+
+═══════════════════════════════
+1. CẤU TRÚC THƯ MỤC
+═══════════════════════════════
+Tree đầy đủ + mục đích từng folder và file.
+
+Phải làm rõ các nhóm chính:
+- workshop: pipeline streaming thực hành với Kafka/Redpanda, Flink, Postgres
+- workshop/live: biến thể live/demo của workshop
+- extras/python: Kafka/Redpanda producer-consumer, JSON, Avro, Spark/Faust examples
+- extras/pyflink: PyFlink jobs và producer data
+- extras/ksqldb: lệnh ksqlDB
+- theory/java/kafka_examples: Kafka Java producer/consumer, Kafka Streams, Avro, tests
+
+═══════════════════════════════
+2. NỘI DUNG CÁC FILE .MD
+═══════════════════════════════
+Tóm tắt từng file .md theo format:
+[Tên file]
+- Dạy về: [topic]
+- Concepts chính: [list]
+- Commands được dùng: [list commands thực tế]
+- Services/tools liên quan: [Kafka, Redpanda, Flink, PyFlink, Spark, Faust, ksqlDB...]
+- Lưu ý đặc biệt: [nếu có]
+
+═══════════════════════════════
+3. PHÂN TÍCH CODE FILES & CONFIGS
+═══════════════════════════════
+Với mỗi file code/config, ghi rõ:
+
+[docker-compose.yml / docker-compose.yaml]
+- Services: tên, image/build, ports, volumes, env vars, networks, depends_on
+- Kafka/Redpanda listeners, advertised listeners, broker config
+- Flink JobManager/TaskManager config
+- Postgres/Adminer/pgAdmin config nếu có
+- Copy nguyên văn toàn bộ file
+
+[Dockerfile.flink / Dockerfile_ARM64.flink / Spark Dockerfiles]
+- Base image
+- Packages/dependencies được cài
+- Python/Flink/Spark connector jars
+- Env vars, user, working directory, entrypoint/CMD
+- Copy nguyên văn toàn bộ file
+
+[flink-config.yaml]
+- JobManager/TaskManager config
+- Parallelism, checkpointing/state/backend nếu có
+- Copy nguyên văn toàn bộ file
+
+[Makefile / build.sh / spark-submit.sh / gradlew / gradlew.bat]
+- Target/command chính
+- Cách build, run, submit job, start services
+- Arguments và env vars
+- Copy nguyên văn toàn bộ file
+
+[pyproject.toml / pyproject.flink.toml / requirements.txt / uv.lock / build.gradle / settings.gradle]
+- Dependencies/plugins list
+- Version quan trọng
+- Kafka/Flink/Spark/Avro/Schema Registry libraries
+- Copy nguyên văn toàn bộ file
+
+[Python producer files]
+- Topic ghi vào
+- Data source / model được serialize
+- Serialization format: JSON, Avro, Pydantic/model dict
+- Kafka/Redpanda config: bootstrap servers, key/value serializer, schema registry nếu có
+- Logic chính từng bước
+- Copy nguyên văn toàn bộ file
+
+[Python consumer files]
+- Topic đọc từ
+- Consumer group, offset behavior
+- Deserialization format
+- Sink đích: console, Postgres, dataframe, notebook...
+- Logic chính từng bước
+- Copy nguyên văn toàn bộ file
+
+[PyFlink/Flink job files]
+- Source connector: Kafka/Redpanda topic, schema, watermark nếu có
+- Transformations: map/filter/window/group/aggregate
+- Sink connector: Kafka/Postgres/print/file nếu có
+- Checkpoint/state/parallelism nếu có
+- Table API vs DataStream API
+- Copy nguyên văn toàn bộ file
+
+[Spark/Faust streaming files]
+- Source topics
+- Stream processing logic
+- Windowing, joins, aggregation, branching
+- Output topics/sinks
+- Copy nguyên văn toàn bộ file
+
+[Java Kafka Producer/Consumer files]
+- Class purpose
+- Topics used
+- Producer/consumer properties
+- Serdes used: String, JSON custom Serde, Avro
+- Schema Registry usage nếu có
+- Logic chính từng bước
+- Copy nguyên văn toàn bộ file
+
+[Java Kafka Streams files]
+- Topology: source stream/table, transforms, joins, windows, aggregations, sinks
+- State stores/window stores nếu có
+- Serdes và key/value types
+- Test topology nếu có
+- Copy nguyên văn toàn bộ file
+
+[Avro schema files .avsc]
+- Record name, namespace
+- Fields: name, type, nullable/default
+- Compatibility implications giữa rides.avsc, rides_compatible.avsc, rides_non_compatible.avsc
+- Copy nguyên văn toàn bộ file
+
+[CSV/resource files]
+- Columns
+- Sample records
+- File được code nào sử dụng
+- Nếu file quá lớn: copy header + 20 dòng đầu + mô tả tổng số dòng
+
+[Notebook .ipynb]
+- Mục đích notebook
+- Các cell chính và logic
+- Packages/imports
+- Topic/source/sink được dùng
+- Không cần copy toàn bộ JSON notebook nếu quá dài; nhưng phải tóm tắt từng cell quan trọng và copy các đoạn code cell chính
+
+[Binary files như gradle-wrapper.jar]
+- Không copy nội dung nhị phân
+- Ghi rõ path, mục đích, size nếu đọc được
+
+═══════════════════════════════
+4. DATA FLOW THỰC TẾ
+═══════════════════════════════
+- Flow đầy đủ từng pipeline: data đi từ đâu → qua broker/topic nào → qua processor nào → sink đích nào
+- Topic lineage: producer nào ghi topic nào, consumer/job nào đọc topic nào
+- File nào trigger/chạy file nào
+- Thứ tự chạy đúng: docker compose → producer → streaming job → consumer/sink
+- Dependency giữa các services: Kafka/Redpanda, Schema Registry nếu có, Flink, Spark, Postgres
+- Phân biệt rõ:
+  - workshop flow
+  - workshop/live flow
+  - extras/python JSON flow
+  - extras/python Avro flow
+  - extras/python Redpanda flow
+  - extras/pyflink flow
+  - theory/java Kafka Streams flow
+
+═══════════════════════════════
+5. ĐIỂM YẾU & THIẾU SÓT
+═══════════════════════════════
+- Security issues trong code/config thực tế: hardcode broker URL, credentials, secrets, plaintext config
+- Delivery semantics gaps: at-most-once / at-least-once / exactly-once, idempotent producer, transactions
+- Offset management issues
+- Schema evolution / compatibility issues
+- Checkpointing/state recovery gaps trong Flink/Spark
+- Backpressure, retries, DLQ, poison message handling
+- Data quality and validation gaps
+- Observability gaps: metrics, logs, tracing, lag monitoring, alerting
+- Production readiness gaps: scaling, partitioning, replication factor, retention, compaction
+- Testing gaps: unit tests, integration tests, Testcontainers, topology tests
+- Những gì repo dạy nhưng không đủ cho Senior DE
+
+═══════════════════════════════
+6. KIẾN THỨC NGOÀI REPO
+═══════════════════════════════
+Dựa trên những gì repo đang cover, liệt kê những concept Senior Data Engineer phải biết nhưng repo KHÔNG dạy đủ:
+- Kafka/Redpanda internals: [broker, partition, replication, ISR, controller/KRaft, retention, compaction...]
+- Kafka producer/consumer advanced: [acks, retries, idempotence, batching, compression, consumer groups, rebalance...]
+- Schema Registry & Avro: [compatibility modes, evolution strategy, subject naming, Protobuf/JSON Schema...]
+- Kafka Streams: [state stores, changelog topics, standby replicas, exactly-once, interactive queries...]
+- Flink/PyFlink: [checkpointing, savepoints, event time, watermarks, state backend, fault tolerance, deployment...]
+- Spark Structured Streaming: [trigger, watermark, output mode, checkpoint, state store, late data...]
+- Streaming architecture: [Lambda/Kappa, CDC, outbox pattern, event sourcing, stream-table duality...]
+- Production operations: [monitoring lag, capacity planning, partition strategy, autoscaling, incident response...]
+- Testing streaming systems: [contract tests, replay tests, deterministic topology tests, integration tests...]
+
+Lưu file: repo_notes_M07.md
+
+QUAN TRỌNG:
+- Copy nguyên văn toàn bộ nội dung các file code/config/text được liệt kê, trừ file nhị phân và notebook quá dài như quy định ở trên
+- Không tóm tắt bỏ qua bất kỳ dòng code nào trong file code/config thông thường
+- Không bỏ qua file nào trong danh sách trên
+- Với các file trùng ý tưởng giữa workshop và workshop/live, vẫn phân tích riêng từng file theo đúng path
+- Với generated Avro Java files, vẫn đọc và tóm tắt vai trò; copy nguyên văn nếu kích thước hợp lý
+- Mục tiêu: đọc file notes này là hiểu hoàn toàn module 07-streaming mà không cần mở repo
